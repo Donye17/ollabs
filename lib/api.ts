@@ -37,3 +37,48 @@ export async function query<T = any>(sql: string, params: any[] = []): Promise<T
     const data = await response.json();
     return data.result;
 }
+
+// Social Features
+export async function getFrameLikes(frameId: string) {
+    return query(`SELECT COUNT(*) as count FROM frame_likes WHERE frame_id = $1`, [frameId]);
+}
+
+export async function hasUserLikedFrame(frameId: string, userId: string) {
+    const result = await query(`SELECT 1 FROM frame_likes WHERE frame_id = $1 AND user_id = $2`, [frameId, userId]);
+    return result.length > 0;
+}
+
+export async function toggleLikeFrame(frameId: string, userId: string) {
+    // Check if liked first
+    const hasLiked = await hasUserLikedFrame(frameId, userId);
+
+    if (hasLiked) {
+        // Unlike
+        await query(`DELETE FROM frame_likes WHERE frame_id = $1 AND user_id = $2`, [frameId, userId]);
+        return false;
+    } else {
+        // Like
+        await query(`INSERT INTO frame_likes (frame_id, user_id) VALUES ($1, $2)`, [frameId, userId]);
+        return true;
+    }
+}
+
+export async function getFrameComments(frameId: string) {
+    // Join with user_profiles to get name/avatar
+    // Note: We use LEFT JOIN in case the user profile is missing for some reason
+    return query(`
+        SELECT c.*, u.name as user_name, u.image as user_image 
+        FROM frame_comments c 
+        LEFT JOIN user_profiles u ON c.user_id = u.id 
+        WHERE c.frame_id = $1 
+        ORDER BY c.created_at ASC
+    `, [frameId]);
+}
+
+export async function addFrameComment(frameId: string, userId: string, content: string) {
+    return query(`
+        INSERT INTO frame_comments (frame_id, user_id, content) 
+        VALUES ($1, $2, $3) 
+        RETURNING *
+    `, [frameId, userId, content]);
+}

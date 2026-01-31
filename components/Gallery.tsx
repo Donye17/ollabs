@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { query } from '../lib/api';
 import { FrameRendererFactory } from './renderer/FrameRendererFactory';
 import { FrameConfig, FrameType } from '../types';
-import { Loader2, UserCircle2, Copy } from 'lucide-react';
+import { Loader2, UserCircle2, Copy, MessageSquare, Heart } from 'lucide-react';
 import { CANVAS_SIZE } from '../constants';
+import { LikeButton } from './social/LikeButton';
+import { CommentSection } from './social/CommentSection';
 
 interface GalleryProps {
     onSelectFrame: (frame: FrameConfig) => void;
@@ -91,6 +93,7 @@ const GalleryCard: React.FC<{ frame: PublishedFrame, onSelect: () => void }> = (
     // Generate a mini preview using the existing renderer logic
     // We can reuse the same canvas rendering logic or just create a small canvas
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
+    const [showComments, setShowComments] = useState(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -122,7 +125,7 @@ const GalleryCard: React.FC<{ frame: PublishedFrame, onSelect: () => void }> = (
     }, [frame.config]);
 
     return (
-        <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden hover:border-blue-500/50 transition-all hover:shadow-xl hover:shadow-blue-500/10 group">
+        <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden hover:border-blue-500/50 transition-all hover:shadow-xl hover:shadow-blue-500/10 group flex flex-col">
             <div className="aspect-square bg-slate-950 relative flex items-center justify-center p-4">
                 <canvas
                     ref={canvasRef}
@@ -141,12 +144,36 @@ const GalleryCard: React.FC<{ frame: PublishedFrame, onSelect: () => void }> = (
                 </div>
             </div>
 
-            <div className="p-4">
-                <h3 className="font-bold text-white truncate">{frame.name}</h3>
-                <div className="flex items-center gap-2 mt-2 text-sm text-slate-400">
-                    <UserCircle2 size={16} />
-                    <span>{frame.creator_name}</span>
+            <div className="p-4 bg-slate-900 flex-1">
+                <div className="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 className="font-bold text-white truncate">{frame.name}</h3>
+                        <div className="flex items-center gap-2 mt-1 text-sm text-slate-400">
+                            <UserCircle2 size={16} />
+                            <span>{frame.creator_name}</span>
+                        </div>
+                    </div>
                 </div>
+
+                <p className="text-xs text-slate-500 mb-4 line-clamp-2">{frame.description}</p>
+
+                <div className="flex items-center justify-between border-t border-slate-800 pt-3 mt-auto">
+                    <LikeButton frameId={frame.id.toString()} />
+
+                    <button
+                        onClick={() => setShowComments(!showComments)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors ${showComments ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+                    >
+                        <MessageSquare size={16} />
+                        <span className="text-sm font-medium">Comments</span>
+                    </button>
+                </div>
+
+                {showComments && (
+                    <div className="mt-4 border-t border-slate-800 pt-4 animate-in slide-in-from-top-2 duration-300">
+                        <CommentSection frameId={frame.id.toString()} />
+                    </div>
+                )}
             </div>
         </div>
     );
