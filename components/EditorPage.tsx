@@ -101,18 +101,12 @@ export const EditorPage: React.FC = () => {
                             onPreviewUpdate={handlePreviewUpdate}
                         />
 
-                        <div className="mt-8 p-4 bg-slate-800/30 rounded-lg border border-slate-800 text-sm text-slate-400 max-w-md">
-                            <div className="flex gap-3">
-                                <AlertCircle className="shrink-0 text-blue-400" size={20} />
-                                <p>
-                                    Drag & Drop a photo or use the upload button. Pinch to zoom. The final image will be a high-resolution square.
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Mobile Preview (Hidden on Desktop, shown on Mobile below editor) */}
-                        <div className="lg:hidden w-full mt-12 border-t border-slate-800 pt-8">
-                            <ContactPreview previewSrc={previewDataUrl} />
+                        {/* Info Box */}
+                        <div className="mt-8 p-4 bg-blue-900/10 rounded-xl border border-blue-500/20 text-sm text-blue-200 max-w-md flex gap-3 items-start">
+                            <AlertCircle className="shrink-0 text-blue-400 mt-0.5" size={18} />
+                            <p>
+                                <strong>Tip:</strong> Drag & Drop a photo to start. Pinch to zoom/pan.
+                            </p>
                         </div>
                     </div>
 
@@ -158,11 +152,19 @@ export const EditorPage: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Mobile Only: Preview at the bottom */}
+                    <div className="lg:hidden col-span-1 md:col-span-2 lg:col-span-12 w-full border-t border-slate-800 pt-12 pb-8 mt-8">
+                        <h3 className="text-center text-slate-400 text-sm uppercase tracking-wider font-bold mb-6">Final Preview</h3>
+                        <div className="flex justify-center">
+                            <ContactPreview previewSrc={previewDataUrl} />
+                        </div>
+                    </div>
+
                 </div>
             </main>
 
             <footer className="py-8 text-center text-slate-600 text-sm">
-                <p>&copy; {new Date().getFullYear()} Ollabs. All processing happens locally on your device.</p>
+                <p>&copy; {new Date().getFullYear()} Ollabs. Designed & Built for the Community.</p>
             </footer>
         </div>
     );

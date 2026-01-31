@@ -78,8 +78,15 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame }) => {
             </div>
 
             {frames.length === 0 && (
-                <div className="text-center py-12 bg-slate-900/50 rounded-2xl border border-slate-800">
-                    <p className="text-slate-500">No frames yet. Be the first to publish one!</p>
+                <div className="text-center py-20 bg-slate-900/30 rounded-3xl border border-slate-800 border-dashed">
+                    <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Loader2 className="text-slate-600" size={32} />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">No frames yet</h3>
+                    <p className="text-slate-400 mb-6 max-w-sm mx-auto">Be the first to publish a verified design to the community gallery.</p>
+                    <a href="/" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-6 rounded-full transition-all">
+                        Create Masterpiece
+                    </a>
                 </div>
             )}
         </div>
