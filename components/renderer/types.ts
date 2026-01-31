@@ -1,4 +1,4 @@
-import { FrameConfig } from '../../types';
+import { FrameConfig } from '@/lib/types';
 
 export interface RenderContext {
     ctx: CanvasRenderingContext2D;

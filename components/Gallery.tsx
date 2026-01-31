@@ -1,9 +1,10 @@
+"use client";
 import React, { useEffect, useState } from 'react';
-import { query } from '../lib/api';
+
 import { FrameRendererFactory } from './renderer/FrameRendererFactory';
-import { FrameConfig, FrameType } from '../types';
+import { FrameConfig, FrameType } from '@/lib/types';
 import { Loader2, UserCircle2, Copy, MessageSquare, Heart } from 'lucide-react';
-import { CANVAS_SIZE } from '../constants';
+import { CANVAS_SIZE } from '@/lib/constants';
 import { LikeButton } from './social/LikeButton';
 import { CommentSection } from './social/CommentSection';
 
@@ -29,19 +30,15 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame }) => {
             try {
                 // TODO: Update query when we have user profiles table. 
                 // For now, fetching frames and mocking user name if missing
-                const sql = `
-                    SELECT * FROM frames 
-                    WHERE is_public = true 
-                    ORDER BY created_at DESC 
-                    LIMIT 20
-                `;
-                const result = await query(sql);
+                const response = await fetch('/api/frames?limit=20');
+                if (!response.ok) throw new Error('Failed to fetch frames');
+
+                const result = await response.json();
 
                 // Parse the config JSON for each row
                 const parsedFrames = result.map((row: any) => ({
                     ...row,
                     config: typeof row.config === 'string' ? JSON.parse(row.config) : row.config,
-                    creator_name: 'Community Member' // Placeholder until we join users
                 }));
 
                 setFrames(parsedFrames);

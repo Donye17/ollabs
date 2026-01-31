@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 import { SignIn } from './SignIn';
 import { SignUp } from './SignUp';

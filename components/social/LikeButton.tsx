@@ -1,6 +1,6 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
-import { getFrameLikes, hasUserLikedFrame, toggleLikeFrame } from '../../lib/api';
 import { authClient } from '../../lib/auth-client';
 
 interface LikeButtonProps {
@@ -16,13 +16,10 @@ export const LikeButton: React.FC<LikeButtonProps> = ({ frameId }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const countResult = await getFrameLikes(frameId);
-                setLikes(parseInt(countResult[0]?.count || '0'));
-
-                if (session?.user?.id) {
-                    const liked = await hasUserLikedFrame(frameId, session.user.id);
-                    setIsLiked(liked);
-                }
+                const res = await fetch(`/api/frames/likes?frameId=${frameId}&userId=${session?.user?.id || ''}`);
+                const data = await res.json();
+                setLikes(data.count);
+                if (session?.user?.id) setIsLiked(data.userLiked);
             } catch (error) {
                 console.error("Error fetching likes:", error);
             }
@@ -43,12 +40,15 @@ export const LikeButton: React.FC<LikeButtonProps> = ({ frameId }) => {
         setLikes(prev => isLiked ? prev - 1 : prev + 1);
 
         try {
-            await toggleLikeFrame(frameId, session.user.id);
+            await fetch('/api/frames/likes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ frameId, userId: session.user.id })
+            });
         } catch (error) {
-            // Revert on error
+            // Revert
             setIsLiked(previousIsLiked);
             setLikes(previousLikes);
-            console.error("Error toggling like:", error);
         } finally {
             setLoading(false);
         }

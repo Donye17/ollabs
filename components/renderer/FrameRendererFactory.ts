@@ -1,5 +1,5 @@
 
-import { FrameType } from '../../types';
+import { FrameType } from '@/lib/types';
 import { IFrameRenderer, RenderContext } from './types';
 import {
     CircleRenderer,

@@ -1,0 +1,9 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/frames/comments/route": "/api/frames/comments",
+  "/api/frames/likes/route": "/api/frames/likes",
+  "/api/frames/route": "/api/frames",
+  "/gallery/page": "/gallery",
+  "/page": "/"
+}

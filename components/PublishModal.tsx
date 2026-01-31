@@ -1,7 +1,8 @@
+"use client";
 import React, { useState } from 'react';
 import { Loader2, X, Globe, Lock, Share2 } from 'lucide-react';
-import { query } from '../lib/api';
-import { FrameConfig } from '../types';
+
+import { FrameConfig } from '@/lib/types';
 import { authClient } from '../lib/auth-client';
 
 interface PublishModalProps {
@@ -36,21 +37,23 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
             // creator_id is mostly likely the user_id from auth, handled by backend or passed explicitly if RLS allows
             // We'll pass the user ID from session for now.
 
-            const sql = `
-                INSERT INTO frames (creator_id, name, description, config, is_public)
-                VALUES ($1, $2, $3, $4, $5)
-                RETURNING id;
-            `;
+            const response = await fetch('/api/frames', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name, // Changed from frameName to name
+                    description,
+                    config: frameConfig,
+                    creator_id: session.user.id,
+                    creator_name: session.user.name || 'Anonymous',
+                    is_public: isPublic // Changed from true to isPublic
+                })
+            });
 
-            const params = [
-                session.user.id,
-                name,
-                description,
-                JSON.stringify(frameConfig),
-                isPublic
-            ];
+            if (!response.ok) throw new Error('Failed to publish frame');
+            const result = await response.json();
 
-            await query(sql, params);
+            console.log("Published frame ID:", result.id);
             setSuccess(true);
 
             // Close after delay

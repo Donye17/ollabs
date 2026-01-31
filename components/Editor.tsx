@@ -1,7 +1,8 @@
+"use client";
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Download, Upload, ZoomIn, ZoomOut, RefreshCcw, Image as ImageIcon, Maximize, RotateCw, Share2 } from 'lucide-react';
-import { CANVAS_SIZE, DISPLAY_SIZE } from '../constants';
-import { FrameConfig, FrameType, Position } from '../types';
+import { CANVAS_SIZE, DISPLAY_SIZE } from '@/lib/constants';
+import { FrameConfig, FrameType, Position } from '@/lib/types';
 import { FrameRendererFactory } from './renderer/FrameRendererFactory';
 import { PublishModal } from './PublishModal';
 import { authClient } from '../lib/auth-client';

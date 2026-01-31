@@ -1,7 +1,9 @@
+"use client";
 import React, { useState } from 'react';
 import { authClient } from '../lib/auth-client';
 import { AuthModal } from './auth/AuthModal';
-import { UserCircle, LogOut, LayoutGrid, Plus } from 'lucide-react';
+import Link from 'next/link';
+import { UserCircle, LogOut } from 'lucide-react';
 
 export const NavBar: React.FC = () => {
     const { data: session } = authClient.useSession();
@@ -20,10 +22,20 @@ export const NavBar: React.FC = () => {
                 <div className="flex items-center gap-4">
                     {session ? (
                         <div className="flex items-center gap-4">
-                            <button className="flex items-center gap-2 px-3 py-1.5 text-slate-400 hover:text-white transition-colors">
-                                <LayoutGrid size={18} />
-                                <span className="text-sm font-medium">Gallery</span>
-                            </button>
+                            <div className="flex bg-slate-900/50 p-1 rounded-lg border border-slate-800">
+                                <Link
+                                    href="/"
+                                    className={'px-4 py-1.5 rounded-md text-sm font-medium transition-all text-white bg-slate-800 shadow-sm'}
+                                >
+                                    Editor
+                                </Link>
+                                <Link
+                                    href="/gallery"
+                                    className={'px-4 py-1.5 rounded-md text-sm font-medium transition-all text-slate-400 hover:text-white'}
+                                >
+                                    Gallery
+                                </Link>
+                            </div>
 
                             <div className="h-6 w-px bg-slate-800" />
 

@@ -1,0 +1,9 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/frames/comments/route": "app/api/frames/comments/route.js",
+  "/api/frames/likes/route": "app/api/frames/likes/route.js",
+  "/api/frames/route": "app/api/frames/route.js",
+  "/gallery/page": "app/gallery/page.js",
+  "/page": "app/page.js"
+}

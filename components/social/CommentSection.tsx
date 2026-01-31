@@ -1,6 +1,7 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { Send, UserCircle2 } from 'lucide-react';
-import { getFrameComments, addFrameComment } from '../../lib/api';
+
 import { authClient } from '../../lib/auth-client';
 
 interface Comment {
@@ -24,8 +25,9 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ frameId }) => {
     useEffect(() => {
         const fetchComments = async () => {
             try {
-                const result = await getFrameComments(frameId);
-                setComments(result);
+                const res = await fetch(`/api/frames/comments?frameId=${frameId}`);
+                const data = await res.json();
+                setComments(data);
             } catch (error) {
                 console.error("Error fetching comments:", error);
             }
@@ -39,16 +41,20 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ frameId }) => {
 
         setSubmitting(true);
         try {
-            await addFrameComment(frameId, session.user.id, newComment);
-            // Optimistic update
-            const comment: Comment = {
-                id: Date.now().toString(), // Temp ID
-                content: newComment,
-                user_name: session.user.name || 'You',
-                user_image: session.user.image || undefined,
-                created_at: new Date().toISOString()
-            };
-            setComments([...comments, comment]);
+            const res = await fetch('/api/frames/comments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    frameId,
+                    userId: session.user.id,
+                    content: newComment,
+                    userName: session.user.name,
+                    userImage: session.user.image
+                })
+            });
+            const savedComment = await res.json();
+
+            setComments(prev => [...prev, savedComment]); // Append real comment
             setNewComment("");
         } catch (error) {
             console.error("Error posting comment:", error);
