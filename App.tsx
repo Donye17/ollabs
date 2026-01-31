@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { Editor } from './components/Editor';
 import { FrameSelector } from './components/FrameSelector';
 import { FrameCustomizer } from './components/FrameCustomizer';
@@ -72,6 +73,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-50 font-sans selection:bg-blue-500/30">
+      <Analytics />
       <NavBar onViewChange={setCurrentView} currentView={currentView} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
