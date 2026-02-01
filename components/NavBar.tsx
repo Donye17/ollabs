@@ -15,6 +15,11 @@ export const NavBar: React.FC = () => {
     const activeClass = "bg-blue-600 text-white shadow-md shadow-blue-900/20";
     const inactiveClass = "text-slate-400 hover:text-white hover:bg-slate-800";
 
+    const handleSignOut = async () => {
+        await authClient.signOut();
+        window.location.href = '/'; // Hard reload to clear all states
+    };
+
     return (
         <>
             <nav className="w-full h-16 border-b border-slate-800 bg-slate-950/50 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-40">
@@ -59,7 +64,7 @@ export const NavBar: React.FC = () => {
                                     </div>
                                 </Link>
                                 <button
-                                    onClick={() => authClient.signOut()}
+                                    onClick={handleSignOut}
                                     className="p-2 text-slate-500 hover:text-red-400 transition-colors"
                                     title="Sign Out"
                                 >
