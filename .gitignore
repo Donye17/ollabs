@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 
 .agent
+
+# Next.js
+.next/
+out/
+build/
+.vercel/
