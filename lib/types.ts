@@ -26,6 +26,7 @@ export interface FrameConfig {
   color2?: string;
   width: number; // proportional thickness
   imageUrl?: string; // For CUSTOM_IMAGE type
+  stickers?: StickerConfig[]; // Optional stickers array
 }
 
 export interface StickerConfig {

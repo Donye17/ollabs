@@ -82,13 +82,13 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId }) =>
             </div>
 
             {frames.length === 0 && (
-                <div className="text-center py-20 bg-slate-900/30 rounded-3xl border border-slate-800 border-dashed">
-                    <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Loader2 className="text-slate-600" size={32} />
+                <div className="text-center py-20 bg-slate-900/30 backdrop-blur-sm rounded-3xl border border-white/5 border-dashed hover:border-sidebar-primary/20 transition-all">
+                    <div className="w-20 h-20 bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                        <Loader2 className="text-slate-600" size={40} />
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">No frames yet</h3>
-                    <p className="text-slate-400 mb-6 max-w-sm mx-auto">Be the first to publish a verified design to the community gallery.</p>
-                    <a href="/" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-6 rounded-full transition-all">
+                    <h3 className="text-2xl font-heading font-bold text-white mb-2">No frames yet</h3>
+                    <p className="text-slate-400 mb-8 max-w-sm mx-auto leading-relaxed">Be the first to publish a verified design to the community gallery.</p>
+                    <a href="/" className="inline-flex items-center gap-2 bg-primary hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1">
                         Create Masterpiece
                     </a>
                 </div>
@@ -133,47 +133,47 @@ const GalleryCard: React.FC<{ frame: PublishedFrame, onSelect: () => void }> = (
     }, [frame.config]);
 
     return (
-        <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden hover:border-blue-500/50 transition-all hover:shadow-xl hover:shadow-blue-500/10 group flex flex-col">
-            <div className="aspect-square bg-slate-950 relative flex items-center justify-center p-4">
+        <div className="bg-slate-900/50 backdrop-blur-md rounded-2xl border border-white/5 overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 group flex flex-col">
+            <div className="aspect-square bg-slate-950/50 relative flex items-center justify-center p-6 group-hover:bg-slate-950/80 transition-colors">
                 <canvas
                     ref={canvasRef}
                     width={300}
                     height={300}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain drop-shadow-2xl"
                 />
 
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-sm">
                     <button
                         onClick={onSelect}
-                        className="bg-white text-black font-bold py-2 px-6 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+                        className="bg-primary hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-xl shadow-primary/20 hover:scale-105"
                     >
-                        Use this Frame
+                        Remix
                     </button>
                 </div>
             </div>
 
-            <div className="p-4 bg-slate-900 flex-1">
+            <div className="p-5 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-3">
                     <div>
-                        <h3 className="font-bold text-white truncate">{frame.name}</h3>
-                        <div className="flex items-center gap-2 mt-1 text-sm text-slate-400">
-                            <UserCircle2 size={16} />
-                            <span>{frame.creator_name}</span>
+                        <h3 className="font-heading font-bold text-lg text-white truncate group-hover:text-primary transition-colors">{frame.name}</h3>
+                        <div className="flex items-center gap-2 mt-1.5 text-sm text-slate-400">
+                            <UserCircle2 size={16} className="text-slate-500" />
+                            <span className="font-medium text-slate-300">{frame.creator_name}</span>
                         </div>
                     </div>
                 </div>
 
-                <p className="text-xs text-slate-500 mb-4 line-clamp-2">{frame.description}</p>
+                <p className="text-sm text-slate-500 mb-5 line-clamp-2 leading-relaxed">{frame.description}</p>
 
-                <div className="flex items-center justify-between border-t border-slate-800 pt-3 mt-auto">
+                <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-auto">
                     <LikeButton frameId={frame.id.toString()} />
 
                     <button
                         onClick={() => setShowComments(!showComments)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors ${showComments ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${showComments ? 'bg-primary/20 text-primary' : 'text-slate-500 hover:text-slate-200 hover:bg-slate-800'}`}
                     >
-                        <MessageSquare size={16} />
-                        <span className="text-sm font-medium">Comments</span>
+                        <MessageSquare size={18} />
+                        <span className="text-xs font-bold uppercase tracking-wide">Comments</span>
                     </button>
                 </div>
 
@@ -183,6 +183,6 @@ const GalleryCard: React.FC<{ frame: PublishedFrame, onSelect: () => void }> = (
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

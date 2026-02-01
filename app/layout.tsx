@@ -1,11 +1,21 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Archivo, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const archivo = Archivo({
+    subsets: ['latin'],
+    variable: '--font-archivo',
+    display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+    subsets: ['latin'],
+    variable: '--font-space',
+    display: 'swap',
+});
 
 export const metadata: Metadata = {
-    metadataBase: new URL('https://ollabs.vercel.app'), // Replace with actual domain if known, or Vercel URL
+    metadataBase: new URL('https://ollabs.vercel.app'),
     title: {
         template: '%s | Ollabs',
         default: 'Ollabs - Create Custom Avatar Frames',
@@ -42,7 +52,9 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={inter.className}>{children}</body>
+            <body className={`${archivo.variable} ${spaceGrotesk.variable} font-sans bg-slate-950 text-slate-50 antialiased`}>
+                {children}
+            </body>
         </html>
     );
 }

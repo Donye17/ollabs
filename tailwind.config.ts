@@ -6,7 +6,17 @@ const config: Config = {
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
     ],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                sans: ['var(--font-space)', 'sans-serif'],
+                heading: ['var(--font-archivo)', 'sans-serif'],
+            },
+            colors: {
+                primary: '#2563EB',
+                secondary: '#60A5FA',
+                cta: '#F43F5E',
+            },
+        },
     },
     plugins: [],
 };

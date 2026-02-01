@@ -55,12 +55,32 @@ export const Editor: React.FC<EditorProps> = ({
   // Stickers State
   const [stickers, setStickers] = useState<StickerConfig[]>([]);
   // Interaction State
-  const [selection, setSelection] = useState<{ type: 'image' } | { type: 'sticker', id: string }>({ type: 'image' });
+  const [selection, setSelection] = useState<string | null>(null); // Selected Sticker ID
+  const [interactionMode, setInteractionMode] = useState<'none' | 'drag' | 'scale' | 'rotate' | 'pan'>('none');
   const [dragStart, setDragStart] = useState<Position>({ x: 0, y: 0 });
+  const [initialStickerState, setInitialStickerState] = useState<{ x: number, y: number, scale: number, rotation: number } | null>(null);
 
-  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [isPublishOpen, setIsPublishOpen] = useState(false);
+
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const [imageObject, setImageObject] = useState<HTMLImageElement | null>(null);
+
+  // Constants
+  const HANDLE_SIZE = 10;
+  const ROTATION_HANDLE_OFFSET = 30; // Distance from top of box
+  const STICKER_BASE_SIZE = 48; // Base width/height of sticker svgs
+
+  // Sync stickers from selectedFrame if present (Remix flow)
+  useEffect(() => {
+    if (selectedFrame.stickers) {
+      setStickers(selectedFrame.stickers);
+    } else {
+      // Optional: Reset stickers if switching frames? 
+      // Maybe not if user just changed the frame styling while keeping stickers.
+      // But for a "Fresh" remix load, we want to set them.
+      // We can rely on upstream not to pass stickers if it's a basic preset.
+    }
+  }, [selectedFrame]);
 
   // Load image object when source changes
   useEffect(() => {
@@ -175,17 +195,53 @@ export const Editor: React.FC<EditorProps> = ({
       ctx.save();
       ctx.translate(sticker.x + centerX, sticker.y + centerY);
       ctx.rotate((sticker.rotation * Math.PI) / 180);
-      ctx.scale(sticker.scale, sticker.scale);
-      // Draw centered
-      ctx.drawImage(img, -24, -24, 48, 48); // Base size 48px
 
-      // Selection Ring
-      if (selection.type === 'sticker' && (selection as any).id === sticker.id) {
-        ctx.strokeStyle = '#3b82f6'; // Blue
+      const sSize = STICKER_BASE_SIZE * sticker.scale;
+      // Draw centered
+      ctx.drawImage(img, -sSize / 2, -sSize / 2, sSize, sSize);
+
+      // Draw Selection Box
+      if (selection === sticker.id) {
+        ctx.strokeStyle = '#3b82f6'; // Primary Blue
         ctx.lineWidth = 2;
-        ctx.setLineDash([4, 2]);
+        ctx.setLineDash([]);
+
+        // Bounding Box
+        ctx.strokeRect(-sSize / 2, -sSize / 2, sSize, sSize);
+
+        // Corner Handles
+        ctx.fillStyle = '#fff';
+        const halfHandle = HANDLE_SIZE / 2 / 1.5; // Scale handle size relative to canvas
+
+        // We actually want consistent handle size visually, but here we are in scaled/rotated context
+        // To make handles constant size visually, we might need to invert scale, but let's keep it simple first
+        // Or actually, handles should ignore scale? 
+        // For simplicity, let's just draw them at corners.
+
+        const corners = [
+          { x: -sSize / 2, y: -sSize / 2 },
+          { x: sSize / 2, y: -sSize / 2 },
+          { x: sSize / 2, y: sSize / 2 },
+          { x: -sSize / 2, y: sSize / 2 }
+        ];
+
+        corners.forEach(c => {
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, 6, 0, Math.PI * 2); // 6px radius handle
+          ctx.fill();
+          ctx.stroke();
+        });
+
+        // Rotation Handle (Top Center + Offset)
         ctx.beginPath();
-        ctx.arc(0, 0, 32, 0, Math.PI * 2);
+        ctx.moveTo(0, -sSize / 2);
+        ctx.lineTo(0, -sSize / 2 - 20);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, -sSize / 2 - 20, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#3b82f6';
+        ctx.fill();
         ctx.stroke();
       }
 
@@ -251,6 +307,16 @@ export const Editor: React.FC<EditorProps> = ({
     };
   };
 
+  // Helper: Rotate point around center
+  const rotatePoint = (px: number, py: number, cx: number, cy: number, angle: number) => {
+    const rad = (angle * Math.PI) / 180;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+    const nx = (cos * (px - cx)) - (sin * (py - cy)) + cx;
+    const ny = (sin * (px - cx)) + (cos * (py - cy)) + cy;
+    return { x: nx, y: ny };
+  };
+
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     // Prevent scrolling on touch
     if ('touches' in e) {
@@ -258,66 +324,165 @@ export const Editor: React.FC<EditorProps> = ({
     }
     const { x, y } = getMousePos(e);
 
-    // Hit Test for Stickers (Top-most first)
     const centerX = CANVAS_SIZE / 2;
     const centerY = CANVAS_SIZE / 2;
 
-    // Check stickers in reverse (drawn top on top)
+    // Check Handles for Selected Sticker FIRST
+    if (selection) {
+      const s = stickers.find(st => st.id === selection);
+      if (s) {
+        const sX = centerX + s.x;
+        const sY = centerY + s.y;
+        const sSize = STICKER_BASE_SIZE * s.scale;
+
+        // We need to check transformed coordinates
+        // Inverse rotate mouse pos around sticker center to check against axis-aligned box
+        const localM = rotatePoint(x, y, sX, sY, -s.rotation);
+
+        const localX = localM.x - sX;
+        const localY = localM.y - sY;
+
+        // Check Rotation Handle
+        // Defined at (0, -sSize/2 - 20) with radius 10 (generous hit)
+        if (Math.abs(localX) <= 10 && Math.abs(localY - (-sSize / 2 - 20)) <= 10) {
+          setInteractionMode('rotate');
+          setInitialStickerState({ ...s });
+          return;
+        }
+
+        // Check Scale Handles (Corners) - Generic hit test for any corner
+        // Corners at +/- size/2
+        const half = sSize / 2;
+        const corners = [
+          { x: -half, y: -half }, { x: half, y: -half },
+          { x: half, y: half }, { x: -half, y: half }
+        ];
+
+        for (let c of corners) {
+          if (Math.abs(localX - c.x) <= 10 && Math.abs(localY - c.y) <= 10) {
+            setInteractionMode('scale');
+            setDragStart({ x, y }); // Keep global drag start for scale calc?
+            // Better: keep track of distance from center
+            setInitialStickerState({ ...s });
+            return;
+          }
+        }
+      }
+    }
+
+    // Hit Test for Sticker Bodies
     let hitStickerId: string | null = null;
+    // Check in reverse order (top first)
     for (let i = stickers.length - 1; i >= 0; i--) {
       const s = stickers[i];
       const sX = centerX + s.x;
       const sY = centerY + s.y;
-      const radius = (24 * s.scale) + 10; // Hit area
-      const dist = Math.sqrt(Math.pow(x - sX, 2) + Math.pow(y - sY, 2));
+      const sSize = STICKER_BASE_SIZE * s.scale;
 
-      if (dist <= radius) {
+      const localM = rotatePoint(x, y, sX, sY, -s.rotation);
+      const localX = localM.x - sX;
+      const localY = localM.y - sY;
+
+      // Simple box test
+      if (Math.abs(localX) <= sSize / 2 && Math.abs(localY) <= sSize / 2) {
         hitStickerId = s.id;
         break;
       }
     }
 
-    setIsDragging(true);
-
     if (hitStickerId) {
-      setSelection({ type: 'sticker', id: hitStickerId });
+      setSelection(hitStickerId);
+      setInteractionMode('drag');
       const s = stickers.find(st => st.id === hitStickerId)!;
-      setDragStart({ x: x - s.x, y: y - s.y });
+      setDragStart({ x: x - s.x, y: y - s.y }); // Offset from sticker center
     } else {
-      // Fallback to Image
-      setSelection({ type: 'image' });
-      setDragStart({ x: x - position.x, y: y - position.y });
+      setSelection(null);
+      // Pan/Move Image
+      if (imageObject) {
+        setInteractionMode('pan');
+        setDragStart({ x: x - position.x, y: y - position.y });
+      } else {
+        setInteractionMode('none');
+      }
     }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
+    if (interactionMode === 'none') return;
 
     // Only prevent default if we are dragging
     if (e.cancelable) e.preventDefault();
 
     const { x, y } = getMousePos(e);
+    const centerX = CANVAS_SIZE / 2;
+    const centerY = CANVAS_SIZE / 2;
 
-    if (selection.type === 'sticker') {
-      const newX = x - dragStart.x;
-      const newY = y - dragStart.y;
+    if (interactionMode === 'pan') {
+      setPosition({ x: x - dragStart.x, y: y - dragStart.y });
+    }
+    else if (interactionMode === 'drag' && selection) {
+      // Wait, my dragStart logic for sticker was: x - s.x (which is offset from sticker origin)
+      // So new s.x should be: x - dragStart.x (if x is mouse pos relative to canvas origin)
+      // But dragStart was (mouse.x - sticker.x). 
+      // So sticker.x = mouse.x - dragStart.x?
+      // Let's fix the dragStart logic in MouseDown to be cleaner:
+      // dragStart = mouseX - stickerX. 
+      // New stickerX = mouseX - dragStart. YES.
+      // But wait... handleMouseDown recorded `dragStart = x - s.x`. 
+      // So `s.x = x - dragStart.x`. Correct.
+      const offsetX = dragStart.x;
+      const offsetY = dragStart.y;
       setStickers(prev => prev.map(s =>
-        s.id === (selection as any).id ? { ...s, x: newX, y: newY } : s
+        s.id === selection ? { ...s, x: x - offsetX, y: y - offsetY } : s
       ));
-    } else if (imageObject) {
-      const newX = x - dragStart.x;
-      const newY = y - dragStart.y;
-      setPosition({ x: newX, y: newY });
+    }
+    else if (interactionMode === 'rotate' && selection) {
+      setStickers(prev => prev.map(s => {
+        if (s.id !== selection) return s;
+        const sX = centerX + s.x;
+        const sY = centerY + s.y;
+        // Angle from sticker center to mouse
+        const angle = Math.atan2(y - sY, x - sX) * (180 / Math.PI);
+        // Snap to 45 deg? maybe later.
+        // Correct logic: The handle is at -90 deg (top).
+        // So we want the rotation to align the top (-90 local) to the mouse.
+        // angle = mouseAngle + 90
+        return { ...s, rotation: angle + 90 };
+      }));
+    }
+    else if (interactionMode === 'scale' && selection && initialStickerState) {
+      setStickers(prev => prev.map(s => {
+        if (s.id !== selection) return s;
+        // Scale based on distance from center
+        const sX = centerX + s.x;
+        const sY = centerY + s.y;
+        const dist = Math.sqrt(Math.pow(x - sX, 2) + Math.pow(y - sY, 2));
+        const startDist = (STICKER_BASE_SIZE * initialStickerState.scale) / 2 * Math.sqrt(2); // approximate diagonal
+        // Actually better:
+        // Compare current dist from center vs initial dist from center??
+        // Or simpler: scale = dist / base_size * 2?
+        // Let's roughly map distance to scale.
+        // Edge is at size/2. Corner is at size/2 * sqrt(2).
+        // So if mouse is at `dist`, then `size/2 * sqrt(2) * scale` approx `dist`.
+        // `scale = dist / (size/2 * sqrt(2))`
+        const baseRadius = (STICKER_BASE_SIZE / 2) * Math.sqrt(2);
+        let newScale = dist / baseRadius;
+        if (newScale < 0.2) newScale = 0.2;
+        return { ...s, scale: newScale };
+      }));
     }
   };
 
   const handleEnd = () => {
-    setIsDragging(false);
+    setInteractionMode('none');
+    setInitialStickerState(null);
   };
 
   // Touch wrappers to map to mouse handlers
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => handleMouseDown(e);
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => handleMouseMove(e);
+  const handleTouchEnd = () => handleEnd();
+  const handleTouchCancel = () => handleEnd();
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
@@ -341,15 +506,15 @@ export const Editor: React.FC<EditorProps> = ({
       {/* Canvas Container */}
       <div
         className={`
-           relative group rounded-full transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+           relative group rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
            ${isDragOver
-            ? 'scale-110 ring-8 ring-blue-500 shadow-[0_20px_50px_rgba(59,130,246,0.5)]'
-            : 'scale-100 ring-4 ring-slate-800 bg-slate-900'}
+            ? 'scale-110 ring-8 ring-primary/50 shadow-[0_20px_50px_rgba(37,99,235,0.5)]'
+            : 'scale-100 ring-4 ring-white/5 bg-slate-900/50 backdrop-blur-3xl shadow-2xl shadow-black/50'}
         `}
         style={{
           width: DISPLAY_SIZE,
           height: DISPLAY_SIZE,
-          cursor: imageObject ? (isDragging ? 'grabbing' : 'grab') : 'default',
+          cursor: imageObject ? (interactionMode !== 'none' ? 'grabbing' : 'grab') : 'default',
           borderRadius: selectedFrame.type === FrameType.STAR || selectedFrame.type === FrameType.HEXAGON || selectedFrame.type === FrameType.HEART ? '0%' : '9999px'
         }}
         onMouseDown={handleMouseDown}
@@ -369,23 +534,23 @@ export const Editor: React.FC<EditorProps> = ({
           ref={canvasRef}
           width={CANVAS_SIZE}
           height={CANVAS_SIZE}
-          className="w-full h-full object-contain pointer-events-none"
+          className="w-full h-full object-contain pointer-events-none drop-shadow-2xl"
         />
 
         {!imageObject && !isDragOver && (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 pointer-events-none">
-            <Upload className="w-12 h-12 mb-2 opacity-50" />
-            <span className="text-sm font-medium">Drag & Drop or Upload</span>
+            <Upload className="w-12 h-12 mb-3 opacity-50 text-slate-400" />
+            <span className="text-sm font-bold font-heading text-slate-400 tracking-wide">Drag & Drop or Upload</span>
           </div>
         )}
 
         {isDragOver && (
           <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
-            <div className="absolute inset-0 bg-blue-500/20 backdrop-blur-[2px] animate-pulse" />
+            <div className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] animate-pulse" />
             <div className="absolute inset-8 rounded-full border-4 border-dashed border-white/60 animate-[spin_8s_linear_infinite]" />
-            <div className="relative bg-blue-600 text-white px-6 py-3 rounded-full shadow-xl shadow-blue-900/40 font-bold flex items-center gap-2 animate-bounce">
-              <ImageIcon size={24} />
-              <span>Drop Image</span>
+            <div className="relative bg-primary text-white px-8 py-4 rounded-2xl shadow-xl shadow-primary/40 font-bold font-heading flex items-center gap-3 animate-bounce">
+              <ImageIcon size={28} />
+              <span className="text-lg">Drop Image</span>
             </div>
           </div>
         )}
@@ -401,7 +566,7 @@ export const Editor: React.FC<EditorProps> = ({
             onChange={handleFileInput}
           />
           <div
-            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-3 px-6 rounded-xl cursor-pointer transition-colors shadow-lg shadow-blue-900/20 font-medium select-none"
+            className="flex items-center justify-center gap-2 bg-primary hover:bg-blue-600 text-white py-4 px-6 rounded-xl cursor-pointer transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 font-bold font-heading select-none hover:-translate-y-0.5"
             title="Select an image from your device"
           >
             <Upload size={20} />
@@ -411,7 +576,7 @@ export const Editor: React.FC<EditorProps> = ({
       </div>
 
       {imageObject && (
-        <div className="flex gap-3 justify-center w-full">
+        <div className="flex gap-3 justify-center w-full px-4">
           {session && (
             <button
               onClick={async () => {
@@ -433,7 +598,7 @@ export const Editor: React.FC<EditorProps> = ({
                 }
               }}
               disabled={isUpdatingProfile}
-              className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 text-white py-3 px-6 rounded-xl transition-colors font-medium border border-purple-500 shadow-lg shadow-purple-900/20 disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 text-white py-3.5 px-6 rounded-xl transition-all font-bold border border-transparent hover:border-purple-400 shadow-lg shadow-purple-900/20 disabled:opacity-50 hover:-translate-y-0.5"
               title="Set as your profile picture"
             >
               {isUpdatingProfile ? <Loader2 size={20} className="animate-spin" /> : <User size={20} />}
@@ -443,7 +608,7 @@ export const Editor: React.FC<EditorProps> = ({
 
           <button
             onClick={handleDownload}
-            className="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white py-3 px-6 rounded-xl transition-colors font-medium border border-slate-600"
+            className="flex-1 flex items-center justify-center gap-2 bg-slate-800/80 hover:bg-slate-700/80 backdrop-blur-md text-white py-3.5 px-6 rounded-xl transition-all font-bold border border-white/5 hover:border-white/10 hover:-translate-y-0.5"
             title="Download high-resolution PNG"
           >
             <Download size={20} />
@@ -455,79 +620,79 @@ export const Editor: React.FC<EditorProps> = ({
       {/* Advanced Controls (Context Aware) */}
       {
         (imageObject || stickers.length > 0) && (
-          <div className="w-full bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 space-y-4 transition-colors duration-300">
+          <div className="w-full bg-slate-900/60 p-5 rounded-2xl border border-white/5 backdrop-blur-xl space-y-5 animate-in slide-in-from-bottom-4 duration-500">
             <div className="flex justify-between items-center px-1">
-              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                {selection.type === 'sticker' ? 'Adjust Decoration' : 'Adjust Base Image'}
+              <h4 className="text-xs font-bold font-heading text-slate-400 uppercase tracking-widest">
+                {selection ? 'Adjust Decoration' : 'Adjust Base Image'}
               </h4>
-              {selection.type === 'sticker' && (
-                <span className="text-[10px] text-blue-400 font-mono bg-blue-400/10 px-2 py-0.5 rounded">Selected</span>
+              {selection && (
+                <span className="text-[10px] text-primary font-bold font-mono bg-primary/10 px-2 py-0.5 rounded border border-primary/20">Selected</span>
               )}
             </div>
 
             {/* Scale Control */}
             <div className="flex items-center gap-3">
-              <ZoomOut size={16} className="text-slate-400" />
+              <ZoomOut size={16} className="text-slate-500" />
               <input
                 type="range"
                 min="0.1"
                 max="3"
                 step="0.1"
-                value={selection.type === 'sticker'
-                  ? (stickers.find(s => s.id === (selection as any).id)?.scale || 1)
+                value={selection
+                  ? (stickers.find(s => s.id === selection)?.scale || 1)
                   : scale
                 }
                 onChange={(e) => {
                   const val = parseFloat(e.target.value);
-                  if (selection.type === 'sticker') {
-                    setStickers(prev => prev.map(s => s.id === (selection as any).id ? { ...s, scale: val } : s));
+                  if (selection) {
+                    setStickers(prev => prev.map(s => s.id === selection ? { ...s, scale: val } : s));
                   } else {
                     setScale(val);
                   }
                 }}
-                className={`flex-1 h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer ${selection.type === 'sticker' ? 'accent-blue-500' : 'accent-indigo-500'}`}
+                className={`flex-1 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-indigo-500'}`}
                 title="Scale"
               />
-              <ZoomIn size={16} className="text-slate-400" />
+              <ZoomIn size={16} className="text-slate-500" />
             </div>
 
             {/* Rotate Control */}
             <div className="flex items-center gap-3">
               <div className="relative group">
-                <RotateCw size={16} className="text-slate-400 group-hover:text-white transition-colors" />
+                <RotateCw size={16} className="text-slate-500 group-hover:text-white transition-colors" />
               </div>
               <input
                 type="range"
                 min="-180"
                 max="180"
                 step="1"
-                value={selection.type === 'sticker'
-                  ? (stickers.find(s => s.id === (selection as any).id)?.rotation || 0)
+                value={selection
+                  ? (stickers.find(s => s.id === selection)?.rotation || 0)
                   : rotation
                 }
                 onChange={(e) => {
                   const val = parseInt(e.target.value);
-                  if (selection.type === 'sticker') {
-                    setStickers(prev => prev.map(s => s.id === (selection as any).id ? { ...s, rotation: val } : s));
+                  if (selection) {
+                    setStickers(prev => prev.map(s => s.id === selection ? { ...s, rotation: val } : s));
                   } else {
                     setRotation(val);
                   }
                 }}
-                className={`flex-1 h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer ${selection.type === 'sticker' ? 'accent-blue-500' : 'accent-purple-500'}`}
+                className={`flex-1 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-purple-500'}`}
                 title="Rotate"
               />
               <span className="text-[10px] w-8 text-right font-mono text-slate-400">
-                {selection.type === 'sticker'
-                  ? (stickers.find(s => s.id === (selection as any).id)?.rotation || 0)
+                {selection
+                  ? (stickers.find(s => s.id === selection)?.rotation || 0)
                   : rotation
                 }°
               </span>
             </div>
 
-            <div className="flex gap-2 pt-2 border-t border-slate-700/50 justify-between">
+            <div className="flex gap-2 pt-3 border-t border-white/5 justify-between">
               <button
                 onClick={handleAutoFit}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-700 rounded-lg text-xs text-slate-400 hover:text-white transition-colors bg-slate-700/30"
+                className="flex items-center gap-2 px-3 py-2 hover:bg-slate-800 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-colors bg-slate-800/50 border border-transparent hover:border-white/5"
                 title="Auto-fit: Fit entire image inside frame"
               >
                 <Maximize size={14} />
@@ -536,7 +701,7 @@ export const Editor: React.FC<EditorProps> = ({
 
               <button
                 onClick={() => { setScale(1); setPosition({ x: 0, y: 0 }); setRotation(0); }}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-700 rounded-lg text-xs text-slate-400 hover:text-white transition-colors bg-slate-700/30"
+                className="flex items-center gap-2 px-3 py-2 hover:bg-slate-800 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-colors bg-slate-800/50 border border-transparent hover:border-white/5"
                 title="Reset Position, Zoom, and Rotation"
               >
                 <RefreshCcw size={14} />
@@ -548,8 +713,8 @@ export const Editor: React.FC<EditorProps> = ({
       }
 
       {/* Sticker Toolbar */}
-      <div className="w-full max-w-lg bg-slate-900/80 p-4 rounded-2xl border border-slate-700/50 backdrop-blur-md">
-        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Add Decorations</h4>
+      <div className="w-full max-w-lg bg-slate-900/60 p-5 rounded-2xl border border-white/5 backdrop-blur-xl">
+        <h4 className="text-xs font-bold font-heading text-slate-400 uppercase tracking-widest mb-4">Add Decorations</h4>
         <div className="flex gap-4 justify-center">
           {[
             { id: 'verified', icon: BadgeCheck, label: 'Verified', color: 'text-blue-400' },
@@ -572,29 +737,50 @@ export const Editor: React.FC<EditorProps> = ({
                   }
                 ]);
               }}
-              className="flex flex-col items-center gap-1 group"
+              className="flex flex-col items-center gap-1.5 group"
             >
-              <div className={`p-3 rounded-xl bg-slate-800 border border-slate-700 group-hover:bg-slate-700 transition-colors ${item.color}`}>
+              <div className={`p-3.5 rounded-xl bg-slate-800/80 border border-white/5 group-hover:bg-slate-700/80 transition-all ${item.color} group-hover:-translate-y-1 shadow-lg shadow-black/20`}>
                 <item.icon size={24} />
               </div>
-              <span className="text-[10px] text-slate-500 font-medium">{item.label}</span>
+              <span className="text-[10px] text-slate-500 font-bold group-hover:text-slate-300 transition-colors uppercase tracking-wide">{item.label}</span>
             </button>
           ))}
         </div>
 
         {/* Sticker Controls (Delete Selected) */}
         {stickers.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center">
-            <span className="text-xs text-slate-500">{stickers.length} stickers active</span>
+          <div className="mt-4 pt-4 border-t border-white/5 flex justify-between items-center">
+            <span className="text-xs text-slate-500 font-medium">{stickers.length} stickers active</span>
             <button
               onClick={() => setStickers([])}
-              className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
+              className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1.5 font-bold uppercase tracking-wide px-2 py-1 hover:bg-red-500/10 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
             >
               <Trash2 size={12} /> Clear All
             </button>
           </div>
         )}
       </div>
+
+      {/* Publish Modal Trigger (Only if image is present) */}
+      {imageSrc && (
+        <div className="mt-4">
+          <button
+            onClick={() => setIsPublishOpen(true)}
+            className="text-sm text-slate-500 hover:text-white underline decoration-slate-700 hover:decoration-white transition-all"
+          >
+            Publish to Community Gallery
+          </button>
+        </div>
+      )}
+
+      <PublishModal
+        isOpen={isPublishOpen}
+        onClose={() => setIsPublishOpen(false)}
+        frameConfig={{
+          ...selectedFrame,
+          stickers: stickers // Include stickers in the published config
+        }}
+      />
     </div >
   );
 };

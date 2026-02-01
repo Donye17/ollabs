@@ -2,7 +2,8 @@
   "pages": {},
   "app": {
     "[project]/app/gallery/page": [
-      "static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2"
+      "static/media/75affa71d1e2f6a7-s.p.51cde8ff.woff2",
+      "static/media/0c89a48fa5027cee-s.p.4564287c.woff2"
     ]
   },
   "appUsingSizeAdjust": true,
