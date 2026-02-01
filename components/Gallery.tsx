@@ -10,6 +10,7 @@ import { CommentSection } from './social/CommentSection';
 
 interface GalleryProps {
     onSelectFrame: (frame: FrameConfig) => void;
+    creatorId?: string;
 }
 
 interface PublishedFrame {
@@ -21,16 +22,19 @@ interface PublishedFrame {
     created_at: string;
 }
 
-export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame }) => {
+export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId }) => {
     const [frames, setFrames] = useState<PublishedFrame[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchFrames = async () => {
             try {
-                // TODO: Update query when we have user profiles table. 
-                // For now, fetching frames and mocking user name if missing
-                const response = await fetch('/api/frames?limit=20');
+                // Fetch frames (optionally filtered by creator)
+                const url = creatorId
+                    ? `/api/frames?limit=20&creator_id=${creatorId}`
+                    : '/api/frames?limit=20';
+
+                const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch frames');
 
                 const result = await response.json();

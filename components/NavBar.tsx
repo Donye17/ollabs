@@ -48,14 +48,16 @@ export const NavBar: React.FC = () => {
                             <div className="h-6 w-px bg-slate-800" />
 
                             <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-white">{session.user.name}</span>
-                                <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 overflow-hidden">
-                                    {session.user.image ? (
-                                        <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <UserCircle className="w-full h-full text-slate-400 p-1" />
-                                    )}
-                                </div>
+                                <Link href={`/profile/${session.user.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity group">
+                                    <span className="text-sm font-medium text-white group-hover:text-blue-400 transition-colors">{session.user.name}</span>
+                                    <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 overflow-hidden ring-2 ring-transparent group-hover:ring-blue-500 transition-all">
+                                        {session.user.image ? (
+                                            <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <UserCircle className="w-full h-full text-slate-400 p-1" />
+                                        )}
+                                    </div>
+                                </Link>
                                 <button
                                     onClick={() => authClient.signOut()}
                                     className="p-2 text-slate-500 hover:text-red-400 transition-colors"

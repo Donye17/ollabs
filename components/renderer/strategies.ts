@@ -246,3 +246,54 @@ export class GeometricRenderer extends CircleRenderer {
         ctx.restore();
     }
 }
+
+export class ImageFrameRenderer implements IFrameRenderer {
+    private imageCache: HTMLImageElement | null = null;
+    private lastImageUrl: string | null = null;
+
+    drawFrame(context: RenderContext): void {
+        const { ctx, centerX, centerY, radius, frame } = context;
+
+        if (!frame.imageUrl) return;
+
+        // Load image if needed (basic caching mechanism)
+        if (this.lastImageUrl !== frame.imageUrl) {
+            this.imageCache = null;
+            this.lastImageUrl = frame.imageUrl;
+            const img = new Image();
+            img.src = frame.imageUrl;
+            img.onload = () => {
+                this.imageCache = img;
+            };
+        }
+
+        if (this.imageCache) {
+            ctx.save();
+            const size = radius * 2;
+            ctx.drawImage(
+                this.imageCache,
+                centerX - radius,
+                centerY - radius,
+                size,
+                size
+            );
+            ctx.restore();
+        } else {
+            // Loading placeholder
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#334155'; // Slate 700
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    createPath(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number): void {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+        ctx.closePath();
+    }
+}

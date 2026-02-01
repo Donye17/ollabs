@@ -5,11 +5,20 @@ export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
         const limit = parseInt(searchParams.get('limit') || '20');
+        const creatorId = searchParams.get('creator_id');
 
-        const result = await pool.query(
-            `SELECT * FROM frames WHERE is_public = true ORDER BY created_at DESC LIMIT $1`,
-            [limit]
-        );
+        let query = `SELECT * FROM frames WHERE is_public = true`;
+        const queryParams: any[] = [];
+
+        if (creatorId) {
+            query += ` AND creator_id = $${queryParams.length + 1}`;
+            queryParams.push(creatorId);
+        }
+
+        query += ` ORDER BY created_at DESC LIMIT $${queryParams.length + 1}`;
+        queryParams.push(limit);
+
+        const result = await pool.query(query, queryParams);
 
         return NextResponse.json(result.rows);
     } catch (error) {

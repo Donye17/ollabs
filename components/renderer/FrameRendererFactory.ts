@@ -11,7 +11,8 @@ import {
     NeonRenderer,
     DoubleRenderer,
     MemphisRenderer,
-    GeometricRenderer
+    GeometricRenderer,
+    ImageFrameRenderer
 } from './strategies';
 
 class NoneRenderer extends CircleRenderer {
@@ -46,6 +47,7 @@ export class FrameRendererFactory {
             case FrameType.STAR: return new StarRenderer();
             case FrameType.HEART: return new HeartRenderer();
             case FrameType.HEXAGON: return new HexagonRenderer();
+            case FrameType.CUSTOM_IMAGE: return new ImageFrameRenderer();
             default: return new CircleRenderer();
         }
     }
