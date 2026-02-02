@@ -6,11 +6,15 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const limit = parseInt(searchParams.get('limit') || '20');
         const creatorId = searchParams.get('creator_id');
+        const id = searchParams.get('id');
 
         let query = `SELECT * FROM frames WHERE is_public = true`;
         const queryParams: any[] = [];
 
-        if (creatorId) {
+        if (id) {
+            query += ` AND id = $${queryParams.length + 1}`;
+            queryParams.push(id);
+        } else if (creatorId) {
             query += ` AND creator_id = $${queryParams.length + 1}`;
             queryParams.push(creatorId);
         }

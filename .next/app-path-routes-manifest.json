@@ -6,5 +6,6 @@
   "/api/frames/route": "/api/frames",
   "/gallery/page": "/gallery",
   "/page": "/",
-  "/profile/[id]/page": "/profile/[id]"
+  "/profile/[id]/page": "/profile/[id]",
+  "/share/[id]/page": "/share/[id]"
 }

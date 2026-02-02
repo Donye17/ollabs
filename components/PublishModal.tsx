@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { Loader2, X, Globe, Lock, Share2 } from 'lucide-react';
+import { Loader2, X, Globe, Lock, Share2, Copy } from 'lucide-react';
 
 import { FrameConfig } from '@/lib/types';
 import { authClient } from '../lib/auth-client';
@@ -19,6 +19,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+    const [publishedId, setPublishedId] = useState<string | null>(null);
 
     if (!isOpen) return null;
 
@@ -54,13 +55,9 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
             const result = await response.json();
 
             console.log("Published frame ID:", result.id);
+            setPublishedId(result.id);
             setSuccess(true);
-
-            // Close after delay
-            setTimeout(() => {
-                onClose();
-                setSuccess(false);
-            }, 2000);
+            // We removed the auto-close to let users copy the link
 
         } catch (err: any) {
             console.error(err);
@@ -86,7 +83,39 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
                             <Share2 className="text-green-500" size={32} />
                         </div>
                         <h2 className="text-2xl font-bold text-white mb-2">Published!</h2>
-                        <p className="text-slate-400">Your frame is now live in the gallery.</p>
+                        <p className="text-slate-400 mb-6">Your frame is now live in the gallery.</p>
+
+                        <div className="flex items-center gap-2 bg-slate-800 p-3 rounded-xl border border-white/5 mb-6">
+                            <code className="flex-1 text-sm text-slate-300 font-mono text-left truncate">
+                                {window.location.origin}/share/{publishedId}
+                            </code>
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText(`${window.location.origin}/share/${publishedId}`);
+                                    alert('Copied to clipboard!');
+                                }}
+                                className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition-colors"
+                            >
+                                <Copy size={16} />
+                            </button>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={onClose}
+                                className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors"
+                            >
+                                Close
+                            </button>
+                            <a
+                                href={`/share/${publishedId}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex-1 py-3 bg-primary hover:bg-blue-600 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
+                            >
+                                View Page
+                            </a>
+                        </div>
                     </div>
                 ) : (
                     <>

@@ -6,5 +6,6 @@
   "/api/frames/route": "app/api/frames/route.js",
   "/gallery/page": "app/gallery/page.js",
   "/page": "app/page.js",
-  "/profile/[id]/page": "app/profile/[id]/page.js"
+  "/profile/[id]/page": "app/profile/[id]/page.js",
+  "/share/[id]/page": "app/share/[id]/page.js"
 }

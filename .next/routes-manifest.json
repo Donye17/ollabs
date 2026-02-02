@@ -28,6 +28,14 @@
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/profile/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/share/[id]",
+      "regex": "^/share/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/share/(?<nxtPid>[^/]+?)(?:/)?$"
     }
   ],
   "staticRoutes": [

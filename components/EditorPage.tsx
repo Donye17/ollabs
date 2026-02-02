@@ -9,24 +9,56 @@ import { AVAILABLE_FRAMES } from '@/lib/constants';
 import { FrameConfig } from '@/lib/types';
 import { AlertCircle } from 'lucide-react';
 
-export const EditorPage: React.FC = () => {
+export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const [history, setHistory] = useState<FrameConfig[]>([AVAILABLE_FRAMES[2]]);
     const [historyIndex, setHistoryIndex] = useState<number>(0);
 
-    // Check for incoming frame from gallery
+    // Initial Load Logic (Local Storage OR Remix ID)
     useEffect(() => {
-        try {
-            const stored = localStorage.getItem('temp_frame');
-            if (stored) {
-                const frame = JSON.parse(stored);
-                setHistory([frame]);
-                setHistoryIndex(0);
-                localStorage.removeItem('temp_frame');
+        const loadInitialFrame = async () => {
+            // Priority 1: URL Remix ID
+            if (remixId) {
+                try {
+                    const res = await fetch(`/api/frames?id=${remixId}`);
+                    if (res.ok) {
+                        const frames = await res.json();
+                        if (frames.length > 0) {
+                            const frame = frames[0];
+                            // Parse config if it's a string (DB) vs object
+                            const config = typeof frame.config === 'string' ? JSON.parse(frame.config) : frame.config;
+                            setHistory([{
+                                ...config,
+                                id: frame.id, // Keep original ID or generate new? For remix, maybe keep ID for reference but treating as new draft? 
+                                // Actually, if we want to "fork", we should probably generate a NEW temp ID so we don't overwrite if we had logic for that.
+                                // But Editor usually manages IDs for presets.
+                            }]);
+                            setHistoryIndex(0);
+                            // Clean URL to avoid re-fetching on refresh?
+                            window.history.replaceState({}, '', '/');
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to load remix frame", e);
+                }
             }
-        } catch (e) {
-            console.error("Failed to load frame from storage", e);
-        }
-    }, []);
+
+            // Priority 2: Local Storage (from internal navigation)
+            try {
+                const stored = localStorage.getItem('temp_frame');
+                if (stored) {
+                    const frame = JSON.parse(stored);
+                    setHistory([frame]);
+                    setHistoryIndex(0);
+                    localStorage.removeItem('temp_frame');
+                }
+            } catch (e) {
+                console.error("Failed to load frame from storage", e);
+            }
+        };
+
+        loadInitialFrame();
+    }, [remixId]);
 
     const selectedFrame = history[historyIndex];
 

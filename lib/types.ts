@@ -29,6 +29,8 @@ export interface FrameConfig {
   stickers?: StickerConfig[]; // Optional stickers array
 }
 
+export type MotionEffect = 'none' | 'pulse' | 'spin' | 'glitch' | 'rain';
+
 export interface StickerConfig {
   id: string;
   icon: string; // Lucide icon name or image URL
