@@ -224,43 +224,84 @@ export const Editor: React.FC<EditorProps> = ({
     // 5. Draw Text Layers
     textLayers.forEach(text => {
       ctx.save();
-      const tX = text.x + centerX;
-      const tY = text.y + centerY;
 
-      ctx.translate(tX, tY);
-      ctx.rotate((text.rotation * Math.PI) / 180);
-
+      // Common Settings
       ctx.font = `${text.fontSize}px "${text.fontFamily}", sans-serif`;
       ctx.fillStyle = text.color;
-      ctx.textAlign = text.align;
       ctx.textBaseline = 'middle';
 
-      // Simple Shadow for visibility
+      // Shadow
       ctx.shadowColor = 'rgba(0,0,0,0.5)';
       ctx.shadowBlur = 4;
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 2;
 
-      ctx.fillText(text.text, 0, 0);
+      if (text.curved) {
+        // --- Curved Text Logic ---
+        const radius = CANVAS_SIZE / 2 - (text.fontSize * 0.8); // Fit inside edge
+        const characters = text.text.split('');
+        const totalAngle = ctx.measureText(text.text).width / radius; // Approximation
 
-      // Selection Box (If Selected)
-      if (selectedTextId === text.id && !isPlaying && !isRecording) {
-        const metrics = ctx.measureText(text.text);
-        const width = metrics.width;
-        const height = text.fontSize; // Approx height
-        const padding = 10;
+        // Starting Angle based on Alignment
+        // We treat text.rotation as the "Center" of the text block on the circle
+        let startAngle = (text.rotation * Math.PI) / 180;
 
-        ctx.shadowColor = 'transparent'; // Remove shadow for box
-        ctx.strokeStyle = '#3b82f6';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]);
+        if (text.align === 'center') startAngle -= totalAngle / 2;
+        if (text.align === 'right') startAngle -= totalAngle;
+        // if left, startAngle is just rotation
 
-        // Adjust rect based on alignment
-        let xOffset = 0;
-        if (text.align === 'center') xOffset = -width / 2;
-        if (text.align === 'right') xOffset = -width;
+        // Draw each char
+        characters.forEach((char) => {
+          const charWidth = ctx.measureText(char).width;
+          const charAngle = charWidth / radius;
 
-        ctx.strokeRect(xOffset - padding, -height / 2 - padding, width + padding * 2, height + padding * 2);
+          // Middle of the character
+          const theta = startAngle + charAngle / 2;
+
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.rotate(theta + Math.PI / 2); // basic rotation + 90 deg to stand upright on top
+          ctx.translate(0, -radius);
+
+          // Fix text rotation for readability?
+          // Standard curved text points "outward" usually.
+          // At 12 o'clock (-90 deg), text is upright.
+
+          ctx.fillText(char, 0, 0);
+          ctx.restore();
+
+          startAngle += charAngle;
+        });
+
+      } else {
+        // --- Straight Text Logic (Legacy) ---
+        const tX = text.x + centerX;
+        const tY = text.y + centerY;
+
+        ctx.translate(tX, tY);
+        ctx.rotate((text.rotation * Math.PI) / 180);
+        ctx.textAlign = text.align;
+
+        ctx.fillText(text.text, 0, 0);
+
+        // Selection Box (If Selected)
+        if (selectedTextId === text.id && !isPlaying && !isRecording) {
+          const metrics = ctx.measureText(text.text);
+          const width = metrics.width;
+          const height = text.fontSize;
+          const padding = 10;
+
+          ctx.shadowColor = 'transparent';
+          ctx.strokeStyle = '#3b82f6';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 5]);
+
+          let xOffset = 0;
+          if (text.align === 'center') xOffset = -width / 2;
+          if (text.align === 'right') xOffset = -width;
+
+          ctx.strokeRect(xOffset - padding, -height / 2 - padding, width + padding * 2, height + padding * 2);
+        }
       }
 
       ctx.restore();

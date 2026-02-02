@@ -51,4 +51,5 @@ export interface TextConfig {
   color: string;
   rotation: number;
   align: 'left' | 'center' | 'right';
+  curved?: boolean;
 }

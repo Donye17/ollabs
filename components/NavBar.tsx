@@ -9,6 +9,7 @@ import { UserCircle, LogOut } from 'lucide-react';
 export const NavBar: React.FC = () => {
     const { data: session } = authClient.useSession();
     const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [isSigningOut, setIsSigningOut] = useState(false);
     const pathname = usePathname();
 
     const isActive = (path: string) => pathname === path;
@@ -16,8 +17,14 @@ export const NavBar: React.FC = () => {
     const inactiveClass = "text-slate-400 hover:text-white hover:bg-slate-800/50 hover:scale-105 border-transparent";
 
     const handleSignOut = async () => {
-        await authClient.signOut();
-        window.location.href = '/';
+        setIsSigningOut(true);
+        try {
+            await authClient.signOut();
+            window.location.href = '/';
+        } catch (error) {
+            console.error("Sign out failed", error);
+            setIsSigningOut(false);
+        }
     };
 
     return (
@@ -68,10 +75,16 @@ export const NavBar: React.FC = () => {
                                 </Link>
                                 <button
                                     onClick={handleSignOut}
-                                    className="p-3 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-300"
+                                    disabled={isSigningOut}
+                                    className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-300 font-medium text-sm group"
                                     title="Sign Out"
                                 >
-                                    <LogOut size={20} message-circle />
+                                    {isSigningOut ? (
+                                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <LogOut size={18} className="group-hover:-translate-x-0.5 transition-transform" />
+                                    )}
+                                    <span className="hidden sm:inline">Sign Out</span>
                                 </button>
                             </div>
                         </div>

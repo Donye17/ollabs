@@ -1,5 +1,5 @@
 import React from 'react';
-import { Type, AlignLeft, AlignCenter, AlignRight, Plus, Trash2 } from 'lucide-react';
+import { Type, AlignLeft, AlignCenter, AlignRight, Plus, Trash2, Circle } from 'lucide-react';
 import { TextConfig } from '@/lib/types';
 
 interface TextControlsProps {
@@ -69,7 +69,7 @@ export const TextControls: React.FC<TextControlsProps> = ({
                         </button>
                     </div>
 
-                    {/* Font & Alignment */}
+                    {/* Font & Alignment & Curve */}
                     <div className="grid grid-cols-2 gap-3">
                         <select
                             value={selectedText.fontFamily}
@@ -95,6 +95,14 @@ export const TextControls: React.FC<TextControlsProps> = ({
                                     {align === 'right' && <AlignRight size={14} />}
                                 </button>
                             ))}
+                            <div className="w-px bg-slate-700 mx-1 my-1" />
+                            <button
+                                onClick={() => onUpdateText(selectedText.id, { curved: !selectedText.curved })}
+                                className={`flex-1 flex items-center justify-center p-1.5 rounded-lg transition-colors ${selectedText.curved ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}
+                                title="Curved Text"
+                            >
+                                <Circle size={14} className={selectedText.curved ? 'fill-current' : ''} />
+                            </button>
                         </div>
                     </div>
 
