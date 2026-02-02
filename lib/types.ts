@@ -27,6 +27,7 @@ export interface FrameConfig {
   width: number; // proportional thickness
   imageUrl?: string; // For CUSTOM_IMAGE type
   stickers?: StickerConfig[]; // Optional stickers array
+  textLayers?: TextConfig[]; // Optional text layers
 }
 
 export type MotionEffect = 'none' | 'pulse' | 'spin' | 'glitch' | 'rain';
@@ -38,4 +39,16 @@ export interface StickerConfig {
   y: number;
   scale: number;
   rotation: number;
+}
+
+export interface TextConfig {
+  id: string;
+  text: string;
+  x: number;
+  y: number;
+  fontSize: number;
+  fontFamily: string;
+  color: string;
+  rotation: number;
+  align: 'left' | 'center' | 'right';
 }

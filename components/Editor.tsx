@@ -2,10 +2,11 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Download, Upload, ZoomIn, ZoomOut, RefreshCcw, Image as ImageIcon, Maximize, RotateCw, Share2, User, Loader2 } from 'lucide-react';
 import GIF from 'gif.js';
 import { CANVAS_SIZE, DISPLAY_SIZE } from '@/lib/constants';
-import { FrameConfig, FrameType, Position, StickerConfig, MotionEffect } from '@/lib/types';
+import { FrameConfig, FrameType, Position, StickerConfig, MotionEffect, TextConfig } from '@/lib/types';
 import { FrameRendererFactory } from './renderer/FrameRendererFactory';
 import { PublishModal } from './PublishModal';
 import { MotionControls } from './MotionControls';
+import { TextControls } from './TextControls';
 import { authClient } from '../lib/auth-client';
 import { BadgeCheck, Zap, Heart, Star, Award, Trash2 } from 'lucide-react';
 
@@ -46,6 +47,9 @@ export const Editor: React.FC<EditorProps> = ({
 
   // Stickers State
   const [stickers, setStickers] = useState<StickerConfig[]>([]);
+  // Text State
+  const [textLayers, setTextLayers] = useState<TextConfig[]>([]);
+
   // Motion State
   const [motionEffect, setMotionEffect] = useState<MotionEffect>('none');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -55,6 +59,7 @@ export const Editor: React.FC<EditorProps> = ({
 
   // Interaction State
   const [selection, setSelection] = useState<string | null>(null); // Selected Sticker ID
+  const [selectedTextId, setSelectedTextId] = useState<string | null>(null); // Selected Text ID
   const [interactionMode, setInteractionMode] = useState<'none' | 'drag' | 'scale' | 'rotate' | 'pan'>('none');
   const [dragStart, setDragStart] = useState<Position>({ x: 0, y: 0 });
   const [initialStickerState, setInitialStickerState] = useState<{ x: number, y: number, scale: number, rotation: number } | null>(null);
@@ -213,6 +218,54 @@ export const Editor: React.FC<EditorProps> = ({
       ctx.restore();
     });
 
+    ctx.restore();
+
+
+    // 5. Draw Text Layers
+    textLayers.forEach(text => {
+      ctx.save();
+      const tX = text.x + centerX;
+      const tY = text.y + centerY;
+
+      ctx.translate(tX, tY);
+      ctx.rotate((text.rotation * Math.PI) / 180);
+
+      ctx.font = `${text.fontSize}px "${text.fontFamily}", sans-serif`;
+      ctx.fillStyle = text.color;
+      ctx.textAlign = text.align;
+      ctx.textBaseline = 'middle';
+
+      // Simple Shadow for visibility
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+
+      ctx.fillText(text.text, 0, 0);
+
+      // Selection Box (If Selected)
+      if (selectedTextId === text.id && !isPlaying && !isRecording) {
+        const metrics = ctx.measureText(text.text);
+        const width = metrics.width;
+        const height = text.fontSize; // Approx height
+        const padding = 10;
+
+        ctx.shadowColor = 'transparent'; // Remove shadow for box
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+
+        // Adjust rect based on alignment
+        let xOffset = 0;
+        if (text.align === 'center') xOffset = -width / 2;
+        if (text.align === 'right') xOffset = -width;
+
+        ctx.strokeRect(xOffset - padding, -height / 2 - padding, width + padding * 2, height + padding * 2);
+      }
+
+      ctx.restore();
+    });
+
     // Rain Effect Overlay
     if (motionEffect === 'rain') {
       ctx.save();
@@ -229,7 +282,7 @@ export const Editor: React.FC<EditorProps> = ({
       ctx.restore();
     }
 
-  }, [imageObject, position, scale, rotation, selectedFrame, isDragOver, stickers, selection, motionEffect, isPlaying, isRecording]);
+  }, [imageObject, position, scale, rotation, selectedFrame, isDragOver, stickers, selection, motionEffect, isPlaying, isRecording, textLayers, selectedTextId]);
 
   // Animation Loop
   const animate = useCallback((time: number) => {
@@ -427,6 +480,53 @@ export const Editor: React.FC<EditorProps> = ({
 
     // Hit Test for Sticker Bodies
     let hitStickerId: string | null = null;
+    let hitTextId: string | null = null;
+    const ctx = canvasRef.current?.getContext('2d');
+
+    // 1. Text Hit Test (Top Priority)
+    // Reverse order
+    for (let i = textLayers.length - 1; i >= 0; i--) {
+      const t = textLayers[i];
+      const tX = centerX + t.x;
+      const tY = centerY + t.y;
+
+      const localM = rotatePoint(x, y, tX, tY, -t.rotation);
+      const localX = localM.x - tX;
+      const localY = localM.y - tY;
+
+      // Approx hit box
+      if (ctx) {
+        ctx.font = `${t.fontSize}px "${t.fontFamily}", sans-serif`;
+        const metrics = ctx.measureText(t.text);
+        const width = metrics.width;
+        const height = t.fontSize;
+
+        let xStart = 0;
+        if (t.align === 'center') xStart = -width / 2;
+        if (t.align === 'right') xStart = -width;
+
+        if (
+          localX >= xStart &&
+          localX <= xStart + width &&
+          localY >= -height / 2 &&
+          localY <= height / 2
+        ) {
+          hitTextId = t.id;
+          break;
+        }
+      }
+    }
+
+    if (hitTextId) {
+      setSelectedTextId(hitTextId);
+      setSelection(null); // Deselect sticker
+      setInteractionMode('drag');
+      const t = textLayers.find(tl => tl.id === hitTextId)!;
+      setDragStart({ x: x - t.x, y: y - t.y });
+      return;
+    }
+
+    // 2. Sticker Hit Test
     // Check in reverse order (top first)
     for (let i = stickers.length - 1; i >= 0; i--) {
       const s = stickers[i];
@@ -447,11 +547,13 @@ export const Editor: React.FC<EditorProps> = ({
 
     if (hitStickerId) {
       setSelection(hitStickerId);
+      setSelectedTextId(null); // Deselect text
       setInteractionMode('drag');
       const s = stickers.find(st => st.id === hitStickerId)!;
       setDragStart({ x: x - s.x, y: y - s.y }); // Offset from sticker center
     } else {
       setSelection(null);
+      setSelectedTextId(null);
       // Pan/Move Image
       if (imageObject) {
         setInteractionMode('pan');
@@ -475,21 +577,20 @@ export const Editor: React.FC<EditorProps> = ({
     if (interactionMode === 'pan') {
       setPosition({ x: x - dragStart.x, y: y - dragStart.y });
     }
-    else if (interactionMode === 'drag' && selection) {
-      // Wait, my dragStart logic for sticker was: x - s.x (which is offset from sticker origin)
-      // So new s.x should be: x - dragStart.x (if x is mouse pos relative to canvas origin)
-      // But dragStart was (mouse.x - sticker.x). 
-      // So sticker.x = mouse.x - dragStart.x?
-      // Let's fix the dragStart logic in MouseDown to be cleaner:
-      // dragStart = mouseX - stickerX. 
-      // New stickerX = mouseX - dragStart. YES.
-      // But wait... handleMouseDown recorded `dragStart = x - s.x`. 
-      // So `s.x = x - dragStart.x`. Correct.
-      const offsetX = dragStart.x;
-      const offsetY = dragStart.y;
-      setStickers(prev => prev.map(s =>
-        s.id === selection ? { ...s, x: x - offsetX, y: y - offsetY } : s
-      ));
+    else if (interactionMode === 'drag') {
+      if (selection) {
+        const offsetX = dragStart.x;
+        const offsetY = dragStart.y;
+        setStickers(prev => prev.map(s =>
+          s.id === selection ? { ...s, x: x - offsetX, y: y - offsetY } : s
+        ));
+      } else if (selectedTextId) {
+        const offsetX = dragStart.x;
+        const offsetY = dragStart.y;
+        setTextLayers(prev => prev.map(t =>
+          t.id === selectedTextId ? { ...t, x: x - offsetX, y: y - offsetY } : t
+        ));
+      }
     }
     else if (interactionMode === 'rotate' && selection) {
       setStickers(prev => prev.map(s => {
@@ -564,7 +665,7 @@ export const Editor: React.FC<EditorProps> = ({
            relative group rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
            ${isDragOver
             ? 'scale-110 ring-8 ring-primary/50 shadow-[0_20px_50px_rgba(37,99,235,0.5)]'
-            : 'scale-100 ring-4 ring-white/5 bg-slate-900/50 backdrop-blur-3xl shadow-2xl shadow-black/50'}
+            : 'scale-100 bg-slate-900/50 backdrop-blur-3xl shadow-2xl shadow-black/50'}
         `}
         style={{
           width: DISPLAY_SIZE,
@@ -810,13 +911,47 @@ export const Editor: React.FC<EditorProps> = ({
             <span className="text-xs text-slate-500 font-medium">{stickers.length} stickers active</span>
             <button
               onClick={() => setStickers([])}
-              className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1.5 font-bold uppercase tracking-wide px-2 py-1 hover:bg-red-500/10 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
+              className="flex items-center gap-1.5 text-xs font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wide hover:bg-red-400/10 px-3 py-1.5 rounded-lg"
             >
-              <Trash2 size={12} /> Clear All
+              <Trash2 size={14} />
+              <span>Clear All</span>
             </button>
           </div>
         )}
       </div>
+
+      {/* Text Controls */}
+      <TextControls
+        textLayers={textLayers}
+        selectedTextId={selectedTextId}
+        onAddText={() => {
+          const newText: TextConfig = {
+            id: Date.now().toString(),
+            text: 'New Text',
+            x: 0,
+            y: 0,
+            fontSize: 40,
+            fontFamily: 'Inter',
+            color: '#ffffff',
+            rotation: 0,
+            align: 'center'
+          };
+          setTextLayers(prev => [...prev, newText]);
+          setSelectedTextId(newText.id);
+          setSelection(null); // Deselect sticker
+        }}
+        onUpdateText={(id, updates) => {
+          setTextLayers(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
+        }}
+        onDeleteText={(id) => {
+          setTextLayers(prev => prev.filter(t => t.id !== id));
+          if (selectedTextId === id) setSelectedTextId(null);
+        }}
+        onSelectText={(id) => {
+          setSelectedTextId(id);
+          setSelection(null);
+        }}
+      />
 
       {/* Motion Controls */}
       <MotionControls
@@ -829,16 +964,18 @@ export const Editor: React.FC<EditorProps> = ({
       />
 
       {/* Publish Modal Trigger (Only if image is present) */}
-      {imageSrc && (
-        <div className="mt-4">
-          <button
-            onClick={() => setIsPublishOpen(true)}
-            className="text-sm text-slate-500 hover:text-white underline decoration-slate-700 hover:decoration-white transition-all"
-          >
-            Publish to Community Gallery
-          </button>
-        </div>
-      )}
+      {
+        imageSrc && (
+          <div className="mt-4">
+            <button
+              onClick={() => setIsPublishOpen(true)}
+              className="text-sm text-slate-500 hover:text-white underline decoration-slate-700 hover:decoration-white transition-all"
+            >
+              Publish to Community Gallery
+            </button>
+          </div>
+        )
+      }
 
       <PublishModal
         isOpen={isPublishOpen}
