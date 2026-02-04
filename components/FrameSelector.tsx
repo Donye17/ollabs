@@ -1,8 +1,7 @@
 "use client";
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { AVAILABLE_FRAMES } from '@/lib/constants';
 import { FrameConfig, FrameType } from '@/lib/types';
-import { Upload } from 'lucide-react';
 
 interface FrameSelectorProps {
   selectedFrameId: string;
@@ -10,49 +9,11 @@ interface FrameSelectorProps {
 }
 
 export const FrameSelector: React.FC<FrameSelectorProps> = ({ selectedFrameId, onSelect }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleCustomUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
-        onSelect({
-          id: `custom-${Date.now()}`,
-          name: 'My Custom Frame',
-          type: FrameType.CUSTOM_IMAGE,
-          color1: '#ffffff', // unused but required types
-          width: 0,
-          imageUrl: dataUrl
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   return (
     <div className="grid grid-cols-4 gap-3">
-      {/* Custom Upload Button */}
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        className="relative group flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 bg-blue-900/20 hover:bg-blue-900/40 border border-blue-500/30 hover:border-blue-500/60 ring-offset-2 ring-offset-slate-900"
-        title="Upload your own PNG frame"
-      >
-        <div className="w-10 h-10 mb-1 flex items-center justify-center bg-blue-500/20 rounded-full group-hover:bg-blue-500/30 transition-colors">
-          <Upload size={20} className="text-blue-400 group-hover:text-blue-200" />
-        </div>
-        <span className="text-[10px] font-medium text-blue-200 truncate w-full text-center">
-          Upload New
-        </span>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/png,image/webp"
-          className="hidden"
-          onChange={handleCustomUpload}
-        />
-      </button>
+
 
       {AVAILABLE_FRAMES.map((frame) => {
         const isSelected = selectedFrameId === frame.id;

@@ -4,6 +4,7 @@
   "/api/frames/comments/route": "app/api/frames/comments/route.js",
   "/api/frames/likes/route": "app/api/frames/likes/route.js",
   "/api/frames/route": "app/api/frames/route.js",
+  "/create/page": "app/create/page.js",
   "/gallery/page": "app/gallery/page.js",
   "/page": "app/page.js",
   "/profile/[id]/page": "app/profile/[id]/page.js",

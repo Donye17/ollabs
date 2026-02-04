@@ -8,19 +8,19 @@ import { FrameConfig } from '@/lib/types';
 export const GalleryPageClient: React.FC = () => {
     const router = useRouter();
 
-    const handleSelectFrame = (frame: FrameConfig) => {
+    const handleSelectFrame = (frame: FrameConfig, frameId: string) => {
         // Store in localStorage purely for client-side persistence across navigation
         localStorage.setItem('temp_frame', JSON.stringify(frame));
-        router.push('/');
+        router.push(`/create?id=${frameId}`);
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-50 font-sans">
+        <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-blue-500/30">
             <NavBar />
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
                 <Gallery onSelectFrame={handleSelectFrame} />
             </main>
-            <footer className="py-8 text-center text-slate-600 text-sm">
+            <footer className="py-12 text-center text-zinc-600 text-sm border-t border-white/5 bg-zinc-950">
                 <p>&copy; {new Date().getFullYear()} Ollabs. Community Gallery.</p>
             </footer>
         </div>

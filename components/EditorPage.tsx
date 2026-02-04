@@ -1,49 +1,65 @@
 "use client";
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Editor } from './Editor';
 import { FrameSelector } from './FrameSelector';
 import { FrameCustomizer } from './FrameCustomizer';
+import { CustomFramePanel } from './CustomFramePanel';
 import { ContactPreview } from './ContactPreview';
-import { NavBar } from './NavBar';
+import { StickerControls } from './StickerControls';
+import { TextControls } from './TextControls';
+import { MotionControls } from './MotionControls';
+import { NavBar } from '@/components/NavBar';
 import { AVAILABLE_FRAMES } from '@/lib/constants';
-import { FrameConfig } from '@/lib/types';
-import { AlertCircle } from 'lucide-react';
+import { FrameConfig, StickerConfig, TextConfig, MotionEffect } from '@/lib/types';
+import { AlertCircle, Sparkles, Sliders, Eye, Type, Sticker, Clapperboard, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
+import { PublishTemplateModal } from './PublishTemplateModal';
+import { removeBackground } from "@imgly/background-removal";
 
 export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
+    // History State (Frame Config)
     const [history, setHistory] = useState<FrameConfig[]>([AVAILABLE_FRAMES[2]]);
     const [historyIndex, setHistoryIndex] = useState<number>(0);
+    const selectedFrame = history[historyIndex];
+
+    // Editor State (Lifted Up)
+    const [stickers, setStickers] = useState<StickerConfig[]>([]);
+    const [textLayers, setTextLayers] = useState<TextConfig[]>([]);
+    const [motionEffect, setMotionEffect] = useState<MotionEffect>('none');
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [selection, setSelection] = useState<string | null>(null); // For Stickers
+    const [selectedTextId, setSelectedTextId] = useState<string | null>(null); // For Text
+
+    // Refs
+    const editorRef = useRef<{ exportGif: () => void }>(null);
+
+    const [activeTab, setActiveTab] = useState<'design' | 'custom' | 'customize' | 'text' | 'decor' | 'motion' | 'preview'>('design');
+    const [isPublishOpen, setIsPublishOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(!!remixId);
 
     // Initial Load Logic (Local Storage OR Remix ID)
     useEffect(() => {
         const loadInitialFrame = async () => {
-            // Priority 1: URL Remix ID
             if (remixId) {
+                setIsLoading(true);
                 try {
                     const res = await fetch(`/api/frames?id=${remixId}`);
                     if (res.ok) {
                         const frames = await res.json();
                         if (frames.length > 0) {
                             const frame = frames[0];
-                            // Parse config if it's a string (DB) vs object
                             const config = typeof frame.config === 'string' ? JSON.parse(frame.config) : frame.config;
-                            setHistory([{
-                                ...config,
-                                id: frame.id, // Keep original ID or generate new? For remix, maybe keep ID for reference but treating as new draft? 
-                                // Actually, if we want to "fork", we should probably generate a NEW temp ID so we don't overwrite if we had logic for that.
-                                // But Editor usually manages IDs for presets.
-                            }]);
+                            setHistory([{ ...config, id: frame.id }]);
                             setHistoryIndex(0);
-                            // Clean URL to avoid re-fetching on refresh?
-                            window.history.replaceState({}, '', '/');
-                            return;
+                            window.history.replaceState({}, '', '/create');
                         }
                     }
                 } catch (e) {
                     console.error("Failed to load remix frame", e);
+                } finally {
+                    setIsLoading(false);
                 }
+                return;
             }
-
-            // Priority 2: Local Storage (from internal navigation)
             try {
                 const stored = localStorage.getItem('temp_frame');
                 if (stored) {
@@ -56,22 +72,32 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                 console.error("Failed to load frame from storage", e);
             }
         };
-
         loadInitialFrame();
     }, [remixId]);
 
-    const selectedFrame = history[historyIndex];
-
     const [imageSrc, setImageSrc] = useState<string | null>(null);
     const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
+    const [isRemovingBg, setIsRemovingBg] = useState(false);
 
-    // Updated to accept File object directly for DnD support
+    const handleRemoveBackground = async () => {
+        if (!imageSrc) return;
+        setIsRemovingBg(true);
+        try {
+            const blob = await removeBackground(imageSrc);
+            const url = URL.createObjectURL(blob);
+            setImageSrc(url);
+        } catch (error) {
+            console.error("BG Removal failed", error);
+            alert("Failed to remove background. Please try again.");
+        } finally {
+            setIsRemovingBg(false);
+        }
+    };
+
     const handleImageSelect = (file: File) => {
         if (file) {
             const reader = new FileReader();
-            reader.onload = (event) => {
-                setImageSrc(event.target?.result as string);
-            };
+            reader.onload = (event) => setImageSrc(event.target?.result as string);
             reader.readAsDataURL(file);
         }
     };
@@ -79,9 +105,12 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const handleReset = () => {
         setImageSrc(null);
         setPreviewDataUrl(null);
+        setStickers([]);
+        setTextLayers([]);
+        setMotionEffect('none');
     };
 
-    // Add new state to history
+    // History Helpers
     const addToHistory = (newFrame: FrameConfig) => {
         const newHistory = history.slice(0, historyIndex + 1);
         newHistory.push(newFrame);
@@ -89,41 +118,54 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
         setHistoryIndex(newHistory.length - 1);
     };
 
-    const handleUndo = () => {
-        if (historyIndex > 0) {
-            setHistoryIndex(historyIndex - 1);
-        }
+    const handleUndo = () => historyIndex > 0 && setHistoryIndex(historyIndex - 1);
+    const handleRedo = () => historyIndex < history.length - 1 && setHistoryIndex(historyIndex + 1);
+    const handlePresetSelect = (frame: FrameConfig) => addToHistory(frame);
+    const handleFrameUpdate = (updatedFrame: FrameConfig) => addToHistory(updatedFrame);
+    const handlePreviewUpdate = useCallback((dataUrl: string) => setPreviewDataUrl(dataUrl), []);
+
+    // Handlers for controls
+    const handleAddSticker = (icon: string) => {
+        setStickers(prev => [
+            ...prev,
+            {
+                id: Date.now().toString(),
+                icon: icon,
+                x: 0,
+                y: 0,
+                scale: 1,
+                rotation: 0
+            }
+        ]);
     };
 
-    const handleRedo = () => {
-        if (historyIndex < history.length - 1) {
-            setHistoryIndex(historyIndex + 1);
-        }
+    const handleUpdateSticker = (id: string, updates: Partial<StickerConfig>) => {
+        setStickers(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
     };
 
-    // When a preset is selected, overwrite history path
-    const handlePresetSelect = (frame: FrameConfig) => {
-        addToHistory(frame);
+    const handleDeleteSticker = (id: string) => {
+        setStickers(prev => prev.filter(s => s.id !== id));
+        if (selection === id) setSelection(null);
     };
 
-    // When customizing, update specific fields and add to history
-    const handleFrameUpdate = (updatedFrame: FrameConfig) => {
-        addToHistory(updatedFrame);
-    };
 
-    // Update the preview image data
-    const handlePreviewUpdate = useCallback((dataUrl: string) => {
-        setPreviewDataUrl(dataUrl);
-    }, []);
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-50 font-sans">
+                <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+                <p className="text-zinc-400 text-sm animate-pulse">Loading Template...</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-50 font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-blue-500/30">
             <NavBar />
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 lg:py-24">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
 
-                    {/* Left Column: Editor & Canvas */}
+                    {/* Left Column: Canvas */}
                     <div className="lg:col-span-7 flex flex-col items-center">
                         <Editor
                             imageSrc={imageSrc}
@@ -131,71 +173,200 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             selectedFrame={selectedFrame}
                             onReset={handleReset}
                             onPreviewUpdate={handlePreviewUpdate}
+
+                            // State Props
+                            stickers={stickers}
+                            onStickersChange={setStickers}
+                            textLayers={textLayers}
+                            onTextLayersChange={setTextLayers}
+                            motionEffect={motionEffect}
+                            isPlaying={isPlaying}
+
+                            // Interaction Props
+                            selection={selection}
+                            onSelectSticker={setSelection}
+                            selectedTextId={selectedTextId}
+                            onSelectText={setSelectedTextId}
+
+                            editorRef={editorRef as React.RefObject<{ exportGif: () => void }>}
+                            onRemoveBackground={handleRemoveBackground}
+                            isRemovingBackground={isRemovingBg}
                         />
 
-                        {/* Info Box */}
-                        <div className="mt-8 p-4 bg-blue-900/10 rounded-xl border border-blue-500/20 text-sm text-blue-200 max-w-md flex gap-3 items-start">
+                        {/* Tip Box */}
+                        <div className="mt-8 p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10 text-sm text-blue-200 max-w-md flex gap-3 items-start animate-fade-in">
                             <AlertCircle className="shrink-0 text-blue-400 mt-0.5" size={18} />
-                            <p>
-                                <strong>Tip:</strong> Drag & Drop a photo to start. Pinch to zoom/pan.
-                            </p>
+                            <p><strong>Tip:</strong> Drag & Drop a photo to start. Pinch to zoom/pan.</p>
                         </div>
                     </div>
 
-                    {/* Right Column: Controls & Desktop Preview */}
-                    <div className="lg:col-span-5 space-y-8">
+                    {/* Right Column: Key Controls */}
+                    <div className="lg:col-span-5 space-y-6">
 
-                        {/* 1. Desktop Preview (Only visible on large screens) */}
-                        <div className="hidden lg:block">
-                            <ContactPreview previewSrc={previewDataUrl} />
+                        {/* Creator Header */}
+                        <div className="flex items-center justify-between px-2">
+                            <div>
+                                <h1 className="text-2xl font-black text-white tracking-tight">Studio</h1>
+                                <p className="text-xs text-zinc-400 font-medium">Create & Share Templates</p>
+                            </div>
+                            <button
+                                onClick={() => setIsPublishOpen(true)}
+                                className="bg-white text-zinc-950 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-zinc-200 transition-colors shadow-lg shadow-white/5"
+                            >
+                                <Upload size={16} /> Publish
+                            </button>
                         </div>
 
-                        {/* 2. Controls */}
-                        <div className="bg-slate-800/50 rounded-3xl p-6 border border-slate-700/50 backdrop-blur-sm sticky top-24">
-                            <div className="mb-6">
-                                <h2 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                                    <span className="w-1 h-6 rounded-full bg-blue-500 block"></span>
-                                    Frame Presets
-                                </h2>
-                                <p className="text-slate-400 text-sm">Select a base style then customize it below.</p>
-                            </div>
+                        {/* Tab Switcher - Scrollable on mobile */}
+                        <div className="flex p-1 bg-zinc-900/50 backdrop-blur-sm border border-white/5 rounded-2xl overflow-x-auto scrollbar-hide">
+                            {[
+                                { id: 'design', icon: Sparkles, label: 'Design' },
+                                { id: 'custom', icon: ImageIcon, label: 'Custom' },
+                                { id: 'customize', icon: Sliders, label: 'Edit' },
+                                { id: 'text', icon: Type, label: 'Text' },
+                                { id: 'decor', icon: Sticker, label: 'Decor' },
+                                { id: 'motion', icon: Clapperboard, label: 'Motion' },
+                                { id: 'preview', icon: Eye, label: 'Preview' },
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as any)}
+                                    className={`flex-1 min-w-[60px] flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl text-[10px] uppercase font-bold tracking-wide transition-all ${activeTab === tab.id ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                >
+                                    <tab.icon size={18} />
+                                    <span>{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
 
-                            <FrameSelector
-                                selectedFrameId={selectedFrame.id}
-                                onSelect={handlePresetSelect}
-                            />
+                        {/* Tab Content Panels */}
+                        <div className="glass-panel p-6 rounded-3xl min-h-[400px]">
 
-                            <div className="my-6 border-t border-slate-700/50"></div>
-
-                            <FrameCustomizer
-                                frame={selectedFrame}
-                                onChange={handleFrameUpdate}
-                                onUndo={handleUndo}
-                                onRedo={handleRedo}
-                                canUndo={historyIndex > 0}
-                                canRedo={historyIndex < history.length - 1}
-                            />
-
-                            {!imageSrc && (
-                                <div className="mt-6 p-4 bg-blue-500/10 rounded-xl text-center border border-blue-500/20">
-                                    <p className="text-blue-200 text-sm">Upload a photo to see the live preview.</p>
+                            {activeTab === 'design' && (
+                                <div className="space-y-4 animate-fade-in">
+                                    <div>
+                                        <h2 className="text-lg font-bold text-white mb-1">Choose a Style</h2>
+                                        <p className="text-zinc-400 text-xs">Select a base frame to start with.</p>
+                                    </div>
+                                    <FrameSelector selectedFrameId={selectedFrame.id} onSelect={handlePresetSelect} />
                                 </div>
                             )}
-                        </div>
-                    </div>
 
-                    {/* Mobile Only: Preview at the bottom */}
-                    <div className="lg:hidden col-span-1 md:col-span-2 lg:col-span-12 w-full border-t border-slate-800 pt-12 pb-8 mt-8">
-                        <h3 className="text-center text-slate-400 text-sm uppercase tracking-wider font-bold mb-6">Final Preview</h3>
-                        <div className="flex justify-center">
-                            <ContactPreview previewSrc={previewDataUrl} />
+                            {activeTab === 'custom' && (
+                                <CustomFramePanel
+                                    frame={selectedFrame}
+                                    onChange={handleFrameUpdate}
+                                />
+                            )}
+
+                            {activeTab === 'customize' && (
+                                <div className="space-y-4 animate-fade-in">
+                                    <div>
+                                        <h2 className="text-lg font-bold text-white mb-1">Fine Tune</h2>
+                                        <p className="text-zinc-400 text-xs">Adjust colors, borders, and effects.</p>
+                                    </div>
+                                    <FrameCustomizer
+                                        frame={selectedFrame}
+                                        onChange={handleFrameUpdate}
+                                        onUndo={handleUndo}
+                                        onRedo={handleRedo}
+                                        canUndo={historyIndex > 0}
+                                        canRedo={historyIndex < history.length - 1}
+                                    />
+                                </div>
+                            )}
+
+                            {activeTab === 'text' && (
+                                <div className="space-y-4 animate-fade-in">
+                                    <TextControls
+                                        textLayers={textLayers}
+                                        selectedTextId={selectedTextId}
+                                        onAddText={() => {
+                                            const newText: TextConfig = {
+                                                id: Date.now().toString(),
+                                                text: 'New Text',
+                                                x: 0,
+                                                y: 0,
+                                                fontSize: 40,
+                                                fontFamily: 'Inter',
+                                                color: '#ffffff',
+                                                rotation: 0,
+                                                align: 'center',
+                                                curved: true
+                                            };
+                                            setTextLayers([...textLayers, newText]);
+                                            setSelectedTextId(newText.id);
+                                            setSelection(null);
+                                        }}
+                                        onUpdateText={(id, updates) => {
+                                            setTextLayers(textLayers.map(t => t.id === id ? { ...t, ...updates } : t));
+                                        }}
+                                        onDeleteText={(id) => {
+                                            setTextLayers(textLayers.filter(t => t.id !== id));
+                                            if (selectedTextId === id) setSelectedTextId(null);
+                                        }}
+                                        onSelectText={(id) => {
+                                            setSelectedTextId(id);
+                                            setSelection(null);
+                                        }}
+                                    />
+                                </div>
+                            )}
+
+                            {activeTab === 'decor' && (
+                                <div className="space-y-4 animate-fade-in">
+                                    <StickerControls
+                                        stickers={stickers}
+                                        selectedStickerId={selection}
+                                        onAddSticker={handleAddSticker}
+                                        onUpdateSticker={handleUpdateSticker}
+                                        onDeleteSticker={handleDeleteSticker}
+                                        onSelectSticker={(id) => {
+                                            setSelection(id);
+                                            setSelectedTextId(null);
+                                        }}
+                                    />
+                                </div>
+                            )}
+
+                            {activeTab === 'motion' && (
+                                <div className="space-y-4 animate-fade-in">
+                                    <MotionControls
+                                        currentEffect={motionEffect}
+                                        setEffect={setMotionEffect}
+                                        isRecording={false} // Loading state not lifted fully, maybe todo
+                                        onExport={() => editorRef.current?.exportGif()}
+                                        isPlaying={isPlaying}
+                                        onTogglePlay={() => setIsPlaying(!isPlaying)}
+                                    />
+                                </div>
+                            )}
+
+                            {activeTab === 'preview' && (
+                                <div className="space-y-4 animate-fade-in flex flex-col items-center justify-center h-full">
+                                    <div>
+                                        <h2 className="text-lg font-bold text-white mb-1 text-center">Live Preview</h2>
+                                        <p className="text-zinc-400 text-xs text-center mb-6">See how it looks in a contact list.</p>
+                                    </div>
+                                    <ContactPreview previewSrc={previewDataUrl} />
+                                </div>
+                            )}
+
                         </div>
+
                     </div>
 
                 </div>
             </main>
 
-            <footer className="py-8 text-center text-slate-600 text-sm">
+            <PublishTemplateModal
+                isOpen={isPublishOpen}
+                onClose={() => setIsPublishOpen(false)}
+                config={{ ...selectedFrame, stickers, textLayers }}
+                previewDataUrl={previewDataUrl}
+            />
+
+            <footer className="py-12 text-center text-zinc-600 text-sm border-t border-white/5 bg-zinc-950">
                 <p>&copy; {new Date().getFullYear()} Ollabs. Designed & Built for the Community.</p>
             </footer>
         </div>

@@ -95,16 +95,9 @@ export const TextControls: React.FC<TextControlsProps> = ({
                                     {align === 'right' && <AlignRight size={14} />}
                                 </button>
                             ))}
-                            <div className="w-px bg-slate-700 mx-1 my-1" />
-                            <button
-                                onClick={() => onUpdateText(selectedText.id, { curved: !selectedText.curved })}
-                                className={`flex-1 flex items-center justify-center p-1.5 rounded-lg transition-colors ${selectedText.curved ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}
-                                title="Curved Text"
-                            >
-                                <Circle size={14} className={selectedText.curved ? 'fill-current' : ''} />
-                            </button>
                         </div>
                     </div>
+
 
                     {/* Colors */}
                     <div>
@@ -152,30 +145,33 @@ export const TextControls: React.FC<TextControlsProps> = ({
                     <p className="text-sm text-slate-400 font-medium">No Text Selected</p>
                     <p className="text-xs text-slate-600 mt-1">Select text on canvas or add new</p>
                 </div>
-            )}
+            )
+            }
 
             {/* Layer List (Mini) */}
-            {textLayers.length > 0 && !selectedText && (
-                <div className="mt-4 space-y-2">
-                    <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2">Layers</p>
-                    {textLayers.map(layer => (
-                        <div
-                            key={layer.id}
-                            onClick={() => onSelectText(layer.id)}
-                            className="flex items-center gap-3 p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-transparent hover:border-slate-700 cursor-pointer group transition-colors"
-                        >
-                            <Type size={14} className="text-slate-500" />
-                            <span className="text-sm text-slate-300 truncate flex-1 font-medium">{layer.text}</span>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); onDeleteText(layer.id); }}
-                                className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 text-slate-500 hover:text-red-400 rounded transition-all"
+            {
+                textLayers.length > 0 && !selectedText && (
+                    <div className="mt-4 space-y-2">
+                        <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2">Layers</p>
+                        {textLayers.map(layer => (
+                            <div
+                                key={layer.id}
+                                onClick={() => onSelectText(layer.id)}
+                                className="flex items-center gap-3 p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-transparent hover:border-slate-700 cursor-pointer group transition-colors"
                             >
-                                <Trash2 size={12} />
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
+                                <Type size={14} className="text-slate-500" />
+                                <span className="text-sm text-slate-300 truncate flex-1 font-medium">{layer.text}</span>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onDeleteText(layer.id); }}
+                                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 text-slate-500 hover:text-red-400 rounded transition-all"
+                                >
+                                    <Trash2 size={12} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )
+            }
+        </div >
     );
 };

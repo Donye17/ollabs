@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 import { FrameRendererFactory } from './renderer/FrameRendererFactory';
 import { FrameConfig, FrameType } from '@/lib/types';
@@ -9,7 +10,7 @@ import { LikeButton } from './social/LikeButton';
 import { CommentSection } from './social/CommentSection';
 
 interface GalleryProps {
-    onSelectFrame: (frame: FrameConfig) => void;
+    onSelectFrame: (frame: FrameConfig, frameId: string) => void;
     creatorId?: string;
 }
 
@@ -65,32 +66,33 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId }) =>
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="text-center">
-                <h2 className="text-3xl font-bold text-white mb-2">Community Gallery</h2>
-                <p className="text-slate-400">Discover designs from other creators</p>
+        <div className="space-y-12 animate-in fade-in duration-700">
+            <div className="text-center space-y-4">
+                <h2 className="text-4xl font-bold tracking-tight text-zinc-50">Community Gallery</h2>
+                <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Discover and remix designs from creators worldwide.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {frames.map((frame) => (
-                    <GalleryCard
-                        key={frame.id}
-                        frame={frame}
-                        onSelect={() => onSelectFrame(frame.config)}
-                    />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {frames.map((frame, i) => (
+                    <div className="animate-slide-up" style={{ animationDelay: `${i * 100}ms` }} key={frame.id}>
+                        <GalleryCard
+                            frame={frame}
+                            onSelect={() => onSelectFrame(frame.config, frame.id.toString())}
+                        />
+                    </div>
                 ))}
             </div>
 
             {frames.length === 0 && (
-                <div className="text-center py-20 bg-slate-900/30 backdrop-blur-sm rounded-3xl border border-white/5 border-dashed hover:border-sidebar-primary/20 transition-all">
-                    <div className="w-20 h-20 bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-                        <Loader2 className="text-slate-600" size={40} />
+                <div className="text-center py-20 bg-zinc-900/30 backdrop-blur-sm rounded-3xl border border-white/5 border-dashed hover:border-blue-500/20 transition-all">
+                    <div className="w-20 h-20 bg-zinc-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                        <Loader2 className="text-zinc-600" size={40} />
                     </div>
-                    <h3 className="text-2xl font-heading font-bold text-white mb-2">No frames yet</h3>
-                    <p className="text-slate-400 mb-8 max-w-sm mx-auto leading-relaxed">Be the first to publish a verified design to the community gallery.</p>
-                    <a href="/" className="inline-flex items-center gap-2 bg-primary hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1">
+                    <h3 className="text-2xl font-bold text-zinc-50 mb-2">No frames yet</h3>
+                    <p className="text-zinc-400 mb-8 max-w-sm mx-auto leading-relaxed">Be the first to publish a verified design to the community gallery.</p>
+                    <Link href="/create" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-violet-600 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 text-white font-bold py-3 px-8 rounded-full transition-all">
                         Create Masterpiece
-                    </a>
+                    </Link>
                 </div>
             )}
         </div>
@@ -133,52 +135,54 @@ const GalleryCard: React.FC<{ frame: PublishedFrame, onSelect: () => void }> = (
     }, [frame.config]);
 
     return (
-        <div className="bg-slate-900/50 backdrop-blur-md rounded-2xl border border-white/5 overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 group flex flex-col">
-            <div className="aspect-square bg-slate-950/50 relative flex items-center justify-center p-6 group-hover:bg-slate-950/80 transition-colors">
+        <div className="glass-panel rounded-3xl overflow-hidden hover:border-zinc-700 hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 group flex flex-col h-full hover:bg-zinc-900/60">
+            <div className="aspect-square bg-zinc-950/30 relative flex items-center justify-center p-4 sm:p-8 group-hover:bg-zinc-950/50 transition-colors">
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
                 <canvas
                     ref={canvasRef}
                     width={300}
                     height={300}
-                    className="w-full h-full object-contain drop-shadow-2xl"
+                    className="w-full h-full object-contain drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
 
-                <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-sm">
+                <div className="absolute inset-x-0 bottom-0 p-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 flex justify-center pb-8 bg-gradient-to-t from-zinc-950/80 to-transparent">
                     <button
                         onClick={onSelect}
-                        className="bg-primary hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-xl shadow-primary/20 hover:scale-105"
+                        className="bg-zinc-50 hover:bg-white text-zinc-950 font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all text-sm tracking-wide"
                     >
-                        Remix
+                        Remix This
                     </button>
                 </div>
             </div>
 
-            <div className="p-5 flex-1 flex flex-col">
+            <div className="p-4 sm:p-6 flex-1 flex flex-col border-t border-white/5 bg-zinc-900/20">
                 <div className="flex justify-between items-start mb-3">
                     <div>
-                        <h3 className="font-heading font-bold text-lg text-white truncate group-hover:text-primary transition-colors">{frame.name}</h3>
-                        <div className="flex items-center gap-2 mt-1.5 text-sm text-slate-400">
-                            <UserCircle2 size={16} className="text-slate-500" />
-                            <span className="font-medium text-slate-300">{frame.creator_name}</span>
+                        <h3 className="font-bold text-lg text-zinc-100 truncate group-hover:text-blue-400 transition-colors tracking-tight">{frame.name}</h3>
+                        <div className="flex items-center gap-2 mt-2 text-sm text-zinc-500">
+                            <UserCircle2 size={16} className="text-zinc-600" />
+                            <span className="font-medium text-zinc-400">{frame.creator_name}</span>
                         </div>
                     </div>
                 </div>
 
-                <p className="text-sm text-slate-500 mb-5 line-clamp-2 leading-relaxed">{frame.description}</p>
+                <p className="text-sm text-zinc-500 mb-6 line-clamp-2 leading-relaxed font-normal">{frame.description}</p>
 
-                <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-auto">
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
                     <LikeButton frameId={frame.id.toString()} />
 
                     <button
                         onClick={() => setShowComments(!showComments)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${showComments ? 'bg-primary/20 text-primary' : 'text-slate-500 hover:text-slate-200 hover:bg-slate-800'}`}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${showComments ? 'bg-blue-500/10 text-blue-400' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'}`}
                     >
-                        <MessageSquare size={18} />
+                        <MessageSquare size={18} strokeWidth={2} />
                         <span className="text-xs font-bold uppercase tracking-wide">Comments</span>
                     </button>
                 </div>
 
                 {showComments && (
-                    <div className="mt-4 border-t border-slate-800 pt-4 animate-in slide-in-from-top-2 duration-300">
+                    <div className="mt-4 border-t border-zinc-800/50 pt-4 animate-in slide-in-from-top-2 duration-300">
                         <CommentSection frameId={frame.id.toString()} />
                     </div>
                 )}

@@ -247,16 +247,22 @@ export class GeometricRenderer extends CircleRenderer {
     }
 }
 
-export class ImageFrameRenderer implements IFrameRenderer {
+export class ImageFrameRenderer extends CircleRenderer {
     private imageCache: HTMLImageElement | null = null;
     private lastImageUrl: string | null = null;
 
-    drawFrame(context: RenderContext): void {
-        const { ctx, centerX, centerY, radius, frame } = context;
+    protected applyStyle(context: RenderContext): void {
+        const { ctx, frame } = context;
 
-        if (!frame.imageUrl) return;
+        if (!frame.imageUrl) {
+            // Fallback to dashed placeholder if no image
+            const lineWidth = frame.width * 2;
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = '#cbd5e1'; // Light slate
+            return;
+        }
 
-        // Load image if needed (basic caching mechanism)
+        // Cache Handling
         if (this.lastImageUrl !== frame.imageUrl) {
             this.imageCache = null;
             this.lastImageUrl = frame.imageUrl;
@@ -267,33 +273,39 @@ export class ImageFrameRenderer implements IFrameRenderer {
             };
         }
 
-        if (this.imageCache) {
-            ctx.save();
-            const size = radius * 2;
-            ctx.drawImage(
-                this.imageCache,
-                centerX - radius,
-                centerY - radius,
-                size,
-                size
-            );
-            ctx.restore();
-        } else {
-            // Loading placeholder
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            ctx.strokeStyle = '#334155'; // Slate 700
-            ctx.lineWidth = 2;
-            ctx.setLineDash([5, 5]);
-            ctx.stroke();
-            ctx.restore();
-        }
-    }
+        if (this.imageCache && this.imageCache.complete) {
+            const pattern = ctx.createPattern(this.imageCache, 'no-repeat');
+            if (pattern) {
+                const diameter = context.radius * 2;
 
-    createPath(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number): void {
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-        ctx.closePath();
+                // Calculate scale to cover the frame diameter
+                // We use Math.max to ensure it covers the larger dimension (aspect fill)
+                const scaleX = diameter / this.imageCache.width;
+                const scaleY = diameter / this.imageCache.height;
+                const scale = Math.max(scaleX, scaleY);
+
+                const matrix = new DOMMatrix();
+
+                // Align pattern origin to the frame bounding box
+                const x = context.centerX - context.radius;
+                const y = context.centerY - context.radius;
+
+                // Center the image within the bounding box if aspect ratios differ
+                // (Optional polish: calculate offsets to center crop)
+
+                matrix.translateSelf(x, y);
+                matrix.scaleSelf(scale, scale);
+
+                pattern.setTransform(matrix);
+
+                ctx.strokeStyle = pattern;
+                // Ensure solid line
+                ctx.setLineDash([]);
+            }
+        } else {
+            // Loading state
+            ctx.setLineDash([2, 2]);
+            ctx.strokeStyle = '#94a3b8';
+        }
     }
 }

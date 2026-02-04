@@ -4,17 +4,18 @@ import { authClient } from '../lib/auth-client';
 import { AuthModal } from './auth/AuthModal';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { UserCircle, LogOut } from 'lucide-react';
+import { UserCircle, LogOut, Sparkles, Menu, X } from 'lucide-react';
 
 export const NavBar: React.FC = () => {
     const { data: session } = authClient.useSession();
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const [isSigningOut, setIsSigningOut] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathname = usePathname();
 
     const isActive = (path: string) => pathname === path;
-    const activeClass = "bg-primary text-white shadow-lg shadow-blue-500/25 scale-105 border-transparent";
-    const inactiveClass = "text-slate-400 hover:text-white hover:bg-slate-800/50 hover:scale-105 border-transparent";
+    const activeClass = "bg-zinc-800 text-white border-zinc-700 shadow-sm";
+    const inactiveClass = "text-zinc-400 hover:text-white hover:bg-zinc-800/50 border-transparent";
 
     const handleSignOut = async () => {
         setIsSigningOut(true);
@@ -29,75 +30,129 @@ export const NavBar: React.FC = () => {
 
     return (
         <>
-            <nav className="w-full h-18 border-b border-white/5 bg-slate-950/70 backdrop-blur-xl flex items-center justify-between px-6 sticky top-0 z-50 transition-all duration-300">
-                <div className="flex items-center gap-2">
-                    <Link href="/" className="flex items-center gap-3 group">
-                        <div className="w-10 h-10 bg-gradient-to-tr from-primary to-purple-600 rounded-xl flex items-center justify-center shadow-xl shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300 group-hover:rotate-3">
-                            <span className="text-white font-heading font-bold text-xl">O</span>
+            <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl">
+                <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Link href="/" className="block group">
+                            <img
+                                src="/Ollabs Logo White.png"
+                                alt="Ollabs"
+                                className="h-6 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                            />
+                        </Link>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        {/* Mobile Toggle */}
+                        <button
+                            className="md:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors"
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        >
+                            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+
+                        {/* Desktop Nav Items */}
+                        <div className="hidden md:flex items-center gap-6">
+                            {session ? (
+                                <div className="flex items-center gap-6">
+                                    <div className="flex bg-zinc-900/50 p-1 rounded-xl border border-white/5 backdrop-blur-md">
+                                        <Link
+                                            href="/create"
+                                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 border ${isActive('/create') ? activeClass : inactiveClass}`}
+                                        >
+                                            Create
+                                        </Link>
+                                        <Link
+                                            href="/gallery"
+                                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 border ${isActive('/gallery') ? activeClass : inactiveClass}`}
+                                        >
+                                            Gallery
+                                        </Link>
+                                    </div>
+
+                                    <div className="h-6 w-px bg-white/10" />
+
+                                    <div className="flex items-center gap-4">
+                                        <Link href={`/profile/${session.user.id}`} className="flex items-center gap-3 hover:opacity-100 transition-opacity group">
+                                            <div className="flex flex-col items-end hidden md:flex">
+                                                <span className="text-sm font-bold text-zinc-200 group-hover:text-white transition-colors">{session.user.name}</span>
+                                                <span className="text-[10px] text-zinc-500 font-medium uppercase tracking-wider group-hover:text-zinc-400">Creator</span>
+                                            </div>
+                                            <div className="w-9 h-9 rounded-full bg-zinc-800 border-2 border-zinc-700 overflow-hidden ring-2 ring-transparent group-hover:ring-blue-500/20 group-hover:border-zinc-600 transition-all duration-300 shadow-lg">
+                                                {session.user.image ? (
+                                                    <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <UserCircle className="w-full h-full text-zinc-400 p-1.5" />
+                                                )}
+                                            </div>
+                                        </Link>
+                                        <button
+                                            onClick={handleSignOut}
+                                            disabled={isSigningOut}
+                                            className="flex items-center gap-2 px-3 py-2 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-300 font-medium text-sm group"
+                                            title="Sign Out"
+                                        >
+                                            {isSigningOut ? (
+                                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <LogOut size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <Link href="/create" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors hidden sm:block">Create</Link>
+                                    <Link href="/gallery" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors hidden sm:block">Gallery</Link>
+                                    <button
+                                        onClick={() => setIsAuthOpen(true)}
+                                        className="bg-white hover:bg-zinc-200 text-zinc-950 px-5 py-2 rounded-full text-sm font-bold transition-all shadow-lg hover:shadow-white/10 hover:-translate-y-0.5"
+                                    >
+                                        Sign In
+                                    </button>
+                                </>
+                            )}
                         </div>
-                        <span className="text-white font-heading font-bold text-xl hidden sm:block tracking-tight group-hover:text-primary transition-colors">Ollabs</span>
-                    </Link>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-6">
-                    {session ? (
-                        <div className="flex items-center gap-6">
-                            <div className="flex bg-slate-900/50 p-1.5 rounded-xl border border-white/5 backdrop-blur-md">
-                                <Link
-                                    href="/"
-                                    className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 border ${isActive('/') ? activeClass : inactiveClass}`}
-                                >
-                                    Editor
-                                </Link>
-                                <Link
-                                    href="/gallery"
-                                    className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 border ${isActive('/gallery') ? activeClass : inactiveClass}`}
-                                >
-                                    Gallery
-                                </Link>
-                            </div>
+            </nav >
 
-                            <div className="h-8 w-px bg-white/10" />
+            {/* Mobile Menu Overlay */}
+            {
+                isMenuOpen && (
+                    <div className="fixed inset-0 z-40 bg-zinc-950/95 backdrop-blur-xl pt-24 px-6 animate-in slide-in-from-top-10 duration-200 md:hidden flex flex-col gap-6">
+                        <Link href="/create" onClick={() => setIsMenuOpen(false)} className={`text-2xl font-bold ${isActive('/create') ? 'text-white' : 'text-zinc-500'}`}>Create</Link>
+                        <Link href="/gallery" onClick={() => setIsMenuOpen(false)} className={`text-2xl font-bold ${isActive('/gallery') ? 'text-white' : 'text-zinc-500'}`}>Gallery</Link>
 
-                            <div className="flex items-center gap-4">
-                                <Link href={`/profile/${session.user.id}`} className="flex items-center gap-3 hover:opacity-100 transition-opacity group">
-                                    <div className="flex flex-col items-end hidden md:flex">
-                                        <span className="text-sm font-heading font-bold text-white group-hover:text-primary transition-colors">{session.user.name}</span>
-                                        <span className="text-[10px] text-slate-500 font-medium uppercase tracking-wider group-hover:text-slate-400">Creator</span>
+                        <div className="h-px bg-zinc-800 w-full my-2" />
+
+                        {session ? (
+                            <>
+                                <Link href={`/profile/${session.user.id}`} onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-xl font-medium text-zinc-300">
+                                    <div className="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden">
+                                        {session.user.image ? <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover" /> : <UserCircle className="w-full h-full p-2" />}
                                     </div>
-                                    <div className="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 overflow-hidden ring-2 ring-transparent group-hover:ring-primary group-hover:border-transparent transition-all duration-300 shadow-lg group-hover:shadow-primary/25">
-                                        {session.user.image ? (
-                                            <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover" />
-                                        ) : (
-                                            <UserCircle className="w-full h-full text-slate-400 p-2" />
-                                        )}
-                                    </div>
+                                    {session.user.name}
                                 </Link>
                                 <button
-                                    onClick={handleSignOut}
-                                    disabled={isSigningOut}
-                                    className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-300 font-medium text-sm group"
-                                    title="Sign Out"
+                                    onClick={() => { handleSignOut(); setIsMenuOpen(false); }}
+                                    className="flex items-center gap-2 text-red-400 font-medium text-lg mt-4"
                                 >
-                                    {isSigningOut ? (
-                                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                    ) : (
-                                        <LogOut size={18} className="group-hover:-translate-x-0.5 transition-transform" />
-                                    )}
-                                    <span className="hidden sm:inline">Sign Out</span>
+                                    <LogOut size={20} /> Sign Out
                                 </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={() => setIsAuthOpen(true)}
-                            className="bg-primary hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
-                        >
-                            Sign In
-                        </button>
-                    )}
-                </div>
-            </nav>
+                            </>
+                        ) : (
+                            <button
+                                onClick={() => { setIsAuthOpen(true); setIsMenuOpen(false); }}
+                                className="bg-white text-zinc-950 py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-zinc-200 transition-colors"
+                            >
+                                Sign In
+                            </button>
+                        )}
+                    </div>
+                )
+            }
 
             <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
         </>

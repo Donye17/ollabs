@@ -1,1 +1,6 @@
-{}
+{
+  "/api/frames/route": "app/api/frames/route.js",
+  "/create/page": "app/create/page.js",
+  "/gallery/page": "app/gallery/page.js",
+  "/page": "app/page.js"
+}

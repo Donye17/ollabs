@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ollab - Create Your Ultimate Avatar Frame</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#8c2bee",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#191022",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Spline Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-300">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- TopNavBar -->
+<div class="flex justify-center border-b border-white/10">
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1">
+<header class="flex items-center justify-between whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center size-10 bg-primary rounded text-white">
+<span class="material-symbols-outlined">auto_fix_high</span>
+</div>
+<h2 class="text-xl font-black leading-tight tracking-tight">Ollab</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-10">
+<nav class="flex items-center gap-8">
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Features</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Showcase</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Pricing</a>
+<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Resources</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-11 px-6 bg-primary text-white text-sm font-bold tracking-tight hover:brightness-110 transition-all">
+                                    Get Started
+                                </button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/30" data-alt="User profile placeholder with neon frame" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuARoj0dmBRPraVz6Rjq0DeV0UOgIeC2bxgwtCB8e1C7ZjwXNLspHoIdi4D-xm--CnW-ZJWMlMj26csY9sM8Ya1QNa-Ww_QrTT-4JvsdCG2z2OKQwR7ouBUQRq9gos9-L6tylYltMWuqNmp8Y_hrmghTDK8UdUu3SYkNaLH6O40jdvdGCcwOXLXikoLEVnPEHYESbWtZhCGWzrxB6cG6vOrfYM44cETSuedhsGGr_Cjj_zxT79q3Bik_uBVPcV_3jeGggBxP8TRG_jc");'></div>
+</div>
+</div>
+</header>
+</div>
+</div>
+<!-- HeroSection -->
+<div class="flex flex-1 justify-center py-12 md:py-24">
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1">
+<div class="@container px-6">
+<div class="flex flex-col gap-10 @[864px]:flex-row @[864px]:items-center">
+<div class="flex flex-col gap-8 flex-1">
+<div class="flex flex-col gap-4">
+<h1 class="text-4xl font-black leading-[1.1] tracking-[-0.04em] @[480px]:text-6xl lg:text-7xl">
+                                        Create Your Ultimate <span class="text-primary">Avatar Frame</span>
+</h1>
+<p class="text-base font-medium text-slate-500 dark:text-slate-400 @[480px]:text-lg max-w-[540px]">
+                                        Design high-impact AI avatar frames with custom colors, dynamic patterns, and instant export capabilities.
+                                    </p>
+</div>
+<div class="flex flex-wrap gap-4">
+<button class="flex min-w-[180px] cursor-pointer items-center justify-center rounded-full h-14 px-8 bg-primary text-white text-lg font-bold tracking-tight hover:shadow-[0_0_20px_rgba(140,43,238,0.4)] transition-all">
+                                        Start Creating
+                                    </button>
+<button class="flex min-w-[180px] cursor-pointer items-center justify-center rounded-full h-14 px-8 bg-primary/10 border border-primary/20 text-primary text-lg font-bold tracking-tight hover:bg-primary/20 transition-all">
+                                        View Gallery
+                                    </button>
+</div>
+<div class="flex items-center gap-3">
+<!-- AvatarGroup Mini -->
+<div class="flex -space-x-3">
+<div class="size-8 rounded-full border-2 border-background-dark bg-cover" data-alt="Happy user face" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBg8WXOihidh1pwjUU9CD_Iw6FTrJZk9ey7qHaqqobCPGoqTM2-6igAUrO2Q3jenoGU8nyPlgzWOSwx_lhZ7yV5WKn-4EPiLboFXA7bTJvRaqzzq9JxKq5vUAsvMnEAkWfx5Fx_EPT0wGX-uwXPAwklInCj1bAE961TAC0M5e1RssAnhWIiLRy6tYqcReUsilQT3-iBglYauQ2a68SUx6rNm8wbhqU2VytmMBssyn14dLk15hmM4uYZcinej783sdY8sClv87r962Q')"></div>
+<div class="size-8 rounded-full border-2 border-background-dark bg-cover" data-alt="Professional user face" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBZx-ySrWYEDiMs6y-mUTjvANOhHBS1pao_uczBYvXit4f50tA6KdV_Tgsz1WmJ04y0xkK6rDOM5gFUSPT1_KJce1SVZxydndnkcc4z3Y8owa96czuovbBxk1RHouOinykV_geocRU0VMTWOnnlVfCVvEkBP6FUdnSzPQ5TUPpROeq01Ak_Vbn9XNXW4XXb-q549v1Ql4kS4F7AUryeKMOQcipU8JdXfy0RO-2VEz5Fz1Oc4xP8cveuNae5sA8Vby5WZ5MW2ZS9yrU')"></div>
+<div class="size-8 rounded-full border-2 border-background-dark bg-cover" data-alt="Creative user face" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAxmrC50fWbJJ6p8MiIK94j-BYi4KZ1irV-974uEB8WUDPvB2JDboFXSdQpJUcentfqRbYT7Op9FG1akRHzvpPSVzWoEZ54pptZwxZN-3HOzGXsDzS-6vpskHKwJuyq8WKKyYGz8dkjegjeTPoayKDP-IHGWLWBTpy2vGn2bA1eoU1fZdIpI7BQ71GxtywmKIHmZRJ1O6Puo7KtttttVTD6FZ_g3RNi1_VB5iW9D0Xd0GjidE-mwq_ItOZeJDQdHVkbhnq8cG8XKfU')"></div>
+</div>
+<p class="text-sm font-medium text-slate-500">Joined by 10k+ creators</p>
+</div>
+</div>
+<div class="flex-1 relative">
+<div class="w-full bg-gradient-to-tr from-primary/20 to-primary/5 aspect-square rounded-xl flex items-center justify-center overflow-hidden border border-white/5 shadow-2xl">
+<div class="size-64 md:size-80 rounded-full border-[12px] border-primary flex items-center justify-center bg-cover shadow-[0_0_50px_rgba(140,43,238,0.3)]" data-alt="Main showcase avatar with glowing frame" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAw3BnM1vQTWydEqe15oAMx8QlxP0DFdw3cI7W3gF7wV0Bkj01IbyLhm-QCaeApy2qw2B5zNG9gpBAFtmLNg9CTLKmB8tvYqYjAUjRsjssNaV5V0vtlpdTT0_Km4ldVjBcLhbs55t2zKTp52TEsVTQ-pywBCBQJrY30KwFocuVJI4BbqTH2vohKX4l6wrP-y_h1rB2Nyyx0ZKtFpIWqasD8C-XmbwxhTyPjiIqLk0wwTo6Th5ONAzKYczZVzE2DsRsmLJ2AYf4ePxI");'>
+</div>
+<!-- Decorative Elements -->
+<div class="absolute top-10 right-10 size-20 rounded-lg bg-primary/20 backdrop-blur-md border border-white/10 flex items-center justify-center rotate-12">
+<span class="material-symbols-outlined text-primary text-3xl">palette</span>
+</div>
+<div class="absolute bottom-10 left-10 size-16 rounded-full bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center -rotate-12">
+<span class="material-symbols-outlined text-primary text-2xl">auto_awesome</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- FeatureSection -->
+<div class="flex justify-center bg-white/5 py-20">
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1 px-6">
+<div class="flex flex-col gap-12">
+<div class="flex flex-col gap-4 text-center items-center">
+<h2 class="text-3xl md:text-5xl font-black tracking-tight max-w-[800px]">
+                                Powerful Features for Digital Identities
+                            </h2>
+<p class="text-slate-500 dark:text-slate-400 text-lg max-w-[600px]">Everything you need to stand out in the digital space with professional-grade tools.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="flex flex-col gap-6 rounded-lg border border-white/5 bg-white/5 p-10 hover:border-primary/50 transition-all group">
+<div class="size-14 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-3xl">palette</span>
+</div>
+<div class="flex flex-col gap-3">
+<h3 class="text-2xl font-bold">Custom Colors</h3>
+<p class="text-slate-500 dark:text-slate-400 leading-relaxed">Match your brand perfectly with our precision color picker and gradient engine.</p>
+</div>
+</div>
+<div class="flex flex-col gap-6 rounded-lg border border-white/5 bg-white/5 p-10 hover:border-primary/50 transition-all group">
+<div class="size-14 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-3xl">magic_button</span>
+</div>
+<div class="flex flex-col gap-3">
+<h3 class="text-2xl font-bold">AI Patterns</h3>
+<p class="text-slate-500 dark:text-slate-400 leading-relaxed">Generate unique procedural textures and patterns using advanced AI models.</p>
+</div>
+</div>
+<div class="flex flex-col gap-6 rounded-lg border border-white/5 bg-white/5 p-10 hover:border-primary/50 transition-all group">
+<div class="size-14 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-3xl">download</span>
+</div>
+<div class="flex flex-col gap-3">
+<h3 class="text-2xl font-bold">Instant Export</h3>
+<p class="text-slate-500 dark:text-slate-400 leading-relaxed">Download high-res PNGs or animated GIFs optimized for all major platforms.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Community Showcase Section -->
+<div class="flex justify-center py-20">
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1 px-6">
+<div class="flex justify-between items-end mb-12">
+<div class="flex flex-col gap-3">
+<h2 class="text-3xl md:text-4xl font-black tracking-tight">Community Showcase</h2>
+<p class="text-slate-500 dark:text-slate-400">See what others are creating with Ollab</p>
+</div>
+<button class="hidden md:block text-primary font-bold hover:underline">View all creations →</button>
+</div>
+<!-- Masonry-style Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+<div class="flex flex-col items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+<div class="size-32 md:size-40 rounded-full border-4 border-primary p-1 bg-gradient-to-br from-primary to-purple-400">
+<div class="w-full h-full rounded-full bg-cover" data-alt="Avatar with futuristic purple frame" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCTLIzG8YTw2qzHl1OYUidUu1P3Lkc1g8CAHgJHEjDfrYOupkSwcVLSDzoqTbUZGmDIeeFB6g7Z3GI033kWAvdFG9v6vctWgeOHh94vYC4zwUKAjWcgxoUQopuZYRxSbQ3ng0LzDoNRf8AADk9OAj_MYlltRunqoyDXoNKA6p3RMhru5xSWujLoNxjC_Hz9q5jtCDea0znacOYeyTlh_D4EaMdtm0fU3q66P-vzuaJO4y6DKzMI7EHOOMQvJzyvrtMHgGhwbKVqCwQ");'></div>
+</div>
+<span class="font-bold">@alex_dev</span>
+</div>
+<div class="flex flex-col items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 mt-8 md:mt-12">
+<div class="size-32 md:size-40 rounded-full border-4 border-cyan-400 p-1 bg-gradient-to-br from-cyan-400 to-blue-500">
+<div class="w-full h-full rounded-full bg-cover" data-alt="Avatar with glowing cyan frame" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBmNxEQCTH5k9b60ls062OdJJdj6JA8zuxW79Z1WxpNcRWlXmI6vVJ0Gbxa2oCY68-0McmysOUxEnOnusrRC7Vik3P6HUBKiN32bajZsHyfqiUb8cs8yyLLFcxd2M5E5jGbz_B9PTgzZE_SAqtQwfU0yDg7QsFsC7LtyHeeN2Bknt1lX05oPTif6IaaV6FQeUQeWtAbMLzHS7scweEZ-2KwJusoUtMBFWgRBTH5QbUP0obGt7zXqzQh6bV38vxsCnEEOXFzZK4Of1w");'></div>
+</div>
+<span class="font-bold">@sarah_ui</span>
+</div>
+<div class="flex flex-col items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+<div class="size-32 md:size-40 rounded-full border-4 border-pink-500 p-1 bg-gradient-to-br from-pink-500 to-orange-400">
+<div class="w-full h-full rounded-full bg-cover" data-alt="Avatar with vibrant pink frame" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBhrARhWWtUZm8ENjNehzK7_elqy7p4cO3x7ldGSs3aEQWo1JnuKdKcHDcVHaho4B6A9SgOFNzRoa5_MjsHwisIAkoOkNJiu94losXfHHQU9IqXsFs8-ooQvwR71NnvMmOKxmp86JFG3t5KNoItGVsGCtqrErO036VsSsqs0lgPbPrVF-aRb6vKq4i1ikbvs9q8rnJLJA8bpXWARE2Kj2uFGOLSFiZ9KxNt-X8XtI7RSaEnBdEjnKq3vxhpJUT88Es1KrkIt89w4Xc");'></div>
+</div>
+<span class="font-bold">@miko_arts</span>
+</div>
+<div class="flex flex-col items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 mt-8 md:mt-12">
+<div class="size-32 md:size-40 rounded-full border-4 border-emerald-400 p-1 bg-gradient-to-br from-emerald-400 to-teal-500">
+<div class="w-full h-full rounded-full bg-cover" data-alt="Avatar with fresh green frame" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCcBbReHmNxUemLcSkIAvQmZ-SCGz0vLrl3aHENsNhBo-uPUx4sYcnz7yTlhtmHONb66a518IjKq2MGquSG9i6-UEVuTcOwGiftIN-PUxiSU3bNtRFXhqAK0eByh4FySeWEdwHgLwFAUVMHJxhq7vzKuqefPRZXcYAogaQv8iV6rClp5YxX0_fFtFLdYq8UrbMa533U8KEwsnlb93GqbaUbVmGdfiqQHOsjXBxzKiQDD0xJRcp-ys8eNuy2yoWc-pm7rN0VPY-FcOQ");'></div>
+</div>
+<span class="font-bold">@green_lion</span>
+</div>
+</div>
+<!-- AvatarGroup Section -->
+<div class="mt-20 flex flex-col items-center gap-8 py-10 border-t border-white/10">
+<h3 class="text-xl font-bold opacity-60">Loved by teams at</h3>
+<div class="flex flex-wrap items-center justify-center gap-4">
+<div class="flex items-center px-4 py-3 justify-center">
+<div class="overflow-visible w-[34px]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover border-background-dark bg-slate-800 rounded-full flex items-center justify-center size-11 border-4" data-alt="Company logo placeholder 1" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBh4FGfSoWMSiiFnxRqyv7JG_6SQUSQcI5L9GyD9NUf4pwSlKYooFPrCEKkBkhryBVU_sG1rIlh49rO1BA4NsfYC0B7CyyeGuZ8-SxJqqkYmoBpWRWH6u0I7lWGRKgNLqiKmCz7GJymeK3fBJHVQR1j3rQzXurXSt_wB5AD8MRi0mSXd5W2suxhKzzDWFwXIcwwP-FAU9lBjn1oHEbAxu_mSRLD9E7PgmLax9fejQuieVB90sHgQwLOox5m8m__XWkKZZlVuAAi_mA");'></div>
+</div>
+<div class="overflow-visible w-[34px]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover border-background-dark bg-slate-800 rounded-full flex items-center justify-center size-11 border-4" data-alt="Company logo placeholder 2" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCKcwc-81A6G0JSYsf_TDLMlZwFKFY7iMnPysfJIJZw5Nm219Sd6TjNKaTx4GwaA6kmUSqrNIPT68PmcYSN5Lyo5gMwDZJKiRABb4ug-crHmisul-OLZT6R7vVjiPCTgsy44MkiGkRDizrWLSWbUUBu8ivSMENg087TIQNxEOWXsV19xosCJiYY4pxlYvvVM9ZBAIRacaquWy-5uVeTX_HDc62yY__75AOjyLNpgXL7kJ-vsI74ne2zlSErlc5xT43Rrei_EYHuT_Q");'></div>
+</div>
+<div class="overflow-visible w-[34px]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover border-background-dark bg-slate-800 rounded-full flex items-center justify-center size-11 border-4" data-alt="Company logo placeholder 3" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAEv_dGsO6ea9PUfxZPgu7DP6Ozc4qLkUytojpf0T7JtBmSlu0v3eVuXQieK-JXvfS_dQrejbepgGVlMj_zJy5JARZBtEEilQVcXFZINuvqBwfvtbAu7VhgLOzcPuTud_dXbO8g5mhKHS_Ttva8UqG-4cmk0I4s0TTIzzOkQciBaETes518sQ22EVjntyjvVzrBb8oSGnKX3aUSu_IrXMFFdVaYucx-Gouu2iZLXOwqP_k3GRPYYEnY80OSk136qYUHw0Qz3fTz-HM");'></div>
+</div>
+<div class="overflow-visible w-[34px]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover border-background-dark bg-slate-800 rounded-full flex items-center justify-center size-11 border-4" data-alt="Company logo placeholder 4" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDhX5VYM2e2Bn5_dao5PI5TdcB_X_dmh24i64jXQZmaa9ev5AjqR6uzoRrOu5VJ53vPMacXTvbY7AkUQ-Ex544GOPJmZJjF9dCIibPPbhBRo1beuvI72vNXk6S0ouetMUsyyWPPYzNW-AnNAEQEodr4yvkwFkE2ZHXxuOBVNMk6EbQDMMYPhQUQZQGvudN45O2NtuhLinFucaZfZfXSv8ntpmSdbibyjCnEArkKMBW9dxboWFzVuL1m_W_4FtNtapjNeffbmimzbsw");'></div>
+</div>
+<div class="overflow-visible w-[34px]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover border-background-dark bg-slate-800 rounded-full flex items-center justify-center size-11 border-4" data-alt="Company logo placeholder 5" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDv5FWmB2DOJ6FNgb4N4LBQ_gJO2BD4xmnUNeAoLXOIL-xvLjfxx0sSwkET6laAU38zC-f8XdG07q773ABiEDo2u5hZoG9ADll1dPWkTU9mGreszCVU0-HX2-hCxjUzDlCs3Y_hPHZDkVmiUPAQTJcNLHGP-X8biHV_rqX6bL0XWLjD0u0WBAZcryoZV9M9UZlV0qqtbxa30Fg8VkxqGbhFUO4ePtbV2ItduutCtP8dLHZiLzeeqR_GWSUZ3IScMW-i7NEZLEgsW0w");'></div>
+</div>
+<div class="overflow-visible w-11">
+<div class="bg-center bg-no-repeat aspect-square bg-cover border-background-dark bg-slate-800 rounded-full flex items-center justify-center size-11 border-4" data-alt="Company logo placeholder 6" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDxAS4zOzFxBnmYrblYqARE0UUHcAJPp3EPL2zo4BOTLwMgrzT6WJqHo9zr2w69Z8FfCVZEGhQsDEihXJxmvpjqI7jU0o9hxaeOem8VI7aVK7vQJH2kXc12q_ngoWOThy9oRoyqwIfoILjrw2oWrfizX9tc8C_y71NU4FLXsbVABJQ4MF5pwTeShcw7NjvR0iNfeYmzxBtVaXBWJyyD9aS_PwJJO21qG2R4mSJT4BQEPXdQdnLgpanK8xOGd-KjFtyT6uX250_wSYA");'></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Section -->
+<footer class="flex justify-center border-t border-white/5 bg-black/20 py-16">
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1 px-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="flex flex-col gap-6 col-span-1 md:col-span-1">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center size-8 bg-primary rounded text-white">
+<span class="material-symbols-outlined text-sm">auto_fix_high</span>
+</div>
+<h2 class="text-lg font-black tracking-tight">Ollab</h2>
+</div>
+<p class="text-sm text-slate-500 leading-relaxed">
+                                Empowering creators to express their digital identity with the power of AI.
+                            </p>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-bold">Product</h4>
+<a class="text-sm text-slate-500 hover:text-primary" href="#">Features</a>
+<a class="text-sm text-slate-500 hover:text-primary" href="#">Styles</a>
+<a class="text-sm text-slate-500 hover:text-primary" href="#">API</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-bold">Community</h4>
+<a class="text-sm text-slate-500 hover:text-primary" href="#">Showcase</a>
+<a class="text-sm text-slate-500 hover:text-primary" href="#">Discord</a>
+<a class="text-sm text-slate-500 hover:text-primary" href="#">Blog</a>
+</div>
+<div class="flex flex-col gap-6">
+<h4 class="font-bold">Newsletter</h4>
+<div class="flex flex-col gap-3">
+<input class="bg-white/5 border border-white/10 rounded-full px-4 h-11 text-sm focus:border-primary outline-none transition-all" placeholder="Email address" type="email"/>
+<button class="bg-primary text-white font-bold h-11 rounded-full text-sm">Subscribe</button>
+</div>
+</div>
+</div>
+<div class="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-xs text-slate-500">© 2024 Ollab AI. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="text-xs text-slate-500 hover:text-white" href="#">Privacy Policy</a>
+<a class="text-xs text-slate-500 hover:text-white" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

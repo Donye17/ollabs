@@ -76,6 +76,12 @@
       "namedRegex": "^/api/frames/likes(?:/)?$"
     },
     {
+      "page": "/create",
+      "regex": "^/create(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/create(?:/)?$"
+    },
+    {
       "page": "/gallery",
       "regex": "^/gallery(?:/)?$",
       "routeKeys": {},

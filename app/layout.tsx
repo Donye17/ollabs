@@ -1,16 +1,10 @@
 import type { Metadata } from 'next';
-import { Archivo, Space_Grotesk } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './globals.css';
 
-const archivo = Archivo({
+const inter = Inter({
     subsets: ['latin'],
-    variable: '--font-archivo',
-    display: 'swap',
-});
-
-const spaceGrotesk = Space_Grotesk({
-    subsets: ['latin'],
-    variable: '--font-space',
+    variable: '--font-inter',
     display: 'swap',
 });
 
@@ -51,8 +45,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en">
-            <body className={`${archivo.variable} ${spaceGrotesk.variable} font-sans bg-slate-950 text-slate-50 antialiased`}>
+        <html lang="en" className="dark">
+            <body className={`${inter.variable} font-sans bg-zinc-950 text-zinc-400 antialiased selection:bg-blue-500/30 selection:text-blue-200`}>
                 {children}
             </body>
         </html>

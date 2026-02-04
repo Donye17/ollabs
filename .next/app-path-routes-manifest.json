@@ -4,6 +4,7 @@
   "/api/frames/comments/route": "/api/frames/comments",
   "/api/frames/likes/route": "/api/frames/likes",
   "/api/frames/route": "/api/frames",
+  "/create/page": "/create",
   "/gallery/page": "/gallery",
   "/page": "/",
   "/profile/[id]/page": "/profile/[id]",
