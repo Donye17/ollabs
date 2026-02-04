@@ -70,8 +70,12 @@ export default function Home() {
 
             {/* Footer */}
             <footer className="border-t border-white/5 py-12 bg-zinc-950">
-                <div className="max-w-7xl mx-auto px-6 text-center text-zinc-500 text-sm">
+                <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-zinc-500 text-sm">
                     <p>© 2026 Ollabs. All rights reserved.</p>
+                    <div className="flex gap-6">
+                        <Link href="/privacy" className="hover:text-zinc-300 transition-colors">Privacy Policy</Link>
+                        <Link href="/terms" className="hover:text-zinc-300 transition-colors">Terms of Service</Link>
+                    </div>
                 </div>
             </footer>
         </main>
