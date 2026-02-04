@@ -11,6 +11,8 @@ Go to **Vercel Dashboard > Settings > Environment Variables** and add these:
 - `GOOGLE_CLIENT_SECRET`: `...`
 - `DISCORD_CLIENT_ID`: `...`
 - `DISCORD_CLIENT_SECRET`: `...`
+- `TWITTER_CLIENT_ID`: `...`
+- `TWITTER_CLIENT_SECRET`: `...`
 - `NEXT_PUBLIC_APP_URL`: `https://ollabs.studio` (or your vercel url)
 - `BETTER_AUTH_SECRET`: `...` (Generate a random string)
 
@@ -25,6 +27,11 @@ When creating your apps in Google/Discord, you must add these **Redirect URIs**:
 - `http://localhost:3000/api/auth/callback/discord`
 - `https://ollabs.studio/api/auth/callback/discord`
 - **Scopes:** `identify`, `email` (The app requests these automatically, no need to check boxes in the URL generator)
+
+**For Twitter (X) Developer Portal:**
+- `http://localhost:3000/api/auth/callback/twitter`
+- `https://ollabs.studio/api/auth/callback/twitter`
+- **Permissions:** Read and Write (or at least Read user info)
 
 ### B. Storage (Vercel Blob)
 *Get this from Vercel > Storage > Create Blob.*
@@ -45,19 +52,26 @@ Allows me to open PRs, read issues, and manage the repo.
   "command": "npx",
   "args": ["-y", "@modelcontextprotocol/server-github"],
   "env": {
-    "GITHUB_PERSONAL_ACCESS_TOKEN": "your_github_pat"
+    "GITHUB_PERSONAL_ACCESS_TOKEN": "..."
   }
 }
 ```
 
 ### B. Sentry (Fix Crashes)
-Allows me to see crash reports and fix them automatically.
+**What is it?** It tracks errors and bugs in real-time. Giving me this token allows me to read those crash reports and fix bugs automatically.
+
+**How to get it:**
+1. Sign up/Log in at [sentry.io](https://sentry.io).
+2. Go to [Auth Tokens](https://sentry.io/settings/account/api/auth-tokens/).
+3. Create a token with `project:read` and `issue:read` scopes.
+4. Paste it below.
+
 ```json
 "sentry": {
   "command": "npx",
   "args": ["-y", "@modelcontextprotocol/server-sentry"],
   "env": {
-    "SENTRY_AUTH_TOKEN": "your_sentry_token"
+    "SENTRY_AUTH_TOKEN": "..."
   }
 }
 ```

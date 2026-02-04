@@ -7,8 +7,12 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const secret = searchParams.get('secret');
 
-    // 1. Verify Secret Key (Hardcoded for bootstrapping)
-    if (secret !== 'ollabs-2026-master-key') {
+    // 1. Verify Secret Key (From Env)
+    if (!process.env.ADMIN_CLAIM_SECRET) {
+        return NextResponse.json({ error: 'Server misconfigured: ADMIN_CLAIM_SECRET not set' }, { status: 500 });
+    }
+
+    if (secret !== process.env.ADMIN_CLAIM_SECRET) {
         return NextResponse.json({ error: 'Invalid secret key' }, { status: 403 });
     }
 
@@ -21,23 +25,22 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'You must be logged in to claim admin' }, { status: 401 });
     }
 
-    // 3. Promote User
+    // 3. Promote User (Using Safe Auth API)
     try {
-        // We use raw SQL because we are bypassing auth lib for this specific operation
-        const table = session.user.email ? 'user' : 'users'; // Try to be robust
-        await pool.query(`UPDATE "user" SET role = 'admin' WHERE id = $1`, [session.user.id]);
+        await auth.api.updateUser({
+            headers: await headers(),
+            body: {
+                role: 'admin'
+            }
+        });
 
         return NextResponse.json({
             status: 'success',
-            message: `User ${session.user.email} promoted to ADMIN.`,
-            user: session.user
+            message: `User ${session.user.email} promoted to ADMIN. Refresh your page to see admin tools.`,
+            user: { ...session.user, role: 'admin' }
         });
+
     } catch (e: any) {
-        // Fallback for table name
-        if (e.message?.includes('does not exist')) {
-            await pool.query(`UPDATE users SET role = 'admin' WHERE id = $1`, [session.user.id]);
-            return NextResponse.json({ status: 'success', message: 'User promoted (fallback table)' });
-        }
-        return NextResponse.json({ error: String(e) }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to update user role: ' + String(e.message) }, { status: 500 });
     }
 }

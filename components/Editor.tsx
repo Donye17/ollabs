@@ -102,15 +102,6 @@ export const Editor: React.FC<EditorProps> = ({
   // Constants
   const STICKER_BASE_SIZE = 48; // Base width/height of sticker svgs
 
-  // @ts-ignore
-  import ColorThief from 'colorthief';
-
-  // Helper
-  const rgbToHex = (r: number, g: number, b: number) => '#' + [r, g, b].map(x => {
-    const hex = x.toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
-  }).join('');
-
   // ... inside component
 
   // Load image object when source changes
