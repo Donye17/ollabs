@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { pool } from "./neon";
 
 export const auth = betterAuth({
+    baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
     database: pool,
     socialProviders: {
         google: {
@@ -29,5 +30,12 @@ export const auth = betterAuth({
         process.env.NEXT_PUBLIC_APP_URL,
         process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined
     ].filter(Boolean) as string[],
-    secret: process.env.BETTER_AUTH_SECRET
+    emailAndPassword: {
+        enabled: true
+    },
+    // Debugging enabled
+    logger: {
+        level: "debug",
+        disabled: false
+    }
 });
