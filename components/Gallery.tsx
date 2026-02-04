@@ -93,6 +93,18 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId }) =>
                     <Link href="/create" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-violet-600 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 text-white font-bold py-3 px-8 rounded-full transition-all">
                         Create Masterpiece
                     </Link>
+
+                    <div className="mt-8 pt-8 border-t border-white/5">
+                        <button
+                            onClick={async () => {
+                                const res = await fetch('/api/seed');
+                                if (res.ok) window.location.reload();
+                            }}
+                            className="text-xs text-zinc-600 hover:text-zinc-400 underline transition-colors"
+                        >
+                            (Admin) Populate Default Templates
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

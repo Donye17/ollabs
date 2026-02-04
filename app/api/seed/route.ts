@@ -99,6 +99,153 @@ const SEED_TEMPLATES = [
             { id: 't1', text: 'LIMITED', x: 0, y: -160, fontSize: 32, fontFamily: 'Playfair Display', color: '#34d399', rotation: 0, align: 'center', curved: true },
             { id: 't2', text: 'EDITION', x: 0, y: 160, fontSize: 32, fontFamily: 'Playfair Display', color: '#34d399', rotation: 0, align: 'center', curved: true }
         ]
+    },
+    // --- NEW SEED CONTENT ---
+    // CATEGORY: PROFESSIONAL
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Minimal White')!,
+        overrideName: 'CEO Mindset',
+        description: 'Clean, professional, and authoritarian.',
+        stickers: [],
+        textLayers: [
+            { id: 't1', text: 'FOUNDER', x: 0, y: 160, fontSize: 32, fontFamily: 'Inter', color: '#ffffff', rotation: 0, align: 'center', curved: true }
+        ]
+    },
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Apple Gray')!,
+        overrideName: 'Product Design',
+        description: 'Sleek and industrial.',
+        stickers: [],
+        textLayers: [
+            { id: 't1', text: 'DESIGNER', x: 0, y: -160, fontSize: 32, fontFamily: 'Inter', color: '#e5e5ea', rotation: 0, align: 'center', curved: true },
+            { id: 't2', text: '2026', x: 0, y: 160, fontSize: 24, fontFamily: 'Inter', color: '#e5e5ea', rotation: 0, align: 'center', curved: true }
+        ]
+    },
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Luxury Gold')!,
+        overrideName: 'Club 100',
+        description: 'Exclusive members only.',
+        stickers: [
+            { id: 's1', icon: 'crown', x: 0, y: -140, scale: 1.2, rotation: 0 }
+        ],
+        textLayers: [
+            { id: 't1', text: 'VIP', x: 0, y: 140, fontSize: 48, fontFamily: 'Playfair Display', color: '#FDB931', rotation: 0, align: 'center', curved: true }
+        ]
+    },
+    // CATEGORY: GAMER / NEON
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Cyberpunk')!,
+        overrideName: 'Streamer Mode',
+        description: 'Live now.',
+        stickers: [
+            { id: 's1', icon: 'radio', x: 0, y: -140, scale: 1.0, rotation: 0 }
+        ],
+        textLayers: [
+            { id: 't1', text: 'LIVE', x: 0, y: 140, fontSize: 48, fontFamily: 'Inter', color: '#d946ef', rotation: 0, align: 'center', curved: true }
+        ]
+    },
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Hex Tech')!,
+        overrideName: 'System Core',
+        description: 'Powered by code.',
+        stickers: [],
+        textLayers: [
+            { id: 't1', text: 'ROOT ACCESS', x: 0, y: 180, fontSize: 28, fontFamily: 'Courier New', color: '#60a5fa', rotation: 0, align: 'center', curved: true }
+        ]
+    },
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Super Star')!,
+        overrideName: 'Winner POV',
+        description: 'For the champions.',
+        stickers: [
+            { id: 's1', icon: 'trophy', x: 0, y: -150, scale: 1.2, rotation: 0 }
+        ],
+        textLayers: [
+            { id: 't1', text: '#1 CHAMPS', x: 0, y: 150, fontSize: 40, fontFamily: 'Inter', color: '#fbbf24', rotation: 0, align: 'center', curved: true }
+        ]
+    },
+    // CATEGORY: VIBES
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Ocean Gradient')!,
+        overrideName: 'Chill Wave',
+        description: 'Relax and reset.',
+        stickers: [
+            { id: 's1', icon: 'music', x: 120, y: 0, scale: 1.0, rotation: 10 },
+            { id: 's2', icon: 'music', x: -120, y: 0, scale: 1.0, rotation: -10 }
+        ],
+        textLayers: []
+    },
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Lovely Heart')!,
+        overrideName: 'Self Love',
+        description: 'Be kind to yourself.',
+        stickers: [],
+        textLayers: [
+            { id: 't1', text: 'LOVED', x: 0, y: 150, fontSize: 50, fontFamily: 'Playfair Display', color: '#f472b6', rotation: 0, align: 'center', curved: true }
+        ]
+    },
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Modern Dots')!,
+        overrideName: 'Art School',
+        description: 'Creative and chaotic.',
+        stickers: [
+            { id: 's1', icon: 'palette', x: 0, y: -140, scale: 1.2, rotation: 0 }
+        ],
+        textLayers: [
+            { id: 't1', text: 'CREATOR', x: 0, y: 140, fontSize: 40, fontFamily: 'Inter', color: '#f43f5e', rotation: 0, align: 'center', curved: true }
+        ]
+    },
+    // CATEGORY: EVENTS / MEME
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Memphis Pop')!,
+        overrideName: 'HODL',
+        description: 'Crypto forever.',
+        stickers: [
+            { id: 's1', icon: 'rocket', x: 0, y: -150, scale: 1.5, rotation: 0 }
+        ],
+        textLayers: [
+            { id: 't1', text: 'TO THE MOON', x: 0, y: 170, fontSize: 36, fontFamily: 'Inter', color: '#facc15', rotation: 0, align: 'center', curved: true }
+        ]
+    },
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Cyberpunk')!,
+        overrideName: 'Build Szn',
+        description: 'Keep shipping.',
+        stickers: [
+            { id: 's1', icon: 'hammer', x: 0, y: -130, scale: 1.2, rotation: 0 }
+        ],
+        textLayers: [
+            { id: 't1', text: 'SHIP IT', x: 0, y: 140, fontSize: 48, fontFamily: 'Inter', color: '#d946ef', rotation: 0, align: 'center', curved: true }
+        ]
+    },
+    // PLAIN FRAMES (Good Bases)
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Minimal White')!,
+        overrideName: 'Pure White',
+        description: 'Just a clean white border.',
+        stickers: [],
+        textLayers: []
+    },
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Ocean Gradient')!,
+        overrideName: 'Blue Ring',
+        description: 'Simple blue gradient.',
+        stickers: [],
+        textLayers: []
+    },
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Luxury Gold')!,
+        overrideName: 'Gold Ring',
+        description: 'Simple gold double frame.',
+        stickers: [],
+        textLayers: []
+    },
+    {
+        ...AVAILABLE_FRAMES.find(f => f.name === 'Apple Gray')!,
+        overrideName: 'Titanium',
+        description: 'Natural titanium finish.',
+        stickers: [],
+        textLayers: []
     }
 ];
 
