@@ -249,7 +249,22 @@ const SEED_TEMPLATES = [
     }
 ];
 
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
 export async function GET(request: NextRequest) {
+    const { searchParams } = new URL(request.url);
+    const secret = searchParams.get('secret');
+
+    // Secure the seed route: Require Admin Role OR Master Key
+    const session = await auth.api.getSession({ headers: await headers() });
+    const isAdmin = session?.user?.role === 'admin';
+    const isMasterKey = secret === 'ollabs-2026-master-key';
+
+    if (!isAdmin && !isMasterKey) {
+        return NextResponse.json({ error: 'Unauthorized. Admin role required.' }, { status: 403 });
+    }
+
     try {
         const results = [];
         for (const template of SEED_TEMPLATES) {

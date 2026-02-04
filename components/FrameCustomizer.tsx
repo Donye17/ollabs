@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { FrameConfig, FrameType } from '@/lib/types';
-import { Sliders, Palette, MoveHorizontal, RotateCcw, RotateCw, BoxSelect, Pipette, Hexagon } from 'lucide-react';
+import { Sliders, Palette, MoveHorizontal, RotateCcw, RotateCw, BoxSelect, Pipette, Hexagon, Sparkles } from 'lucide-react';
 
 interface FrameCustomizerProps {
   frame: FrameConfig;
@@ -10,6 +10,7 @@ interface FrameCustomizerProps {
   onRedo: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  onAutoMatch?: () => void;
 }
 
 // Full range of preset colors for quick selection
@@ -51,7 +52,8 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
   onUndo,
   onRedo,
   canUndo,
-  canRedo
+  canRedo,
+  onAutoMatch
 }) => {
   if (frame.type === FrameType.NONE) return null;
 
@@ -131,6 +133,16 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
             ))}
           </div>
         </div>
+
+        {/* AI Magic Match */}
+        {onAutoMatch && (
+          <button
+            onClick={onAutoMatch}
+            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-900/20 transition-all hover:scale-[1.02]"
+          >
+            <Sparkles size={14} /> ✨ Auto-Match Colors
+          </button>
+        )}
 
         {/* Color Palette Swatches */}
         <div className="space-y-2">

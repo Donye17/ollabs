@@ -1,6 +1,16 @@
 "use client";
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Download, Upload, ZoomIn, ZoomOut, RefreshCcw, Image as ImageIcon, Maximize, RotateCw, Share2, User, Loader2, Sparkles } from 'lucide-react';
+import { upload } from '@vercel/blob/client';
+// @ts-ignore
+import ColorThief from 'colorthief';
+
+// Helper
+const rgbToHex = (r: number, g: number, b: number) => '#' + [r, g, b].map(x => {
+  const hex = x.toString(16);
+  return hex.length === 1 ? '0' + hex : hex;
+}).join('');
+
 import GIF from 'gif.js';
 import { CANVAS_SIZE, DISPLAY_SIZE } from '@/lib/constants';
 import { FrameConfig, FrameType, Position, StickerConfig, MotionEffect, TextConfig } from '@/lib/types';
@@ -41,7 +51,8 @@ interface EditorProps {
   onSelectText: (id: string | null) => void;
 
   // Export Ref
-  editorRef?: React.RefObject<{ exportGif: () => void }>;
+  // Export Ref
+  editorRef?: React.RefObject<{ exportGif: () => void; getDominantColors: () => Promise<string[]> }>;
 
   // Background Removal
   onRemoveBackground?: () => void;
@@ -91,13 +102,26 @@ export const Editor: React.FC<EditorProps> = ({
   // Constants
   const STICKER_BASE_SIZE = 48; // Base width/height of sticker svgs
 
+  // @ts-ignore
+  import ColorThief from 'colorthief';
+
+  // Helper
+  const rgbToHex = (r: number, g: number, b: number) => '#' + [r, g, b].map(x => {
+    const hex = x.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  }).join('');
+
+  // ... inside component
+
   // Load image object when source changes
   useEffect(() => {
     if (imageSrc) {
       const img = new Image();
+      img.crossOrigin = "Anonymous"; // Enable CORS for analysis
       img.src = imageSrc;
       img.onload = () => {
         setImageObject(img);
+        // ... (rest of onload)
         setScale(1);
         setRotation(0);
         setPosition({ x: 0, y: 0 });
@@ -106,6 +130,33 @@ export const Editor: React.FC<EditorProps> = ({
       setImageObject(null);
     }
   }, [imageSrc]);
+
+  // ... inside useImperativeHandle
+  React.useImperativeHandle(editorRef, () => ({
+    exportGif: handleExportGif,
+    getDominantColors: () => {
+      return new Promise<string[]>((resolve, reject) => {
+        if (!imageObject) {
+          reject("No image loaded");
+          return;
+        }
+        try {
+          const colorThief = new ColorThief();
+          const palette = colorThief.getPalette(imageObject, 3); // Get top 3
+          if (palette && palette.length > 0) {
+            const hexPalette = palette.map((rgb: number[]) => rgbToHex(rgb[0], rgb[1], rgb[2]));
+            resolve(hexPalette);
+          } else {
+            reject("No colors found");
+          }
+        } catch (e) {
+          console.error("ColorThief failed", e);
+          // Fallback or reject
+          reject(e);
+        }
+      });
+    }
+  }));
 
   // Handle Auto Fit
   const handleAutoFit = () => {
@@ -311,7 +362,28 @@ export const Editor: React.FC<EditorProps> = ({
   };
 
   React.useImperativeHandle(editorRef, () => ({
-    exportGif: handleExportGif
+    exportGif: handleExportGif,
+    getDominantColors: () => {
+      return new Promise<string[]>((resolve, reject) => {
+        if (!imageObject) {
+          reject("No image loaded");
+          return;
+        }
+        try {
+          const colorThief = new ColorThief();
+          const palette = colorThief.getPalette(imageObject, 3);
+          if (palette && palette.length > 0) {
+            // @ts-ignore
+            const hexPalette = palette.map((rgb: number[]) => rgbToHex(rgb[0], rgb[1], rgb[2]));
+            resolve(hexPalette);
+          } else {
+            reject("No colors found");
+          }
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
   }));
 
   // Static preview update
@@ -576,13 +648,24 @@ export const Editor: React.FC<EditorProps> = ({
               if (!canvas) return;
               setIsUpdatingProfile(true);
               try {
-                const dataUrl = canvas.toDataURL('image/png', 0.8);
+                // 1. Convert Canvas to Blob
+                const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png', 0.8));
+                if (!blob) throw new Error("Canvas conversion failed");
+
+                // 2. Upload to Vercel Blob (Cloud Storage)
+                const { url } = await upload(`profile-${Date.now()}.png`, blob, {
+                  access: 'public',
+                  handleUploadUrl: '/api/upload',
+                });
+
+                // 3. Update User Profile with the Cloud URL (DB stores string, not base64)
                 // @ts-ignore
-                await authClient.updateUser({ image: dataUrl });
+                await authClient.updateUser({ image: url });
+
                 alert("Profile picture updated!");
               } catch (e) {
-                console.error(e);
-                alert("Failed to update profile picture.");
+                console.error("Upload failed", e);
+                alert("Failed to update profile picture. Ensure you are logged in.");
               } finally {
                 setIsUpdatingProfile(false);
               }

@@ -30,7 +30,25 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const [selectedTextId, setSelectedTextId] = useState<string | null>(null); // For Text
 
     // Refs
-    const editorRef = useRef<{ exportGif: () => void }>(null);
+    const editorRef = useRef<{ exportGif: () => void; getDominantColors: () => Promise<string[]> }>(null);
+
+    const handleAutoMatch = async () => {
+        if (!editorRef.current) return;
+        try {
+            const colors = await editorRef.current.getDominantColors();
+            if (colors && colors.length >= 2) {
+                const newFrame = { ...selectedFrame, color1: colors[0], color2: colors[1] };
+                handleFrameUpdate(newFrame);
+            } else if (colors && colors.length === 1) {
+                const newFrame = { ...selectedFrame, color1: colors[0] };
+                handleFrameUpdate(newFrame);
+            }
+        } catch (e) {
+            console.error("Auto match failed", e);
+            alert("Could not extract colors from this image.");
+        }
+    };
+
 
     const [activeTab, setActiveTab] = useState<'design' | 'custom' | 'customize' | 'text' | 'decor' | 'motion' | 'preview'>('design');
     const [isPublishOpen, setIsPublishOpen] = useState(false);
@@ -188,7 +206,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             selectedTextId={selectedTextId}
                             onSelectText={setSelectedTextId}
 
-                            editorRef={editorRef as React.RefObject<{ exportGif: () => void }>}
+                            editorRef={editorRef}
                             onRemoveBackground={handleRemoveBackground}
                             isRemovingBackground={isRemovingBg}
                         />
@@ -272,6 +290,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                                         onRedo={handleRedo}
                                         canUndo={historyIndex > 0}
                                         canRedo={historyIndex < history.length - 1}
+                                        onAutoMatch={handleAutoMatch}
                                     />
                                 </div>
                             )}

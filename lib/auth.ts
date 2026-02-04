@@ -15,7 +15,8 @@ export const auth = betterAuth({
     },
     user: {
         additionalFields: {
-            image: { type: "string", required: false }
+            image: { type: "string", required: false },
+            role: { type: "string", required: false, defaultValue: "user" }
         }
     },
     trustedOrigins: ["https://ollabs.studio", "http://localhost:3000"]
