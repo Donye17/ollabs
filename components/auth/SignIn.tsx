@@ -50,10 +50,16 @@ export const SignIn: React.FC<AuthProps> = ({ onSuccess, onSwitch }) => {
             <div className="space-y-3 mb-6">
                 <button
                     onClick={async () => {
+                        console.log("Attempting Google Sign In...");
                         await authClient.signIn.social({
                             provider: 'google',
                             callbackURL: '/gallery'
-                        }).catch(err => alert("Google Login Error: " + err.message));
+                        })
+                            .then(() => console.log("Google Sign In initiated"))
+                            .catch(err => {
+                                console.error("Google Error:", err);
+                                alert("Google Login Error: " + err.message);
+                            });
                     }}
                     className="w-full bg-white text-black hover:bg-gray-100 font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
@@ -62,10 +68,16 @@ export const SignIn: React.FC<AuthProps> = ({ onSuccess, onSwitch }) => {
                 </button>
                 <button
                     onClick={async () => {
+                        console.log("Attempting Discord Sign In...");
                         await authClient.signIn.social({
                             provider: 'discord',
                             callbackURL: '/gallery'
-                        }).catch(err => alert("Discord Login Error: " + err.message));
+                        })
+                            .then(() => console.log("Discord Sign In initiated"))
+                            .catch(err => {
+                                console.error("Discord Error:", err);
+                                alert("Discord Login Error: " + err.message);
+                            });
                     }}
                     className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
@@ -74,10 +86,16 @@ export const SignIn: React.FC<AuthProps> = ({ onSuccess, onSwitch }) => {
                 </button>
                 <button
                     onClick={async () => {
+                        console.log("Attempting Twitter Sign In...");
                         await authClient.signIn.social({
                             provider: 'twitter',
                             callbackURL: '/gallery'
-                        }).catch(err => alert("Twitter Login Error: " + err.message));
+                        })
+                            .then(() => console.log("Twitter Sign In initiated"))
+                            .catch(err => {
+                                console.error("Twitter Error:", err);
+                                alert("Twitter Login Error: " + err.message);
+                            });
                     }}
                     className="w-full bg-black hover:bg-gray-800 text-white font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
