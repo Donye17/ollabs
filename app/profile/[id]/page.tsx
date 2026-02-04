@@ -14,16 +14,29 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     };
 }
 
-// Fetch user data directly from DB
+// Fetch user data directly from DB with fallback for table names
 async function getUser(id: string) {
     try {
+        // Try default "user" table (quoted because it's a reserved word)
         const result = await pool.query(
             'SELECT name, image, created_at FROM "user" WHERE id = $1',
             [id]
         );
         return result.rows[0];
-    } catch (e) {
-        console.error("Failed to fetch user", e);
+    } catch (e: any) {
+        // If error is "relation does not exist", try 'users' table
+        if (e.message?.includes('does not exist')) {
+            try {
+                const result = await pool.query(
+                    'SELECT name, image, created_at FROM users WHERE id = $1',
+                    [id]
+                );
+                return result.rows[0];
+            } catch (innerError) {
+                console.error("Failed to fetch user from 'users' table fallback", innerError);
+            }
+        }
+        console.error("Failed to fetch user from 'user' table", e);
         return null;
     }
 }
