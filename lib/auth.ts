@@ -31,7 +31,13 @@ export const auth = betterAuth({
         process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined
     ].filter(Boolean) as string[],
     emailAndPassword: {
-        enabled: true
+        enabled: true,
+        autoSignIn: true
+    },
+    emailVerification: {
+        sendOnSignUp: false,
+        autoSignInAfterVerification: true,
+        expiresIn: 3600 // 1 hour
     },
     // Debugging enabled
     logger: {
