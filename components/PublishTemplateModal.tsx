@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { X, Upload, Check, Loader2 } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
+import { authClient } from '@/lib/auth-client';
 
 interface PublishTemplateModalProps {
     isOpen: boolean;
@@ -11,6 +12,7 @@ interface PublishTemplateModalProps {
 }
 
 export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl }) => {
+    const { data: session } = authClient.useSession();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,6 +22,10 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
     const handlePublish = async () => {
         if (!name) return;
+        if (!session?.user) {
+            alert("Please sign in to publish templates.");
+            return;
+        }
         setIsSubmitting(true);
 
         try {
@@ -30,8 +36,8 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                     name,
                     description,
                     config,
-                    creator_id: '123', // TODO: Get actual user ID
-                    creator_name: 'Josh', // TODO: Get actual user name
+                    creator_id: session.user.id,
+                    creator_name: session.user.name,
                     is_public: true
                 })
             });
@@ -111,7 +117,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 <div className="p-6 border-t border-white/5 bg-zinc-900/50">
                     <button
                         onClick={handlePublish}
-                        disabled={!name || isSubmitting || isSuccess}
+                        disabled={!name || isSubmitting || isSuccess || !session}
                         className={`w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${isSuccess
                             ? 'bg-green-500 text-white'
                             : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20'
@@ -123,6 +129,8 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             <>
                                 <Check size={20} /> Published!
                             </>
+                        ) : !session ? (
+                            <span>Sign In Required</span>
                         ) : (
                             <>
                                 <Upload size={20} /> Publish to Community
