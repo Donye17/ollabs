@@ -52,7 +52,7 @@ interface EditorProps {
 
   // Export Ref
   // Export Ref
-  editorRef?: React.RefObject<{ exportGif: () => void; getDominantColors: () => Promise<string[]> }>;
+  editorRef?: React.RefObject<{ exportGif: () => void; getDominantColors: () => Promise<string[]> } | null>;
 
   // Background Removal
   onRemoveBackground?: () => void;
