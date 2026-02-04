@@ -37,6 +37,11 @@ export const metadata: Metadata = {
         description: 'Design unique profile picture frames with neon, geometric, and artistic styles.',
         images: ['/og-image.png'],
     },
+    icons: {
+        icon: '/Ollabs Logo Black.png',
+        shortcut: '/Ollabs Logo Black.png',
+        apple: '/Ollabs Logo Black.png',
+    },
 };
 
 export default function RootLayout({

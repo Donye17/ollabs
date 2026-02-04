@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { FrameRendererFactory } from './renderer/FrameRendererFactory';
 import { FrameConfig, FrameType } from '@/lib/types';
-import { Loader2, UserCircle2, Copy, MessageSquare, Heart } from 'lucide-react';
+import { Loader2, UserCircle2, Copy, MessageSquare, Heart, Layout } from 'lucide-react';
 import { CANVAS_SIZE } from '@/lib/constants';
 import { LikeButton } from './social/LikeButton';
 import { CommentSection } from './social/CommentSection';
@@ -86,7 +86,7 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId }) =>
             {frames.length === 0 && (
                 <div className="text-center py-20 bg-zinc-900/30 backdrop-blur-sm rounded-3xl border border-white/5 border-dashed hover:border-blue-500/20 transition-all">
                     <div className="w-20 h-20 bg-zinc-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-                        <Loader2 className="text-zinc-600" size={40} />
+                        <Layout className="text-zinc-600" size={40} />
                     </div>
                     <h3 className="text-2xl font-bold text-zinc-50 mb-2">No frames yet</h3>
                     <p className="text-zinc-400 mb-8 max-w-sm mx-auto leading-relaxed">Be the first to publish a verified design to the community gallery.</p>
@@ -94,6 +94,7 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId }) =>
                         Create Masterpiece
                     </Link>
 
+                    {/* Admin button hidden for public view
                     <div className="mt-8 pt-8 border-t border-white/5">
                         <button
                             onClick={async () => {
@@ -105,6 +106,7 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId }) =>
                             (Admin) Populate Default Templates
                         </button>
                     </div>
+                    */}
                 </div>
             )}
         </div>
