@@ -1,6 +1,9 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
@@ -8,18 +11,31 @@ export async function GET(request: NextRequest) {
         const creatorId = searchParams.get('creator_id');
         const id = searchParams.get('id');
 
-        let query = `SELECT * FROM frames WHERE is_public = true`;
+        // Check auth for 'liked_by_user' field
+        const session = await auth.api.getSession({ headers: await headers() });
+        const currentUserId = session?.user?.id;
+
+        let query = `
+            SELECT 
+                f.*, 
+                ${currentUserId ? `CASE WHEN l.user_id IS NOT NULL THEN true ELSE false END as liked_by_user` : 'false as liked_by_user'}
+            FROM frames f
+            ${currentUserId ? `LEFT JOIN likes l ON f.id = l.frame_id AND l.user_id = $1` : ''}
+            WHERE f.is_public = true
+        `;
+
         const queryParams: any[] = [];
+        if (currentUserId) queryParams.push(currentUserId);
 
         if (id) {
-            query += ` AND id = $${queryParams.length + 1}`;
+            query += ` AND f.id = $${queryParams.length + 1}`;
             queryParams.push(id);
         } else if (creatorId) {
-            query += ` AND creator_id = $${queryParams.length + 1}`;
+            query += ` AND f.creator_id = $${queryParams.length + 1}`;
             queryParams.push(creatorId);
         }
 
-        query += ` ORDER BY created_at DESC LIMIT $${queryParams.length + 1}`;
+        query += ` ORDER BY f.created_at DESC LIMIT $${queryParams.length + 1}`;
         queryParams.push(limit);
 
         const result = await pool.query(query, queryParams);
