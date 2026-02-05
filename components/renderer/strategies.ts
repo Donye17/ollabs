@@ -1,5 +1,6 @@
 import { FrameType } from '@/lib/types';
 import { IFrameRenderer, RenderContext } from './types';
+import { CANVAS_SIZE } from '@/lib/constants';
 
 // --- Base Helper for standard shapes ---
 abstract class BaseShapeRenderer implements IFrameRenderer {
@@ -9,7 +10,10 @@ abstract class BaseShapeRenderer implements IFrameRenderer {
         const { ctx, centerX, centerY, radius, frame } = context;
 
         ctx.save();
-        const lineWidth = frame.width * 2;
+        // Scale width based on canvas size relative to standard 1024px canvas
+        // This ensures the frame looks the same proportional thickness on all sizes (Gallery vs Editor)
+        const scale = radius / (CANVAS_SIZE / 2);
+        const lineWidth = frame.width * 2 * scale;
         const strokeRadius = radius - (lineWidth / 2);
 
         // Define path for the stroke
@@ -115,8 +119,9 @@ export class HeartRenderer extends BaseShapeRenderer {
 
 export class DashedRenderer extends CircleRenderer {
     protected applyStyle(context: RenderContext): void {
-        const { ctx, frame } = context;
-        const lineWidth = frame.width * 2;
+        const { ctx, frame, radius } = context;
+        const scale = radius / (CANVAS_SIZE / 2);
+        const lineWidth = frame.width * 2 * scale;
         ctx.setLineDash([lineWidth * 2, lineWidth]);
     }
 }
@@ -139,7 +144,8 @@ export class NeonRenderer extends CircleRenderer {
         const { ctx, centerX, centerY, radius, frame } = context;
         if (!frame.color2) return super.drawFrame(context);
 
-        const lineWidth = frame.width * 2;
+        const scale = radius / (CANVAS_SIZE / 2);
+        const lineWidth = frame.width * 2 * scale;
         const strokeRadius = radius - (lineWidth / 2);
 
         // Glow
@@ -165,7 +171,8 @@ export class NeonRenderer extends CircleRenderer {
 export class DoubleRenderer extends CircleRenderer {
     drawFrame(context: RenderContext): void {
         const { ctx, centerX, centerY, radius, frame } = context;
-        const lineWidth = frame.width * 2;
+        const scale = radius / (CANVAS_SIZE / 2);
+        const lineWidth = frame.width * 2 * scale;
         const strokeRadius = radius - (lineWidth / 2);
 
         // Outer
@@ -191,7 +198,8 @@ export class DoubleRenderer extends CircleRenderer {
 export class MemphisRenderer extends CircleRenderer {
     drawFrame(context: RenderContext): void {
         const { ctx, centerX, centerY, radius, frame } = context;
-        const lineWidth = frame.width * 2;
+        const scale = radius / (CANVAS_SIZE / 2);
+        const lineWidth = frame.width * 2 * scale;
         const strokeRadius = radius - (lineWidth / 2);
 
         if (frame.color2) {
@@ -218,7 +226,8 @@ export class MemphisRenderer extends CircleRenderer {
 export class GeometricRenderer extends CircleRenderer {
     drawFrame(context: RenderContext): void {
         const { ctx, centerX, centerY, radius, frame } = context;
-        const lineWidth = frame.width * 2;
+        const scale = radius / (CANVAS_SIZE / 2);
+        const lineWidth = frame.width * 2 * scale;
 
         // Inner Ring
         ctx.save();
@@ -256,7 +265,8 @@ export class ImageFrameRenderer extends CircleRenderer {
 
         if (!frame.imageUrl) {
             // Fallback to dashed placeholder if no image
-            const lineWidth = frame.width * 2;
+            const scale = context.radius / (CANVAS_SIZE / 2);
+            const lineWidth = frame.width * 2 * scale;
             ctx.setLineDash([5, 5]);
             ctx.strokeStyle = '#cbd5e1'; // Light slate
             return;

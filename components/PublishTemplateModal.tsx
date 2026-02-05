@@ -9,9 +9,10 @@ interface PublishTemplateModalProps {
     onClose: () => void;
     config: FrameConfig;
     previewDataUrl: string | null;
+    parentId?: string;
 }
 
-export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl }) => {
+export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl, parentId }) => {
     const { data: session } = authClient.useSession();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -38,7 +39,8 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                     config,
                     creator_id: session.user.id,
                     creator_name: session.user.name,
-                    is_public: true
+                    is_public: true,
+                    parent_id: parentId
                 })
             });
 

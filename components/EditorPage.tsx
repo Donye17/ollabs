@@ -385,6 +385,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                 onClose={() => setIsPublishOpen(false)}
                 config={{ ...selectedFrame, stickers, textLayers }}
                 previewDataUrl={previewDataUrl}
+                parentId={remixId}
             />
 
             <footer className="py-12 text-center text-zinc-600 text-sm border-t border-white/5 bg-zinc-950">

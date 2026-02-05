@@ -52,8 +52,8 @@ export async function GET(request: NextRequest) {
 
         if (sort === 'trending') {
             // Logic: Sort by likes_count DESC. 
-            // Optional: You could restrict to recent frames if desired, e.g. AND f.created_at > NOW() - INTERVAL '30 days'
-            query += ` ORDER BY f.likes_count DESC, f.created_at DESC LIMIT $${queryParams.length + 1}`;
+            // Restrict to recent frames (last 7 days) to keep trending fresh
+            query += ` AND f.created_at > NOW() - INTERVAL '7 days' ORDER BY f.likes_count DESC, f.created_at DESC LIMIT $${queryParams.length + 1}`;
         } else {
             query += ` ORDER BY f.created_at DESC LIMIT $${queryParams.length + 1}`;
         }
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { name, description, config, creator_id, creator_name, is_public } = body;
+        const { name, description, config, creator_id, creator_name, is_public, parent_id } = body;
 
         // TODO: Add server-side auth validation here (using Request Headers or Cookie)
 
@@ -85,7 +85,46 @@ export async function POST(request: NextRequest) {
             [name, description, JSON.stringify(config), creator_id, creator_name, is_public]
         );
 
-        return NextResponse.json(result.rows[0]);
+        const newFrame = result.rows[0];
+
+        // NOTIFICATION LOGIC: Remix
+        if (parent_id) {
+            try {
+                // 1. Get parent frame creator
+                const parentResult = await pool.query(
+                    'SELECT created_by, name FROM frames WHERE id = $1',
+                    [parent_id]
+                );
+
+                if (parentResult.rows.length > 0) {
+                    const originalCreatorId = parentResult.rows[0].created_by;
+                    const originalFrameName = parentResult.rows[0].name;
+
+                    // 2. Insert notification if not self-remix
+                    if (originalCreatorId && originalCreatorId !== creator_id) {
+                        await pool.query(
+                            `INSERT INTO notifications (user_id, actor_id, type, entity_id, metadata)
+                             VALUES ($1, $2, 'remix', $3, $4)`,
+                            [
+                                originalCreatorId,
+                                creator_id,
+                                newFrame.id, // Link to the NEW frame so they can see what was made
+                                JSON.stringify({
+                                    actor_name: creator_name,
+                                    frame_name: originalFrameName,
+                                    new_frame_name: newFrame.name
+                                })
+                            ]
+                        );
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to send remix notification", err);
+                // Don't fail the request
+            }
+        }
+
+        return NextResponse.json(newFrame);
     } catch (error) {
         console.error('Failed to create frame:', error);
         return NextResponse.json(
