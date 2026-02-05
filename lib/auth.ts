@@ -40,6 +40,29 @@ export const auth = betterAuth({
         expiresIn: 3600 // 1 hour
     },
     // Map verification table fields to snake_case
+    // Fix split-brain schema (both expiresAt and expires_at exist and are NOT NULL)
+    databaseHooks: {
+        verification: {
+            create: {
+                before: async (verification) => {
+                    return {
+                        data: {
+                            ...verification,
+                            // Ensure snake_case columns are populated
+                            expires_at: verification.expiresAt,
+                            created_at: verification.createdAt,
+                            updated_at: verification.updatedAt,
+                            // Ensure camelCase columns are populated (just in case)
+                            expiresAt: verification.expiresAt,
+                            createdAt: verification.createdAt,
+                            updatedAt: verification.updatedAt
+                        }
+                    }
+                }
+            }
+        }
+    },
+
     // Debugging enabled
     logger: {
         level: "debug",
