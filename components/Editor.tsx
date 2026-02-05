@@ -180,7 +180,7 @@ export const Editor: React.FC<EditorProps> = ({
     // 1. Draw Background
     ctx.save();
     renderer.createPath(ctx, centerX, centerY, radius);
-    ctx.fillStyle = '#1e293b';
+    ctx.fillStyle = '#334155';
     ctx.fill();
     ctx.restore();
 

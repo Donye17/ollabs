@@ -146,10 +146,13 @@ export const SignIn: React.FC<AuthProps> = ({ onSuccess, onSwitch }) => {
                 </button>
             </form>
 
-            <div className="mt-6 text-center text-sm text-slate-400">
-                Don't have an account?{' '}
-                <button onClick={onSwitch} className="text-blue-400 hover:text-blue-300 font-medium">
-                    Sign Up
+            <div className="mt-6 pt-6 border-t border-slate-800">
+                <p className="text-center text-slate-400 text-sm mb-3">New to Ollabs?</p>
+                <button
+                    onClick={onSwitch}
+                    className="w-full py-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 text-white font-bold transition-all"
+                >
+                    Create an Account
                 </button>
             </div>
         </div>

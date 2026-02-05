@@ -13,6 +13,7 @@ import { AVAILABLE_FRAMES } from '@/lib/constants';
 import { FrameConfig, StickerConfig, TextConfig, MotionEffect } from '@/lib/types';
 import { AlertCircle, Sparkles, Sliders, Eye, Type, Sticker, Clapperboard, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
+import { OnboardingOverlay } from './editor/OnboardingOverlay';
 import { removeBackground } from "@imgly/background-removal";
 
 export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
@@ -179,6 +180,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     return (
         <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-blue-500/30">
             <NavBar />
+            <OnboardingOverlay />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 lg:py-24">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
@@ -242,7 +244,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                                 { id: 'custom', icon: ImageIcon, label: 'Custom' },
                                 { id: 'customize', icon: Sliders, label: 'Edit' },
                                 { id: 'text', icon: Type, label: 'Text' },
-                                { id: 'decor', icon: Sticker, label: 'Decor' },
+                                { id: 'decor', icon: Sticker, label: 'Stickers' },
                                 { id: 'motion', icon: Clapperboard, label: 'Motion' },
                                 { id: 'preview', icon: Eye, label: 'Preview' },
                             ].map((tab) => (

@@ -28,7 +28,7 @@ export const StickerControls: React.FC<StickerControlsProps> = ({
     return (
         <div className="w-full bg-slate-900/60 p-5 rounded-2xl border border-white/5 backdrop-blur-xl animate-in slide-in-from-bottom-5 duration-500">
             <div className="flex items-center justify-between mb-4">
-                <h4 className="text-xs font-bold font-heading text-slate-400 uppercase tracking-widest">Decorations ✨</h4>
+                <h4 className="text-xs font-bold font-heading text-slate-400 uppercase tracking-widest">Stickers ✨</h4>
             </div>
 
             <p className="text-xs text-slate-500 font-bold mb-3 uppercase tracking-wider">Add Sticker</p>
