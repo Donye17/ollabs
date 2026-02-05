@@ -12,12 +12,13 @@ import { CommentSection } from './social/CommentSection';
 interface GalleryProps {
     onSelectFrame: (frame: FrameConfig, frameId: string) => void;
     creatorId?: string;
+    likedBy?: string;
     filter?: (frame: PublishedFrame) => boolean;
 }
 
 import { FrameCard, PublishedFrame } from './FrameCard';
 
-export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filter }) => {
+export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, likedBy, filter }) => {
     const [frames, setFrames] = useState<PublishedFrame[]>([]);
     const [trendingFrames, setTrendingFrames] = useState<PublishedFrame[]>([]);
     const [loading, setLoading] = useState(true);
@@ -35,7 +36,7 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filt
 
     // Fetch Trending (Only on main gallery)
     useEffect(() => {
-        if (!creatorId) {
+        if (!creatorId && !likedBy) {
             const fetchTrending = async () => {
                 try {
                     const response = await fetch('/api/frames?sort=trending&limit=4');
@@ -62,6 +63,7 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filt
                 const params = new URLSearchParams();
                 params.set('limit', '50'); // Increased limit for search
                 if (creatorId) params.set('creator_id', creatorId);
+                if (likedBy) params.set('liked_by', likedBy);
                 if (debouncedSearch) params.set('search', debouncedSearch);
                 if (selectedTag) params.set('tag', selectedTag);
 
@@ -85,14 +87,14 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filt
         };
 
         fetchFrames();
-    }, [creatorId, debouncedSearch, selectedTag]);
+    }, [creatorId, likedBy, debouncedSearch, selectedTag]);
 
 
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
             {/* Header Section */}
-            {!creatorId && (
+            {!creatorId && !likedBy && (
                 <div className="text-center space-y-4">
                     <h2 className="text-4xl font-bold tracking-tight text-zinc-50">Community Gallery</h2>
                     <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Discover and remix designs from creators worldwide.</p>
@@ -100,7 +102,7 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filt
             )}
 
             {/* Trending Section */}
-            {!creatorId && !searchQuery && !selectedTag && trendingFrames.length > 0 && (
+            {!creatorId && !likedBy && !searchQuery && !selectedTag && trendingFrames.length > 0 && (
                 <div className="space-y-6">
                     <div className="flex items-center gap-2 mb-6">
                         <span className="relative flex h-3 w-3">
@@ -125,7 +127,7 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filt
             )}
 
             {/* Search & Filter Controls */}
-            {!creatorId && (
+            {!creatorId && !likedBy && (
                 <div className="flex flex-col items-center gap-6 max-w-4xl mx-auto">
                     {/* Search Bar */}
                     <div className="relative w-full max-w-lg">
@@ -166,7 +168,7 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filt
                 </div>
             ) : (
                 <div className="space-y-6">
-                    {!creatorId && (
+                    {!creatorId && !likedBy && (
                         <h3 className="text-xl font-bold text-zinc-400">All Frames</h3>
                     )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

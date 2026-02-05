@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { FrameRendererFactory } from './renderer/FrameRendererFactory';
 import { FrameConfig } from '@/lib/types';
-import { UserCircle2, MessageSquare, Heart, Share2 } from 'lucide-react';
+import { UserCircle2, MessageSquare, Heart, Share2, Eye } from 'lucide-react';
 import { LikeButton } from './social/LikeButton'; // We might replace this with inline logic or keep it
 import { CommentSection } from './social/CommentSection';
 import { authClient } from '@/lib/auth-client';
@@ -16,6 +16,7 @@ export interface PublishedFrame {
     creator_name: string;
     created_at: string;
     likes_count: number;
+    views_count?: number;
     liked_by_user: boolean;
     is_public?: boolean;
 }
@@ -116,9 +117,17 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
                 <div className="flex justify-between items-start mb-3">
                     <div>
                         <h3 className="font-bold text-lg text-zinc-100 truncate group-hover:text-blue-400 transition-colors tracking-tight">{frame.name}</h3>
-                        <div className="flex items-center gap-2 mt-2 text-sm text-zinc-500">
-                            <UserCircle2 size={16} className="text-zinc-600" />
-                            <span className="font-medium text-zinc-400">{frame.creator_name}</span>
+                        <div className="flex items-center gap-4 mt-2 text-sm text-zinc-500">
+                            <div className="flex items-center gap-2">
+                                <UserCircle2 size={16} className="text-zinc-600" />
+                                <span className="font-medium text-zinc-400">{frame.creator_name}</span>
+                            </div>
+                            {(frame.views_count !== undefined) && (
+                                <div className="flex items-center gap-1.5" title={`${frame.views_count} views`}>
+                                    <Eye size={14} className="text-zinc-600" />
+                                    <span className="text-xs font-medium text-zinc-500">{frame.views_count}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

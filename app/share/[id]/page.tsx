@@ -18,6 +18,15 @@ async function getFrame(id: string) {
     }
 }
 
+// Increment view count
+async function incrementView(id: string) {
+    try {
+        await pool.query('UPDATE frames SET views_count = views_count + 1 WHERE id = $1', [id]);
+    } catch (e) {
+        console.error("Failed to increment view", e);
+    }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id } = await params;
     const frame = await getFrame(id);
@@ -68,6 +77,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function SharePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const frame = await getFrame(id);
+
+    if (frame) {
+        // Fire and forget view increment to avoid blocking render significantly
+        // or await it if strictness needed. Fire-and-forget in server components is tricky as runtime might kill it.
+        // Better to await.
+        await incrementView(id);
+    }
 
     if (!frame) {
         notFound();

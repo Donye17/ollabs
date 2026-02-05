@@ -2,8 +2,9 @@
 import { pool } from '@/lib/neon';
 import { ProfileGrid } from '@/components/ProfileGrid';
 import { EditProfileModalWrapper } from '@/components/profile/EditProfileModalWrapper';
+import { ProfileTabs } from '@/components/profile/ProfileTabs';
 import type { Metadata } from 'next';
-import { User, Calendar, MapPin, Link as LinkIcon, Twitter, Instagram, Globe } from 'lucide-react';
+import { User, Calendar, MapPin, Link as LinkIcon, Twitter, Instagram } from 'lucide-react';
 import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
@@ -43,8 +44,9 @@ async function getUser(id: string) {
     }
 }
 
-export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ProfilePage({ params, searchParams }: { params: Promise<{ id: string }>, searchParams: Promise<{ tab?: string }> }) {
     const { id } = await params;
+    const { tab } = await searchParams;
     const user = await getUser(id);
     const session = await auth.api.getSession({ headers: await headers() });
 
@@ -86,7 +88,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Profile Header */}
-                <div className="relative mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="relative mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
                     {/* Cover Banner (Abstract) */}
                     <div className="absolute inset-x-0 -top-12 h-48 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-slate-900/20 rounded-3xl blur-3xl -z-10 opacity-50" />
@@ -159,18 +161,17 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
                     </div>
                 </div>
 
-                <div className="h-px bg-slate-800 mb-12" />
+                <div className="h-px bg-slate-800 mb-8" />
 
-                {/* User's Frames */}
+                {/* Profile Tabs */}
+                {/* We pass isOwner to decide if Drafts tab is shown */}
+                <ProfileTabs isOwner={isOwner} />
+
+                {/* User's Frames Grid */}
                 <div className="space-y-8">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-white">Created Frames</h2>
-                    </div>
-
-                    <ProfileGrid creatorId={id} />
+                    <ProfileGrid creatorId={id} tab={tab} />
                 </div>
             </main>
         </div>
     );
 }
-

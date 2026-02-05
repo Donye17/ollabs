@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
         const search = searchParams.get('search');
         const tag = searchParams.get('tag');
         const sort = searchParams.get('sort');
+        const likedBy = searchParams.get('liked_by');
 
         // Check auth for 'liked_by_user' field
         const session = await auth.api.getSession({ headers: await headers() });
@@ -24,12 +25,16 @@ export async function GET(request: NextRequest) {
                 ${currentUserId ? `CASE WHEN l.user_id IS NOT NULL THEN true ELSE false END as liked_by_user` : 'false as liked_by_user'}
             FROM frames f
             ${currentUserId ? `LEFT JOIN likes l ON f.id = l.frame_id AND l.user_id = $1` : ''}
+            ${likedBy ? `INNER JOIN likes filter_likes ON f.id = filter_likes.frame_id AND filter_likes.user_id = $${queryParams.length + (currentUserId ? 2 : 1)}` : ''}
             WHERE (f.is_public = true ${currentUserId ? `OR f.creator_id = $1` : ''})
         `;
 
         const queryParams: any[] = [];
         if (currentUserId) queryParams.push(currentUserId);
 
+        if (likedBy) {
+            queryParams.push(likedBy); // Add param for filter_likes JOIN
+        }
 
         if (id) {
             query += ` AND f.id = $${queryParams.length + 1}`;
