@@ -18,8 +18,9 @@ async function getFrame(id: string) {
     }
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-    const frame = await getFrame(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+    const { id } = await params;
+    const frame = await getFrame(id);
 
     if (!frame) {
         return {
@@ -64,8 +65,9 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     };
 }
 
-export default async function SharePage({ params }: { params: { id: string } }) {
-    const frame = await getFrame(params.id);
+export default async function SharePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const frame = await getFrame(id);
 
     if (!frame) {
         notFound();

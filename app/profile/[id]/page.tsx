@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id } = await params;
     const user = await getUser(id);
     return {
@@ -43,7 +43,7 @@ async function getUser(id: string) {
     }
 }
 
-export default async function ProfilePage({ params }: { params: { id: string } }) {
+export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const user = await getUser(id);
     const session = await auth.api.getSession({ headers: await headers() });
