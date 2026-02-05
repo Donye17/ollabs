@@ -3,10 +3,7 @@ import { pool } from "./neon";
 
 export const auth = betterAuth({
     baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-    database: {
-        client: pool,
-        casing: "snake"
-    },
+    database: pool,
     socialProviders: {
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -41,6 +38,16 @@ export const auth = betterAuth({
         sendOnSignUp: false,
         autoSignInAfterVerification: true,
         expiresIn: 3600 // 1 hour
+    },
+    // Map verification table fields to snake_case
+    verification: {
+        fields: {
+            expiresAt: "expires_at",
+            createdAt: "created_at",
+            updatedAt: "updated_at",
+            value: "value",
+            identifier: "identifier"
+        }
     },
     // Debugging enabled
     logger: {
