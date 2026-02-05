@@ -23,24 +23,44 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
     if (!frame) {
         return {
-            title: 'Frame Not Found',
+            title: 'Frame Not Found - Ollabs',
+            description: 'The requested avatar frame could not be found.',
         };
     }
 
+    const title = `${frame.name} by ${frame.creator_name} | Ollabs Avatar Frame`;
+    const description = frame.description || `Customize your profile picture with the ${frame.name} frame by ${frame.creator_name}. Create your own custom avatar frames on Ollabs.`;
+
+    const ogImageUrl = `https://ollabs.studio/api/og?title=${encodeURIComponent(frame.name)}&creator=${encodeURIComponent(frame.creator_name)}`;
+
     return {
-        title: `${frame.name} by ${frame.creator_name} | Ollabs`,
-        description: frame.description || `Check out this custom avatar frame by ${frame.creator_name}. Remix it to create your own!`,
+        title,
+        description,
         openGraph: {
-            title: `${frame.name} - Avatar Frame`,
-            description: `Remix this frame by ${frame.creator_name} on Ollabs.`,
-            images: ['/og-image.png'], // TODO: dynamic OG image generation
+            title,
+            description,
+            url: `https://ollabs.studio/share/${frame.id}`,
+            siteName: 'Ollabs',
+            locale: 'en_US',
+            type: 'website',
+            images: [
+                {
+                    url: ogImageUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: `${frame.name} by ${frame.creator_name}`,
+                },
+            ],
         },
         twitter: {
             card: 'summary_large_image',
-            title: `${frame.name} - Avatar Frame`,
-            description: `Remix this frame by ${frame.creator_name} on Ollabs.`,
-            images: ['/og-image.png'],
-        }
+            title,
+            description,
+            creator: '@ollabs_studio',
+            images: [ogImageUrl],
+        },
+        authors: [{ name: frame.creator_name }],
+        category: 'design',
     };
 }
 

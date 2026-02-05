@@ -2,14 +2,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { FrameRendererFactory } from './renderer/FrameRendererFactory';
 import { FrameConfig } from '@/lib/types';
-import { UserCircle2, MessageSquare, Heart } from 'lucide-react';
+import { UserCircle2, MessageSquare, Heart, Share2 } from 'lucide-react';
 import { LikeButton } from './social/LikeButton'; // We might replace this with inline logic or keep it
 import { CommentSection } from './social/CommentSection';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 
 export interface PublishedFrame {
-    id: number;
+    id: string;
     name: string;
     description: string;
     config: FrameConfig;
@@ -17,6 +17,7 @@ export interface PublishedFrame {
     created_at: string;
     likes_count: number;
     liked_by_user: boolean;
+    is_public?: boolean;
 }
 
 interface FrameCardProps {
@@ -125,22 +126,34 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
                 <p className="text-sm text-zinc-500 mb-6 line-clamp-2 leading-relaxed font-normal">{frame.description}</p>
 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-
                     {/* Like Button */}
                     <button
                         onClick={handleLike}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${isLiked ? 'bg-pink-500/10 text-pink-500' : 'text-zinc-500 hover:bg-zinc-800 hover:text-pink-400'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 active:scale-95 ${isLiked ? 'bg-pink-500/10 text-pink-500' : 'text-zinc-500 hover:bg-zinc-800 hover:text-pink-400'}`}
                     >
-                        <Heart size={18} fill={isLiked ? "currentColor" : "none"} strokeWidth={isLiked ? 0 : 2} className={isLiked ? "scale-110" : ""} />
+                        <Heart size={20} fill={isLiked ? "currentColor" : "none"} strokeWidth={isLiked ? 0 : 2} className={isLiked ? "scale-110" : ""} />
                         <span className="text-sm font-semibold">{likeCount}</span>
                     </button>
 
                     <button
                         onClick={() => setShowComments(!showComments)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${showComments ? 'bg-blue-500/10 text-blue-400' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all active:scale-95 ${showComments ? 'bg-blue-500/10 text-blue-400' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'}`}
                     >
-                        <MessageSquare size={18} strokeWidth={2} />
-                        <span className="text-xs font-bold uppercase tracking-wide">Comments</span>
+                        <MessageSquare size={20} strokeWidth={2} />
+                        <span className="text-xs font-bold uppercase tracking-wide hidden sm:inline">Comments</span>
+                        <span className="text-xs font-bold uppercase tracking-wide sm:hidden">{showComments ? 'Hide' : 'Chat'}</span>
+                    </button>
+
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(`${window.location.origin}/share/${frame.id}`);
+                            alert('Link copied to clipboard!');
+                        }}
+                        className="p-3 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-all ml-2 active:scale-95"
+                        title="Share Frame"
+                    >
+                        <Share2 size={20} />
                     </button>
                 </div>
 

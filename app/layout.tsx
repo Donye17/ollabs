@@ -12,29 +12,29 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://ollabs.vercel.app'),
     title: {
         template: '%s | Ollabs',
-        default: 'Ollabs - Create Custom Avatar Frames',
+        default: 'Ollabs - Custom Avatar Frame Maker & PFP Border Creator',
     },
-    description: 'The easiest way to create, customize, and share professional avatar frames for social media.',
+    description: 'The best free tool to create custom avatar frames, profile picture borders, and PFP overlays for Discord, Twitter, and Instagram.',
     openGraph: {
         type: 'website',
         locale: 'en_US',
-        url: 'https://ollabs.vercel.app',
+        url: 'https://ollabs.studio',
         siteName: 'Ollabs',
-        title: 'Ollabs - AI Avatar Frame Creator',
-        description: 'Design unique profile picture frames with neon, geometric, and artistic styles.',
+        title: 'Ollabs - Custom Avatar Frame Maker',
+        description: 'Design unique profile picture frames, neon borders, and PFP overlays in seconds.',
         images: [
             {
                 url: '/og-image.png',
                 width: 1200,
                 height: 630,
-                alt: 'Ollabs Social Banner',
+                alt: 'Ollabs Avatar Frame Creator',
             },
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Ollabs - AI Avatar Frame Creator',
-        description: 'Design unique profile picture frames with neon, geometric, and artistic styles.',
+        title: 'Ollabs - Custom Avatar Frame Maker',
+        description: 'Design unique profile picture frames, neon borders, and PFP overlays in seconds.',
         images: ['/og-image.png'],
     },
     icons: {
@@ -60,6 +60,22 @@ export const metadata: Metadata = {
     manifest: '/favicon/site.webmanifest',
 };
 
+const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    'name': 'Ollabs',
+    'url': 'https://ollabs.vercel.app',
+    'description': 'Create custom avatar frames, profile picture borders, and PFP overlays for Discord, Twitter, and social media.',
+    'applicationCategory': 'DesignApplication',
+    'operatingSystem': 'Web',
+    'offers': {
+        '@type': 'Offer',
+        'price': '0',
+        'priceCurrency': 'USD'
+    },
+    'featureList': 'Custom Avatar Frames, PFP Maker, Discord Profile Borders, Sticker Overlays'
+};
+
 export default function RootLayout({
     children,
 }: {
@@ -68,6 +84,10 @@ export default function RootLayout({
     return (
         <html lang="en" className="dark">
             <body className={`${inter.variable} font-sans bg-zinc-950 text-zinc-400 antialiased selection:bg-blue-500/30 selection:text-blue-200`}>
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                />
                 {children}
             </body>
         </html>

@@ -12,11 +12,12 @@ import { CommentSection } from './social/CommentSection';
 interface GalleryProps {
     onSelectFrame: (frame: FrameConfig, frameId: string) => void;
     creatorId?: string;
+    filter?: (frame: PublishedFrame) => boolean;
 }
 
 import { FrameCard, PublishedFrame } from './FrameCard';
 
-export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId }) => {
+export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filter }) => {
     const [frames, setFrames] = useState<PublishedFrame[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -114,14 +115,16 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId }) =>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {frames.map((frame, i) => (
-                        <div className="animate-slide-up" style={{ animationDelay: `${i * 50}ms` }} key={frame.id}>
-                            <FrameCard
-                                frame={frame}
-                                onSelect={() => onSelectFrame(frame.config, frame.id.toString())}
-                            />
-                        </div>
-                    ))}
+                    {frames
+                        .filter(f => filter ? filter(f) : true)
+                        .map((frame, i) => (
+                            <div className="animate-slide-up" style={{ animationDelay: `${i * 50}ms` }} key={frame.id}>
+                                <FrameCard
+                                    frame={frame}
+                                    onSelect={() => onSelectFrame(frame.config, frame.id.toString())}
+                                />
+                            </div>
+                        ))}
                 </div>
             )}
 

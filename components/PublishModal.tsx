@@ -23,12 +23,10 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
 
     if (!isOpen) return null;
 
-    const handlePublish = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handlePublish = async (isPublicArg: boolean) => {
         if (!session) return;
-
         setLoading(true);
-        setError(null);
+        setError('');
 
         try {
             // Check if user has a profile (optional, usually handled by triggers or lazy creation)
@@ -42,17 +40,23 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: name, // Changed from frameName to name
+                    name: name,
                     description,
                     config: frameConfig,
                     creator_id: session.user.id,
                     creator_name: session.user.name || 'Anonymous',
-                    is_public: isPublic // Changed from true to isPublic
+                    is_public: isPublicArg // Use the argument, not the state which might be stale or irrelevant for drafts
                 })
             });
 
             if (!response.ok) throw new Error('Failed to publish frame');
             const result = await response.json();
+
+            if (!isPublicArg) {
+                alert("Draft saved successfully!");
+                onClose();
+                return;
+            }
 
             console.log("Published frame ID:", result.id);
             setPublishedId(result.id);
@@ -100,13 +104,22 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
                             </button>
                         </div>
 
-                        <div className="flex gap-3">
+                        <div className="flex gap-2">
                             <button
                                 onClick={onClose}
                                 className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors"
                             >
                                 Close
                             </button>
+                            <a
+                                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out my new avatar frame "${name}" on Ollabs! 🎨✨\n\n${window.location.origin}/share/${publishedId}`)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex-1 py-3 bg-black hover:bg-zinc-900 border border-zinc-800 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+                                Share
+                            </a>
                             <a
                                 href={`/share/${publishedId}`}
                                 target="_blank"
@@ -127,7 +140,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
                             </div>
                         )}
 
-                        <form onSubmit={handlePublish} className="space-y-4">
+                        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-slate-400 mb-1">Frame Name</label>
                                 <input
@@ -151,41 +164,26 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-3">Visibility</label>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsPublic(true)}
-                                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border transition-all ${isPublic
-                                            ? 'bg-blue-600/20 border-blue-500 text-white'
-                                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'
-                                            }`}
-                                    >
-                                        <Globe size={18} />
-                                        <span className="font-medium">Public</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsPublic(false)}
-                                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border transition-all ${!isPublic
-                                            ? 'bg-purple-600/20 border-purple-500 text-white'
-                                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'
-                                            }`}
-                                    >
-                                        <Lock size={18} />
-                                        <span className="font-medium">Private</span>
-                                    </button>
-                                </div>
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => handlePublish(false)}
+                                    disabled={loading}
+                                    className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {loading && !isPublic ? <Loader2 className="animate-spin" size={20} /> : <Lock size={18} />}
+                                    Save Draft
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handlePublish(true)}
+                                    disabled={loading}
+                                    className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-blue-900/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {loading && isPublic ? <Loader2 className="animate-spin" size={20} /> : <Globe size={18} />}
+                                    Publish
+                                </button>
                             </div>
-
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full mt-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2 disabled:opacity-50"
-                            >
-                                {loading ? <Loader2 className="animate-spin" size={20} /> : 'Publish Frame'}
-                            </button>
                         </form>
                     </>
                 )}

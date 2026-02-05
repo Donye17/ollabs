@@ -68,13 +68,12 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <div className="min-h-screen bg-slate-950 text-slate-50 font-sans">
             <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                            OA
-                        </div>
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                            Ollabs
-                        </span>
+                    <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight group">
+                        <img
+                            src="/og-image.png"
+                            alt="Ollabs"
+                            className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-lg"
+                        />
                     </Link>
                     {session && (
                         <div className="flex items-center gap-4">

@@ -32,15 +32,13 @@ export const NavBar: React.FC = () => {
         <>
             <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl">
                 <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Link href="/" className="block group">
-                            <img
-                                src="/Ollabs Logo White.png"
-                                alt="Ollabs"
-                                className="h-6 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-                            />
-                        </Link>
-                    </div>
+                    <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight group">
+                        <img
+                            src="/og-image.png"
+                            alt="Ollabs"
+                            className="h-10 w-auto object-contain rounded-lg transition-transform duration-300 group-hover:scale-105"
+                        />
+                    </Link>
 
                     <div className="flex items-center gap-4">
                         {/* Mobile Toggle */}
