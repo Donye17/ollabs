@@ -40,15 +40,6 @@ export const auth = betterAuth({
         expiresIn: 3600 // 1 hour
     },
     // Map verification table fields to snake_case
-    verification: {
-        fields: {
-            expiresAt: "expires_at",
-            createdAt: "created_at",
-            updatedAt: "updated_at",
-            value: "value",
-            identifier: "identifier"
-        }
-    },
     // Debugging enabled
     logger: {
         level: "debug",
