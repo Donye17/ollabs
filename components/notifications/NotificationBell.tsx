@@ -99,6 +99,7 @@ export const NotificationBell: React.FC = () => {
 
             if (n.type === 'like') return <span className="text-sm"><span className="font-bold text-zinc-200">{actorName}</span> liked <span className="font-medium text-blue-400">{frameName}</span></span>;
             if (n.type === 'comment') return <span className="text-sm"><span className="font-bold text-zinc-200">{actorName}</span> commented on <span className="font-medium text-blue-400">{frameName}</span></span>;
+            if (n.type === 'remix') return <span className="text-sm"><span className="font-bold text-zinc-200">{actorName}</span> remixed <span className="font-medium text-blue-400">{frameName}</span></span>;
             return <span className="text-sm">New interaction on your frame</span>;
         } catch (e) {
             return <span className="text-sm">New notification</span>;
