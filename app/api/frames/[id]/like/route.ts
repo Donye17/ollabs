@@ -53,12 +53,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                 // NOTIFICATION LOGIC
                 // 1. Get frame creator
                 const frameResult = await client.query(
-                    'SELECT created_by, name FROM frames WHERE id = $1',
+                    'SELECT creator_id, name FROM frames WHERE id = $1',
                     [frameId]
                 );
 
                 if (frameResult.rows.length > 0) {
-                    const creatorId = frameResult.rows[0].created_by;
+                    const creatorId = frameResult.rows[0].creator_id;
                     const frameName = frameResult.rows[0].name;
 
                     // 2. Insert notification if not self-like
