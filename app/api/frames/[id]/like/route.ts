@@ -49,6 +49,36 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
                     [frameId]
                 );
                 isLiked = true;
+
+                // NOTIFICATION LOGIC
+                // 1. Get frame creator
+                const frameResult = await client.query(
+                    'SELECT created_by, name FROM frames WHERE id = $1',
+                    [frameId]
+                );
+
+                if (frameResult.rows.length > 0) {
+                    const creatorId = frameResult.rows[0].created_by;
+                    const frameName = frameResult.rows[0].name;
+
+                    // 2. Insert notification if not self-like
+                    if (creatorId && creatorId !== userId) {
+                        await client.query(
+                            `INSERT INTO notifications (user_id, actor_id, type, entity_id, metadata)
+                             VALUES ($1, $2, 'like', $3, $4)`,
+                            [
+                                creatorId,
+                                userId,
+                                frameId,
+                                JSON.stringify({
+                                    actor_name: session.user.name,
+                                    actor_image: session.user.image,
+                                    frame_name: frameName
+                                })
+                            ]
+                        );
+                    }
+                }
             }
 
             // Get updated count

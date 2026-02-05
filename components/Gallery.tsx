@@ -19,6 +19,7 @@ import { FrameCard, PublishedFrame } from './FrameCard';
 
 export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filter }) => {
     const [frames, setFrames] = useState<PublishedFrame[]>([]);
+    const [trendingFrames, setTrendingFrames] = useState<PublishedFrame[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -31,6 +32,28 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filt
     }, [searchQuery]);
 
     const tags = ["Cyberpunk", "Retro", "Minimal", "Nature", "Neon", "Abstract"];
+
+    // Fetch Trending (Only on main gallery)
+    useEffect(() => {
+        if (!creatorId) {
+            const fetchTrending = async () => {
+                try {
+                    const response = await fetch('/api/frames?sort=trending&limit=4');
+                    if (response.ok) {
+                        const result = await response.json();
+                        const parsed = result.map((row: any) => ({
+                            ...row,
+                            config: typeof row.config === 'string' ? JSON.parse(row.config) : row.config,
+                        }));
+                        setTrendingFrames(parsed);
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch trending", e);
+                }
+            };
+            fetchTrending();
+        }
+    }, [creatorId]);
 
     useEffect(() => {
         const fetchFrames = async () => {
@@ -67,11 +90,39 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filt
 
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-700">
-            <div className="text-center space-y-4">
-                <h2 className="text-4xl font-bold tracking-tight text-zinc-50">Community Gallery</h2>
-                <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Discover and remix designs from creators worldwide.</p>
-            </div>
+        <div className="space-y-12 animate-in fade-in duration-700">
+            {/* Header Section */}
+            {!creatorId && (
+                <div className="text-center space-y-4">
+                    <h2 className="text-4xl font-bold tracking-tight text-zinc-50">Community Gallery</h2>
+                    <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Discover and remix designs from creators worldwide.</p>
+                </div>
+            )}
+
+            {/* Trending Section */}
+            {!creatorId && !searchQuery && !selectedTag && trendingFrames.length > 0 && (
+                <div className="space-y-6">
+                    <div className="flex items-center gap-2 mb-6">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                        </span>
+                        <h3 className="text-2xl font-bold text-white tracking-tight">Trending Now</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {trendingFrames.map((frame, i) => (
+                            <div className="animate-slide-up" style={{ animationDelay: `${i * 100}ms` }} key={`trending-${frame.id}`}>
+                                <FrameCard
+                                    frame={frame}
+                                    onSelect={() => onSelectFrame(frame.config, frame.id.toString())}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-12" />
+                </div>
+            )}
 
             {/* Search & Filter Controls */}
             {!creatorId && (
@@ -114,17 +165,22 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, filt
                     <Loader2 className="animate-spin text-blue-500" size={32} />
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {frames
-                        .filter(f => filter ? filter(f) : true)
-                        .map((frame, i) => (
-                            <div className="animate-slide-up" style={{ animationDelay: `${i * 50}ms` }} key={frame.id}>
-                                <FrameCard
-                                    frame={frame}
-                                    onSelect={() => onSelectFrame(frame.config, frame.id.toString())}
-                                />
-                            </div>
-                        ))}
+                <div className="space-y-6">
+                    {!creatorId && (
+                        <h3 className="text-xl font-bold text-zinc-400">All Frames</h3>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {frames
+                            .filter(f => filter ? filter(f) : true)
+                            .map((frame, i) => (
+                                <div className="animate-slide-up" style={{ animationDelay: `${i * 50}ms` }} key={frame.id}>
+                                    <FrameCard
+                                        frame={frame}
+                                        onSelect={() => onSelectFrame(frame.config, frame.id.toString())}
+                                    />
+                                </div>
+                            ))}
+                    </div>
                 </div>
             )}
 

@@ -70,9 +70,9 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight group">
                         <img
-                            src="/og-image.png"
+                            src="/Ollabs Logo White.png"
                             alt="Ollabs"
-                            className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105 rounded-lg"
+                            className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                         />
                     </Link>
                     {session && (

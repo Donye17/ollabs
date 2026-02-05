@@ -5,6 +5,7 @@ import { AuthModal } from './auth/AuthModal';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserCircle, LogOut, Sparkles, Menu, X } from 'lucide-react';
+import { NotificationBell } from './notifications/NotificationBell';
 
 export const NavBar: React.FC = () => {
     const { data: session } = authClient.useSession();
@@ -34,9 +35,9 @@ export const NavBar: React.FC = () => {
                 <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight group">
                         <img
-                            src="/og-image.png"
+                            src="/Ollabs Logo White.png"
                             alt="Ollabs"
-                            className="h-10 w-auto object-contain rounded-lg transition-transform duration-300 group-hover:scale-105"
+                            className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                         />
                     </Link>
 
@@ -71,6 +72,7 @@ export const NavBar: React.FC = () => {
                                     <div className="h-6 w-px bg-white/10" />
 
                                     <div className="flex items-center gap-4">
+                                        <NotificationBell />
                                         <Link href={`/profile/${session.user.id}`} className="flex items-center gap-3 hover:opacity-100 transition-opacity group">
                                             <div className="flex flex-col items-end hidden md:flex">
                                                 <span className="text-sm font-bold text-zinc-200 group-hover:text-white transition-colors">{session.user.name}</span>

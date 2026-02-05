@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
         const id = searchParams.get('id');
         const search = searchParams.get('search');
         const tag = searchParams.get('tag');
+        const sort = searchParams.get('sort');
 
         // Check auth for 'liked_by_user' field
         const session = await auth.api.getSession({ headers: await headers() });
@@ -49,7 +50,13 @@ export async function GET(request: NextRequest) {
             queryParams.push(`%${tag}%`);
         }
 
-        query += ` ORDER BY f.created_at DESC LIMIT $${queryParams.length + 1}`;
+        if (sort === 'trending') {
+            // Logic: Sort by likes_count DESC. 
+            // Optional: You could restrict to recent frames if desired, e.g. AND f.created_at > NOW() - INTERVAL '30 days'
+            query += ` ORDER BY f.likes_count DESC, f.created_at DESC LIMIT $${queryParams.length + 1}`;
+        } else {
+            query += ` ORDER BY f.created_at DESC LIMIT $${queryParams.length + 1}`;
+        }
         queryParams.push(limit);
 
         const result = await pool.query(query, queryParams);
