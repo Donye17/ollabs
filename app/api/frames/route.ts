@@ -10,6 +10,8 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '20');
         const creatorId = searchParams.get('creator_id');
         const id = searchParams.get('id');
+        const search = searchParams.get('search');
+        const tag = searchParams.get('tag');
 
         // Check auth for 'liked_by_user' field
         const session = await auth.api.getSession({ headers: await headers() });
@@ -33,6 +35,17 @@ export async function GET(request: NextRequest) {
         } else if (creatorId) {
             query += ` AND f.creator_id = $${queryParams.length + 1}`;
             queryParams.push(creatorId);
+        }
+
+        if (search) {
+            query += ` AND f.name ILIKE $${queryParams.length + 1}`;
+            queryParams.push(`%${search}%`);
+        }
+
+        if (tag) {
+            // MVP Tag search: Look in description or config
+            query += ` AND (f.description ILIKE $${queryParams.length + 1} OR f.config::text ILIKE $${queryParams.length + 1})`;
+            queryParams.push(`%${tag}%`);
         }
 
         query += ` ORDER BY f.created_at DESC LIMIT $${queryParams.length + 1}`;
