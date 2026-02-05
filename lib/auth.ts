@@ -3,7 +3,10 @@ import { pool } from "./neon";
 
 export const auth = betterAuth({
     baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-    database: pool,
+    database: {
+        client: pool,
+        casing: "snake"
+    },
     socialProviders: {
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID!,
