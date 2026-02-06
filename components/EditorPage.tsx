@@ -15,6 +15,7 @@ import { AlertCircle, Sparkles, Sliders, Eye, Type, Sticker, Clapperboard, Image
 import { PublishTemplateModal } from './PublishTemplateModal';
 import { OnboardingOverlay } from './editor/OnboardingOverlay';
 import { removeBackground } from "@imgly/background-removal";
+import { authClient } from '@/lib/auth-client';
 
 export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     // History State (Frame Config)
@@ -55,6 +56,9 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(!!remixId);
 
+    const { data: session } = authClient.useSession();
+    const [imageSrc, setImageSrc] = useState<string | null>(null);
+
     // Initial Load Logic (Local Storage OR Remix ID)
     useEffect(() => {
         const loadInitialFrame = async () => {
@@ -69,7 +73,18 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             const config = typeof frame.config === 'string' ? JSON.parse(frame.config) : frame.config;
                             setHistory([{ ...config, id: frame.id }]);
                             setHistoryIndex(0);
+
+                            // Initialize lifted state from config
+                            if (config.stickers) setStickers(config.stickers);
+                            if (config.textLayers) setTextLayers(config.textLayers);
+                            if (config.motionEffect) setMotionEffect(config.motionEffect);
+
                             window.history.replaceState({}, '', '/create');
+
+                            // Auto-load user profile picture if available and no image set
+                            if (!imageSrc && session?.user?.image) {
+                                setImageSrc(session.user.image);
+                            }
                         }
                     }
                 } catch (e) {
@@ -83,18 +98,33 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                 const stored = localStorage.getItem('temp_frame');
                 if (stored) {
                     const frame = JSON.parse(stored);
-                    setHistory([frame]);
+
+                    // Handle case where frame is just Config or PublishedFrame (with config prop)
+                    const config = frame.config ? (typeof frame.config === 'string' ? JSON.parse(frame.config) : frame.config) : frame;
+
+                    setHistory([{ ...config, id: frame.id }]);
                     setHistoryIndex(0);
+
+                    // Initialize lifted state from config
+                    if (config.stickers) setStickers(config.stickers);
+                    if (config.textLayers) setTextLayers(config.textLayers);
+                    if (config.motionEffect) setMotionEffect(config.motionEffect);
+
                     localStorage.removeItem('temp_frame');
+
+                    // Auto-load user profile picture if available and no image set
+                    if (!imageSrc && session?.user?.image) {
+                        setImageSrc(session.user.image);
+                    }
                 }
             } catch (e) {
                 console.error("Failed to load frame from storage", e);
             }
         };
         loadInitialFrame();
-    }, [remixId]);
+    }, [remixId, session]); // Added session to dependencies
 
-    const [imageSrc, setImageSrc] = useState<string | null>(null);
+
     const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
     const [isRemovingBg, setIsRemovingBg] = useState(false);
 

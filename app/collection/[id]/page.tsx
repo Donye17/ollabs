@@ -124,7 +124,7 @@ export default function CollectionPage({ params }: { params: Promise<{ id: strin
                             initialFrames={items}
                             onSelectFrame={(frame, frameId) => {
                                 localStorage.setItem('temp_frame', JSON.stringify(frame));
-                                router.push(`/?remix=${frameId}`);
+                                router.push(`/create?id=${frameId}`);
                             }}
                         />
                     ) : (

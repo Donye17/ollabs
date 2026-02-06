@@ -609,20 +609,41 @@ export const Editor: React.FC<EditorProps> = ({
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => handleMouseDown(e);
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => handleMouseMove(e);
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = `ollabs-frame-${Date.now()}.png`;
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }, 'image/png');
+
+    // Convert to blob first
+    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
+    if (!blob) return;
+
+    // Create file for sharing
+    const file = new File([blob], `ollabs-frame-${Date.now()}.png`, { type: 'image/png' });
+
+    // Try Web Share API first (Mobile Native Experience)
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'Ollabs Creation',
+          text: 'Check out my creation from Ollabs!',
+        });
+        return; // Success, exit
+      } catch (error) {
+        // User cancelled or share failed, fall back to download
+        console.log('Share failed or cancelled, falling back to download', error);
+      }
+    }
+
+    // Fallback: Standard Download Link (Desktop / Non-supported browsers)
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `ollabs-frame-${Date.now()}.png`;
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
