@@ -3,22 +3,27 @@ require('dotenv').config({ path: '.env.local' });
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-async function checkColumns() {
+async function inspect() {
     const client = await pool.connect();
     try {
-        console.log("Checking columns in frames tables...");
-        const res = await client.query(`
-      SELECT column_name, data_type 
-      FROM information_schema.columns 
-      WHERE table_name = 'frames'
-    `);
-        console.log("Columns:", res.rows);
-    } catch (err) {
-        console.error("Error checking columns:", err);
+        const res = await client.query('SELECT * FROM "frames" LIMIT 1');
+        if (res.rows.length > 0) {
+            console.log("Frames Columns:", Object.keys(res.rows[0]));
+        } else {
+            console.log("No frames found, checking information schema");
+            const res2 = await client.query(`
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_name = 'frames'
+            `);
+            console.log("Columns from Schema:", res2.rows.map(r => r.column_name));
+        }
+    } catch (e) {
+        console.error(e);
     } finally {
         client.release();
         await pool.end();
     }
 }
 
-checkColumns();
+inspect();
