@@ -98,14 +98,16 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
     return (
         <div className="glass-panel rounded-3xl overflow-hidden hover:border-zinc-700 hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 group flex flex-col h-full hover:bg-zinc-900/60">
             {/* Valid Click Area for Remixing */}
-            <div className="aspect-square bg-zinc-950/30 relative flex items-center justify-center p-4 sm:p-8 group-hover:bg-zinc-950/50 transition-colors cursor-pointer" onClick={onSelect}>
+            <div className="aspect-square bg-zinc-950/30 relative flex items-center justify-center p-4 sm:p-8 group-hover:bg-zinc-950/50 transition-colors cursor-pointer overflow-hidden" onClick={onSelect}>
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <canvas
-                    ref={canvasRef}
-                    width={300}
-                    height={300}
-                    className="w-full h-full object-contain drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-500 ease-out"
-                />
+                <div className="relative w-full h-full">
+                    <canvas
+                        ref={canvasRef}
+                        width={300}
+                        height={300}
+                        className="w-full h-full object-contain drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-500 ease-out"
+                    />
+                </div>
                 <div className="absolute inset-x-0 bottom-0 p-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 flex justify-center pb-8 bg-gradient-to-t from-zinc-950/80 to-transparent pointer-events-none">
                     <span className="bg-zinc-50 text-zinc-950 font-bold py-3 px-8 rounded-full shadow-lg text-sm tracking-wide">
                         Remix This

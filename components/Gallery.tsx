@@ -14,14 +14,23 @@ interface GalleryProps {
     creatorId?: string;
     likedBy?: string;
     filter?: (frame: PublishedFrame) => boolean;
+    initialFrames?: PublishedFrame[];
+    initialTrendingFrames?: PublishedFrame[];
 }
 
 import { FrameCard, PublishedFrame } from './FrameCard';
 
-export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, likedBy, filter }) => {
-    const [frames, setFrames] = useState<PublishedFrame[]>([]);
-    const [trendingFrames, setTrendingFrames] = useState<PublishedFrame[]>([]);
-    const [loading, setLoading] = useState(true);
+export const Gallery: React.FC<GalleryProps> = ({
+    onSelectFrame,
+    creatorId,
+    likedBy,
+    filter,
+    initialFrames = [],
+    initialTrendingFrames = []
+}) => {
+    const [frames, setFrames] = useState<PublishedFrame[]>(initialFrames);
+    const [trendingFrames, setTrendingFrames] = useState<PublishedFrame[]>(initialTrendingFrames);
+    const [loading, setLoading] = useState(initialFrames.length === 0);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
@@ -37,6 +46,8 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, like
     // Fetch Trending (Only on main gallery)
     useEffect(() => {
         if (!creatorId && !likedBy) {
+            if (initialTrendingFrames.length > 0) return;
+
             const fetchTrending = async () => {
                 try {
                     const response = await fetch('/api/frames?sort=trending&limit=4');
@@ -57,6 +68,12 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, like
     }, [creatorId]);
 
     useEffect(() => {
+        // If we have initial frames and no search/filter, don't re-fetch immediately on mount
+        if (initialFrames.length > 0 && !creatorId && !likedBy && !debouncedSearch && !selectedTag) {
+            setLoading(false);
+            return;
+        }
+
         const fetchFrames = async () => {
             setLoading(true);
             try {
@@ -101,31 +118,6 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, like
                 </div>
             )}
 
-            {/* Trending Section */}
-            {!creatorId && !likedBy && !searchQuery && !selectedTag && trendingFrames.length > 0 && (
-                <div className="space-y-6">
-                    <div className="flex items-center gap-2 mb-6">
-                        <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
-                        </span>
-                        <h3 className="text-2xl font-bold text-white tracking-tight">Trending Now</h3>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {trendingFrames.map((frame, i) => (
-                            <div className="animate-slide-up" style={{ animationDelay: `${i * 100}ms` }} key={`trending-${frame.id}`}>
-                                <FrameCard
-                                    frame={frame}
-                                    onSelect={() => onSelectFrame(frame.config, frame.id.toString())}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                    <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-12" />
-                </div>
-            )}
-
             {/* Search & Filter Controls */}
             {!creatorId && !likedBy && (
                 <div className="flex flex-col items-center gap-6 max-w-4xl mx-auto">
@@ -162,6 +154,31 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, like
                 </div>
             )}
 
+            {/* Trending Section */}
+            {!creatorId && !likedBy && !searchQuery && !selectedTag && trendingFrames.length > 0 && (
+                <div className="space-y-6">
+                    <div className="flex items-center gap-2 mb-6">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                        </span>
+                        <h3 className="text-2xl font-bold text-white tracking-tight">Trending Now</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {trendingFrames.map((frame, i) => (
+                            <div className="animate-slide-up" style={{ animationDelay: `${i * 100}ms` }} key={`trending-${frame.id}`}>
+                                <FrameCard
+                                    frame={frame}
+                                    onSelect={() => onSelectFrame(frame.config, frame.id.toString())}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-12" />
+                </div>
+            )}
+
             {loading ? (
                 <div className="flex justify-center items-center h-64">
                     <Loader2 className="animate-spin text-blue-500" size={32} />
@@ -175,7 +192,7 @@ export const Gallery: React.FC<GalleryProps> = ({ onSelectFrame, creatorId, like
                         {frames
                             .filter(f => filter ? filter(f) : true)
                             .map((frame, i) => (
-                                <div className="animate-slide-up" style={{ animationDelay: `${i * 50}ms` }} key={frame.id}>
+                                <div className="animate-slide-up h-full" style={{ animationDelay: `${i * 50}ms` }} key={frame.id}>
                                     <FrameCard
                                         frame={frame}
                                         onSelect={() => onSelectFrame(frame.config, frame.id.toString())}

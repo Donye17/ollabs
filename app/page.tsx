@@ -1,19 +1,64 @@
-"use client";
-
-import { Gallery } from "@/components/Gallery";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-
 import { NavBar } from "@/components/NavBar";
+import { HomeClient } from "@/components/HomeClient";
+import { pool } from "@/lib/neon";
+import { PublishedFrame } from "@/components/FrameCard";
 
-export default function Home() {
-    const router = useRouter();
+async function getInitialFrames() {
+    try {
+        const result = await pool.query(`
+            SELECT f.*, 
+            (SELECT COUNT(*) FROM frame_likes WHERE frame_id = f.id) as likes_count
+            FROM frames f 
+            WHERE f.is_public = true 
+            ORDER BY f.created_at DESC 
+            LIMIT 50
+        `);
 
-    const handleSelectFrame = (frameConfig: any, frameId: string) => {
-        // Navigate to create page with this frame config
-        router.push(`/create?id=${frameId}`);
-    };
+        return result.rows.map((row) => ({
+            ...row,
+            config: typeof row.config === 'string' ? JSON.parse(row.config) : row.config,
+            likes_count: parseInt(row.likes_count || '0'),
+            liked_by_user: false // Server side can't know user state easily without auth check, default false
+        })) as PublishedFrame[];
+    } catch (e) {
+        console.error("Failed to fetch initial frames", e);
+        return [];
+    }
+}
+
+async function getTrendingFrames() {
+    try {
+        const result = await pool.query(`
+            SELECT f.*, 
+            (SELECT COUNT(*) FROM frame_likes WHERE frame_id = f.id) as likes_count
+            FROM frames f 
+            WHERE f.is_public = true AND f.created_at > NOW() - INTERVAL '7 days'
+            ORDER BY likes_count DESC, f.created_at DESC 
+            LIMIT 4
+        `);
+
+        return result.rows.map((row) => ({
+            ...row,
+            config: typeof row.config === 'string' ? JSON.parse(row.config) : row.config,
+            likes_count: parseInt(row.likes_count || '0'),
+            liked_by_user: false
+        })) as PublishedFrame[];
+    } catch (e) {
+        console.error("Failed to fetch trending frames", e);
+        return [];
+    }
+}
+
+// Revalidate every hour
+export const revalidate = 3600;
+
+export default async function Home() {
+    const [initialFrames, trendingFrames] = await Promise.all([
+        getInitialFrames(),
+        getTrendingFrames()
+    ]);
 
     return (
         <main className="min-h-screen bg-zinc-950 text-zinc-50 selection:bg-blue-500/30">
@@ -63,7 +108,7 @@ export default function Home() {
             {/* Gallery Section */}
             <section className="px-6 py-20 border-t border-white/5 bg-zinc-900/20 backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto">
-                    <Gallery onSelectFrame={handleSelectFrame} />
+                    <HomeClient initialFrames={initialFrames} initialTrendingFrames={trendingFrames} />
                 </div>
             </section>
 
