@@ -11,8 +11,8 @@ async function verify() {
         await client.query('BEGIN');
 
         // 1. Setup Users
-        const userA = { id: uuidv4(), name: 'Creator', email: `creator_${Date.now()}@test.com`, image: 'img_a' };
-        const userB = { id: uuidv4(), name: 'Interactor', email: `interactor_${Date.now()}@test.com`, image: 'img_b' };
+        const userA = { id: uuidv4(), name: 'Sarah_Designs', email: `creator_${Date.now()}@test.com`, image: 'img_a' };
+        const userB = { id: uuidv4(), name: 'PixelMaster99', email: `interactor_${Date.now()}@test.com`, image: 'img_b' };
 
         await client.query(`
             INSERT INTO "user" (id, name, email, image, "emailVerified", "createdAt", "updatedAt")

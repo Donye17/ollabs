@@ -161,6 +161,18 @@ export const Editor: React.FC<EditorProps> = ({
     setRotation(0);
   };
 
+  // Custom Texture Pre-loader
+  const [textureVersion, setTextureVersion] = useState(0);
+  useEffect(() => {
+    if (selectedFrame.type === FrameType.CUSTOM_IMAGE && selectedFrame.imageUrl) {
+      const img = new Image();
+      img.src = selectedFrame.imageUrl;
+      img.onload = () => {
+        setTextureVersion(prev => prev + 1);
+      };
+    }
+  }, [selectedFrame.type, selectedFrame.imageUrl]);
+
   // Main drawing logic
   const draw = useCallback((time: number = 0) => {
     const canvas = canvasRef.current;
@@ -289,7 +301,7 @@ export const Editor: React.FC<EditorProps> = ({
       }
       ctx.restore();
     }
-  }, [imageObject, position, scale, rotation, selectedFrame, isDragOver, stickers, selection, motionEffect, isPlaying, isRecording, textLayers, selectedTextId]);
+  }, [imageObject, position, scale, rotation, selectedFrame, isDragOver, stickers, selection, motionEffect, isPlaying, isRecording, textLayers, selectedTextId, textureVersion]);
 
   // Animation Loop
   const animate = useCallback((time: number) => {

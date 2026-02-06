@@ -10,7 +10,10 @@ import { CommentSection } from '@/components/social/CommentSection';
 async function getFrame(id: string) {
     try {
         const result = await pool.query(
-            'SELECT * FROM frames WHERE id = $1',
+            `SELECT f.*, p.name as parent_name 
+             FROM frames f 
+             LEFT JOIN frames p ON f.parent_id = p.id 
+             WHERE f.id = $1`,
             [id]
         );
         return result.rows[0];
@@ -111,6 +114,11 @@ export default async function SharePage({ params }: { params: Promise<{ id: stri
                     </div>
                     <h1 className="text-3xl font-bold text-white mb-2 font-heading">{frame.name}</h1>
                     <p className="text-slate-400">Created by <span className="text-blue-400 font-medium">{frame.creator_name}</span></p>
+                    {frame.parent_id && frame.parent_name && (
+                        <p className="text-xs text-slate-500 mt-2">
+                            Remixed from <Link href={`/share/${frame.parent_id}`} className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors">{frame.parent_name}</Link>
+                        </p>
+                    )}
                 </div>
 
                 <div className="space-y-4">
