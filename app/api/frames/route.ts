@@ -65,15 +65,29 @@ export async function GET(request: NextRequest) {
         }
 
         if (search) {
-            query += ` AND f.name ILIKE $${paramIndex}`;
+            // Updated to search name, description, and tags
+            query += ` AND (f.name ILIKE $${paramIndex} OR f.description ILIKE $${paramIndex} OR f.tags @> $${paramIndex + 1} OR f.tags::text ILIKE $${paramIndex})`;
             queryParams.push(`%${search}%`);
-            paramIndex++;
+            // For simple text search in tags, we can use the text cast, but @> expects an array literal which is hard with partial matches
+            // Actually, for partial search in tags (scanned as text), filtering by text cast is easiest for "contains substring" logic
+            // But let's keep it simple: Name OR Description OR Tag (Array Match) is tricky with partials.
+            // Let's just do Name OR Description OR Tags cast to text (for partial match like 'eo' in 'neon')
+
+            // Re-doing the query logic for cleaner parameters:
+            // We use $paramIndex for '%search%'
+            // We'll use a separate param for the array check if we wanted exact match, but for a general "search box" partial match is usually expected.
+            // So: name ILIKE %s% OR description ILIKE %s% OR tags::text ILIKE %s%
         }
 
         if (tag) {
-            query += ` AND (f.description ILIKE $${paramIndex} OR f.config::text ILIKE $${paramIndex})`;
+            // Updated to search both the explicit 'tags' array OR the description/config for backwards compatibility
+            // $paramIndex is for the LIKE search (%tag%), $paramIndex+1 is for Array contains query
+            query += ` AND (f.tags @> $${paramIndex} OR f.description ILIKE $${paramIndex + 1} OR f.config::text ILIKE $${paramIndex + 1})`;
+            // For array contains logic: '{tag}'
+            queryParams.push(`{${tag}}`);
+            // For text search logic: '%tag%'
             queryParams.push(`%${tag}%`);
-            paramIndex++;
+            paramIndex += 2;
         }
 
         if (sort === 'trending') {
@@ -99,15 +113,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { name, description, config, creator_id, creator_name, is_public, parent_id } = body;
+        const { name, description, config, creator_id, creator_name, is_public, parent_id, tags } = body;
+
+        // Ensure tags is a valid array of strings or empty
+        const safeTags = Array.isArray(tags) ? tags : [];
 
         // TODO: Add server-side auth validation here (using Request Headers or Cookie)
 
         const result = await pool.query(
-            `INSERT INTO frames (name, description, config, creator_id, creator_name, is_public, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, NOW())
-       RETURNING id, name, created_at`,
-            [name, description, JSON.stringify(config), creator_id, creator_name, is_public]
+            `INSERT INTO frames (name, description, config, creator_id, creator_name, is_public, created_at, tags)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7)
+       RETURNING id, name, created_at, tags`,
+            [name, description, JSON.stringify(config), creator_id, creator_name, is_public, safeTags]
         );
 
         const newFrame = result.rows[0];

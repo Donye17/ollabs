@@ -16,8 +16,25 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     const { data: session } = authClient.useSession();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [tags, setTags] = useState<string[]>([]);
+    const [tagInput, setTagInput] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+
+    const handleTagKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            const val = tagInput.trim();
+            if (val && !tags.includes(val) && tags.length < 5) {
+                setTags([...tags, val]);
+                setTagInput('');
+            }
+        } else if (e.key === 'Backspace' && !tagInput && tags.length > 0) {
+            setTags(tags.slice(0, -1));
+        }
+    };
+
+    const removeTag = (t: string) => setTags(tags.filter(tag => tag !== t));
 
     if (!isOpen) return null;
 
@@ -40,7 +57,8 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                     creator_id: session.user.id,
                     creator_name: session.user.name,
                     is_public: true,
-                    parent_id: parentId
+                    parent_id: parentId,
+                    tags // Pass the tags array
                 })
             });
 
@@ -101,6 +119,28 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 placeholder="E.g. Neon Cyberpunk"
                                 className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
                             />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Tags</label>
+                            <div className="bg-zinc-950 border border-zinc-800 rounded-xl px-2 py-2 flex flex-wrap gap-2 focus-within:ring-2 focus-within:ring-blue-500/50 transition-all">
+                                {tags.map((tag) => (
+                                    <span key={tag} className="bg-zinc-800 text-zinc-200 text-xs px-2 py-1 rounded-lg flex items-center gap-1">
+                                        #{tag}
+                                        <button onClick={() => removeTag(tag)} className="hover:text-red-400 hidden-hover-trigger">
+                                            <X size={12} />
+                                        </button>
+                                    </span>
+                                ))}
+                                <input
+                                    type="text"
+                                    value={tagInput}
+                                    onChange={(e) => setTagInput(e.target.value)}
+                                    onKeyDown={handleTagKeyDown}
+                                    placeholder={tags.length === 0 ? "Add tags (press Enter)..." : ""}
+                                    className="bg-transparent border-none outline-none text-white text-sm flex-1 min-w-[120px] px-2 py-1"
+                                />
+                            </div>
                         </div>
 
                         <div className="space-y-2">
