@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import { redirect, notFound } from 'next/navigation';
 import Image from 'next/image';
 import { ShieldAlert, Users, Layers, Heart } from 'lucide-react';
+import { VerificationToggle } from './VerificationToggle';
 
 export const metadata = {
     title: 'Admin Dashboard | Ollabs',
@@ -16,7 +17,9 @@ async function getAdminData() {
             u.name, 
             u.email, 
             u.image, 
+            u.image, 
             u."createdAt", 
+            u.isVerified,
             COUNT(DISTINCT f.id) as frames_created,
             COUNT(DISTINCT l.frame_id) as likes_given
         FROM "user" u
@@ -101,6 +104,7 @@ export default async function AdminPage() {
                             <thead>
                                 <tr className="bg-slate-950/50 text-slate-400 text-xs uppercase tracking-wider font-bold">
                                     <th className="px-6 py-4">User</th>
+                                    <th className="px-6 py-4 text-center">Verified</th>
                                     <th className="px-6 py-4">Joined</th>
                                     <th className="px-6 py-4 text-center">Frames Created</th>
                                     <th className="px-6 py-4 text-center">Saved (Likes)</th>
@@ -130,6 +134,9 @@ export default async function AdminPage() {
                                                     <p className="text-[10px] text-slate-600 font-mono mt-0.5 select-all">{user.id}</p>
                                                 </div>
                                             </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                            <VerificationToggle userId={user.id} isVerified={user.isverified} />
                                         </td>
                                         <td className="px-6 py-4 text-sm text-slate-400">
                                             {new Date(user.createdAt).toLocaleDateString(undefined, {

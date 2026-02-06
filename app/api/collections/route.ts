@@ -1,60 +1,78 @@
 
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth'; // Adjust import based on your auth helper usually it is auth.api.getSession stuff but checking other routes is safer.
+import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 
-// We need to check how auth is handled in other routes. 
-// Assuming checking headers or using better-auth helper.
-// For now, I'll use a standard pattern and might need to adjust if auth helper is different.
-
 export async function GET(request: NextRequest) {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-
-    if (!userId) {
-        return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
-    }
-
     try {
-        // Fetch collections for a user
-        // If viewing own profile (auth check needed) show private? 
-        // For MVP, just show public, OR show all if requested by same user.
-        // Let's simplified: fetch all for now, filter in UI or refine later.
+        const { searchParams } = new URL(request.url);
+        const userId = searchParams.get('user_id');
 
-        const result = await pool.query(
-            `SELECT * FROM collections WHERE user_id = $1 ORDER BY created_at DESC`,
-            [userId]
-        );
+        // Auth check
+        const session = await auth.api.getSession({ headers: await headers() });
+        const currentUserId = session?.user?.id;
+
+        if (!userId && !currentUserId) {
+            return NextResponse.json({ error: 'User ID required' }, { status: 400 });
+        }
+
+        const targetUserId = userId || currentUserId;
+        const isOwner = currentUserId === targetUserId;
+
+        let query = `
+            SELECT c.*, 
+            (SELECT COUNT(*) FROM collection_items ci WHERE ci.collection_id = c.id) as item_count,
+            (
+                SELECT json_agg(json_build_object('id', f.id, 'image', f.config->>'image', 'type', f.config->>'type'))
+                FROM collection_items ci
+                JOIN frames f ON f.id = ci.frame_id
+                WHERE ci.collection_id = c.id
+                LIMIT 4
+            ) as preview_frames
+            FROM collections c 
+            WHERE c.user_id = $1
+        `;
+
+        if (!isOwner) {
+            query += ` AND c.is_public = true`;
+        }
+
+        query += ` ORDER BY c.created_at DESC`;
+
+        const result = await pool.query(query, [targetUserId]);
 
         return NextResponse.json(result.rows);
-    } catch (e) {
-        console.error('Failed to fetch collections', e);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    } catch (error) {
+        console.error('Failed to fetch collections:', error);
+        return NextResponse.json({ error: 'Failed to fetch collections' }, { status: 500 });
     }
 }
 
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
-        const { name, userId, isPublic } = body; // expecting userId from client for now but should verify session
-
-        if (!name || !userId) {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // TODO: Verify session match userId
+        const body = await request.json();
+        const { name, description, is_public } = body;
+
+        if (!name) {
+            return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+        }
 
         const result = await pool.query(
-            `INSERT INTO collections (name, user_id, is_public) 
-             VALUES ($1, $2, $3) 
+            `INSERT INTO collections (user_id, name, description, is_public)
+             VALUES ($1, $2, $3, $4)
              RETURNING *`,
-            [name, userId, isPublic ?? true]
+            [session.user.id, name, description || '', is_public ?? true]
         );
 
         return NextResponse.json(result.rows[0]);
-    } catch (e) {
-        console.error('Failed to create collection', e);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    } catch (error) {
+        console.error('Failed to create collection:', error);
+        return NextResponse.json({ error: 'Failed to create collection' }, { status: 500 });
     }
 }

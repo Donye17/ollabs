@@ -52,7 +52,7 @@ interface EditorProps {
 
   // Export Ref
   // Export Ref
-  editorRef?: React.RefObject<{ exportGif: () => void; getDominantColors: () => Promise<string[]> } | null>;
+  editorRef?: React.RefObject<{ exportGif: () => void; generateGif: () => Promise<Blob>; getDominantColors: () => Promise<string[]> } | null>;
 
   // Background Removal
   onRemoveBackground?: () => void;
@@ -123,31 +123,7 @@ export const Editor: React.FC<EditorProps> = ({
   }, [imageSrc]);
 
   // ... inside useImperativeHandle
-  React.useImperativeHandle(editorRef, () => ({
-    exportGif: handleExportGif,
-    getDominantColors: () => {
-      return new Promise<string[]>((resolve, reject) => {
-        if (!imageObject) {
-          reject("No image loaded");
-          return;
-        }
-        try {
-          const colorThief = new ColorThief();
-          const palette = colorThief.getPalette(imageObject, 3); // Get top 3
-          if (palette && palette.length > 0) {
-            const hexPalette = palette.map((rgb: number[]) => rgbToHex(rgb[0], rgb[1], rgb[2]));
-            resolve(hexPalette);
-          } else {
-            reject("No colors found");
-          }
-        } catch (e) {
-          console.error("ColorThief failed", e);
-          // Fallback or reject
-          reject(e);
-        }
-      });
-    }
-  }));
+
 
   // Handle Auto Fit
   const handleAutoFit = () => {
@@ -366,6 +342,56 @@ export const Editor: React.FC<EditorProps> = ({
 
   React.useImperativeHandle(editorRef, () => ({
     exportGif: handleExportGif,
+    generateGif: async () => {
+      setIsRecording(true);
+      onSelectSticker(null);
+      onSelectText(null);
+      // Ensure clean state
+      draw(0);
+
+      return new Promise<Blob>(async (resolve, reject) => {
+        try {
+          const gif = new GIF({
+            workers: 2,
+            quality: 10,
+            width: CANVAS_SIZE,
+            height: CANVAS_SIZE,
+            workerScript: '/gif.worker.js',
+          });
+
+          const FPS = 30;
+          const DURATION_SEC = 2; // Standard 2s loop
+          const TOTAL_FRAMES = FPS * DURATION_SEC;
+          const TIME_PER_FRAME = 1000 / FPS;
+
+          for (let i = 0; i < TOTAL_FRAMES; i++) {
+            draw(i * TIME_PER_FRAME);
+            const canvas = canvasRef.current;
+            if (canvas) {
+              gif.addFrame(canvas, { copy: true, delay: TIME_PER_FRAME });
+            }
+            // Small yield to not freeze UI completely
+            await new Promise(r => setTimeout(r, 0));
+          }
+
+          gif.on('finished', (blob: Blob) => {
+            setIsRecording(false);
+            draw(0); // Reset
+            resolve(blob);
+          });
+
+          gif.on('abort', () => {
+            setIsRecording(false);
+            reject(new Error("GIF generation aborted"));
+          });
+
+          gif.render();
+        } catch (e) {
+          setIsRecording(false);
+          reject(e);
+        }
+      });
+    },
     getDominantColors: () => {
       return new Promise<string[]>((resolve, reject) => {
         if (!imageObject) {
@@ -757,7 +783,7 @@ export const Editor: React.FC<EditorProps> = ({
           <button onClick={() => setIsPublishOpen(true)} className="text-sm text-slate-500 hover:text-white underline decoration-slate-700 hover:decoration-white transition-all">Publish to Community Gallery</button>
         </div>
       )}
-      <PublishModal isOpen={isPublishOpen} onClose={() => setIsPublishOpen(false)} frameConfig={{ ...selectedFrame, stickers: stickers }} />
+      <PublishModal isOpen={isPublishOpen} onClose={() => setIsPublishOpen(false)} frameConfig={{ ...selectedFrame, stickers: stickers }} editorRef={editorRef} />
     </div>
   );
 };

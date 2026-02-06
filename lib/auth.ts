@@ -21,7 +21,8 @@ export const auth = betterAuth({
     user: {
         additionalFields: {
             image: { type: "string", required: false },
-            role: { type: "string", required: false, defaultValue: "user" }
+            role: { type: "string", required: false, defaultValue: "user" },
+            isVerified: { type: "boolean", required: false, defaultValue: false }
         }
     },
     trustedOrigins: [

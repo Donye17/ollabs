@@ -28,6 +28,7 @@ export interface FrameConfig {
   imageUrl?: string; // For CUSTOM_IMAGE type
   stickers?: StickerConfig[]; // Optional stickers array
   textLayers?: TextConfig[]; // Optional text layers
+  motionEffect?: MotionEffect;
 }
 
 export type MotionEffect = 'none' | 'pulse' | 'spin' | 'glitch' | 'rain';

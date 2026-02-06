@@ -8,6 +8,7 @@ import { User, Calendar, MapPin, Link as LinkIcon, Twitter, Instagram } from 'lu
 import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id } = await params;
@@ -41,6 +42,29 @@ async function getUser(id: string) {
         }
         console.error("Failed to fetch user", e);
         return null;
+    }
+}
+
+async function getProfileFrames(creatorId: string) {
+    try {
+        const result = await pool.query(`
+            SELECT f.*, 
+            (SELECT COUNT(*) FROM frame_likes WHERE frame_id = f.id) as likes_count
+            FROM frames f 
+            WHERE f.creator_id = $1 AND f.is_public = true
+            ORDER BY f.created_at DESC
+            LIMIT 50
+        `, [creatorId]);
+
+        return result.rows.map((row) => ({
+            ...row,
+            config: typeof row.config === 'string' ? JSON.parse(row.config) : row.config,
+            likes_count: parseInt(row.likes_count || '0'),
+            liked_by_user: false
+        }));
+    } catch (e) {
+        console.error("Failed to fetch profile frames", e);
+        return [];
     }
 }
 
@@ -109,7 +133,10 @@ export default async function ProfilePage({ params, searchParams }: { params: Pr
                         <div className="flex-1 w-full">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
                                 <div>
-                                    <h1 className="text-4xl font-bold text-white mb-2">{user.name}</h1>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <h1 className="text-4xl font-bold text-white">{user.name}</h1>
+                                        {user.isverified && <VerifiedBadge className="w-8 h-8" />}
+                                    </div>
                                     <div className="flex flex-wrap items-center gap-4 text-slate-400 text-sm">
                                         <span className="flex items-center gap-1.5">
                                             <Calendar size={14} className="text-slate-500" />
@@ -169,7 +196,11 @@ export default async function ProfilePage({ params, searchParams }: { params: Pr
 
                 {/* User's Frames Grid */}
                 <div className="space-y-8">
-                    <ProfileGrid creatorId={id} tab={tab} />
+                    <ProfileGrid
+                        creatorId={id}
+                        tab={tab}
+                        initialFrames={(!tab || tab === 'frames') ? await getProfileFrames(id) : undefined}
+                    />
                 </div>
             </main>
         </div>

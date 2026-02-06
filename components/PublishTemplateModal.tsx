@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { X, Upload, Check, Loader2 } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { authClient } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
 
 interface PublishTemplateModalProps {
     isOpen: boolean;
@@ -13,6 +14,7 @@ interface PublishTemplateModalProps {
 }
 
 export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl, parentId }) => {
+    const router = useRouter();
     const { data: session } = authClient.useSession();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -63,13 +65,18 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             });
 
             if (res.ok) {
+                const result = await res.json();
                 setIsSuccess(true);
                 setTimeout(() => {
                     onClose();
                     setIsSuccess(false);
                     setName('');
                     setDescription('');
-                }, 2000);
+                    // Redirect to the new frame
+                    if (result.frame?.id || result.id) {
+                        router.push(`/share/${result.frame?.id || result.id}`);
+                    }
+                }, 1500);
             } else {
                 alert('Failed to publish template');
             }

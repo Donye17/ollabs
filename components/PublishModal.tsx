@@ -5,13 +5,16 @@ import { Loader2, X, Globe, Lock, Share2, Copy } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { authClient } from '../lib/auth-client';
 
+import { upload } from '@vercel/blob/client';
+
 interface PublishModalProps {
     isOpen: boolean;
     onClose: () => void;
     frameConfig: FrameConfig;
+    editorRef: any; // Using any for simplicity as strict type is complex to share without common definition
 }
 
-export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, frameConfig }) => {
+export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, frameConfig, editorRef }) => {
     const { data: session } = authClient.useSession();
     const [name, setName] = useState(frameConfig.name || '');
     const [description, setDescription] = useState('');
@@ -29,12 +32,30 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
         setError('');
 
         try {
-            // Check if user has a profile (optional, usually handled by triggers or lazy creation)
-            // Ideally we insert into 'frames' table
+            let previewUrl = null;
+            let mediaType = 'image/png';
 
-            // Construct the SQL query
-            // creator_id is mostly likely the user_id from auth, handled by backend or passed explicitly if RLS allows
-            // We'll pass the user ID from session for now.
+            // Check if motion effect is active
+            if (frameConfig.motionEffect && frameConfig.motionEffect !== 'none' && editorRef.current?.generateGif) {
+                try {
+                    // Generate GIF
+                    const gifBlob = await editorRef.current.generateGif();
+
+                    // Upload to Vercel Blob
+                    const { url } = await upload(`frame-preview-${Date.now()}.gif`, gifBlob, {
+                        access: 'public',
+                        handleUploadUrl: '/api/upload',
+                    });
+
+                    previewUrl = url;
+                    mediaType = 'image/gif';
+                } catch (e) {
+                    console.error("Failed to generate/upload GIF preview", e);
+                    // Fallback to no preview or handle error? 
+                    // For now, we proceed without preview_url (or maybe we should block?)
+                    // Let's assume standard OG generation will work for static preview if this fails
+                }
+            }
 
             const response = await fetch('/api/frames', {
                 method: 'POST',
@@ -45,7 +66,9 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
                     config: frameConfig,
                     creator_id: session.user.id,
                     creator_name: session.user.name || 'Anonymous',
-                    is_public: isPublicArg // Use the argument, not the state which might be stale or irrelevant for drafts
+                    is_public: isPublicArg,
+                    preview_url: previewUrl,
+                    media_type: mediaType
                 })
             });
 
@@ -61,8 +84,6 @@ export const PublishModal: React.FC<PublishModalProps> = ({ isOpen, onClose, fra
             console.log("Published frame ID:", result.id);
             setPublishedId(result.id);
             setSuccess(true);
-            // We removed the auto-close to let users copy the link
-
         } catch (err: any) {
             console.error(err);
             setError(err.message || "Failed to publish frame");

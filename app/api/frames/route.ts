@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
         const queryParams: any[] = [];
 
         // Base Query Structure
-        let selectClause = `SELECT f.*`;
-        let joinClause = ``;
+        let selectClause = `SELECT f.id, f.name, f.description, f.config, f.creator_id, f.creator_name, f.created_at, f.tags, f.likes_count, f.preview_url, f.media_type, f.is_public, u.isVerified as creator_verified`;
+        let joinClause = ` LEFT JOIN "user" u ON f.creator_id = u.id`;
         let whereClause = `WHERE (f.is_public = true`;
         let paramIndex = 1; // PostgreSQL params start at $1
 
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { name, description, config, creator_id, creator_name, is_public, parent_id, tags } = body;
+        const { name, description, config, creator_id, creator_name, is_public, parent_id, tags, preview_url, media_type } = body;
 
         // Ensure tags is a valid array of strings or empty
         const safeTags = Array.isArray(tags) ? tags : [];
@@ -121,10 +121,10 @@ export async function POST(request: NextRequest) {
         // TODO: Add server-side auth validation here (using Request Headers or Cookie)
 
         const result = await pool.query(
-            `INSERT INTO frames (name, description, config, creator_id, creator_name, is_public, created_at, tags)
-       VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7)
-       RETURNING id, name, created_at, tags`,
-            [name, description, JSON.stringify(config), creator_id, creator_name, is_public, safeTags]
+            `INSERT INTO frames (name, description, config, creator_id, creator_name, is_public, created_at, tags, preview_url, media_type)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9)
+       RETURNING id, name, created_at, tags, preview_url, media_type`,
+            [name, description, JSON.stringify(config), creator_id, creator_name, is_public, safeTags, preview_url || null, media_type || 'image/png']
         );
 
         const newFrame = result.rows[0];

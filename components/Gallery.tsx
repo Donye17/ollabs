@@ -8,6 +8,7 @@ import { Loader2, UserCircle2, Copy, MessageSquare, Heart, Layout } from 'lucide
 import { CANVAS_SIZE } from '@/lib/constants';
 import { LikeButton } from './social/LikeButton';
 import { CommentSection } from './social/CommentSection';
+import { authClient } from '@/lib/auth-client';
 
 interface GalleryProps {
     onSelectFrame: (frame: FrameConfig, frameId: string) => void;
@@ -33,6 +34,9 @@ export const Gallery: React.FC<GalleryProps> = ({
     const [loading, setLoading] = useState(initialFrames.length === 0);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+    const { data: session } = authClient.useSession();
+    const currentUserId = session?.user?.id;
 
     // Debounce search
     const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
@@ -208,11 +212,32 @@ export const Gallery: React.FC<GalleryProps> = ({
                     <div className="w-20 h-20 bg-zinc-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
                         <Layout className="text-zinc-600" size={40} />
                     </div>
-                    <h3 className="text-2xl font-bold text-zinc-50 mb-2">No frames found</h3>
-                    <p className="text-zinc-400 mb-8 max-w-sm mx-auto leading-relaxed">Try adjusting your search or filters.</p>
-                    <button onClick={() => { setSearchQuery(''); setSelectedTag(null); }} className="text-blue-400 hover:text-blue-300 underline">
-                        Clear Filters
-                    </button>
+
+                    {creatorId ? (
+                        // Profile View
+                        <>
+                            <h3 className="text-2xl font-bold text-zinc-50 mb-2">No frames yet</h3>
+                            <p className="text-zinc-400 mb-8 max-w-sm mx-auto leading-relaxed">
+                                {creatorId === currentUserId
+                                    ? "You haven't created any frames yet. Start your journey!"
+                                    : "This creator hasn't published any frames yet."}
+                            </p>
+                            {creatorId === currentUserId && (
+                                <Link href="/create" className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all shadow-lg hover:shadow-blue-500/20">
+                                    Create Design
+                                </Link>
+                            )}
+                        </>
+                    ) : (
+                        // Gallery Search View
+                        <>
+                            <h3 className="text-2xl font-bold text-zinc-50 mb-2">No frames found</h3>
+                            <p className="text-zinc-400 mb-8 max-w-sm mx-auto leading-relaxed">Try adjusting your search or filters.</p>
+                            <button onClick={() => { setSearchQuery(''); setSelectedTag(null); }} className="text-blue-400 hover:text-blue-300 underline">
+                                Clear Filters
+                            </button>
+                        </>
+                    )}
                 </div>
             )}
         </div>

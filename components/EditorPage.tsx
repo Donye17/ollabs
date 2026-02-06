@@ -186,7 +186,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
 
                     {/* Left Column: Canvas */}
-                    <div className="lg:col-span-7 flex flex-col items-center">
+                    <div className="lg:col-span-7 flex flex-col items-center sticky top-24 z-0 h-fit lg:h-auto">
                         <Editor
                             imageSrc={imageSrc}
                             onImageSelect={handleImageSelect}
@@ -221,7 +221,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                     </div>
 
                     {/* Right Column: Key Controls */}
-                    <div className="lg:col-span-5 space-y-6">
+                    <div className="lg:col-span-5 space-y-6 relative z-10 bg-zinc-950/95 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none p-4 -mx-4 rounded-t-3xl border-t border-white/10 lg:border-none lg:p-0 lg:m-0 lg:rounded-none shadow-[0_-10px_40px_rgba(0,0,0,0.5)] lg:shadow-none">
 
                         {/* Creator Header */}
                         <div className="flex items-center justify-between px-2">

@@ -5,14 +5,16 @@ import { notFound } from 'next/navigation';
 import { ArrowRight, Copy, Wand2 } from 'lucide-react';
 import { LikeButton } from '@/components/social/LikeButton';
 import { CommentSection } from '@/components/social/CommentSection';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 // Fetch frame data
 async function getFrame(id: string) {
     try {
         const result = await pool.query(
-            `SELECT f.*, p.name as parent_name 
+            `SELECT f.*, p.name as parent_name, u.isVerified as creator_verified
              FROM frames f 
              LEFT JOIN frames p ON f.parent_id = p.id 
+             LEFT JOIN "user" u ON f.creator_id = u.id
              WHERE f.id = $1`,
             [id]
         );
@@ -132,7 +134,10 @@ export default async function SharePage({ params }: { params: Promise<{ id: stri
                         <Wand2 className="text-white w-8 h-8" />
                     </div>
                     <h1 className="text-3xl font-bold text-white mb-2 font-heading">{frame.name}</h1>
-                    <p className="text-slate-400">Created by <span className="text-blue-400 font-medium">{frame.creator_name}</span></p>
+                    <p className="text-slate-400 flex items-center justify-center gap-1">
+                        Created by <span className="text-blue-400 font-medium">{frame.creator_name}</span>
+                        {frame.creator_verified && <VerifiedBadge className="text-blue-400 w-4 h-4" />}
+                    </p>
                     {frame.parent_id && frame.parent_name && (
                         <p className="text-xs text-slate-500 mt-2">
                             Remixed from <Link href={`/share/${frame.parent_id}`} className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors">{frame.parent_name}</Link>

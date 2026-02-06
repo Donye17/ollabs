@@ -4,7 +4,7 @@ import { authClient } from '../lib/auth-client';
 import { AuthModal } from './auth/AuthModal';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { UserCircle, LogOut, Sparkles, Menu, X } from 'lucide-react';
+import { UserCircle, LogOut, Sparkles, Menu, X, MessageSquare } from 'lucide-react';
 import { NotificationBell } from './notifications/NotificationBell';
 
 export const NavBar: React.FC = () => {
@@ -68,6 +68,17 @@ export const NavBar: React.FC = () => {
                                             Gallery
                                         </Link>
                                     </div>
+
+                                    <div className="h-6 w-px bg-white/10" />
+
+                                    {/* Feedback Link */}
+                                    <a
+                                        href="mailto:feedback@ollabs.studio?subject=Ollabs%20Beta%20Feedback"
+                                        className="text-xs font-bold text-zinc-500 hover:text-blue-400 flex items-center gap-1.5 transition-colors uppercase tracking-wider"
+                                    >
+                                        <MessageSquare size={14} />
+                                        Feedback
+                                    </a>
 
                                     <div className="h-6 w-px bg-white/10" />
 
