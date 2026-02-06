@@ -59,6 +59,48 @@ export async function POST(request: NextRequest) {
                 `INSERT INTO frame_likes (frame_id, user_id, created_at) VALUES ($1, $2, NOW())`,
                 [frameId, userId]
             );
+
+            // Fetch Frame Creator info
+            const frameResult = await pool.query(
+                `SELECT created_by, name FROM frames WHERE id = $1`,
+                [frameId]
+            );
+
+            if (frameResult.rows.length > 0) {
+                const creatorId = frameResult.rows[0].created_by;
+                const frameName = frameResult.rows[0].name;
+
+                // Insert Notification (if not self-like)
+                if (creatorId && creatorId !== userId) {
+                    // Extract extra user info from request if available, or just leave it generic
+                    const { userName, userImage } = await request.clone().json().catch(() => ({}));
+
+                    // Check if notification already exists for this like (debounce)
+                    const notifCheck = await pool.query(
+                        `SELECT 1 FROM notifications 
+                         WHERE user_id = $1 AND actor_id = $2 AND type = 'like' AND entity_id = $3`,
+                        [creatorId, userId, frameId]
+                    );
+
+                    if (notifCheck.rows.length === 0) {
+                        await pool.query(
+                            `INSERT INTO notifications (user_id, actor_id, type, entity_id, metadata)
+                             VALUES ($1, $2, 'like', $3, $4)`,
+                            [
+                                creatorId,
+                                userId,
+                                frameId,
+                                JSON.stringify({
+                                    actor_name: userName || 'Someone',
+                                    actor_image: userImage,
+                                    frame_name: frameName
+                                })
+                            ]
+                        );
+                    }
+                }
+            }
+
             return NextResponse.json({ liked: true });
         }
 

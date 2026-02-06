@@ -24,7 +24,7 @@ async function migrate() {
         await client.query(`
             CREATE TABLE IF NOT EXISTS frame_comments (
                 id SERIAL PRIMARY KEY,
-                frame_id INTEGER NOT NULL, 
+                frame_id UUID NOT NULL, 
                 user_id TEXT NOT NULL,
                 content TEXT NOT NULL,
                 user_name TEXT,

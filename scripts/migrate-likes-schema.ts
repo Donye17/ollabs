@@ -19,17 +19,17 @@ async function migrate() {
     try {
         const client = await pool.connect();
 
-        // 1. Create 'likes' table
-        console.log('Checking/Creating "likes" table...');
+        // 1. Create 'frame_likes' table
+        console.log('Checking/Creating "frame_likes" table...');
         await client.query(`
-            CREATE TABLE IF NOT EXISTS likes (
+            CREATE TABLE IF NOT EXISTS frame_likes (
                 user_id TEXT NOT NULL,
                 frame_id UUID NOT NULL,
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                 PRIMARY KEY (user_id, frame_id)
             );
         `);
-        console.log('✅ "likes" table ready.');
+        console.log('✅ "frame_likes" table ready.');
 
         // 2. Add 'likes_count' to 'frames' table if missing
         console.log('Checking "frames" table for "likes_count"...');

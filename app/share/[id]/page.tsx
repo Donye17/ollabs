@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Copy, Wand2 } from 'lucide-react';
+import { LikeButton } from '@/components/social/LikeButton';
+import { CommentSection } from '@/components/social/CommentSection';
 
 // Fetch frame data
 async function getFrame(id: string) {
@@ -142,6 +144,14 @@ export default async function SharePage({ params }: { params: Promise<{ id: stri
                             {new Date(frame.created_at).toLocaleDateString()}
                         </span>
                     </div>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-white/5">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-sm font-bold text-white">Social</h3>
+                        <LikeButton frameId={frame.id} />
+                    </div>
+                    <CommentSection frameId={frame.id} />
                 </div>
             </div>
         </div>
