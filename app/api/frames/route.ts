@@ -19,48 +19,68 @@ export async function GET(request: NextRequest) {
         const session = await auth.api.getSession({ headers: await headers() });
         const currentUserId = session?.user?.id;
 
-        let query = `
-            SELECT 
-                f.*, 
-                ${currentUserId ? `CASE WHEN l.user_id IS NOT NULL THEN true ELSE false END as liked_by_user` : 'false as liked_by_user'}
-            FROM frames f
-            ${currentUserId ? `LEFT JOIN likes l ON f.id = l.frame_id AND l.user_id = $1` : ''}
-            ${likedBy ? `INNER JOIN likes filter_likes ON f.id = filter_likes.frame_id AND filter_likes.user_id = $${queryParams.length + (currentUserId ? 2 : 1)}` : ''}
-            WHERE (f.is_public = true ${currentUserId ? `OR f.creator_id = $1` : ''})
-        `;
-
         const queryParams: any[] = [];
-        if (currentUserId) queryParams.push(currentUserId);
 
-        if (likedBy) {
-            queryParams.push(likedBy); // Add param for filter_likes JOIN
+        // Base Query Structure
+        let selectClause = `SELECT f.*`;
+        let joinClause = ``;
+        let whereClause = `WHERE (f.is_public = true`;
+        let paramIndex = 1; // PostgreSQL params start at $1
+
+        // 1. Current User Logic (for 'liked_by_user' access and private frames)
+        if (currentUserId) {
+            queryParams.push(currentUserId);
+            // Check if current user liked the frame
+            selectClause += `, CASE WHEN l.user_id IS NOT NULL THEN true ELSE false END as liked_by_user`;
+            // Join for 'liked_by_user' check
+            joinClause += ` LEFT JOIN frame_likes l ON f.id = l.frame_id AND l.user_id = $${paramIndex}`;
+            // Allow creator to see their own private frames
+            whereClause += ` OR f.creator_id = $${paramIndex}`;
+            paramIndex++;
+        } else {
+            selectClause += `, false as liked_by_user`;
         }
 
+        // Close initial public/private permission check
+        whereClause += `)`;
+
+        // 2. Filter by "Liked By" (e.g. show my liked frames)
+        if (likedBy) {
+            queryParams.push(likedBy);
+            joinClause += ` INNER JOIN frame_likes filter_likes ON f.id = filter_likes.frame_id AND filter_likes.user_id = $${paramIndex}`;
+            paramIndex++;
+        }
+
+        let query = `${selectClause} FROM frames f ${joinClause} ${whereClause}`;
+
+        // 3. Other Filters
         if (id) {
-            query += ` AND f.id = $${queryParams.length + 1}`;
+            query += ` AND f.id = $${paramIndex}`;
             queryParams.push(id);
+            paramIndex++;
         } else if (creatorId) {
-            query += ` AND f.creator_id = $${queryParams.length + 1}`;
+            query += ` AND f.creator_id = $${paramIndex}`;
             queryParams.push(creatorId);
+            paramIndex++;
         }
 
         if (search) {
-            query += ` AND f.name ILIKE $${queryParams.length + 1}`;
+            query += ` AND f.name ILIKE $${paramIndex}`;
             queryParams.push(`%${search}%`);
+            paramIndex++;
         }
 
         if (tag) {
-            // MVP Tag search: Look in description or config
-            query += ` AND (f.description ILIKE $${queryParams.length + 1} OR f.config::text ILIKE $${queryParams.length + 1})`;
+            query += ` AND (f.description ILIKE $${paramIndex} OR f.config::text ILIKE $${paramIndex})`;
             queryParams.push(`%${tag}%`);
+            paramIndex++;
         }
 
         if (sort === 'trending') {
-            // Logic: Sort by likes_count DESC. 
-            // Restrict to recent frames (last 7 days) to keep trending fresh
-            query += ` AND f.created_at > NOW() - INTERVAL '7 days' ORDER BY f.likes_count DESC, f.created_at DESC LIMIT $${queryParams.length + 1}`;
+            // Sort by likes_count DESC, recent first
+            query += ` AND f.created_at > NOW() - INTERVAL '7 days' ORDER BY f.likes_count DESC, f.created_at DESC LIMIT $${paramIndex}`;
         } else {
-            query += ` ORDER BY f.created_at DESC LIMIT $${queryParams.length + 1}`;
+            query += ` ORDER BY f.created_at DESC LIMIT $${paramIndex}`;
         }
         queryParams.push(limit);
 
