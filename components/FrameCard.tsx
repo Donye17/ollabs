@@ -96,83 +96,58 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
     };
 
     return (
-        <div className="glass-panel rounded-3xl overflow-hidden hover:border-zinc-700 hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 group flex flex-col h-full hover:bg-zinc-900/60">
-            {/* Valid Click Area for Remixing */}
-            <div className="aspect-square bg-zinc-950/30 relative flex items-center justify-center p-4 sm:p-8 group-hover:bg-zinc-950/50 transition-colors cursor-pointer overflow-hidden" onClick={onSelect}>
-                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative w-full h-full">
+        <div className="glass-panel rounded-2xl overflow-hidden hover:border-zinc-600 hover:shadow-xl transition-all duration-300 group flex flex-col h-full bg-zinc-900/40">
+            {/* Image Container with Overlay Actions */}
+            <div className="aspect-square bg-zinc-950/50 relative flex items-center justify-center p-4 cursor-pointer overflow-hidden" onClick={onSelect}>
+                {/* Canvas Preview */}
+                <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500 ease-out">
                     <canvas
                         ref={canvasRef}
                         width={300}
                         height={300}
-                        className="w-full h-full object-contain drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-500 ease-out"
+                        className="w-full h-full object-contain drop-shadow-2xl"
                     />
                 </div>
-                <div className="absolute inset-x-0 bottom-0 p-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 flex justify-center pb-8 bg-gradient-to-t from-zinc-950/80 to-transparent pointer-events-none">
-                    <span className="bg-zinc-50 text-zinc-950 font-bold py-3 px-8 rounded-full shadow-lg text-sm tracking-wide">
+
+                {/* Dark Overlay on Hover */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]" />
+
+                {/* Hover Actions */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 p-4">
+                    <button className="w-full py-2.5 bg-white text-black rounded-full font-bold text-sm hover:scale-105 transition-transform shadow-lg">
                         Remix This
-                    </span>
+                    </button>
+                    <div className="flex gap-2 w-full">
+                        <button
+                            onClick={handleLike}
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-full font-medium text-xs transition-colors backdrop-blur-md ${isLiked ? 'bg-pink-500/20 text-pink-400 border border-pink-500/30' : 'bg-white/10 text-white border border-white/10 hover:bg-white/20'}`}
+                        >
+                            <Heart size={14} fill={isLiked ? "currentColor" : "none"} />
+                            {likeCount}
+                        </button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                navigator.clipboard.writeText(`${window.location.origin}/share/${frame.id}`);
+                                alert('Link copied!');
+                            }}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-full bg-white/10 text-white border border-white/10 hover:bg-white/20 font-medium text-xs backdrop-blur-md"
+                        >
+                            <Share2 size={14} />
+                            Share
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div className="p-4 sm:p-6 flex-1 flex flex-col border-t border-white/5 bg-zinc-900/20">
-                <div className="flex justify-between items-start mb-3">
-                    <div>
-                        <h3 className="font-bold text-lg text-zinc-100 truncate group-hover:text-blue-400 transition-colors tracking-tight">{frame.name}</h3>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-zinc-500">
-                            <div className="flex items-center gap-2">
-                                <UserCircle2 size={16} className="text-zinc-600" />
-                                <span className="font-medium text-zinc-400">{frame.creator_name}</span>
-                            </div>
-                            {(frame.views_count !== undefined) && (
-                                <div className="flex items-center gap-1.5" title={`${frame.views_count} views`}>
-                                    <Eye size={14} className="text-zinc-600" />
-                                    <span className="text-xs font-medium text-zinc-500">{frame.views_count}</span>
-                                </div>
-                            )}
-                        </div>
+            {/* Compact Footer */}
+            <div className="p-3 border-t border-white/5 bg-zinc-900/40">
+                <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                        <h3 className="font-bold text-sm text-zinc-200 truncate group-hover:text-blue-400 transition-colors">{frame.name}</h3>
+                        <p className="text-xs text-zinc-500 truncate">{frame.creator_name}</p>
                     </div>
                 </div>
-
-                <p className="text-sm text-zinc-500 mb-6 line-clamp-2 leading-relaxed font-normal">{frame.description}</p>
-
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-                    {/* Like Button */}
-                    <button
-                        onClick={handleLike}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 active:scale-95 ${isLiked ? 'bg-pink-500/10 text-pink-500' : 'text-zinc-500 hover:bg-zinc-800 hover:text-pink-400'}`}
-                    >
-                        <Heart size={20} fill={isLiked ? "currentColor" : "none"} strokeWidth={isLiked ? 0 : 2} className={isLiked ? "scale-110" : ""} />
-                        <span className="text-sm font-semibold">{likeCount}</span>
-                    </button>
-
-                    <button
-                        onClick={() => setShowComments(!showComments)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all active:scale-95 ${showComments ? 'bg-blue-500/10 text-blue-400' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'}`}
-                    >
-                        <MessageSquare size={20} strokeWidth={2} />
-                        <span className="text-xs font-bold uppercase tracking-wide hidden sm:inline">Comments</span>
-                        <span className="text-xs font-bold uppercase tracking-wide sm:hidden">{showComments ? 'Hide' : 'Chat'}</span>
-                    </button>
-
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            navigator.clipboard.writeText(`${window.location.origin}/share/${frame.id}`);
-                            alert('Link copied to clipboard!');
-                        }}
-                        className="p-3 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-all ml-2 active:scale-95"
-                        title="Share Frame"
-                    >
-                        <Share2 size={20} />
-                    </button>
-                </div>
-
-                {showComments && (
-                    <div className="mt-4 border-t border-zinc-800/50 pt-4 animate-in slide-in-from-top-2 duration-300">
-                        <CommentSection frameId={frame.id.toString()} />
-                    </div>
-                )}
             </div>
         </div>
     );
