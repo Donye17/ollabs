@@ -36,27 +36,7 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
 
     const session = authClient.useSession();
 
-    // Render Preview
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const renderer = FrameRendererFactory.getRenderer(frame.config.type);
-        const mockCtx = {
-            ctx,
-            width: canvas.width,
-            height: canvas.height,
-            centerX: canvas.width / 2,
-            centerY: canvas.height / 2,
-            imageObject: null,
-            frame: frame.config,
-            radius: (canvas.width / 2) - 20
-        };
-        renderer.drawFrame(mockCtx);
-    }, [frame.config]);
+    // Canvas rendering logic removed in favor of Server-Side Image
 
     const handleLike = async (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -101,8 +81,10 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
             <div className="aspect-square bg-zinc-950/50 relative flex items-center justify-center p-4 cursor-pointer overflow-hidden" onClick={onSelect}>
                 {/* Canvas Preview */}
                 <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500 ease-out">
-                    <canvas
-                        ref={canvasRef}
+                    {/* Primary Server-Side Image */}
+                    <img
+                        src={`/api/og/frame?id=${frame.id}`}
+                        alt={frame.name}
                         width={300}
                         height={300}
                         className="w-full h-full object-contain drop-shadow-2xl"
