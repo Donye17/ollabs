@@ -59,7 +59,7 @@ function renderSvgFrame(config: FrameConfig) {
     // Helper for paths
     const circlePath = (r: number) => `M ${center + r} ${center} A ${r} ${r} 0 1 0 ${center - r} ${center} A ${r} ${r} 0 1 0 ${center + r} ${center}`;
 
-    // SVG Defs for Gradients/Filters
+    // SVG Defs for Gradients/Filters/Patterns
     const defs = (
         <defs>
             {color2 && (
@@ -76,6 +76,12 @@ function renderSvgFrame(config: FrameConfig) {
                     <feMergeNode in="SourceGraphic" />
                 </feMerge>
             </filter>
+            {/* Texture Pattern */}
+            {config.imageUrl && (
+                <pattern id="img-pattern" patternUnits="userSpaceOnUse" width={size} height={size}>
+                    <image href={config.imageUrl} x="0" y="0" width={size} height={size} preserveAspectRatio="xMidYMid slice" />
+                </pattern>
+            )}
         </defs>
     );
 
@@ -116,39 +122,27 @@ function renderSvgFrame(config: FrameConfig) {
         // If not, we can render multiple strokes.
     }
 
-    // Texture Pattern Logic
-    let strokePaint = stroke; // Default to color/gradient
-    let defsContent = defs;
-
+    // Texture Override
     if (config.imageUrl) {
-        strokePaint = "url(#img-pattern)";
-        defsContent = (
-            <defs>
-                {defsContent}
-                <pattern id="img-pattern" patternUnits="userSpaceOnUse" width={size} height={size}>
-                    <image href={config.imageUrl} x="0" y="0" width={size} height={size} preserveAspectRatio="xMidYMid slice" />
-                </pattern>
-            </defs>
-        );
+        stroke = "url(#img-pattern)";
     }
 
     if (type === 'DASHED') {
         return (
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-                {defsContent}
-                <path d={pathD} fill="none" stroke={strokePaint} strokeWidth={strokeWidth} strokeDasharray={`${strokeWidth * 2} ${strokeWidth}`} strokeLinecap="round" />
+                {defs}
+                <path d={pathD} fill="none" stroke={stroke} strokeWidth={strokeWidth} strokeDasharray={`${strokeWidth * 2} ${strokeWidth}`} strokeLinecap="round" />
             </svg>
         );
     }
 
     if (type === 'NEON') {
-        // Neon handles its own stroke logic, maybe ignore texture or apply to main stroke?
-        // Let's allow texture on the main stroke if present, but keep the glow colors.
-        const mainStroke = config.imageUrl ? strokePaint : (color2 || color1);
+        // Neon Logic
+        const mainStroke = config.imageUrl ? "url(#img-pattern)" : (color2 || color1);
 
         return (
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-                {defsContent}
+                {defs}
                 {/* Glow uses color1 */}
                 <path d={pathD} fill="none" stroke={color1} strokeWidth={strokeWidth * 1.5} opacity="0.4" />
                 <path d={pathD} fill="none" stroke={color1} strokeWidth={strokeWidth * 1.2} opacity="0.6" />
@@ -160,10 +154,10 @@ function renderSvgFrame(config: FrameConfig) {
 
     if (type === 'DOUBLE') {
         // Texture on outer? Or both? Let's put texture on outer only for now to be safe.
-        const outerStroke = config.imageUrl ? strokePaint : color1;
+        const outerStroke = config.imageUrl ? "url(#img-pattern)" : color1;
         return (
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-                {defsContent}
+                {defs}
                 {/* Outer */}
                 <path d={circlePath(radius)} fill="none" stroke={outerStroke} strokeWidth={strokeWidth / 2} strokeLinecap="round" />
                 {/* Inner */}
@@ -175,8 +169,8 @@ function renderSvgFrame(config: FrameConfig) {
     // Default SOLID / GRADIENT / HEART / STAR etc
     return (
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-            {defsContent}
-            <path d={pathD} fill="none" stroke={strokePaint} strokeWidth={strokeWidth} strokeLinecap="round" />
+            {defs}
+            <path d={pathD} fill="none" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="round" />
         </svg>
     );
 }
