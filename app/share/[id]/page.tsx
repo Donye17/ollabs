@@ -51,6 +51,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     return {
         title,
         description,
+        keywords: ['custom avatar frame', 'pfp border', 'discord profile picture', frame.name, 'remix pfp', 'frame maker'],
         openGraph: {
             title,
             description,
@@ -63,7 +64,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
                     url: ogImageUrl,
                     width: 1200,
                     height: 630,
-                    alt: `${frame.name} by ${frame.creator_name}`,
+                    alt: `${frame.name} Avatar Frame by ${frame.creator_name}`,
                 },
             ],
         },
@@ -102,8 +103,26 @@ export default async function SharePage({ params }: { params: Promise<{ id: stri
         // ignore
     }
 
+    // Structured Data for Google Images
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'ImageObject',
+        'contentUrl': `https://ollabs.studio/api/og?title=${encodeURIComponent(frame.name)}&creator=${encodeURIComponent(frame.creator_name)}`,
+        'name': `${frame.name} Avatar Frame`,
+        'creator': {
+            '@type': 'Person',
+            'name': frame.creator_name
+        },
+        'description': frame.description || `Custom ${frame.name} avatar frame for Discord and social media.`,
+        'thumbnail': `https://ollabs.studio/api/og?title=${encodeURIComponent(frame.name)}&creator=${encodeURIComponent(frame.creator_name)}`
+    };
+
     return (
         <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             {/* Background Ambience */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950 pointer-events-none" />
 

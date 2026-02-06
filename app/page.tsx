@@ -35,7 +35,7 @@ export default function Home() {
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500 animate-slide-up">
-                        Create Custom <br /> Avatar Frames.
+                        Free Avatar Frame <br /> & PFP Border Maker
                     </h1>
 
                     <p className="text-lg md:text-xl text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '100ms' }}>
@@ -77,6 +77,36 @@ export default function Home() {
                     </div>
                 </div>
             </footer>
+            {/* SEO Content Block */}
+            <section className="px-6 py-12 border-t border-white/5 bg-zinc-950">
+                <div className="max-w-4xl mx-auto space-y-12 text-zinc-400">
+                    <div className="space-y-4">
+                        <h2 className="text-2xl font-bold text-white font-heading">The Best Free Profile Picture Border Maker</h2>
+                        <p>
+                            Ollabs is the ultimate <strong>avatar frame creator</strong> and <strong>PFP border maker</strong>. Whether you need a
+                            Discord profile border, a cool Instagram story ring, or a custom Twitter NFT-style frame, our free tool makes it instant
+                            and easy. No login required—just upload, customize, and download.
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 className="text-xl font-bold text-white mb-2">How to make a custom Discord profile border?</h3>
+                            <p className="text-sm leading-relaxed">
+                                Simply upload your profile picture to Ollabs, choose from thousands of community-made frames or design your own
+                                using our powerful editor. Add neon glows, text, and stickers, then download the transparent PNG to use on Discord.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-white mb-2">Is this PFP maker free?</h3>
+                            <p className="text-sm leading-relaxed">
+                                Yes! Ollabs is 100% free to use. You can create unlimited <strong>custom avatar frames</strong> and download them
+                                in high quality without any watermarks.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
     );
 }

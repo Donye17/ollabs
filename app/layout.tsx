@@ -11,32 +11,33 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    metadataBase: new URL('https://ollabs.vercel.app'),
+    metadataBase: new URL('https://ollabs.studio'),
     title: {
         template: '%s | Ollabs',
-        default: 'Ollabs - Custom Avatar Frame Maker & PFP Border Creator',
+        default: 'Ollabs - Best Free Avatar Frame Creator & PFP Border Maker',
     },
-    description: 'The best free tool to create custom avatar frames, profile picture borders, and PFP overlays for Discord, Twitter, and Instagram.',
+    description: 'The #1 free tool to create custom avatar frames, profile picture borders, and PFP overlays for Discord, Twitter, Instagram, and TikTok. No login required.',
+    keywords: ['avatar frame creator', 'profile picture border maker', 'discord profile border', 'pfp border maker', 'circle crop', 'custom pfp', 'frame generator'],
     openGraph: {
         type: 'website',
         locale: 'en_US',
         url: 'https://ollabs.studio',
         siteName: 'Ollabs',
-        title: 'Ollabs - Custom Avatar Frame Maker',
-        description: 'Design unique profile picture frames, neon borders, and PFP overlays in seconds.',
+        title: 'Ollabs - Best Free Avatar Frame Creator & PFP Border Maker',
+        description: 'Design unique profile picture frames, neon borders, and PFP overlays in seconds. Perfect for Discord, Twitter, and Instagram.',
         images: [
             {
                 url: '/og-image.png',
                 width: 1200,
                 height: 630,
-                alt: 'Ollabs Avatar Frame Creator',
+                alt: 'Ollabs Avatar Frame Creator & PFP Border Maker',
             },
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Ollabs - Custom Avatar Frame Maker',
-        description: 'Design unique profile picture frames, neon borders, and PFP overlays in seconds.',
+        title: 'Ollabs - Best Free Avatar Frame Creator & PFP Border Maker',
+        description: 'Design unique profile picture frames, neon borders, and PFP overlays in seconds. Perfect for Discord, Twitter, and Instagram.',
         images: ['/og-image.png'],
     },
     icons: {
@@ -66,16 +67,28 @@ const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     'name': 'Ollabs',
-    'url': 'https://ollabs.vercel.app',
-    'description': 'Create custom avatar frames, profile picture borders, and PFP overlays for Discord, Twitter, and social media.',
+    'url': 'https://ollabs.studio',
+    'description': 'The best free tool to create custom avatar frames, profile picture borders, and PFP overlays for Discord, Twitter, Instagram, and TikTok.',
     'applicationCategory': 'DesignApplication',
     'operatingSystem': 'Web',
+    'genre': 'Design',
     'offers': {
         '@type': 'Offer',
         'price': '0',
         'priceCurrency': 'USD'
     },
-    'featureList': 'Custom Avatar Frames, PFP Maker, Discord Profile Borders, Sticker Overlays'
+    'featureList': 'Custom Avatar Frames, PFP Maker, Discord Profile Borders, Sticker Overlays, Neon Borders',
+    'potentialAction': {
+        '@type': 'CreateAction',
+        'target': {
+            '@type': 'EntryPoint',
+            'urlTemplate': 'https://ollabs.studio/create'
+        },
+        'result': {
+            '@type': 'ImageObject',
+            'name': 'Custom Avatar Frame'
+        }
+    }
 };
 
 export default function RootLayout({

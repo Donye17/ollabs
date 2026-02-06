@@ -31,7 +31,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     try {
         // Fetch all public frames
         const result = await pool.query(
-            'SELECT id, updated_at FROM frames WHERE is_public = true ORDER BY created_at DESC LIMIT 5000'
+            `SELECT id, updated_at 
+             FROM frames 
+             WHERE is_public = true 
+             ORDER BY likes_count DESC, created_at DESC 
+             LIMIT 1000`
         );
 
         const frameRoutes: MetadataRoute.Sitemap = result.rows.map((row) => ({
