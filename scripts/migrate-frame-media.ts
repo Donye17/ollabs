@@ -1,4 +1,6 @@
 
+
+export { };
 const { Pool } = require('@neondatabase/serverless');
 require('dotenv').config({ path: '.env.local' });
 

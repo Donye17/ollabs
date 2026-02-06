@@ -122,12 +122,10 @@ export default function CollectionPage({ params }: { params: Promise<{ id: strin
                     {items.length > 0 ? (
                         <Gallery
                             initialFrames={items}
-                        // Disable fetching more since this is a static collection list for now
-                        // By passing initialFrames and not implementing specific filter/pagination for collections in Gallery
-                        // We rely on Gallery rendering 'initialFrames'.
-                        // However, Gallery usually fetches if not provided or to append.
-                        // We should probably pass a specific 'mode' to Gallery if we want strictly these items.
-                        // But for now let's just pass them. Gallery logic is a bit complex, let's check it.
+                            onSelectFrame={(frame, frameId) => {
+                                localStorage.setItem('temp_frame', JSON.stringify(frame));
+                                router.push(`/?remix=${frameId}`);
+                            }}
                         />
                     ) : (
                         <div className="text-center py-20 bg-zinc-900/30 rounded-3xl border border-white/5 border-dashed">

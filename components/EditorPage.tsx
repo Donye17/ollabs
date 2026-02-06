@@ -31,7 +31,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const [selectedTextId, setSelectedTextId] = useState<string | null>(null); // For Text
 
     // Refs
-    const editorRef = useRef<{ exportGif: () => void; getDominantColors: () => Promise<string[]> }>(null);
+    const editorRef = useRef<{ exportGif: () => void; generateGif: () => Promise<Blob>; getDominantColors: () => Promise<string[]> }>(null);
 
     const handleAutoMatch = async () => {
         if (!editorRef.current) return;

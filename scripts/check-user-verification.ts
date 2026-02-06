@@ -1,10 +1,11 @@
 
+export { };
 const { Pool } = require('@neondatabase/serverless');
 require('dotenv').config({ path: '.env.local' });
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-async function checkVerification(email) {
+async function checkVerification(email: string) {
     if (!email) {
         console.error('Please provide an email address');
         process.exit(1);
