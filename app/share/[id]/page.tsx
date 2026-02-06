@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const title = `${frame.name} by ${frame.creator_name} | Ollabs Avatar Frame`;
     const description = frame.description || `Customize your profile picture with the ${frame.name} frame by ${frame.creator_name}. Create your own custom avatar frames on Ollabs.`;
 
-    const ogImageUrl = `https://ollabs.studio/api/og?title=${encodeURIComponent(frame.name)}&creator=${encodeURIComponent(frame.creator_name)}`;
+    const ogImageUrl = `https://ollabs.studio/api/og/frame?id=${frame.id}`;
 
     return {
         title,
@@ -107,14 +107,14 @@ export default async function SharePage({ params }: { params: Promise<{ id: stri
     const jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'ImageObject',
-        'contentUrl': `https://ollabs.studio/api/og?title=${encodeURIComponent(frame.name)}&creator=${encodeURIComponent(frame.creator_name)}`,
+        'contentUrl': `https://ollabs.studio/api/og/frame?id=${frame.id}`,
         'name': `${frame.name} Avatar Frame`,
         'creator': {
             '@type': 'Person',
             'name': frame.creator_name
         },
         'description': frame.description || `Custom ${frame.name} avatar frame for Discord and social media.`,
-        'thumbnail': `https://ollabs.studio/api/og?title=${encodeURIComponent(frame.name)}&creator=${encodeURIComponent(frame.creator_name)}`
+        'thumbnail': `https://ollabs.studio/api/og/frame?id=${frame.id}`
     };
 
     return (

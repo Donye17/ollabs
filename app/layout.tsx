@@ -27,10 +27,10 @@ export const metadata: Metadata = {
         description: 'Design unique profile picture frames, neon borders, and PFP overlays in seconds. Perfect for Discord, Twitter, and Instagram.',
         images: [
             {
-                url: '/og-image.png',
+                url: 'https://ollabs.studio/Ollabs%20Logo%20White.png',
                 width: 1200,
                 height: 630,
-                alt: 'Ollabs Avatar Frame Creator & PFP Border Maker',
+                alt: 'Ollabs - Best Free Avatar Frame Creator',
             },
         ],
     },
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'Ollabs - Best Free Avatar Frame Creator & PFP Border Maker',
         description: 'Design unique profile picture frames, neon borders, and PFP overlays in seconds. Perfect for Discord, Twitter, and Instagram.',
-        images: ['/og-image.png'],
+        images: ['https://ollabs.studio/Ollabs%20Logo%20White.png'],
     },
     icons: {
         icon: [

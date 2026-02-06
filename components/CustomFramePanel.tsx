@@ -15,12 +15,15 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
             const reader = new FileReader();
             reader.onload = (ev) => {
                 const imageUrl = ev.target?.result as string;
-                // Switch to CUSTOM_IMAGE type when image is uploaded
+                // Update imageUrl without forcing type change. 
+                // If type was NONE, default to SOLID so it shows up.
+                const newType = frame.type === FrameType.NONE ? FrameType.SOLID : frame.type;
+
                 onChange({
                     ...frame,
-                    type: FrameType.CUSTOM_IMAGE,
+                    type: newType,
                     imageUrl: imageUrl,
-                    name: 'Custom Frame'
+                    name: frame.name === 'New Frame' ? 'Custom Frame' : frame.name
                 });
             };
             reader.readAsDataURL(file);
@@ -36,7 +39,7 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
 
             <div className="p-6 bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col items-center gap-4 text-center">
                 <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mb-2">
-                    {frame.imageUrl && frame.type === FrameType.CUSTOM_IMAGE ? (
+                    {frame.imageUrl ? (
                         <img src={frame.imageUrl} alt="Texture" className="w-full h-full object-cover rounded-full opacity-80" />
                     ) : (
                         <ImageIcon className="text-zinc-600" size={32} />

@@ -6,33 +6,73 @@ import { CANVAS_SIZE } from '@/lib/constants';
 abstract class BaseShapeRenderer implements IFrameRenderer {
     abstract createPath(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number): void;
 
+    // Simplified Texture Cache (in-memory for session)
+    private static textureCache: Map<string, HTMLImageElement> = new Map();
+
     drawFrame(context: RenderContext): void {
         const { ctx, centerX, centerY, radius, frame } = context;
 
         ctx.save();
-        // Scale width based on canvas size relative to standard 1024px canvas
-        // This ensures the frame looks the same proportional thickness on all sizes (Gallery vs Editor)
         const scale = radius / (CANVAS_SIZE / 2);
         const lineWidth = frame.width * 2 * scale;
         const strokeRadius = radius - (lineWidth / 2);
 
-        // Define path for the stroke
         this.createPath(ctx, centerX, centerY, strokeRadius);
 
         ctx.lineWidth = lineWidth;
-        ctx.strokeStyle = frame.color1;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
+        // Default stroke style
+        ctx.strokeStyle = frame.color1;
+
+        // Apply shared styles (Gradients, Textures, Dashes)
         this.applyStyle(context);
 
         ctx.stroke();
         ctx.restore();
     }
 
-    // Hook for subclasses to apply specific styles (dash, gradient, shadow) before stroke
+    // Hook for subclasses to apply specific styles
     protected applyStyle(context: RenderContext): void {
-        // Default is solid color1, already set in drawFrame
+        const { ctx, frame, radius, centerX, centerY } = context;
+
+        // 1. Texture Priority (Custom Image)
+        if (frame.imageUrl) {
+            const cachedImg = BaseShapeRenderer.textureCache.get(frame.imageUrl);
+
+            if (cachedImg && cachedImg.complete) {
+                // Create Pattern
+                const pattern = ctx.createPattern(cachedImg, 'no-repeat');
+                if (pattern) {
+                    const diameter = radius * 2;
+                    // Scale logic same as ImageFrameRenderer
+                    const scaleX = diameter / cachedImg.width;
+                    const scaleY = diameter / cachedImg.height;
+                    const scale = Math.max(scaleX, scaleY);
+
+                    const matrix = new DOMMatrix();
+                    const x = centerX - radius;
+                    const y = centerY - radius;
+
+                    matrix.translateSelf(x, y);
+                    matrix.scaleSelf(scale, scale);
+                    pattern.setTransform(matrix);
+
+                    ctx.strokeStyle = pattern;
+                    return; // Texture overrides colors
+                }
+            } else if (!cachedImg) {
+                // Load Texture
+                const img = new Image();
+                img.src = frame.imageUrl;
+                img.onload = () => {
+                    // Trigger re-render? The loop/editor usually handles this via state or rAF.
+                    // For now, we assume the next pass catches it.
+                };
+                BaseShapeRenderer.textureCache.set(frame.imageUrl, img);
+            }
+        }
     }
 }
 
