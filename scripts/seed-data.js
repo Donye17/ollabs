@@ -70,10 +70,12 @@ async function seed() {
         console.log('👥 Creating 10 Users...');
         const users = [];
         for (const u of USERS) {
+            // Use "user" table (singular)
+            // Added emailVerified: new Date() to satisfy NOT NULL constraint
             const res = await client.query(
-                `INSERT INTO users (id, name, email, image) 
-         VALUES (gen_random_uuid(), $1, $2, $3) 
-         RETURNING *`,
+                `INSERT INTO "user" (id, name, email, image, "emailVerified", "createdAt", "updatedAt") 
+                 VALUES (gen_random_uuid(), $1, $2, $3, NOW(), NOW(), NOW()) 
+                 RETURNING *`,
                 [u.name, u.email, u.image]
             );
             users.push(res.rows[0]);
