@@ -30,17 +30,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     try {
         // Fetch all public frames
+        // Fetch all public frames
         const result = await pool.query(
-            `SELECT id, updated_at 
+            `SELECT id, created_at 
              FROM frames 
              WHERE is_public = true 
-             ORDER BY likes_count DESC, created_at DESC 
+             ORDER BY created_at DESC 
              LIMIT 1000`
         );
 
         const frameRoutes: MetadataRoute.Sitemap = result.rows.map((row) => ({
             url: `${baseUrl}/share/${row.id}`,
-            lastModified: new Date(row.updated_at),
+            lastModified: new Date(row.created_at),
             changeFrequency: 'weekly',
             priority: 0.7,
         }));
