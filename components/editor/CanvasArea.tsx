@@ -143,28 +143,79 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
             ctx.font = `${text.fontSize}px "${text.fontFamily}", sans-serif`;
             ctx.fillStyle = text.color;
             ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
             ctx.shadowColor = 'rgba(0,0,0,0.5)';
             ctx.shadowBlur = 4;
             ctx.shadowOffsetX = 2;
             ctx.shadowOffsetY = 2;
 
-            const radius = (CANVAS_SIZE / 2) - 20;
+            // Calculate radius based on frame width to center text in the stroke/path
+            // Scale logic matches renderer: scale = radius / (CANVAS_SIZE/2) => 1 for full canvas
+            const frameWidth = (selectedFrame.width || 20) * 2;
+            const pathRadius = (CANVAS_SIZE / 2) - (frameWidth / 2);
+
             const characters = text.text.split('');
-            const totalAngle = ctx.measureText(text.text).width / radius;
-            let startAngle = (text.rotation * Math.PI) / 180;
-            if (text.align === 'center') startAngle -= totalAngle / 2;
-            if (text.align === 'right') startAngle -= totalAngle;
+            // Total angle occupied by text
+            const totalWidth = ctx.measureText(text.text).width;
+            const totalAngle = totalWidth / pathRadius;
+
+            // Start angle: Text Rotation is center point.
+            // If normal: start = rotation - totalAngle/2
+            // If flip: start = rotation + totalAngle/2 (reversed direction)
+            let currentAngle = (text.rotation * Math.PI) / 180;
+
+            if (text.flip) {
+                currentAngle += totalAngle / 2;
+            } else {
+                currentAngle -= totalAngle / 2;
+            }
+
             characters.forEach((char) => {
                 const charWidth = ctx.measureText(char).width;
-                const charAngle = charWidth / radius;
-                const theta = startAngle + charAngle / 2;
+                const charAngle = charWidth / pathRadius;
+
+                // For 'middle' of char
+                let theta = currentAngle;
+                if (text.flip) {
+                    theta -= charAngle / 2;
+                } else {
+                    theta += charAngle / 2;
+                }
+
                 ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(theta + Math.PI / 2);
-                ctx.translate(0, -radius);
+                // Move to center + polar coordinate
+                // Note: Standard canvas rotation starts at 3 o'clock (0). Text rotation usually 0 is top (-PI/2).
+                // But our slider is 0-360. 
+                // Let's stick to standard behavior: 0 is right. -90 is top.
+                // Text rotation aligns with CSS/Stickers? usually 0 is upright. 
+                // Existing code: ctx.translate(centerX, centerY); ctx.rotate(theta + Math.PI/2);
+                // Implies theta=0 is top (-90deg).
+                // Let's assume text.rotation 0 means "Top".
+                // theta is in radians.
+
+                const x = centerX + pathRadius * Math.cos(theta - Math.PI / 2);
+                const y = centerY + pathRadius * Math.sin(theta - Math.PI / 2);
+
+                ctx.translate(x, y);
+
+                // Rotate character to match curve
+                // Normal: theta
+                // Flip: theta + PI (to point inward)
+                // Adjustment: -PI/2 is top?
+                // Existing: ctx.rotate(theta + Math.PI/2);
+                // If flip: ctx.rotate(theta - Math.PI/2);
+                const rotation = text.flip ? (theta - Math.PI / 2) : (theta + Math.PI / 2);
+                ctx.rotate(rotation);
+
                 ctx.fillText(char, 0, 0);
                 ctx.restore();
-                startAngle += charAngle;
+
+                // Advance angle
+                if (text.flip) {
+                    currentAngle -= charAngle;
+                } else {
+                    currentAngle += charAngle;
+                }
             });
             ctx.restore();
         });

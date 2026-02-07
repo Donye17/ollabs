@@ -343,6 +343,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                                                 color: '#ffffff',
                                                 rotation: 0,
                                                 align: 'center',
+                                                flip: false,
                                                 curved: true
                                             };
                                             setTextLayers([...textLayers, newText]);

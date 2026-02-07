@@ -83,19 +83,12 @@ export const TextControls: React.FC<TextControlsProps> = ({
                             ))}
                         </select>
 
-                        <div className="flex bg-slate-800 rounded-xl border border-slate-700/50 p-1">
-                            {['left', 'center', 'right'].map((align) => (
-                                <button
-                                    key={align}
-                                    onClick={() => onUpdateText(selectedText.id, { align: align as any })}
-                                    className={`flex-1 flex items-center justify-center p-1.5 rounded-lg transition-colors ${selectedText.align === align ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}
-                                >
-                                    {align === 'left' && <AlignLeft size={14} />}
-                                    {align === 'center' && <AlignCenter size={14} />}
-                                    {align === 'right' && <AlignRight size={14} />}
-                                </button>
-                            ))}
-                        </div>
+                        <button
+                            onClick={() => onUpdateText(selectedText.id, { flip: !selectedText.flip })}
+                            className={`flex flex-col items-center justify-center gap-1 p-2 rounded-xl border transition-all ${selectedText.flip ? 'bg-blue-600 border-blue-500 text-white' : 'bg-slate-800 border-slate-700/50 text-slate-400 hover:text-white hover:border-slate-600'}`}
+                        >
+                            <span className="text-[10px] font-bold uppercase tracking-wider">Flip</span>
+                        </button>
                     </div>
 
 

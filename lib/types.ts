@@ -53,4 +53,5 @@ export interface TextConfig {
   rotation: number;
   align: 'left' | 'center' | 'right';
   curved?: boolean;
+  flip?: boolean;
 }
