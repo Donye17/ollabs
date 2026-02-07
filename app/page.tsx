@@ -4,6 +4,9 @@ import { NavBar } from "@/components/NavBar";
 import { HomeClient } from "@/components/HomeClient";
 import { pool } from "@/lib/neon";
 import { PublishedFrame } from "@/components/FrameCard";
+import { MissionSection } from "@/components/landing/MissionSection";
+import { AboutSection } from "@/components/landing/AboutSection";
+import { FAQSection } from "@/components/landing/FAQSection";
 
 async function getInitialFrames() {
     try {
@@ -20,7 +23,8 @@ async function getInitialFrames() {
             ...row,
             config: typeof row.config === 'string' ? JSON.parse(row.config) : row.config,
             likes_count: parseInt(row.likes_count || '0'),
-            liked_by_user: false // Server side can't know user state easily without auth check, default false
+            liked_by_user: false,
+            created_at: new Date(row.created_at).toISOString()
         })) as PublishedFrame[];
     } catch (e) {
         console.error("Failed to fetch initial frames", e);
@@ -43,7 +47,8 @@ async function getTrendingFrames() {
             ...row,
             config: typeof row.config === 'string' ? JSON.parse(row.config) : row.config,
             likes_count: parseInt(row.likes_count || '0'),
-            liked_by_user: false
+            liked_by_user: false,
+            created_at: new Date(row.created_at).toISOString()
         })) as PublishedFrame[];
     } catch (e) {
         console.error("Failed to fetch trending frames", e);
@@ -105,12 +110,21 @@ export default async function Home() {
                 </div>
             </section>
 
+            {/* Mission Section */}
+            <MissionSection />
+
             {/* Gallery Section */}
             <section className="px-6 py-20 border-t border-white/5 bg-zinc-900/20 backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto">
                     <HomeClient initialFrames={initialFrames} initialTrendingFrames={trendingFrames} />
                 </div>
             </section>
+
+            {/* About Section */}
+            <AboutSection />
+
+            {/* FAQ Section */}
+            <FAQSection />
 
             {/* Footer */}
             <footer className="border-t border-white/5 py-12 bg-zinc-950">

@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
-import { pool } from '@/lib/neon';
+import { db } from '@/lib/db';
+import { frames } from '@/lib/db/schema';
+import { desc, eq } from 'drizzle-orm';
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -31,17 +33,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     try {
         // Fetch all public frames
         // Fetch all public frames
-        const result = await pool.query(
-            `SELECT id, created_at 
-             FROM frames 
-             WHERE is_public = true 
-             ORDER BY created_at DESC 
-             LIMIT 1000`
-        );
+        const result = await db.select({
+            id: frames.id,
+            createdAt: frames.createdAt
+        })
+            .from(frames)
+            .where(eq(frames.isPublic, true))
+            .orderBy(desc(frames.createdAt))
+            .limit(1000);
 
-        const frameRoutes: MetadataRoute.Sitemap = result.rows.map((row) => ({
+        const frameRoutes: MetadataRoute.Sitemap = result.map((row) => ({
             url: `${baseUrl}/share/${row.id}`,
-            lastModified: new Date(row.created_at),
+            lastModified: row.createdAt ? new Date(row.createdAt) : new Date(),
             changeFrequency: 'weekly',
             priority: 0.7,
         }));
