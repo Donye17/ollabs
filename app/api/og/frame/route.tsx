@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { pool } from '@/lib/neon';
 import { FrameConfig, FrameType } from '@/lib/types';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);

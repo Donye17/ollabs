@@ -85,9 +85,12 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
 
     return (
         <>
-            <div className="glass-panel rounded-2xl overflow-hidden hover:border-zinc-600 hover:shadow-xl transition-all duration-300 group flex flex-col h-full bg-zinc-900/40">
+            <div
+                className="glass-panel rounded-2xl overflow-hidden hover:border-zinc-600 hover:shadow-xl transition-all duration-300 group flex flex-col h-full bg-zinc-900/40 cursor-pointer"
+                onClick={onSelect}
+            >
                 {/* Image Container with Overlay Actions */}
-                <div className="aspect-square bg-zinc-950/50 relative flex items-center justify-center p-4 cursor-pointer overflow-hidden" onClick={onSelect}>
+                <div className="aspect-square bg-zinc-950/50 relative flex items-center justify-center p-4 overflow-hidden">
                     {/* Canvas Preview */}
                     <div className="relative w-full h-full transform group-hover:scale-105 transition-transform duration-500 ease-out">
                         {/* Primary Server-Side Image */}

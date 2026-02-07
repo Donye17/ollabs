@@ -261,9 +261,9 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             </div>
                             <button
                                 onClick={() => setIsPublishOpen(true)}
-                                className="bg-white text-zinc-950 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-zinc-200 transition-colors shadow-lg shadow-white/5"
+                                className="bg-white text-zinc-950 px-3 py-2 sm:px-4 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-zinc-200 transition-colors shadow-lg shadow-white/5"
                             >
-                                <Upload size={16} /> Publish
+                                <Upload size={16} /> <span className="hidden sm:inline">Publish</span>
                             </button>
                         </div>
 

@@ -229,9 +229,12 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
         >
             <canvas ref={canvasRef} width={CANVAS_SIZE} height={CANVAS_SIZE} className="w-full h-full object-contain pointer-events-none drop-shadow-2xl" />
             {!imageObject && !isDragOver && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 pointer-events-none">
-                    <Upload className="w-12 h-12 mb-3 opacity-50 text-slate-400" />
-                    <span className="text-sm font-bold font-heading text-slate-400 tracking-wide">Drag & Drop or Upload</span>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400 pointer-events-none p-4 text-center">
+                    <div className="w-20 h-20 rounded-2xl bg-white/5 border-2 border-dashed border-white/10 flex items-center justify-center mb-4 group-hover:border-blue-500/50 group-hover:bg-blue-500/10 transition-all duration-300">
+                        <Upload className="w-8 h-8 text-zinc-500 group-hover:text-blue-400 transition-colors" />
+                    </div>
+                    <span className="text-base font-bold text-zinc-300 tracking-wide mb-1">Start Creating</span>
+                    <span className="text-xs text-zinc-500">Drag & Drop an image here</span>
                 </div>
             )}
             {isDragOver && (
