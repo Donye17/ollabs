@@ -109,6 +109,7 @@ export const userProfiles = pgTable("user_profiles", {
 export const frames = pgTable("frames", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	creatorId: text("creator_id").notNull(),
+	parentId: uuid("parent_id"),
 	name: text().notNull(),
 	config: jsonb().notNull(),
 	isPublic: boolean("is_public").default(true),
