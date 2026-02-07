@@ -109,7 +109,7 @@ function renderSvgFrame(config: FrameConfig) {
     let stroke = color1;
     let filter = "";
 
-    if (type === 'GRADIENT' || type === 'DOUBLE' || type === 'MEMPHIS') {
+    if (type === 'GRADIENT' || type === 'DOUBLE' || type === 'MEMPHIS' || type === 'HEART' || type === 'STAR' || type === 'HEXAGON') {
         if (color2) stroke = "url(#grad1)";
     }
 

@@ -149,7 +149,7 @@ export const user = pgTable("user", {
 	location: text(),
 	website: text(),
 	socialLinks: jsonb("social_links").default({}),
-	isverified: boolean().default(false),
+	isVerified: boolean("isverified").default(false),
 }, (table) => [
 	unique("user_email_key").on(table.email),
 ]);
