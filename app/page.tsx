@@ -4,7 +4,6 @@ import { NavBar } from "@/components/NavBar";
 import { HomeClient } from "@/components/HomeClient";
 import { pool } from "@/lib/neon";
 import { PublishedFrame } from "@/components/FrameCard";
-import { MissionSection } from "@/components/landing/MissionSection";
 import { AboutSection } from "@/components/landing/AboutSection";
 import { FAQSection } from "@/components/landing/FAQSection";
 
@@ -54,21 +53,9 @@ export default async function Home() {
                 <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-violet-500/10 blur-[100px] rounded-full mix-blend-screen pointer-events-none opacity-30" />
 
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <div className="inline-flex items-center gap-2 bg-zinc-900/50 border border-white/10 px-4 py-1.5 rounded-full mb-6 backdrop-blur-md animate-fade-in">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                        </span>
-                        <span className="text-xs font-medium text-zinc-300">v2.0 Now Available</span>
-                    </div>
-
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500 animate-slide-up">
+                    <h1 className="text-5xl md:text-8xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500 animate-slide-up">
                         Free Avatar Frame Maker
                     </h1>
-
-                    <p className="text-lg md:text-xl text-zinc-400 mb-8 max-w-xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '100ms' }}>
-                        Customize, remix, and share amazing profile banners for Discord and social media.
-                    </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
                         <Link
@@ -87,11 +74,6 @@ export default async function Home() {
                     </div>
                 </div>
             </section>
-
-            {/* Mission Section - Compact Banner */}
-            <div className="relative z-10 border-y border-white/5 bg-zinc-900/30 backdrop-blur-sm">
-                <MissionSection />
-            </div>
 
             {/* Gallery Section */}
             <section className="px-6 py-16 relative z-10">

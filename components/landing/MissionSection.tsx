@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 export const MissionSection = () => {
     return (
         <section className="py-12 bg-zinc-950/50">
-            <div className="container px-4 text-center">
+            <div className="container mx-auto px-4 text-center">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
