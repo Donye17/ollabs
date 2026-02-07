@@ -53,8 +53,8 @@ export default async function Home() {
                 <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-violet-500/10 blur-[100px] rounded-full mix-blend-screen pointer-events-none opacity-30" />
 
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <h1 className="text-5xl md:text-8xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500 animate-slide-up">
-                        Free Avatar Frame Maker
+                    <h1 className="text-6xl md:text-9xl font-bold tracking-tighter mb-8 text-white animate-slide-up select-none">
+                        Ollabs.
                     </h1>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
