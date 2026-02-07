@@ -53,9 +53,13 @@ export default async function Home() {
                 <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-violet-500/10 blur-[100px] rounded-full mix-blend-screen pointer-events-none opacity-30" />
 
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <h1 className="text-6xl md:text-9xl font-bold tracking-tighter mb-8 text-white animate-slide-up select-none">
-                        Ollabs.
+                    <h1 className="text-5xl md:text-8xl font-bold tracking-tighter mb-6 text-white animate-slide-up select-none">
+                        Design without <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">Boundaries</span>
                     </h1>
+
+                    <p className="text-lg md:text-xl text-zinc-400 mb-8 max-w-2xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '100ms' }}>
+                        Ollabs gives you the power to create stunning visuals in seconds.
+                    </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
                         <Link

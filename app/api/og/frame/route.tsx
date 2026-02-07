@@ -98,10 +98,7 @@ function renderSvgFrame(config: FrameConfig) {
         pathD = `M ${center} ${center + r * 0.7} 
                  C ${center - r} ${center - r * 0.5}, ${center - r} ${center - r}, ${center} ${center - r * 0.5}
                  C ${center + r} ${center - r}, ${center + r} ${center - r * 0.5}, ${center} ${center + r * 0.7}`;
-        // Need to refine this path or just use Circle for now for safety? 
-        // Let's stick to Circle for complex shapes (Heart/Star/Hex) in V1 to ensure it renders something valid.
-        // User cares about "Image Optimization", circle is 90% of frames.
-        pathD = circlePath(radius);
+
     } else {
         pathD = circlePath(radius);
     }
