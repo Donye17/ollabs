@@ -117,8 +117,8 @@ export const Gallery: React.FC<GalleryProps> = ({
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
-            {/* Header Section */}
-            {!creatorId && !likedBy && (
+            {/* Header Section - Hide in trending-only mode to avoid duplicate titles */}
+            {viewMode === 'full' && !creatorId && !likedBy && (
                 <div className="text-center space-y-4">
                     <h2 className="text-4xl font-bold tracking-tight text-zinc-50">Community Gallery</h2>
                     <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Discover and remix designs from creators worldwide.</p>

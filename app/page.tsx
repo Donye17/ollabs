@@ -63,11 +63,11 @@ export default async function Home() {
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500 animate-slide-up">
-                        Free Avatar Frame <br /> & PFP Border Maker
+                        Free Avatar Frame Maker
                     </h1>
 
-                    <p className="text-lg md:text-xl text-zinc-400 mb-8 max-w-2xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '100ms' }}>
-                        The #1 <strong>Profile Picture Border Maker</strong>. Customize, remix, and share amazing PFP overlays for Discord, Twitter, and social media.
+                    <p className="text-lg md:text-xl text-zinc-400 mb-8 max-w-xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '100ms' }}>
+                        Customize, remix, and share amazing profile banners for Discord and social media.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
