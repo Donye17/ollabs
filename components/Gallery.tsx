@@ -218,7 +218,7 @@ export const Gallery: React.FC<GalleryProps> = ({
                 </>
             )}
 
-            {frames.length === 0 && !loading && (
+            {viewMode === 'full' && frames.length === 0 && !loading && (
                 <div className="text-center py-20 bg-zinc-900/30 backdrop-blur-sm rounded-3xl border border-white/5 border-dashed hover:border-blue-500/20 transition-all">
                     <div className="w-20 h-20 bg-zinc-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
                         <Layout className="text-zinc-600" size={40} />
