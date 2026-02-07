@@ -66,17 +66,20 @@ export default async function Home() {
     ]);
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-50 selection:bg-blue-500/30">
+        <main className="min-h-screen bg-zinc-950 text-zinc-50 selection:bg-blue-500/30 relative">
             <NavBar />
 
+            {/* Global Background Grid */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+
             {/* Hero Section */}
-            <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+            <section className="relative pt-32 pb-12 px-6 overflow-hidden">
                 {/* Background Gradients */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-blue-500/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none opacity-50" />
                 <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-violet-500/10 blur-[100px] rounded-full mix-blend-screen pointer-events-none opacity-30" />
 
                 <div className="max-w-4xl mx-auto text-center relative z-10">
-                    <div className="inline-flex items-center gap-2 bg-zinc-900/50 border border-white/10 px-4 py-1.5 rounded-full mb-8 backdrop-blur-md animate-fade-in">
+                    <div className="inline-flex items-center gap-2 bg-zinc-900/50 border border-white/10 px-4 py-1.5 rounded-full mb-6 backdrop-blur-md animate-fade-in">
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -88,7 +91,7 @@ export default async function Home() {
                         Free Avatar Frame <br /> & PFP Border Maker
                     </h1>
 
-                    <p className="text-lg md:text-xl text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '100ms' }}>
+                    <p className="text-lg md:text-xl text-zinc-400 mb-8 max-w-2xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '100ms' }}>
                         The #1 <strong>Profile Picture Border Maker</strong>. Customize, remix, and share amazing PFP overlays for Discord, Twitter, and social media.
                     </p>
 
@@ -110,11 +113,13 @@ export default async function Home() {
                 </div>
             </section>
 
-            {/* Mission Section */}
-            <MissionSection />
+            {/* Mission Section - Compact Banner */}
+            <div className="relative z-10 border-y border-white/5 bg-zinc-900/30 backdrop-blur-sm">
+                <MissionSection />
+            </div>
 
             {/* Gallery Section */}
-            <section className="px-6 py-20 border-t border-white/5 bg-zinc-900/20 backdrop-blur-sm">
+            <section className="px-6 py-16 relative z-10">
                 <div className="max-w-7xl mx-auto">
                     <HomeClient initialFrames={initialFrames} initialTrendingFrames={trendingFrames} />
                 </div>
@@ -126,39 +131,29 @@ export default async function Home() {
             {/* FAQ Section */}
             <FAQSection />
 
-            {/* Footer */}
-            <footer className="border-t border-white/5 py-12 bg-zinc-950">
-                <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-zinc-500 text-sm">
-                    <p>© 2026 Ollabs. All rights reserved.</p>
-                    <div className="flex gap-6">
-                        <Link href="/privacy" className="hover:text-zinc-300 transition-colors">Privacy Policy</Link>
-                        <Link href="/terms" className="hover:text-zinc-300 transition-colors">Terms of Service</Link>
-                    </div>
-                </div>
-            </footer>
             {/* SEO Content Block */}
-            <section className="px-6 py-12 border-t border-white/5 bg-zinc-950">
-                <div className="max-w-4xl mx-auto space-y-12 text-zinc-400">
+            <section className="px-6 py-12 border-t border-white/5 bg-zinc-950 relative z-10">
+                <div className="max-w-4xl mx-auto space-y-8 text-zinc-600">
                     <div className="space-y-4">
-                        <h2 className="text-2xl font-bold text-white font-heading">The Best Free Profile Picture Border Maker</h2>
-                        <p>
+                        <h2 className="text-lg font-bold text-zinc-500 font-heading">The Best Free Profile Picture Border Maker</h2>
+                        <p className="text-sm">
                             Ollabs is the ultimate <strong>avatar frame creator</strong> and <strong>PFP border maker</strong>. Whether you need a
                             Discord profile border, a cool Instagram story ring, or a custom Twitter NFT-style frame, our free tool makes it instant
                             and easy. No login required—just upload, customize, and download.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-8">
+                    <div className="grid md:grid-cols-2 gap-8 border-t border-white/5 pt-8">
                         <div>
-                            <h3 className="text-xl font-bold text-white mb-2">How to make a custom Discord profile border?</h3>
-                            <p className="text-sm leading-relaxed">
+                            <h3 className="text-sm font-bold text-zinc-500 mb-2">How to make a custom Discord profile border?</h3>
+                            <p className="text-xs leading-relaxed">
                                 Simply upload your profile picture to Ollabs, choose from thousands of community-made frames or design your own
                                 using our powerful editor. Add neon glows, text, and stickers, then download the transparent PNG to use on Discord.
                             </p>
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-white mb-2">Is this PFP maker free?</h3>
-                            <p className="text-sm leading-relaxed">
+                            <h3 className="text-sm font-bold text-zinc-500 mb-2">Is this PFP maker free?</h3>
+                            <p className="text-xs leading-relaxed">
                                 Yes! Ollabs is 100% free to use. You can create unlimited <strong>custom avatar frames</strong> and download them
                                 in high quality without any watermarks.
                             </p>
@@ -166,6 +161,43 @@ export default async function Home() {
                     </div>
                 </div>
             </section>
+
+            {/* Footer */}
+            <footer className="border-t border-white/5 py-16 bg-zinc-950 relative z-10">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="flex flex-col md:flex-row items-start justify-between gap-12 mb-12">
+                        <div className="max-w-xs">
+                            <h4 className="text-2xl font-bold text-white mb-4">Ollabs</h4>
+                            <p className="text-zinc-500 text-sm leading-relaxed">
+                                The open-source design tool for everyone.
+                                Built with privacy and performance in mind.
+                            </p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-8 sm:gap-16">
+                            <div>
+                                <h5 className="font-bold text-white mb-4">Product</h5>
+                                <ul className="space-y-2 text-sm text-zinc-500">
+                                    <li><Link href="/create" className="hover:text-blue-400 transition-colors">Editor</Link></li>
+                                    <li><Link href="/gallery" className="hover:text-blue-400 transition-colors">Gallery</Link></li>
+                                    <li><Link href="/features" className="hover:text-blue-400 transition-colors">Features</Link></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 className="font-bold text-white mb-4">Legal</h5>
+                                <ul className="space-y-2 text-sm text-zinc-500">
+                                    <li><Link href="/privacy" className="hover:text-blue-400 transition-colors">Privacy</Link></li>
+                                    <li><Link href="/terms" className="hover:text-blue-400 transition-colors">Terms</Link></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-600">
+                        <p>© 2026 Ollabs. All rights reserved.</p>
+                        <p>Designed for the Community.</p>
+                    </div>
+                </div>
+            </footer>
         </main>
     );
 }
