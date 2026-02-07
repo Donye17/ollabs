@@ -64,41 +64,4 @@ export const AVAILABLE_FRAMES: FrameConfig[] = [
     color1: '#34d399',
     width: 15,
   },
-  {
-    id: 'frame-memphis-pop',
-    type: FrameType.MEMPHIS,
-    name: 'Memphis Pop',
-    color1: '#facc15', // Yellow
-    color2: '#3b82f6', // Blue Shadow
-    width: 20,
-  },
-  {
-    id: 'frame-geometric-dots',
-    type: FrameType.GEOMETRIC,
-    name: 'Modern Dots',
-    color1: '#f43f5e',
-    width: 18,
-  },
-  {
-    id: 'frame-star-gold',
-    type: FrameType.STAR,
-    name: 'Super Star',
-    color1: '#fbbf24', // Amber 400
-    width: 20,
-  },
-  {
-    id: 'frame-heart-pink',
-    type: FrameType.HEART,
-    name: 'Lovely Heart',
-    color1: '#ec4899', // Pink 500
-    color2: '#f472b6', // Pink 400 (for gradient effect if supported)
-    width: 20,
-  },
-  {
-    id: 'frame-hexagon-blue',
-    type: FrameType.HEXAGON,
-    name: 'Hex Tech',
-    color1: '#1e3a8a', // Blue 900
-    width: 25,
-  },
 ];
