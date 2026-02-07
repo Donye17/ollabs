@@ -8,9 +8,10 @@ import { PublishedFrame } from "./FrameCard";
 interface HomeClientProps {
     initialFrames: PublishedFrame[];
     initialTrendingFrames: PublishedFrame[];
+    viewMode?: 'full' | 'trending-only';
 }
 
-export function HomeClient({ initialFrames, initialTrendingFrames }: HomeClientProps) {
+export function HomeClient({ initialFrames, initialTrendingFrames, viewMode = 'full' }: HomeClientProps) {
     const router = useRouter();
 
     const handleSelectFrame = (frameConfig: FrameConfig, frameId: string) => {
@@ -23,6 +24,7 @@ export function HomeClient({ initialFrames, initialTrendingFrames }: HomeClientP
             onSelectFrame={handleSelectFrame}
             initialFrames={initialFrames}
             initialTrendingFrames={initialTrendingFrames}
+            viewMode={viewMode}
         />
     );
 }

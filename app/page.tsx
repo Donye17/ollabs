@@ -8,29 +8,7 @@ import { MissionSection } from "@/components/landing/MissionSection";
 import { AboutSection } from "@/components/landing/AboutSection";
 import { FAQSection } from "@/components/landing/FAQSection";
 
-async function getInitialFrames() {
-    try {
-        const result = await pool.query(`
-            SELECT f.*, 
-            (SELECT COUNT(*) FROM frame_likes WHERE frame_id = f.id) as likes_count
-            FROM frames f 
-            WHERE f.is_public = true 
-            ORDER BY f.created_at DESC 
-            LIMIT 50
-        `);
 
-        return result.rows.map((row) => ({
-            ...row,
-            config: typeof row.config === 'string' ? JSON.parse(row.config) : row.config,
-            likes_count: parseInt(row.likes_count || '0'),
-            liked_by_user: false,
-            created_at: new Date(row.created_at).toISOString()
-        })) as PublishedFrame[];
-    } catch (e) {
-        console.error("Failed to fetch initial frames", e);
-        return [];
-    }
-}
 
 async function getTrendingFrames() {
     try {
@@ -60,10 +38,7 @@ async function getTrendingFrames() {
 export const revalidate = 3600;
 
 export default async function Home() {
-    const [initialFrames, trendingFrames] = await Promise.all([
-        getInitialFrames(),
-        getTrendingFrames()
-    ]);
+    const trendingFrames = await getTrendingFrames();
 
     return (
         <main className="min-h-screen bg-zinc-950 text-zinc-50 selection:bg-blue-500/30 relative">
@@ -121,7 +96,7 @@ export default async function Home() {
             {/* Gallery Section */}
             <section className="px-6 py-16 relative z-10">
                 <div className="max-w-7xl mx-auto">
-                    <HomeClient initialFrames={initialFrames} initialTrendingFrames={trendingFrames} />
+                    <HomeClient initialFrames={[]} initialTrendingFrames={trendingFrames} viewMode="trending-only" />
                 </div>
             </section>
 
@@ -130,37 +105,6 @@ export default async function Home() {
 
             {/* FAQ Section */}
             <FAQSection />
-
-            {/* SEO Content Block */}
-            <section className="px-6 py-12 border-t border-white/5 bg-zinc-950 relative z-10">
-                <div className="max-w-4xl mx-auto space-y-8 text-zinc-600">
-                    <div className="space-y-4">
-                        <h2 className="text-lg font-bold text-zinc-500 font-heading">The Best Free Profile Picture Border Maker</h2>
-                        <p className="text-sm">
-                            Ollabs is the ultimate <strong>avatar frame creator</strong> and <strong>PFP border maker</strong>. Whether you need a
-                            Discord profile border, a cool Instagram story ring, or a custom Twitter NFT-style frame, our free tool makes it instant
-                            and easy. No login required—just upload, customize, and download.
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-8 border-t border-white/5 pt-8">
-                        <div>
-                            <h3 className="text-sm font-bold text-zinc-500 mb-2">How to make a custom Discord profile border?</h3>
-                            <p className="text-xs leading-relaxed">
-                                Simply upload your profile picture to Ollabs, choose from thousands of community-made frames or design your own
-                                using our powerful editor. Add neon glows, text, and stickers, then download the transparent PNG to use on Discord.
-                            </p>
-                        </div>
-                        <div>
-                            <h3 className="text-sm font-bold text-zinc-500 mb-2">Is this PFP maker free?</h3>
-                            <p className="text-xs leading-relaxed">
-                                Yes! Ollabs is 100% free to use. You can create unlimited <strong>custom avatar frames</strong> and download them
-                                in high quality without any watermarks.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* Footer */}
             <footer className="border-t border-white/5 py-16 bg-zinc-950 relative z-10">
