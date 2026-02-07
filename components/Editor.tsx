@@ -141,7 +141,10 @@ export const Editor: React.FC<EditorProps> = ({
       onSelectSticker(null);
       logic.setInteractionMode('drag');
       const t = textLayers.find(tl => tl.id === hitTextId)!;
-      logic.setDragStart({ x: x - t.x, y: y - t.y });
+      // For angular drag, we need the initial angle of the mouse relative to center
+      const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+      logic.setDragStart({ x, y }); // Store raw mouse pos
+      logic.setInitialTextState({ ...t, rotation: t.rotation - angle }); // Store offset
       return;
     }
 
@@ -190,8 +193,11 @@ export const Editor: React.FC<EditorProps> = ({
     } else if (logic.interactionMode === 'drag') {
       if (selection) {
         onStickersChange(stickers.map(s => s.id === selection ? { ...s, x: x - logic.dragStart.x, y: y - logic.dragStart.y } : s));
-      } else if (selectedTextId) {
-        onTextLayersChange(textLayers.map(t => t.id === selectedTextId ? { ...t, x: x - logic.dragStart.x, y: y - logic.dragStart.y } : t));
+      } else if (selectedTextId && logic.initialTextState) {
+        // Angular Drag for Text
+        const currentAngle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+        const newRotation = currentAngle + logic.initialTextState.rotation;
+        onTextLayersChange(textLayers.map(t => t.id === selectedTextId ? { ...t, rotation: newRotation } : t));
       }
     } else if (logic.interactionMode === 'rotate' && selection) {
       onStickersChange(stickers.map(s => {
@@ -216,7 +222,7 @@ export const Editor: React.FC<EditorProps> = ({
     }
   };
 
-  const handleEnd = () => { logic.setInteractionMode('none'); logic.setInitialStickerState(null); };
+  const handleEnd = () => { logic.setInteractionMode('none'); logic.setInitialStickerState(null); logic.setInitialTextState(null); };
 
   // --- Export Logic (GIF & Image) ---
   // Updated to use the new structure

@@ -40,6 +40,7 @@ export const useEditorLogic = ({
     const [isDragOver, setIsDragOver] = useState<boolean>(false);
     // Initial state for interactions to calculate deltas
     const [initialStickerState, setInitialStickerState] = useState<{ x: number, y: number, scale: number, rotation: number } | null>(null);
+    const [initialTextState, setInitialTextState] = useState<{ x: number, y: number, rotation: number } | null>(null);
 
     // Recording State (GIF)
     const [isRecording, setIsRecording] = useState(false);
@@ -148,6 +149,7 @@ export const useEditorLogic = ({
         dragStart, setDragStart,
         isDragOver, setIsDragOver,
         initialStickerState, setInitialStickerState,
+        initialTextState, setInitialTextState,
         isRecording, setIsRecording,
         requestRef,
         startTimeRef,
