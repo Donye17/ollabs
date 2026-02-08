@@ -273,7 +273,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                                 { id: 'design', icon: Sparkles, label: 'Design' },
                                 { id: 'custom', icon: ImageIcon, label: 'Custom' },
                                 { id: 'customize', icon: Sliders, label: 'Edit' },
-                                { id: 'text', icon: Type, label: 'Text' },
+                                // Text tab removed as per user request
                                 { id: 'decor', icon: Sticker, label: 'Stickers' },
                                 { id: 'motion', icon: Clapperboard, label: 'Motion' },
                                 { id: 'preview', icon: Eye, label: 'Preview' },

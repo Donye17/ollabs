@@ -6,6 +6,7 @@ import { pool } from "@/lib/neon";
 import { PublishedFrame } from "@/components/FrameCard";
 import { AboutSection } from "@/components/landing/AboutSection";
 import { FAQSection } from "@/components/landing/FAQSection";
+import { SocialTicker } from "@/components/landing/SocialTicker";
 
 
 
@@ -78,6 +79,11 @@ export default async function Home() {
                     </div>
                 </div>
             </section>
+
+            {/* Social Proof Ticker */}
+            <div className="relative z-20 pb-12">
+                <SocialTicker />
+            </div>
 
             {/* Gallery Section */}
             <section className="px-6 py-16 relative z-10">

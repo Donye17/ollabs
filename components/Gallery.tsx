@@ -73,10 +73,19 @@ export const Gallery: React.FC<GalleryProps> = ({
         }
     }, [creatorId]);
 
+    const [sort, setSort] = useState<'trending' | 'newest' | 'top'>('trending');
+
     useEffect(() => {
         // If we have initial frames and no search/filter, don't re-fetch immediately on mount
-        // Also skip if in trending-only mode
-        if (viewMode === 'trending-only' || (initialFrames.length > 0 && !creatorId && !likedBy && !debouncedSearch && !selectedTag)) {
+        // But if viewMode is full, we might want to respect the user's sort choice if they change it.
+        // For now, initial load relies on initialFrames. If user changes sort, we re-fetch.
+        if (viewMode === 'trending-only') {
+            setLoading(false);
+            return;
+        }
+
+        // Optimization: Use initialFrames if they match the default 'trending' sort and no other filters
+        if (initialFrames.length > 0 && !creatorId && !likedBy && !debouncedSearch && !selectedTag && sort === 'trending') {
             setLoading(false);
             return;
         }
@@ -86,6 +95,7 @@ export const Gallery: React.FC<GalleryProps> = ({
             try {
                 const params = new URLSearchParams();
                 params.set('limit', '50'); // Increased limit for search
+                params.set('sort', sort);
                 if (creatorId) params.set('creator_id', creatorId);
                 if (likedBy) params.set('liked_by', likedBy);
                 if (debouncedSearch) params.set('search', debouncedSearch);
@@ -111,7 +121,7 @@ export const Gallery: React.FC<GalleryProps> = ({
         };
 
         fetchFrames();
-    }, [creatorId, likedBy, debouncedSearch, selectedTag]);
+    }, [creatorId, likedBy, debouncedSearch, selectedTag, sort]);
 
 
 
@@ -140,23 +150,38 @@ export const Gallery: React.FC<GalleryProps> = ({
                         <Layout className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" size={20} />
                     </div>
 
-                    {/* Filter Chips */}
-                    <div className="flex flex-wrap justify-center gap-2">
-                        <button
-                            onClick={() => setSelectedTag(null)}
-                            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${!selectedTag ? 'bg-white text-black' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}
-                        >
-                            All
-                        </button>
-                        {tags.map(tag => (
+                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
+                        {/* Sort Tabs */}
+                        <div className="flex p-1 bg-zinc-900 rounded-full border border-zinc-800">
+                            {(['trending', 'newest', 'top'] as const).map((s) => (
+                                <button
+                                    key={s}
+                                    onClick={() => setSort(s)}
+                                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all capitalize ${sort === s ? 'bg-zinc-800 text-white shadow-sm border border-white/10' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                >
+                                    {s}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Filter Chips */}
+                        <div className="flex flex-wrap justify-center gap-2">
                             <button
-                                key={tag}
-                                onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
-                                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${tag === selectedTag ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}
+                                onClick={() => setSelectedTag(null)}
+                                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${!selectedTag ? 'bg-white text-black' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}
                             >
-                                {tag}
+                                All
                             </button>
-                        ))}
+                            {tags.map(tag => (
+                                <button
+                                    key={tag}
+                                    onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
+                                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${tag === selectedTag ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}
+                                >
+                                    {tag}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}

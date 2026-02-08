@@ -6,10 +6,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserCircle, LogOut, Sparkles, Menu, X, MessageSquare } from 'lucide-react';
 import { NotificationBell } from './notifications/NotificationBell';
+import { Bell } from 'lucide-react';
 
 export const NavBar: React.FC = () => {
-    const { data: session } = authClient.useSession();
+    const { data: sessionData } = authClient.useSession();
+    const session = sessionData as typeof sessionData & { user: { username?: string } } | null;
     const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
     const [isSigningOut, setIsSigningOut] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathname = usePathname();
@@ -46,6 +49,7 @@ export const NavBar: React.FC = () => {
                         <button
                             className="md:hidden p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            aria-label="Toggle menu"
                         >
                             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>

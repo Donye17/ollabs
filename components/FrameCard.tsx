@@ -23,6 +23,7 @@ export interface PublishedFrame {
     preview_url?: string;
     media_type?: string;
     creator_verified?: boolean;
+    tags?: string[];
 }
 
 interface FrameCardProps {
@@ -30,11 +31,13 @@ interface FrameCardProps {
     onSelect: () => void;
 }
 
+import { FrameDetailsModal } from './FrameDetailsModal';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [showComments, setShowComments] = useState(false);
+    const [showDetails, setShowDetails] = useState(false);
     const [isLiked, setIsLiked] = useState(frame.liked_by_user);
     const [likeCount, setLikeCount] = useState(frame.likes_count || 0);
     const [isLikeLoading, setIsLikeLoading] = useState(false);
@@ -111,6 +114,13 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
                         )}
                     </div>
 
+                    {/* Pro Badge */}
+                    {frame.tags?.some((tag: string) => ['pro', 'premium', 'gold'].includes(tag.toLowerCase())) && (
+                        <div className="absolute top-3 right-3 px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-600 text-white text-[10px] font-bold tracking-wider rounded shadow-lg z-10 uppercase pointer-events-none">
+                            PRO
+                        </div>
+                    )}
+
                     {/* Dark Overlay on Hover */}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]" />
 
@@ -123,9 +133,21 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
                             <button
                                 onClick={handleLike}
                                 className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-full font-medium text-xs transition-colors backdrop-blur-md ${isLiked ? 'bg-pink-500/20 text-pink-400 border border-pink-500/30' : 'bg-white/10 text-white border border-white/10 hover:bg-white/20'}`}
+                                aria-label={isLiked ? "Unlike frame" : "Like frame"}
                             >
                                 <Heart size={14} fill={isLiked ? "currentColor" : "none"} />
                                 {likeCount}
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowDetails(true);
+                                }}
+                                className="w-10 flex items-center justify-center py-2.5 rounded-full bg-white/10 text-white border border-white/10 hover:bg-white/20 font-medium text-xs backdrop-blur-md"
+                                title="View Comments"
+                                aria-label="View comments"
+                            >
+                                <MessageSquare size={14} />
                             </button>
                             <button
                                 onClick={(e) => {
@@ -134,6 +156,7 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
                                 }}
                                 className="w-10 flex items-center justify-center py-2.5 rounded-full bg-white/10 text-white border border-white/10 hover:bg-white/20 font-medium text-xs backdrop-blur-md"
                                 title="Save to Collection"
+                                aria-label="Save to collection"
                             >
                                 <Folder size={14} />
                             </button>
@@ -170,6 +193,15 @@ export const FrameCard: React.FC<FrameCardProps> = ({ frame, onSelect }) => {
                 frameId={frame.id}
                 isOpen={showCollectionModal}
                 onClose={() => setShowCollectionModal(false)}
+            />
+
+            <FrameDetailsModal
+                frame={frame}
+                isOpen={showDetails}
+                onClose={() => setShowDetails(false)}
+                isLiked={isLiked}
+                likeCount={likeCount}
+                onLike={handleLike}
             />
         </>
     );

@@ -11,7 +11,7 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 async function getFrame(id: string) {
     try {
         const result = await pool.query(
-            `SELECT f.*, p.name as parent_name, u.isVerified as creator_verified
+            `SELECT f.*, p.name as parent_name, u.isVerified as creator_verified, u.username as creator_username
              FROM frames f 
              LEFT JOIN frames p ON f.parent_id = p.id 
              LEFT JOIN "user" u ON f.creator_id = u.id
@@ -129,20 +129,41 @@ export default async function SharePage({ params }: { params: Promise<{ id: stri
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950 pointer-events-none" />
 
             <div className="relative z-10 max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-500">
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 mb-6 shadow-lg shadow-blue-500/25">
-                        <Wand2 className="text-white w-8 h-8" />
+                <div className="text-center mb-8 relative">
+                    <div className="inline-flex items-center justify-center mb-6 relative group cursor-pointer hover:scale-105 transition-transform duration-500">
+                        {/* Frame Preview (Dynamic OG Image) */}
+                        <div className="w-64 h-64 rounded-full overflow-hidden shadow-2xl relative z-10 bg-black">
+                            <img
+                                src={`/api/og/frame?id=${frame.id}`}
+                                alt={frame.name}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        {/* Glow Effect */}
+                        <div className="absolute inset-0 bg-blue-500/30 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
                     </div>
-                    <h1 className="text-3xl font-bold text-white mb-2 font-heading">{frame.name}</h1>
-                    <p className="text-slate-400 flex items-center justify-center gap-1">
-                        Created by <span className="text-blue-400 font-medium">{frame.creator_name}</span>
-                        {frame.creator_verified && <VerifiedBadge className="text-blue-400 w-4 h-4" />}
-                    </p>
-                    {frame.parent_id && frame.parent_name && (
-                        <p className="text-xs text-slate-500 mt-2">
-                            Remixed from <Link href={`/share/${frame.parent_id}`} className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors">{frame.parent_name}</Link>
+
+                    <h1 className="text-4xl font-bold text-white mb-2 font-heading tracking-tight">{frame.name}</h1>
+
+                    <div className="flex flex-col items-center gap-2">
+                        <p className="text-zinc-400 flex items-center justify-center gap-1.5 text-lg">
+                            Created by
+                            <Link href={`/profile/${frame.creator_id}`} className="text-blue-400 font-bold hover:text-blue-300 transition-colors flex items-center gap-1">
+                                @{frame.creator_username || frame.creator_name.replace(/\s+/g, '').toLowerCase()}
+                                {frame.creator_verified && <VerifiedBadge className="text-blue-400 w-4 h-4" />}
+                            </Link>
                         </p>
-                    )}
+
+                        {frame.parent_id && frame.parent_name && (
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-full transition-colors cursor-pointer group/remix">
+                                <span className="text-xs text-zinc-500 group-hover/remix:text-zinc-400">Remixed from</span>
+                                <Link href={`/share/${frame.parent_id}`} className="flex items-center gap-1 text-xs text-blue-400 font-bold hover:text-blue-300 transition-colors">
+                                    <Wand2 size={12} />
+                                    {frame.parent_name}
+                                </Link>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="space-y-4">

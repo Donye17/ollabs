@@ -93,7 +93,11 @@ export async function GET(request: NextRequest) {
         if (sort === 'trending') {
             // Sort by likes_count DESC, recent first
             query += ` AND f.created_at > NOW() - INTERVAL '7 days' ORDER BY f.likes_count DESC, f.created_at DESC LIMIT $${paramIndex}`;
+        } else if (sort === 'top') {
+            // Top all time
+            query += ` ORDER BY f.likes_count DESC, f.created_at DESC LIMIT $${paramIndex}`;
         } else {
+            // Default to newest
             query += ` ORDER BY f.created_at DESC LIMIT $${paramIndex}`;
         }
         queryParams.push(limit);

@@ -122,7 +122,12 @@ export const frames = pgTable("frames", {
 	previewUrl: text("preview_url"),
 	mediaType: text("media_type").default('image/png'),
 }, (table) => [
-	index("idx_frames_tags").using("gin", table.tags.asc().nullsLast().op("array_ops")),
+	index("idx_frames_tags").using("gin", table.tags),
+	index("idx_frames_is_public").using("btree", table.isPublic.desc().nullsLast()),
+	index("idx_frames_created_at").using("btree", table.createdAt.desc().nullsLast()),
+	index("idx_frames_likes_count").using("btree", table.likesCount.desc().nullsLast()),
+	index("idx_frames_views_count").using("btree", table.viewsCount.desc().nullsLast()),
+	index("idx_frames_creator_id").using("btree", table.creatorId.asc().nullsLast()),
 ]);
 
 export const verification = pgTable("verification", {
@@ -140,6 +145,7 @@ export const verification = pgTable("verification", {
 export const user = pgTable("user", {
 	id: text().primaryKey().notNull(),
 	name: text().notNull(),
+	username: text().unique(),
 	email: text().notNull(),
 	emailVerified: boolean().notNull(),
 	image: text(),

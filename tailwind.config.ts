@@ -20,6 +20,7 @@ const config: Config = {
                 'slide-up': 'slide-up 0.5s ease-out',
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
+                marquee: "marquee 40s linear infinite",
             },
             keyframes: {
                 'fade-in': {
@@ -37,6 +38,10 @@ const config: Config = {
                 "accordion-up": {
                     from: { height: "var(--radix-accordion-content-height)" },
                     to: { height: "0" },
+                },
+                marquee: {
+                    from: { transform: "translateX(0)" },
+                    to: { transform: "translateX(-50%)" },
                 },
             },
         },

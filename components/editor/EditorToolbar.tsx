@@ -137,7 +137,9 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                                     setScale(val);
                                 }
                             }}
-                            className={`flex-1 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-indigo-500'}`} />
+                            className={`flex-1 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-indigo-500'}`}
+                            aria-label="Zoom level"
+                        />
                         <ZoomIn size={16} className="text-slate-500" />
                     </div>
 
@@ -154,7 +156,9 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                                     setRotation(val);
                                 }
                             }}
-                            className={`flex-1 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-purple-500'}`} />
+                            className={`flex-1 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-purple-500'}`}
+                            aria-label="Rotation angle"
+                        />
                         <span className="text-[10px] w-8 text-right font-mono text-slate-400">{selection ? (stickers.find(s => s.id === selection)?.rotation || 0) : rotation}°</span>
                     </div>
 
