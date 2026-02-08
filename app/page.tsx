@@ -14,17 +14,17 @@ async function getTrendingFrames() {
     try {
         const result = await pool.query(`
             SELECT f.*, 
-            (SELECT COUNT(*) FROM frame_likes WHERE frame_id = f.id) as likes_count
+            (SELECT COUNT(*) FROM frame_likes WHERE frame_id = f.id) as real_likes_count
             FROM frames f 
             WHERE f.is_public = true AND f.created_at > NOW() - INTERVAL '7 days'
-            ORDER BY likes_count DESC, f.created_at DESC 
+            ORDER BY real_likes_count DESC, f.created_at DESC 
             LIMIT 4
         `);
 
         return result.rows.map((row) => ({
             ...row,
             config: typeof row.config === 'string' ? JSON.parse(row.config) : row.config,
-            likes_count: parseInt(row.likes_count || '0'),
+            likes_count: parseInt(row.real_likes_count || row.likes_count || '0'),
             liked_by_user: false,
             created_at: new Date(row.created_at).toISOString()
         })) as PublishedFrame[];

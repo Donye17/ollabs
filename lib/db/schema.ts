@@ -134,12 +134,12 @@ export const verification = pgTable("verification", {
 	id: text().primaryKey().notNull(),
 	identifier: text().notNull(),
 	value: text().notNull(),
-	expiresAt: timestamp("expires_at", { mode: 'string' }),
+	expiresAt: timestamp("expiresAt", { mode: 'string' }),
 	// createdAt: timestamp("created_at", { mode: 'string' }),
 	// updatedAt: timestamp("updated_at", { mode: 'string' }),
 	// expiresAt: timestamp({ withTimezone: true, mode: 'string' }),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	createdAt: timestamp("createdAt", { withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp("updatedAt", { withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 export const user = pgTable("user", {

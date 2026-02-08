@@ -14,24 +14,23 @@ async function main() {
         `);
         const columns = check.rows.map(r => r.column_name);
 
-        if (columns.includes('createdAt')) {
-            console.log("Renaming createdAt -> created_at");
-            await client.query('ALTER TABLE verification RENAME COLUMN "createdAt" TO created_at');
+        if (columns.includes('created_at')) {
+            console.log("Renaming created_at -> createdAt");
+            await client.query('ALTER TABLE verification RENAME COLUMN created_at TO "createdAt"');
         } else {
-            console.log("createdAt not found (already renamed?)");
+            console.log("created_at not found");
         }
 
-        if (columns.includes('updatedAt')) {
-            console.log("Renaming updatedAt -> updated_at");
-            await client.query('ALTER TABLE verification RENAME COLUMN "updatedAt" TO updated_at');
+        if (columns.includes('updated_at')) {
+            console.log("Renaming updated_at -> updatedAt");
+            await client.query('ALTER TABLE verification RENAME COLUMN updated_at TO "updatedAt"');
         } else {
-            console.log("updatedAt not found (already renamed?)");
+            console.log("updated_at not found");
         }
 
-        // Also ensure expiresAt -> expires_at if mixed
-        if (columns.includes('expiresAt')) {
-            console.log("Renaming expiresAt -> expires_at");
-            await client.query('ALTER TABLE verification RENAME COLUMN "expiresAt" TO expires_at');
+        if (columns.includes('expires_at')) {
+            console.log("Renaming expires_at -> expiresAt");
+            await client.query('ALTER TABLE verification RENAME COLUMN expires_at TO "expiresAt"');
         }
 
         console.log("Schema fix complete.");
