@@ -27,9 +27,52 @@ export async function GET(request: Request) {
                     height: '100%',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: 'transparent',
+                    backgroundColor: '#18181b', // zinc-900 background for better contrast
+                    position: 'relative',
                 }}>
+                    {/* Render Frame */}
                     {renderSvgFrame(config)}
+
+                    {/* Render Stickers */}
+                    {config.stickers?.map((sticker, index) => {
+                        const size = 400; // OG Image Size must match below
+                        const scale = size / 1024; // Canvas is 1024
+                        const sSize = 48 * sticker.scale * scale; // Base size 48 scaled down
+
+                        // Icon source: generic name map or direct URL
+                        // We need to resolve the icon name to SVG if it's not a URL
+                        let src = sticker.icon;
+                        if (!src.startsWith('http') && !src.startsWith('data:')) {
+                            // Fallback to a simple circle or valid URL if we can't import utils here effectively (runtime: nodejs)
+                            // But we can just use a known CDN for standard icons or inline SVG data uri if possible
+                            // For now, let's assume it's data URI (flags) or skip.
+                            // If it's a known icon name like 'zap', we need the SVG string as data URI.
+                            // We can strictly replicate getIconSvg map here or assume valid data URI for flags.
+                            // Since our flags are data URIs, this is fine.
+                            // For standard icons, we might show broken image if we don't map them.
+                            // Let's copy basic map for safety.
+                            const map: any = {
+                                'verified': `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="%233b82f6" stroke="white" stroke-width="2"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.78 4.78 4 4 0 0 1-6.74 0 4 4 0 0 1-4.78-4.78 4 4 0 0 1 0-6.74Z"/><path d="m9 12 2 2 4-4"/></svg>`,
+                                'zap': `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="%23eab308" stroke="white" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+                            };
+                            src = map[sticker.icon] || map['verified'];
+                        }
+
+                        return (
+                            <img
+                                key={sticker.id}
+                                src={src}
+                                width={sSize}
+                                height={sSize}
+                                style={{
+                                    position: 'absolute',
+                                    left: (size / 2) + (sticker.x * scale) - (sSize / 2),
+                                    top: (size / 2) + (sticker.y * scale) - (sSize / 2),
+                                    transform: `rotate(${sticker.rotation}deg)`,
+                                }}
+                            />
+                        );
+                    })}
                 </div>
             ),
             {
