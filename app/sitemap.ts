@@ -40,14 +40,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             .from(frames)
             .where(eq(frames.isPublic, true))
             .orderBy(desc(frames.createdAt))
-            .limit(1000);
+            .limit(5000);
 
-        const frameRoutes: MetadataRoute.Sitemap = result.map((row) => ({
-            url: `${baseUrl}/share/${row.id}`,
-            lastModified: row.createdAt ? new Date(row.createdAt) : new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.7,
-        }));
+        const frameRoutes: MetadataRoute.Sitemap = result.flatMap((row) => [
+            {
+                url: `${baseUrl}/share/${row.id}`,
+                lastModified: row.createdAt ? new Date(row.createdAt) : new Date(),
+                changeFrequency: 'weekly',
+                priority: 0.6,
+            },
+            {
+                url: `${baseUrl}/create?id=${row.id}`,
+                lastModified: row.createdAt ? new Date(row.createdAt) : new Date(),
+                changeFrequency: 'monthly',
+                priority: 0.8,
+            }
+        ]);
 
         return [...routes, ...frameRoutes];
     } catch (e) {
