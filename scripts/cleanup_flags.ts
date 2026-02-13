@@ -15,9 +15,8 @@ async function main() {
     try {
         const result = await pool.query(
             `DELETE FROM frames 
-             WHERE creator_name = 'FlagMaster2026' 
-             AND 'flag' = ANY(tags)
-             RETURNING id, name`
+             WHERE name LIKE '%Flag%'
+             RETURNING id, name, creator_name, created_at, tags`
         );
 
         console.log(`Deleted ${result.rows.length} frames.`);

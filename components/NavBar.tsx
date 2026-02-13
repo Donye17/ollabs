@@ -65,12 +65,7 @@ export const NavBar: React.FC = () => {
                                         >
                                             Create
                                         </Link>
-                                        <Link
-                                            href="/create/avatar"
-                                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 border ${isActive('/create/avatar') ? activeClass : inactiveClass}`}
-                                        >
-                                            Avatars <span className="ml-1 text-[10px] bg-blue-600 px-1 rounded text-white font-bold">NEW</span>
-                                        </Link>
+
                                         <Link
                                             href="/gallery"
                                             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 border ${isActive('/gallery') ? activeClass : inactiveClass}`}

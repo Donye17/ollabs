@@ -109,7 +109,7 @@ async function main() {
             creator_id: userId,
             creator_name: name,
             is_public: true,
-            tags: ['flag', 'country', country.name.toLowerCase()],
+            tags: ['flag', 'country', 'Olympics', country.name.toLowerCase()],
             config: {
                 id: `flag-${country.code}`,
                 type: 'SOLID',
@@ -142,14 +142,14 @@ async function main() {
                 console.error(`✗ Failed ${country.name}:`, res.status, await res.text());
             }
         } catch (e) {
-            console.error(`Error creating ${country.name}:`, e);
+            console.error(`Error processing ${country.name}:`, e);
         }
 
         // Delay to be nice
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 1500));
     }
 
     console.log('Done.');
 }
 
-main();
+main().catch(err => console.error("Fatal Error:", err));
