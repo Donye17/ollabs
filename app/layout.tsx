@@ -17,7 +17,7 @@ export const metadata: Metadata = {
         default: 'Ollabs - Best Free Avatar Frame Creator & PFP Border Maker',
     },
     description: 'The #1 free tool to create custom avatar frames, profile picture borders, and PFP overlays for Discord, Twitter, Instagram, and TikTok. No login required.',
-    keywords: ['avatar frame creator', 'profile picture border maker', 'discord profile border', 'pfp border maker', 'circle crop', 'custom pfp', 'frame generator'],
+    keywords: ['avatar frame creator', 'profile picture border maker', 'discord profile border', 'pfp border maker', 'circle crop', 'custom pfp', 'frame generator', 'Olympics', 'Country Flags', 'Team Support', 'Flag Overlay'],
     openGraph: {
         type: 'website',
         locale: 'en_US',

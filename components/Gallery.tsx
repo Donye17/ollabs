@@ -47,7 +47,8 @@ export const Gallery: React.FC<GalleryProps> = ({
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
-    const tags = ["Cyberpunk", "Retro", "Minimal", "Nature", "Neon", "Abstract"];
+    // Updated tags list
+    const tags = ["Olympics", "Cyberpunk", "Retro", "Minimal", "Nature", "Neon", "Abstract"];
 
     // Fetch Trending (Only on main gallery)
     useEffect(() => {
@@ -132,6 +133,28 @@ export const Gallery: React.FC<GalleryProps> = ({
                 <div className="text-center space-y-4">
                     <h2 className="text-4xl font-bold tracking-tight text-zinc-50">Community Gallery</h2>
                     <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Discover and remix designs from creators worldwide.</p>
+                </div>
+            )}
+
+            {/* Olympics Banner */}
+            {viewMode === 'full' && !creatorId && !likedBy && !selectedTag && (
+                <div className="mx-auto max-w-4xl bg-gradient-to-r from-blue-900/50 to-red-900/50 rounded-2xl p-1 shadow-lg border border-white/10 relative overflow-hidden group hover:border-white/20 transition-all cursor-pointer" onClick={() => setSelectedTag("Olympics")}>
+                    {/* Background Glow */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-transparent to-red-500/10 opacity-50 group-hover:opacity-100 transition-opacity" />
+
+                    <div className="bg-zinc-950/90 rounded-xl p-6 relative flex items-center justify-between gap-6 backdrop-blur-sm">
+                        <div className="space-y-2">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-xs font-bold uppercase tracking-wider">
+                                <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />
+                                Special Event
+                            </div>
+                            <h3 className="text-2xl font-bold text-white">Support Your Team</h3>
+                            <p className="text-zinc-400 text-sm max-w-md">The Games are here! Add your country's flag to your profile picture and show your support.</p>
+                        </div>
+                        <button className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-white text-black font-bold rounded-lg hover:bg-zinc-200 transition-colors shadow-lg shadow-white/5">
+                            Browse Flags
+                        </button>
+                    </div>
                 </div>
             )}
 

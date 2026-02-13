@@ -122,6 +122,19 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             }
         };
         loadInitialFrame();
+
+        // Check for imported avatar from Avatar Builder
+        const imported = sessionStorage.getItem('imported_avatar');
+        if (imported) {
+            setImageSrc(imported);
+            sessionStorage.removeItem('imported_avatar');
+            // Clean up URL param if present
+            if (window.location.search.includes('source=avatar_builder')) {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('source');
+                window.history.replaceState({}, '', url.toString());
+            }
+        }
     }, [remixId, session]); // Added session to dependencies
 
 

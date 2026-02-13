@@ -115,38 +115,12 @@ async function main() {
                 type: 'SOLID',
                 name: `${country.name} Flag`,
                 color1: '#ffffff',
-                width: 20,
-                stickers: [
-                    {
-                        id: `sticker-flag-${country.code}`,
-                        icon: base64Image,
-                        x: 0,
-                        y: 180, // Bottom center
-                        scale: 1.0,
-                        rotation: 0
-                    }
-                ],
-                textLayers: [
-                    {
-                        id: `text-${country.code}`,
-                        text: country.name.toUpperCase(),
-                        x: 0,
-                        y: 280, // Below the flag
-                        fontSize: 48,
-                        fontFamily: 'Inter',
-                        color: '#000000',
-                        rotation: 0,
-                        align: 'center',
-                        curved: true
-                    }
-                ]
+                width: 25, // Slightly thicker for flag texture
+                imageUrl: base64Image, // Apply flag as texture
+                stickers: [], // No stickers
+                textLayers: [] // No text
             },
-            preview_url: null, // Let the frontend generate preview later? OR use base64?
-            // Sending base64 as preview_url might be too heavy for listing calls if not optimized.
-            // Better to leave null and let the renderer handle it or rely on dynamic generation.
-            // Actually, 'preview_url' is used in the gallery. passing null might show broken image.
-            // But 'config' has the image. 
-            // Let's rely on the gallery rendering 'config' if preview_url is null (HomeClient logic).
+            preview_url: null,
             media_type: 'image/png'
         };
 
