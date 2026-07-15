@@ -68,15 +68,6 @@ export async function GET(request: NextRequest) {
             // Updated to search name, description, and tags
             query += ` AND (f.name ILIKE $${paramIndex} OR f.description ILIKE $${paramIndex} OR f.tags @> $${paramIndex + 1} OR f.tags::text ILIKE $${paramIndex})`;
             queryParams.push(`%${search}%`);
-            // For simple text search in tags, we can use the text cast, but @> expects an array literal which is hard with partial matches
-            // Actually, for partial search in tags (scanned as text), filtering by text cast is easiest for "contains substring" logic
-            // But let's keep it simple: Name OR Description OR Tag (Array Match) is tricky with partials.
-            // Let's just do Name OR Description OR Tags cast to text (for partial match like 'eo' in 'neon')
-
-            // Re-doing the query logic for cleaner parameters:
-            // We use $paramIndex for '%search%'
-            // We'll use a separate param for the array check if we wanted exact match, but for a general "search box" partial match is usually expected.
-            // So: name ILIKE %s% OR description ILIKE %s% OR tags::text ILIKE %s%
         }
 
         if (tag) {
@@ -91,8 +82,9 @@ export async function GET(request: NextRequest) {
         }
 
         if (sort === 'trending') {
-            // Sort by likes_count DESC, recent first
-            query += ` AND f.created_at > NOW() - INTERVAL '7 days' ORDER BY f.likes_count DESC, f.created_at DESC LIMIT $${paramIndex}`;
+            // Recency-weighted popularity (gravity score). Favors fresh, well-liked frames
+            // but never hard-excludes older ones, so the gallery is never empty on a quiet day.
+            query += ` ORDER BY (f.likes_count + 1) / POWER(EXTRACT(EPOCH FROM (NOW() - f.created_at)) / 3600.0 + 2, 1.5) DESC, f.created_at DESC LIMIT $${paramIndex}`;
         } else if (sort === 'top') {
             // Top all time
             query += ` ORDER BY f.likes_count DESC, f.created_at DESC LIMIT $${paramIndex}`;
@@ -138,12 +130,12 @@ export async function POST(request: NextRequest) {
             try {
                 // 1. Get parent frame creator
                 const parentResult = await pool.query(
-                    'SELECT created_by, name FROM frames WHERE id = $1',
+                    'SELECT creator_id, name FROM frames WHERE id = $1',
                     [parent_id]
                 );
 
                 if (parentResult.rows.length > 0) {
-                    const originalCreatorId = parentResult.rows[0].created_by;
+                    const originalCreatorId = parentResult.rows[0].creator_id;
                     const originalFrameName = parentResult.rows[0].name;
 
                     // 2. Insert notification if not self-remix
