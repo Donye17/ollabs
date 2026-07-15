@@ -41,9 +41,6 @@ const BORDER_STYLES = [
   { type: FrameType.NEON, label: 'Neon' },
   { type: FrameType.GRADIENT, label: 'Gradient' },
   { type: FrameType.MEMPHIS, label: 'Shadow' },
-  { type: FrameType.STAR, label: 'Star' },
-  { type: FrameType.HEART, label: 'Heart' },
-  { type: FrameType.HEXAGON, label: 'Hexagon' },
 ];
 
 export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
@@ -68,7 +65,7 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
   const handleTypeChange = (type: FrameType) => {
     // If switching to a type that needs a secondary color but doesn't have one, provide a default
     let color2 = frame.color2;
-    if (!color2 && (type === FrameType.GRADIENT || type === FrameType.NEON || type === FrameType.DOUBLE || type === FrameType.MEMPHIS || type === FrameType.HEART)) {
+    if (!color2 && (type === FrameType.GRADIENT || type === FrameType.NEON || type === FrameType.DOUBLE || type === FrameType.MEMPHIS)) {
       color2 = '#ffffff';
     }
     onChange({ ...frame, type, color2 });
@@ -77,8 +74,7 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
   const hasSecondaryColor = frame.type === FrameType.GRADIENT ||
     frame.type === FrameType.NEON ||
     frame.type === FrameType.DOUBLE ||
-    frame.type === FrameType.MEMPHIS ||
-    frame.type === FrameType.HEART;
+    frame.type === FrameType.MEMPHIS;
 
   return (
     <div className="bg-slate-800/30 p-4 rounded-2xl border border-slate-700/50 space-y-4">
