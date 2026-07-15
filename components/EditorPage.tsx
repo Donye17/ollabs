@@ -244,14 +244,14 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         {/* Creator Header */}
                         <div className="flex items-center justify-between px-2">
                             <div>
-                                <h1 className="text-2xl font-black text-white tracking-tight">Studio</h1>
-                                <p className="text-xs text-zinc-400 font-medium">Create & Share Templates</p>
+                                <h1 className="text-2xl font-black text-white tracking-tight">Campaign builder</h1>
+                                <p className="text-xs text-zinc-400 font-medium">Design your frame, then share one link.</p>
                             </div>
                             <button
                                 onClick={() => setIsPublishOpen(true)}
                                 className="bg-white text-zinc-950 px-3 py-2 sm:px-4 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-zinc-200 transition-colors shadow-lg shadow-white/5"
                             >
-                                <Upload size={16} /> <span className="hidden sm:inline">Publish</span>
+                                <Upload size={16} /> <span className="hidden sm:inline">Create campaign</span>
                             </button>
                         </div>
 

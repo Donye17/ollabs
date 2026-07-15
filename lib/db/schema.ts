@@ -206,3 +206,35 @@ export const likes = pgTable("likes", {
 }, (table) => [
 	primaryKey({ columns: [table.userId, table.frameId], name: "likes_pkey" }),
 ]);
+
+export const campaigns = pgTable("campaigns", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	slug: text().notNull(),
+	title: text().notNull(),
+	description: text(),
+	frameConfig: jsonb("frame_config").notNull(),
+	creatorId: text("creator_id"),
+	creatorName: text("creator_name").default('Anonymous'),
+	supporterCount: integer("supporter_count").default(0),
+	isPublic: boolean("is_public").default(true),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("idx_campaigns_slug").using("btree", table.slug.asc().nullsLast()),
+	index("idx_campaigns_created_at").using("btree", table.createdAt.desc().nullsLast()),
+	unique("campaigns_slug_key").on(table.slug),
+]);
+
+export const campaignUses = pgTable("campaign_uses", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	campaignId: uuid("campaign_id").notNull(),
+	userId: text("user_id"),
+	imageUrl: text("image_url"),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("idx_campaign_uses_campaign_id").using("btree", table.campaignId.asc().nullsLast()),
+	foreignKey({
+		columns: [table.campaignId],
+		foreignColumns: [campaigns.id],
+		name: "campaign_uses_campaign_id_fkey"
+	}).onDelete("cascade"),
+]);
