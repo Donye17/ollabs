@@ -5,13 +5,11 @@ import { FrameSelector } from './FrameSelector';
 import { FrameCustomizer } from './FrameCustomizer';
 import { CustomFramePanel } from './CustomFramePanel';
 import { ContactPreview } from './ContactPreview';
-import { StickerControls } from './StickerControls';
 import { TextControls } from './TextControls';
-import { MotionControls } from './MotionControls';
 import { NavBar } from '@/components/NavBar';
 import { AVAILABLE_FRAMES } from '@/lib/constants';
 import { FrameConfig, StickerConfig, TextConfig, MotionEffect } from '@/lib/types';
-import { AlertCircle, Sparkles, Sliders, Eye, Type, Sticker, Clapperboard, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
+import { AlertCircle, Sparkles, Sliders, Eye, Type, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
 import { OnboardingOverlay } from './editor/OnboardingOverlay';
 import { removeBackground } from "@imgly/background-removal";
@@ -52,7 +50,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     };
 
 
-    const [activeTab, setActiveTab] = useState<'design' | 'custom' | 'customize' | 'text' | 'decor' | 'motion' | 'preview'>('design');
+    const [activeTab, setActiveTab] = useState<'design' | 'custom' | 'customize' | 'text' | 'preview'>('design');
     const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(!!remixId);
 
@@ -186,29 +184,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const handleFrameUpdate = (updatedFrame: FrameConfig) => addToHistory(updatedFrame);
     const handlePreviewUpdate = useCallback((dataUrl: string) => setPreviewDataUrl(dataUrl), []);
 
-    // Handlers for controls
-    const handleAddSticker = (icon: string) => {
-        setStickers(prev => [
-            ...prev,
-            {
-                id: Date.now().toString(),
-                icon: icon,
-                x: 0,
-                y: 0,
-                scale: 1,
-                rotation: 0
-            }
-        ]);
-    };
-
-    const handleUpdateSticker = (id: string, updates: Partial<StickerConfig>) => {
-        setStickers(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
-    };
-
-    const handleDeleteSticker = (id: string) => {
-        setStickers(prev => prev.filter(s => s.id !== id));
-        if (selection === id) setSelection(null);
-    };
 
 
     if (isLoading) {
@@ -287,8 +262,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                                 { id: 'custom', icon: ImageIcon, label: 'Custom' },
                                 { id: 'customize', icon: Sliders, label: 'Edit' },
                                 // Text tab removed as per user request
-                                { id: 'decor', icon: Sticker, label: 'Stickers' },
-                                { id: 'motion', icon: Clapperboard, label: 'Motion' },
                                 { id: 'preview', icon: Eye, label: 'Preview' },
                             ].map((tab) => (
                                 <button
@@ -378,34 +351,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                                 </div>
                             )}
 
-                            {activeTab === 'decor' && (
-                                <div className="space-y-4 animate-fade-in">
-                                    <StickerControls
-                                        stickers={stickers}
-                                        selectedStickerId={selection}
-                                        onAddSticker={handleAddSticker}
-                                        onUpdateSticker={handleUpdateSticker}
-                                        onDeleteSticker={handleDeleteSticker}
-                                        onSelectSticker={(id) => {
-                                            setSelection(id);
-                                            setSelectedTextId(null);
-                                        }}
-                                    />
-                                </div>
-                            )}
-
-                            {activeTab === 'motion' && (
-                                <div className="space-y-4 animate-fade-in">
-                                    <MotionControls
-                                        currentEffect={motionEffect}
-                                        setEffect={setMotionEffect}
-                                        isRecording={false} // Loading state not lifted fully, maybe todo
-                                        onExport={() => editorRef.current?.exportGif()}
-                                        isPlaying={isPlaying}
-                                        onTogglePlay={() => setIsPlaying(!isPlaying)}
-                                    />
-                                </div>
-                            )}
 
                             {activeTab === 'preview' && (
                                 <div className="space-y-4 animate-fade-in flex flex-col items-center justify-center h-full">
