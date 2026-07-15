@@ -1,7 +1,5 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,9 +47,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'title and frameConfig are required' }, { status: 400 });
         }
 
-        const session = await auth.api.getSession({ headers: await headers() });
-        const creatorId = session?.user?.id ?? null;
-        const creatorName = session?.user?.name ?? 'Anonymous';
+        // Anonymous-first: campaigns are created without an account.
+        const creatorId = null;
+        const creatorName = 'Anonymous';
 
         const baseSlug = slugify(title);
 

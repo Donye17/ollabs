@@ -1,7 +1,5 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,13 +26,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             // no body is fine
         }
 
-        const session = await auth.api.getSession({ headers: await headers() });
-        const userId = session?.user?.id ?? null;
-
         await pool.query(
             `INSERT INTO campaign_uses (campaign_id, user_id, image_url, created_at)
              VALUES ($1, $2, $3, NOW())`,
-            [campaignId, userId, imageUrl]
+            [campaignId, null, imageUrl]
         );
 
         const updated = await pool.query(

@@ -30,3 +30,6 @@ dist-ssr
 out/
 build/
 .vercel/
+
+# TypeScript build cache
+tsconfig.tsbuildinfo

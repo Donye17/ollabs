@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Download, Upload, ZoomIn, ZoomOut, RefreshCcw, RotateCw, User, Loader2, Sparkles, Maximize } from 'lucide-react';
 import { StickerConfig, TextConfig } from '@/lib/types';
-import { authClient } from '@/lib/auth-client';
-import { upload } from '@vercel/blob/client';
 
 interface EditorToolbarProps {
     canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -40,36 +38,9 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     isRemovingBackground,
     onDownload
 }) => {
-    const { data: session } = authClient.useSession();
-    const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) onImageSelect(file);
-    };
-
-    const handleSetProfile = async () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        setIsUpdatingProfile(true);
-        try {
-            const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png', 0.8));
-            if (!blob) throw new Error("Canvas conversion failed");
-
-            const { url } = await upload(`profile-${Date.now()}.png`, blob, {
-                access: 'public',
-                handleUploadUrl: '/api/upload',
-            });
-
-            // @ts-ignore
-            await authClient.updateUser({ image: url });
-            alert("Profile picture updated!");
-        } catch (e) {
-            console.error("Upload failed", e);
-            alert("Failed to update profile picture. Ensure you are logged in.");
-        } finally {
-            setIsUpdatingProfile(false);
-        }
     };
 
     return (
@@ -86,14 +57,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
             {imageObject && (
                 <div className="flex gap-3 justify-center w-full px-4">
-                    {session && (
-                        <button onClick={handleSetProfile}
-                            disabled={isUpdatingProfile}
-                            className="flex-1 flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 text-white py-3.5 px-6 rounded-xl transition-all font-bold border border-transparent hover:border-purple-400 shadow-lg shadow-purple-900/20 disabled:opacity-50 hover:-translate-y-0.5">
-                            {isUpdatingProfile ? <Loader2 size={20} className="animate-spin" /> : <User size={20} />}
-                            <span>Set Profile</span>
-                        </button>
-                    )}
                     <button onClick={onDownload} className="flex-1 flex items-center justify-center gap-2 bg-slate-800/80 hover:bg-slate-700/80 backdrop-blur-md text-white py-3.5 px-6 rounded-xl transition-all font-bold border border-white/5 hover:border-white/10 hover:-translate-y-0.5">
                         <Download size={20} /> <span>Save</span>
                     </button>

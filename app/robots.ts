@@ -4,8 +4,8 @@ export default function robots(): MetadataRoute.Robots {
     return {
         rules: {
             userAgent: '*',
-            allow: ['/', '/create', '/share'],
-            disallow: ['/private/', '/admin'],
+            allow: ['/', '/create', '/c'],
+            disallow: ['/api/'],
         },
         sitemap: 'https://ollabs.studio/sitemap.xml',
     };
