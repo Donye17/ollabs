@@ -300,62 +300,32 @@ export class ImageFrameRenderer extends CircleRenderer {
     private imageCache: HTMLImageElement | null = null;
     private lastImageUrl: string | null = null;
 
-    protected applyStyle(context: RenderContext): void {
-        const { ctx, frame } = context;
+    drawFrame(context: RenderContext): void {
+        const { ctx, frame, centerX, centerY, radius } = context;
 
         if (!frame.imageUrl) {
-            // Fallback to dashed placeholder if no image
-            const scale = context.radius / (CANVAS_SIZE / 2);
-            const lineWidth = frame.width * 2 * scale;
-            ctx.setLineDash([5, 5]);
-            ctx.strokeStyle = '#cbd5e1'; // Light slate
+            // No design uploaded yet: show the default ring as a placeholder.
+            super.drawFrame(context);
             return;
         }
 
-        // Cache Handling
         if (this.lastImageUrl !== frame.imageUrl) {
-            this.imageCache = null;
             this.lastImageUrl = frame.imageUrl;
+            this.imageCache = null;
             const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => { this.imageCache = img; };
             img.src = frame.imageUrl;
-            img.onload = () => {
-                this.imageCache = img;
-            };
         }
 
-        if (this.imageCache && this.imageCache.complete) {
-            const pattern = ctx.createPattern(this.imageCache, 'no-repeat');
-            if (pattern) {
-                const diameter = context.radius * 2;
-
-                // Calculate scale to cover the frame diameter
-                // We use Math.max to ensure it covers the larger dimension (aspect fill)
-                const scaleX = diameter / this.imageCache.width;
-                const scaleY = diameter / this.imageCache.height;
-                const scale = Math.max(scaleX, scaleY);
-
-                const matrix = new DOMMatrix();
-
-                // Align pattern origin to the frame bounding box
-                const x = context.centerX - context.radius;
-                const y = context.centerY - context.radius;
-
-                // Center the image within the bounding box if aspect ratios differ
-                // (Optional polish: calculate offsets to center crop)
-
-                matrix.translateSelf(x, y);
-                matrix.scaleSelf(scale, scale);
-
-                pattern.setTransform(matrix);
-
-                ctx.strokeStyle = pattern;
-                // Ensure solid line
-                ctx.setLineDash([]);
-            }
-        } else {
-            // Loading state
-            ctx.setLineDash([2, 2]);
-            ctx.strokeStyle = '#94a3b8';
+        const img = this.imageCache;
+        if (img && img.complete && img.naturalWidth > 0) {
+            // Overlay the uploaded design across the whole circle, preserving transparency
+            // so the photo shows through wherever the design is cut out.
+            const d = radius * 2;
+            ctx.save();
+            ctx.drawImage(img, centerX - radius, centerY - radius, d, d);
+            ctx.restore();
         }
     }
 }

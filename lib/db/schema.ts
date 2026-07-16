@@ -216,6 +216,7 @@ export const campaigns = pgTable("campaigns", {
 	creatorId: text("creator_id"),
 	creatorName: text("creator_name").default('Anonymous'),
 	supporterCount: integer("supporter_count").default(0),
+	previewUrl: text("preview_url"),
 	isPublic: boolean("is_public").default(true),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [

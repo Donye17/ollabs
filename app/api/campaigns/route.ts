@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { title, description, frameConfig, isPublic } = body;
+        const { title, description, frameConfig, isPublic, previewUrl } = body;
 
         if (!title || !frameConfig) {
             return NextResponse.json({ error: 'title and frameConfig are required' }, { status: 400 });
@@ -58,10 +58,10 @@ export async function POST(request: NextRequest) {
             const slug = `${baseSlug}-${randomSuffix()}`;
             try {
                 const result = await pool.query(
-                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, created_at)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, created_at)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
                      RETURNING id, slug, title, supporter_count, created_at`,
-                    [slug, title, description ?? null, JSON.stringify(frameConfig), creatorId, creatorName, isPublic !== false]
+                    [slug, title, description ?? null, JSON.stringify(frameConfig), creatorId, creatorName, isPublic !== false, previewUrl ?? null]
                 );
                 campaign = result.rows[0];
                 break;

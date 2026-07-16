@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { X, Check, Loader2, Copy, ExternalLink, Rocket } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
+import { upload } from '@vercel/blob/client';
 
 interface PublishTemplateModalProps {
     isOpen: boolean;
@@ -25,10 +26,21 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         setIsSubmitting(true);
 
         try {
+            // Upload the rendered preview so the shared campaign link shows a rich image.
+            let previewUrl: string | null = null;
+            if (previewDataUrl) {
+                try {
+                    const blob = await (await fetch(previewDataUrl)).blob();
+                    const uploaded = await upload(`preview-${Date.now()}.png`, blob, { access: 'public', handleUploadUrl: '/api/upload' });
+                    previewUrl = uploaded.url;
+                } catch (e) {
+                    console.error('preview upload failed', e);
+                }
+            }
             const res = await fetch('/api/campaigns', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description, frameConfig: config })
+                body: JSON.stringify({ title, description, frameConfig: config, previewUrl })
             });
 
             if (res.ok) {

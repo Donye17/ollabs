@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 async function getCampaign(slug: string) {
     try {
         const res = await pool.query(
-            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, is_public
+            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, preview_url, is_public
              FROM campaigns WHERE slug = $1 LIMIT 1`,
             [slug]
         );
@@ -34,8 +34,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             title: c.title,
             description,
             url: `https://ollabs.studio/c/${c.slug}`,
+            images: c.preview_url ? [{ url: c.preview_url, width: 1024, height: 1024, alt: c.title }] : undefined,
         },
-        twitter: { card: 'summary_large_image', title: c.title, description },
+        twitter: { card: 'summary_large_image', title: c.title, description, images: c.preview_url ? [c.preview_url] : undefined },
     };
 }
 

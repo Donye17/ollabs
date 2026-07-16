@@ -14,30 +14,30 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://ollabs.studio'),
     title: {
         template: '%s | Ollabs',
-        default: 'Ollabs - Best Free Avatar Frame Creator & PFP Border Maker',
+        default: 'Ollabs — Free Profile Picture Frame Maker for Campaigns & Causes',
     },
-    description: 'The #1 free tool to create custom avatar frames, profile picture borders, and PFP overlays for Discord, Twitter, Instagram, and TikTok. No login required.',
-    keywords: ['avatar frame creator', 'profile picture border maker', 'discord profile border', 'pfp border maker', 'circle crop', 'custom pfp', 'frame generator', 'Olympics', 'Country Flags', 'Team Support', 'Flag Overlay'],
+    description: 'Create a profile-picture frame for your cause, team, or event and share one link. Supporters add it to their photo in seconds — no signup, no ads. A clean, free alternative to Twibbon.',
+    keywords: ['profile picture frame maker', 'profile picture frame', 'pfp frame', 'twibbon alternative', 'profile picture campaign', 'support frame maker', 'add frame to profile picture', 'campaign frame', 'fundraiser profile frame', 'flag overlay', 'avatar frame', 'no signup pfp frame'],
     openGraph: {
         type: 'website',
         locale: 'en_US',
         url: 'https://ollabs.studio',
         siteName: 'Ollabs',
-        title: 'Ollabs - Best Free Avatar Frame Creator & PFP Border Maker',
-        description: 'Design unique profile picture frames, neon borders, and PFP overlays in seconds. Perfect for Discord, Twitter, and Instagram.',
+        title: 'Ollabs — Free Profile Picture Frame Maker for Campaigns & Causes',
+        description: 'Rally your people with a profile-picture frame. Share one link — supporters add it to their photo in seconds. Free, no signup, no ads.',
         images: [
             {
                 url: 'https://ollabs.studio/Ollabs%20Logo%20White.png',
                 width: 1200,
                 height: 630,
-                alt: 'Ollabs - Best Free Avatar Frame Creator',
+                alt: 'Ollabs — Profile Picture Frame Campaigns',
             },
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Ollabs - Best Free Avatar Frame Creator & PFP Border Maker',
-        description: 'Design unique profile picture frames, neon borders, and PFP overlays in seconds. Perfect for Discord, Twitter, and Instagram.',
+        title: 'Ollabs — Free Profile Picture Frame Maker for Campaigns & Causes',
+        description: 'Rally your people with a profile-picture frame. Share one link — supporters add it to their photo in seconds. Free, no signup, no ads.',
         images: ['https://ollabs.studio/Ollabs%20Logo%20White.png'],
     },
     icons: {
@@ -68,7 +68,7 @@ const jsonLd = {
     '@type': 'WebApplication',
     'name': 'Ollabs',
     'url': 'https://ollabs.studio',
-    'description': 'The best free tool to create custom avatar frames, profile picture borders, and PFP overlays for Discord, Twitter, Instagram, and TikTok.',
+    'description': 'Create a profile-picture frame campaign for your cause, team, or event and share one link. Supporters add it to their photo in seconds. Free, no signup.',
     'applicationCategory': 'DesignApplication',
     'operatingSystem': 'Web',
     'genre': 'Design',
@@ -77,7 +77,7 @@ const jsonLd = {
         'price': '0',
         'priceCurrency': 'USD'
     },
-    'featureList': 'Custom Avatar Frames, PFP Maker, Discord Profile Borders, Sticker Overlays, Neon Borders',
+    'featureList': 'Profile Picture Frame Maker, Campaign Links, Supporter Counter, Custom Frame Upload, Flag Overlays',
     'potentialAction': {
         '@type': 'CreateAction',
         'target': {
