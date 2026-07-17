@@ -26,6 +26,7 @@ export interface FrameConfig {
   color2?: string;
   width: number; // proportional thickness
   imageUrl?: string; // For CUSTOM_IMAGE type
+  cutoutScale?: number; // 0-1: transparent center hole (photo window) for CUSTOM_IMAGE
   stickers?: StickerConfig[]; // Optional stickers array
   textLayers?: TextConfig[]; // Optional text layers
   motionEffect?: MotionEffect;

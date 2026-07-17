@@ -299,6 +299,8 @@ export class GeometricRenderer extends CircleRenderer {
 export class ImageFrameRenderer extends CircleRenderer {
     private imageCache: HTMLImageElement | null = null;
     private lastImageUrl: string | null = null;
+    private composited: HTMLCanvasElement | null = null;
+    private compositedKey: string | null = null;
 
     drawFrame(context: RenderContext): void {
         const { ctx, frame, centerX, centerY, radius } = context;
@@ -312,20 +314,45 @@ export class ImageFrameRenderer extends CircleRenderer {
         if (this.lastImageUrl !== frame.imageUrl) {
             this.lastImageUrl = frame.imageUrl;
             this.imageCache = null;
+            this.composited = null;
+            this.compositedKey = null;
             const img = new Image();
             img.crossOrigin = 'anonymous';
-            img.onload = () => { this.imageCache = img; };
+            img.onload = () => { this.imageCache = img; this.composited = null; };
             img.src = frame.imageUrl;
         }
 
         const img = this.imageCache;
-        if (img && img.complete && img.naturalWidth > 0) {
-            // Overlay the uploaded design across the whole circle, preserving transparency
-            // so the photo shows through wherever the design is cut out.
-            const d = radius * 2;
-            ctx.save();
-            ctx.drawImage(img, centerX - radius, centerY - radius, d, d);
-            ctx.restore();
+        if (!img || !img.complete || img.naturalWidth === 0) return;
+
+        const cutout = frame.cutoutScale ?? 0;
+
+        if (cutout > 0) {
+            // Turn a solid badge/logo into a ring: punch a transparent circular hole in the
+            // center so the photo underneath shows through the "photo window".
+            const d = Math.max(2, Math.round(radius * 2));
+            const key = `${frame.imageUrl}|${d}|${cutout}`;
+            if (this.compositedKey !== key || !this.composited) {
+                const off = document.createElement('canvas');
+                off.width = d;
+                off.height = d;
+                const octx = off.getContext('2d');
+                if (octx) {
+                    octx.drawImage(img, 0, 0, d, d);
+                    octx.globalCompositeOperation = 'destination-out';
+                    octx.beginPath();
+                    octx.arc(d / 2, d / 2, (d / 2) * cutout, 0, Math.PI * 2);
+                    octx.closePath();
+                    octx.fill();
+                    this.composited = off;
+                    this.compositedKey = key;
+                }
+            }
+            if (this.composited) {
+                ctx.drawImage(this.composited, centerX - radius, centerY - radius, radius * 2, radius * 2);
+            }
+        } else {
+            ctx.drawImage(img, centerX - radius, centerY - radius, radius * 2, radius * 2);
         }
     }
 }
