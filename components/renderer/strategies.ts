@@ -327,9 +327,16 @@ export class ImageFrameRenderer extends CircleRenderer {
 
         const cutout = frame.cutoutScale ?? 0;
 
+        // Clip the overlay to the circle so rectangular uploads never spill into the corners.
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
         if (cutout > 0) {
-            // Turn a solid badge/logo into a ring: punch a transparent circular hole in the
-            // center so the photo underneath shows through the "photo window".
+            // Turn a solid badge/logo/photo into a ring: punch a transparent circular hole in
+            // the center so the photo underneath shows through the "photo window".
             const d = Math.max(2, Math.round(radius * 2));
             const key = `${frame.imageUrl}|${d}|${cutout}`;
             if (this.compositedKey !== key || !this.composited) {
@@ -354,5 +361,7 @@ export class ImageFrameRenderer extends CircleRenderer {
         } else {
             ctx.drawImage(img, centerX - radius, centerY - radius, radius * 2, radius * 2);
         }
+
+        ctx.restore();
     }
 }

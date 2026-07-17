@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { X, Check, Loader2, Copy, ExternalLink, Rocket } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { upload } from '@vercel/blob/client';
+import { FramePreview } from './FramePreview';
 
 interface PublishTemplateModalProps {
     isOpen: boolean;
@@ -92,16 +93,8 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 <div className="p-6 space-y-6">
                     {/* Preview */}
                     <div className="flex justify-center py-4 relative">
-                        {previewDataUrl && (
-                            <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full scale-75 pointer-events-none" />
-                        )}
-                        <div className="w-40 h-40 rounded-full border-4 border-zinc-900 overflow-hidden bg-zinc-950 shadow-2xl relative z-10 mx-auto">
-                            {previewDataUrl ? (
-                                <img src={previewDataUrl} alt="Preview" className="w-full h-full object-cover" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-zinc-600 bg-zinc-900">No Preview</div>
-                            )}
-                        </div>
+                        <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full scale-75 pointer-events-none" />
+                        <FramePreview frame={config} className="w-40 h-40 rounded-full border-4 border-zinc-900 bg-zinc-950 shadow-2xl relative z-10 mx-auto" />
                     </div>
 
                     {campaignUrl ? (
