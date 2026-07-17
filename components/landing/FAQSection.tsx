@@ -9,22 +9,26 @@ import { motion } from "framer-motion";
 
 const faqs = [
     {
-        question: "Is Ollabs free to use?",
-        answer: "Yes! The core features of Ollabs are completely free. We believe in accessible design tools for everyone."
+        question: "Is Ollabs free?",
+        answer: "Yes, completely free. Create a campaign, share the link, and let supporters add your frame — no cost, no ads."
     },
     {
-        question: "Do I own the designs I create?",
-        answer: "Absolutely. You retain full ownership of any artwork or frames you create using our platform."
+        question: "Do I need an account?",
+        answer: "No. You can create a campaign and supporters can use it without signing up for anything."
     },
     {
-        question: "Can I use custom fonts?",
-        answer: "Currently, we offer a curated selection of premium fonts. Custom font uploads are on our roadmap!"
+        question: "Can I use my own design?",
+        answer: "Yes. Upload your own transparent PNG frame with your logo, colors, or slogan, and it wraps every supporter's photo."
     },
     {
-        question: "How do I verify my profile?",
-        answer: "Profile verification is currently by invitation or request. Active community members are prioritized."
+        question: "How do supporters add the frame?",
+        answer: "They open your link, drop in a photo, adjust it, and download — in seconds, on any phone. No app to install."
+    },
+    {
+        question: "Where can they post it?",
+        answer: "Anywhere — Instagram, X, Discord, WhatsApp, LinkedIn, Facebook. It's just an image you download."
     }
-];
+]
 
 export const FAQSection = () => {
     return (
