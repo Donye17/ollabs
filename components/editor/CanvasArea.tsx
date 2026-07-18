@@ -237,6 +237,15 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
         }
     }, [imageObject, position, scale, rotation, selectedFrame, isDragOver, stickers, selection, motionEffect, isPlaying, isRecording, textLayers, selectedTextId]);
 
+    // Custom frame images load asynchronously — redraw once the image is ready.
+    useEffect(() => {
+        if (selectedFrame.type !== FrameType.CUSTOM_IMAGE || !selectedFrame.imageUrl) return;
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => { draw(); requestAnimationFrame(() => draw()); };
+        img.src = selectedFrame.imageUrl;
+    }, [selectedFrame, draw]);
+
     // Animation Loop
     const requestRef = React.useRef<number | null>(null);
     const startTimeRef = React.useRef<number>(0);

@@ -69,6 +69,15 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
 
     useEffect(() => { draw(); }, [draw]);
 
+    // Custom frame images load asynchronously — redraw once the image is ready.
+    useEffect(() => {
+        if (frame.type !== FrameType.CUSTOM_IMAGE || !frame.imageUrl) return;
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => { draw(); requestAnimationFrame(() => draw()); };
+        img.src = frame.imageUrl;
+    }, [frame, draw]);
+
     const handleFile = (file: File) => {
         const reader = new FileReader();
         reader.onload = (e) => {

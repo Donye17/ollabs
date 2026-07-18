@@ -297,7 +297,7 @@ export class GeometricRenderer extends CircleRenderer {
 }
 
 export class ImageFrameRenderer extends CircleRenderer {
-    private imageCache: HTMLImageElement | null = null;
+    private img: HTMLImageElement | null = null;
     private lastImageUrl: string | null = null;
     private composited: HTMLCanvasElement | null = null;
     private compositedKey: string | null = null;
@@ -306,23 +306,21 @@ export class ImageFrameRenderer extends CircleRenderer {
         const { ctx, frame, centerX, centerY, radius } = context;
 
         if (!frame.imageUrl) {
-            // No design uploaded yet: show the default ring as a placeholder.
             super.drawFrame(context);
             return;
         }
 
         if (this.lastImageUrl !== frame.imageUrl) {
             this.lastImageUrl = frame.imageUrl;
-            this.imageCache = null;
             this.composited = null;
             this.compositedKey = null;
             const img = new Image();
             img.crossOrigin = 'anonymous';
-            img.onload = () => { this.imageCache = img; this.composited = null; };
             img.src = frame.imageUrl;
+            this.img = img;
         }
 
-        const img = this.imageCache;
+        const img = this.img;
         if (!img || !img.complete || img.naturalWidth === 0) return;
 
         const cutout = frame.cutoutScale ?? 0;
@@ -335,8 +333,6 @@ export class ImageFrameRenderer extends CircleRenderer {
         ctx.clip();
 
         if (cutout > 0) {
-            // Turn a solid badge/logo/photo into a ring: punch a transparent circular hole in
-            // the center so the photo underneath shows through the "photo window".
             const d = Math.max(2, Math.round(radius * 2));
             const key = `${frame.imageUrl}|${d}|${cutout}`;
             if (this.compositedKey !== key || !this.composited) {
