@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FrameRendererFactory } from '@/components/renderer/FrameRendererFactory';
 import { FrameConfig, FrameType } from '@/lib/types';
 
@@ -9,6 +9,7 @@ const CANVAS = 512;
 // show "what this frame looks like" without a real photo (publish modal, home examples).
 export const FramePreview: React.FC<{ frame: FrameConfig; className?: string }> = ({ frame, className }) => {
     const ref = useRef<HTMLCanvasElement>(null);
+    const [tick, setTick] = useState(0);
 
     useEffect(() => {
         const canvas = ref.current;
@@ -38,22 +39,14 @@ export const FramePreview: React.FC<{ frame: FrameConfig; className?: string }> 
             ctx.fill();
             ctx.restore();
             try {
-                FrameRendererFactory.getRenderer(frame.type as FrameType).drawFrame({ ctx, centerX: cx, centerY: cy, radius, frame });
+                FrameRendererFactory.getRenderer(frame.type as FrameType).drawFrame({ ctx, centerX: cx, centerY: cy, radius, frame, onImageLoad: () => setTick((t) => t + 1) });
             } catch (e) {
                 console.error('frame preview render failed', e);
             }
         };
 
         draw();
-
-        // Custom images load asynchronously — redraw once ready so the frame actually appears.
-        if (frame.type === FrameType.CUSTOM_IMAGE && frame.imageUrl) {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => draw();
-            img.src = frame.imageUrl;
-        }
-    }, [frame]);
+    }, [frame, tick]);
 
     return <canvas ref={ref} width={CANVAS} height={CANVAS} className={className} />;
 };

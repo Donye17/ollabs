@@ -6,6 +6,7 @@ export interface RenderContext {
     centerY: number;
     radius: number;
     frame: FrameConfig;
+    onImageLoad?: () => void;
 }
 
 export interface IFrameRenderer {

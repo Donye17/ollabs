@@ -27,6 +27,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     const [count, setCount] = useState(initialCount);
     const [downloading, setDownloading] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [imgTick, setImgTick] = useState(0);
 
     const drag = useRef<{ active: boolean; startX: number; startY: number; baseX: number; baseY: number }>({
         active: false, startX: 0, startY: 0, baseX: 0, baseY: 0,
@@ -61,22 +62,13 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         }
 
         try {
-            FrameRendererFactory.getRenderer(frame.type as FrameType).drawFrame({ ctx, centerX: cx, centerY: cy, radius, frame });
+            FrameRendererFactory.getRenderer(frame.type as FrameType).drawFrame({ ctx, centerX: cx, centerY: cy, radius, frame, onImageLoad: () => setImgTick((t) => t + 1) });
         } catch (e) {
             console.error('frame render failed', e);
         }
     }, [zoom, pos, frame]);
 
-    useEffect(() => { draw(); }, [draw]);
-
-    // Custom frame images load asynchronously — redraw once the image is ready.
-    useEffect(() => {
-        if (frame.type !== FrameType.CUSTOM_IMAGE || !frame.imageUrl) return;
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => { draw(); requestAnimationFrame(() => draw()); };
-        img.src = frame.imageUrl;
-    }, [frame, draw]);
+    useEffect(() => { draw(); }, [draw, imgTick]);
 
     const handleFile = (file: File) => {
         const reader = new FileReader();

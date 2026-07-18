@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { Loader2, Upload, ImageIcon, Sparkles } from 'lucide-react';
 import { FrameRendererFactory } from '../renderer/FrameRendererFactory';
 import { CANVAS_SIZE, DISPLAY_SIZE } from '@/lib/constants';
@@ -58,6 +58,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
     onTouchStart, onTouchMove, onTouchEnd, onTouchCancel,
     onDragOver, onDragLeave, onDrop
 }) => {
+    const [imgTick, setImgTick] = useState(0);
 
     // Drawing Logic (Copied from original Editor.tsx but scoped)
     const draw = useCallback((time: number = 0) => {
@@ -102,7 +103,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
 
         // 3. Draw Frame Overlay
         if (selectedFrame.type !== FrameType.NONE) {
-            renderer.drawFrame({ ctx, centerX, centerY, radius, frame: selectedFrame });
+            renderer.drawFrame({ ctx, centerX, centerY, radius, frame: selectedFrame, onImageLoad: () => setImgTick((t) => t + 1) });
         }
 
         // 4. Draw Stickers
@@ -237,14 +238,8 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
         }
     }, [imageObject, position, scale, rotation, selectedFrame, isDragOver, stickers, selection, motionEffect, isPlaying, isRecording, textLayers, selectedTextId]);
 
-    // Custom frame images load asynchronously — redraw once the image is ready.
-    useEffect(() => {
-        if (selectedFrame.type !== FrameType.CUSTOM_IMAGE || !selectedFrame.imageUrl) return;
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => { draw(); requestAnimationFrame(() => draw()); };
-        img.src = selectedFrame.imageUrl;
-    }, [selectedFrame, draw]);
+    // Redraw when a custom frame image finishes loading.
+    useEffect(() => { draw(); }, [imgTick, draw]);
 
     // Animation Loop
     const requestRef = React.useRef<number | null>(null);

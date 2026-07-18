@@ -303,7 +303,7 @@ export class ImageFrameRenderer extends CircleRenderer {
     private compositedKey: string | null = null;
 
     drawFrame(context: RenderContext): void {
-        const { ctx, frame, centerX, centerY, radius } = context;
+        const { ctx, frame, centerX, centerY, radius, onImageLoad } = context;
 
         if (!frame.imageUrl) {
             super.drawFrame(context);
@@ -316,6 +316,7 @@ export class ImageFrameRenderer extends CircleRenderer {
             this.compositedKey = null;
             const img = new Image();
             img.crossOrigin = 'anonymous';
+            img.onload = () => { if (onImageLoad) onImageLoad(); };
             img.src = frame.imageUrl;
             this.img = img;
         }

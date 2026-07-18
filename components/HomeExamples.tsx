@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { FrameRendererFactory } from '@/components/renderer/FrameRendererFactory';
 import { FrameConfig, FrameType } from '@/lib/types';
@@ -15,6 +15,7 @@ export interface HomeCampaign {
 
 function ExampleCanvas({ frame }: { frame: FrameConfig }) {
     const ref = useRef<HTMLCanvasElement>(null);
+    const [tick, setTick] = useState(0);
 
     useEffect(() => {
         const canvas = ref.current;
@@ -44,21 +45,14 @@ function ExampleCanvas({ frame }: { frame: FrameConfig }) {
             ctx.fill();
             ctx.restore();
             try {
-                FrameRendererFactory.getRenderer(frame.type as FrameType).drawFrame({ ctx, centerX: cx, centerY: cy, radius, frame });
+                FrameRendererFactory.getRenderer(frame.type as FrameType).drawFrame({ ctx, centerX: cx, centerY: cy, radius, frame, onImageLoad: () => setTick((t) => t + 1) });
             } catch (e) {
                 console.error('example frame render failed', e);
             }
         };
 
         draw();
-
-        if (frame.type === FrameType.CUSTOM_IMAGE && frame.imageUrl) {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => { draw(); requestAnimationFrame(() => draw()); };
-            img.src = frame.imageUrl;
-        }
-    }, [frame]);
+    }, [frame, tick]);
 
     return <canvas ref={ref} width={CANVAS} height={CANVAS} className="w-32 h-32 sm:w-36 sm:h-36 rounded-full" />;
 }
