@@ -28,6 +28,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     const [downloading, setDownloading] = useState(false);
     const [copied, setCopied] = useState(false);
     const [imgTick, setImgTick] = useState(0);
+    const [dragOver, setDragOver] = useState(false);
 
     const drag = useRef<{ active: boolean; startX: number; startY: number; baseX: number; baseY: number }>({
         active: false, startX: 0, startY: 0, baseX: 0, baseY: 0,
@@ -84,6 +85,15 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
             img.src = e.target?.result as string;
         };
         reader.readAsDataURL(file);
+    };
+
+    const onDragOver = (e: React.DragEvent) => { e.preventDefault(); setDragOver(true); };
+    const onDragLeave = (e: React.DragEvent) => { e.preventDefault(); setDragOver(false); };
+    const onDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragOver(false);
+        const f = e.dataTransfer.files?.[0];
+        if (f && f.type.startsWith('image/')) handleFile(f);
     };
 
     const canvasToDisplayRatio = () => {
@@ -168,19 +178,23 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     onPointerMove={onPointerMove}
                     onPointerUp={onPointerUp}
                     onPointerCancel={onPointerUp}
-                    className={`w-64 h-64 sm:w-72 sm:h-72 rounded-full touch-none ${hasImage ? 'cursor-grab active:cursor-grabbing' : ''}`}
+                    onDragOver={onDragOver}
+                    onDragLeave={onDragLeave}
+                    onDrop={onDrop}
+                    onClick={() => { if (!hasImage) fileRef.current?.click(); }}
+                    className={`w-64 h-64 sm:w-72 sm:h-72 rounded-full touch-none transition-all ${hasImage ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${dragOver ? 'ring-4 ring-sky-500/70 scale-[1.03]' : ''}`}
                     style={{ background: 'transparent' }}
                 />
 
                 {hasImage ? (
                     <div className="w-full flex items-center gap-3 px-2">
-                        <span className="text-xs text-zinc-500">Zoom</span>
-                        <input type="range" min={1} max={3} step={0.01} value={zoom}
+                        <span className="text-xs text-zinc-500">Size</span>
+                        <input type="range" min={0.3} max={3} step={0.01} value={zoom}
                             onChange={(e) => setZoom(parseFloat(e.target.value))}
                             className="flex-1 accent-sky-500" />
                     </div>
                 ) : (
-                    <p className="text-sm text-zinc-500">Drag to reposition after uploading.</p>
+                    <p className="text-sm text-zinc-500">Tap the circle or drag a photo onto it.</p>
                 )}
 
                 <input ref={fileRef} type="file" accept="image/*" className="hidden"
