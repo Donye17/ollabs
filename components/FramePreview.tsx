@@ -5,7 +5,7 @@ import { FrameConfig, FrameType } from '@/lib/types';
 
 const CANVAS = 512;
 
-// Renders a frame config over a neutral avatar silhouette — used wherever we need to
+// Renders a frame config over a neutral avatar silhouette, used wherever we need to
 // show "what this frame looks like" without a real photo (publish modal, home examples).
 export const FramePreview: React.FC<{ frame: FrameConfig; className?: string }> = ({ frame, className }) => {
     const ref = useRef<HTMLCanvasElement>(null);

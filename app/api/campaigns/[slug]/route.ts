@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-// GET /api/campaigns/[slug] — fetch a single public campaign for the supporter page
+// GET /api/campaigns/[slug], fetch a single public campaign for the supporter page
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
     try {
         const { slug } = await params;

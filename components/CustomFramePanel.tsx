@@ -48,7 +48,7 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
         <div className="space-y-6 animate-fade-in">
             <div>
                 <h2 className="text-lg font-bold text-white mb-1">Upload your own frame</h2>
-                <p className="text-zinc-400 text-xs">Use your brand or cause design — a logo, badge, or frame. It wraps the photo, and you open a window in the middle for the picture.</p>
+                <p className="text-zinc-400 text-xs">Use your brand or cause design, a logo, badge, or frame. It wraps the photo, and you open a window in the middle for the picture.</p>
             </div>
 
             <div className="p-6 bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col items-center gap-4 text-center">
@@ -99,7 +99,7 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
             <div className="p-4 bg-blue-500/5 rounded-xl border border-blue-500/10 flex gap-3 items-start">
                 <AlertCircle className="text-blue-400 shrink-0 mt-0.5" size={16} />
                 <p className="text-xs text-blue-200">
-                    <strong>Tip:</strong> A square logo or round badge works great — Ollabs keeps the outer design and opens a window in the center for each supporter's photo.
+                    <strong>Tip:</strong> A square logo or round badge works great, Ollabs keeps the outer design and opens a window in the center for each supporter's photo.
                 </p>
             </div>
         </div>

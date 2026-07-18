@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-// POST /api/campaigns/[slug]/use — a supporter applied the frame; bump the counter.
+// POST /api/campaigns/[slug]/use, a supporter applied the frame; bump the counter.
 // Body (optional): { imageUrl } if the supporter opts in to the supporter wall.
 export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
     try {

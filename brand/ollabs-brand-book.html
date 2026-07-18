@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ollabs Brand Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#01BEF6; --blue-deep:#0288B8; --blue-wash:#E4F7FE;
+    --ink:#06141F; --ink-70:#33414b;
+    --paper:#F4F1EA; --paper2:#EAE6DC; --white:#FDFCF9;
+    --coral:#FF5C39; --amber:#FFC24B;
+    --muted:#726c5f; --line:rgba(20,20,15,.12); --line2:rgba(20,20,15,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55}
+  h1,h2,h3,h4{font-family:"Bricolage Grotesque",sans-serif;letter-spacing:-.02em;margin:0}
+  .display{font-family:"Bricolage Grotesque",sans-serif}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  a{color:var(--blue-deep)}
+
+  /* layout */
+  .page{max-width:980px;margin:0 auto;padding:0 24px}
+  section{padding:64px 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+  .eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--blue-deep);font-weight:800}
+  .sec-title{font-size:clamp(26px,3.4vw,38px);font-weight:800;margin:.3em 0 .5em;line-height:1.05}
+  .lead{font-size:18px;color:var(--ink-70);max-width:70ch}
+  p{max-width:72ch}
+
+  /* cover */
+  .cover{background:var(--paper);border-top:0;padding:0}
+  .cover-inner{position:relative;overflow:hidden;border-radius:0 0 32px 32px;background:var(--paper);padding:70px 0 60px}
+  .cover .kick{font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .wordmark{display:flex;align-items:center;gap:14px;margin:18px 0 6px}
+  .wm-o{width:46px;height:46px;border-radius:50%;border:11px solid var(--blue);display:inline-block}
+  .wm-txt{font-family:"Bricolage Grotesque";font-weight:800;font-size:54px;letter-spacing:-.03em}
+  .cover h1{font-size:clamp(38px,6vw,68px);font-weight:800;line-height:1.0;margin:.25em 0 .3em;max-width:16ch}
+  .cover h1 .c{color:var(--blue-deep)}
+  .cover .sub{font-size:19px;color:var(--ink-70);max-width:56ch}
+  .cover-rings{position:absolute;right:-90px;top:-40px;width:340px;height:340px;border-radius:50%;border:44px solid var(--blue);opacity:.16;pointer-events:none}
+  .cover-rings.two{right:60px;top:120px;width:150px;height:150px;border:18px solid var(--coral);opacity:.18}
+  .meta-row{display:flex;gap:26px;flex-wrap:wrap;margin-top:28px;font-size:13px;color:var(--muted)}
+  .meta-row b{color:var(--ink);display:block;font-size:14px;font-family:"Bricolage Grotesque";font-weight:700}
+
+  /* toc */
+  .toc{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .toc a{font-size:13px;font-weight:600;text-decoration:none;color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:8px 14px}
+  .toc a:hover{border-color:var(--blue);color:var(--blue-deep)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+
+  .card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:24px}
+  .card h3{font-size:19px;font-weight:700;margin-bottom:6px}
+  .card p{font-size:14.5px;color:var(--ink-70);margin:0}
+  .card .ic{width:38px;height:38px;border-radius:10px;background:var(--blue-wash);display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:var(--blue-deep);font-weight:800;font-family:"Bricolage Grotesque"}
+
+  /* pull quote / essence */
+  .essence{background:var(--ink);color:var(--paper);border-radius:24px;padding:44px 40px;position:relative;overflow:hidden}
+  .essence .big{font-family:"Bricolage Grotesque";font-weight:800;font-size:clamp(26px,4vw,40px);line-height:1.08;max-width:20ch}
+  .essence .big .c{color:var(--blue)}
+  .essence .ring{position:absolute;right:-60px;bottom:-70px;width:220px;height:220px;border-radius:50%;border:30px solid var(--blue);opacity:.35}
+
+  /* voice table */
+  .vt{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  @media(max-width:760px){.vt{grid-template-columns:1fr}}
+  .vt .h{padding:12px 18px;font-weight:800;font-family:"Bricolage Grotesque";font-size:14px}
+  .vt .say{background:rgba(1,190,246,.10);color:#065063}
+  .vt .not{background:rgba(255,92,57,.09);color:#8a2a12}
+  .vt .cell{padding:14px 18px;border-top:1px solid var(--line2);font-size:15px}
+  .vt .cell.left{border-right:1px solid var(--line2)}
+  @media(max-width:760px){.vt .cell.left{border-right:0}}
+
+  /* color swatches */
+  .pal{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .swatch{border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+  .swatch .fill{height:104px;display:flex;align-items:flex-end;padding:12px}
+  .swatch .info{padding:12px 14px;background:var(--white)}
+  .swatch .name{font-weight:800;font-family:"Bricolage Grotesque";font-size:15px}
+  .swatch .hex{font-family:ui-monospace,monospace;font-size:12.5px;color:var(--muted);margin-top:2px}
+  .swatch .role{font-size:12.5px;color:var(--ink-70);margin-top:6px}
+  .tagwhite{color:#fff;font-size:11px;font-weight:700;background:rgba(0,0,0,.28);padding:3px 8px;border-radius:6px}
+  .tagink{color:var(--ink);font-size:11px;font-weight:700;background:rgba(255,255,255,.55);padding:3px 8px;border-radius:6px}
+
+  .contrast-note{margin-top:18px;background:var(--blue-wash);border:1px solid rgba(1,190,246,.35);border-radius:14px;padding:16px 18px;font-size:14px;color:#0b4a5c}
+  .contrast-note b{color:#083344}
+
+  /* type scale */
+  .scale > div{padding:14px 0;border-bottom:1px solid var(--line2)}
+  .scale .lbl{font-size:12px;color:var(--muted);font-family:ui-monospace,monospace}
+  .d1{font-family:"Bricolage Grotesque";font-weight:800;font-size:48px;line-height:1.0;letter-spacing:-.03em}
+  .d2{font-family:"Bricolage Grotesque";font-weight:800;font-size:32px;line-height:1.05;letter-spacing:-.02em}
+  .d3{font-family:"Bricolage Grotesque";font-weight:700;font-size:22px}
+  .body-lg{font-size:18px}
+  .body{font-size:16px}
+  .small{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+
+  /* UI demo */
+  .ui{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:26px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px;border-radius:12px;padding:12px 20px;border:0;cursor:default;font-family:Inter}
+  .btn-primary{background:var(--blue);color:var(--ink)}
+  .btn-dark{background:var(--ink);color:var(--paper)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .btn-coral{background:var(--coral);color:#fff}
+  .input{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--ink);font-family:Inter}
+  .input::placeholder{color:#9a9484}
+  .counter{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center}
+  .counter .n{font-family:"Bricolage Grotesque";font-weight:800;font-size:30px;display:flex;gap:8px;align-items:center;justify-content:center}
+  .counter .n .dot{width:12px;height:12px;border-radius:50%;background:var(--coral)}
+  .counter .cap{font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* frame ring demo */
+  .frames{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+  .frame{width:132px;text-align:center}
+  .ringimg{width:132px;height:132px;border-radius:50%;position:relative;overflow:hidden;background:linear-gradient(180deg,#c9c3b4,#a7a091)}
+  .ringimg::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 12px var(--blue)}
+  .ringimg.coral::after{box-shadow:inset 0 0 0 12px var(--coral)}
+  .ringimg.amber::after{box-shadow:inset 0 0 0 12px var(--amber)}
+  .ringimg.thin::after{box-shadow:inset 0 0 0 6px var(--blue)}
+  .ringimg .face{position:absolute;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.5);left:43px;top:30px}
+  .ringimg .body{position:absolute;width:80px;height:52px;border-radius:40px 40px 0 0;background:rgba(255,255,255,.5);left:26px;bottom:8px}
+  .frame .cap{font-size:12.5px;color:var(--muted);margin-top:10px}
+
+  /* do/don't */
+  .dd{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.dd{grid-template-columns:1fr}}
+  .dd .col{border-radius:16px;padding:20px 22px}
+  .dd .do{background:rgba(1,190,246,.09);border:1px solid rgba(1,190,246,.3)}
+  .dd .dont{background:rgba(255,92,57,.08);border:1px solid rgba(255,92,57,.28)}
+  .dd h4{font-size:16px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .dd ul{margin:0;padding-left:18px}
+  .dd li{font-size:14.5px;margin:7px 0;color:var(--ink-70)}
+  .mark{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff}
+  .mark.y{background:var(--blue-deep)} .mark.n{background:var(--coral)}
+
+  /* applied hero */
+  .applied{background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:hidden}
+  .ah{position:relative;padding:40px 36px 36px;overflow:hidden}
+  .ah .nav{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:2}
+  .ah .lg{display:flex;align-items:center;gap:9px;font-family:"Bricolage Grotesque";font-weight:800;font-size:20px}
+  .ah .lg .o{width:17px;height:17px;border-radius:50%;border:5px solid var(--blue)}
+  .ah h2{font-size:clamp(34px,5.4vw,52px);font-weight:800;line-height:.98;margin:26px 0 0;max-width:15ch;position:relative;z-index:2}
+  .ah h2 .c{color:var(--blue-deep)}
+  .ah .sub{font-size:17px;color:var(--ink-70);margin:14px 0 0;max-width:44ch;position:relative;z-index:2}
+  .ah .row{display:flex;gap:12px;margin-top:22px;position:relative;z-index:2}
+  .ah .bigring{position:absolute;right:-70px;bottom:-90px;width:260px;height:260px;border-radius:50%;border:30px solid var(--blue);opacity:.9}
+  .ah .coralblob{position:absolute;right:150px;top:34px;width:60px;height:60px;border-radius:50%;background:var(--coral)}
+
+  footer{padding:48px 0 70px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+ <div class="page">
+  <div class="cover-inner">
+    <div class="cover-rings"></div>
+    <div class="cover-rings two"></div>
+    <div class="kick">Brand Book · v1 · July 2026</div>
+    <div class="wordmark"><img src="ollabs-logo-black.png" alt="Ollabs" style="height:60px;width:auto" /></div>
+    <h1>Rally your people, <span class="c">one link.</span></h1>
+    <p class="sub">The warm, human, no-ads way to put a cause, team, or moment on everyone's photo. This book is how Ollabs looks, sounds, and feels.</p>
+    <div class="meta-row">
+      <div><b>Warm &amp; human</b>personality</div>
+      <div><b>#01BEF6</b>primary blue</div>
+      <div><b>Bricolage + Inter</b>typefaces</div>
+      <div><b>No ads. No signup.</b>promise</div>
+    </div>
+    <div class="toc">
+      <a href="#essence">Essence</a>
+      <a href="#personality">Personality</a>
+      <a href="#voice">Voice</a>
+      <a href="#logo">Logo</a>
+      <a href="#color">Color</a>
+      <a href="#type">Type</a>
+      <a href="#ui">UI</a>
+      <a href="#frames">Frames</a>
+      <a href="#dodont">Do &amp; Don't</a>
+      <a href="#applied">Applied</a>
+    </div>
+  </div>
+ </div>
+</div>
+
+<!-- ESSENCE -->
+<section id="essence"><div class="page">
+  <div class="eyebrow">01 · Brand essence</div>
+  <h2 class="sec-title">What Ollabs is</h2>
+  <p class="lead">The name says it. Ollabs is a play on collabs, short for collaboration. It is about people coming together behind one thing. You make a frame for a cause, team, or event, you share one link, and your people add it to their profile photo. The count climbs. The collab shows.</p>
+
+  <div style="height:26px"></div>
+  <div class="essence">
+    <div class="ring"></div>
+    <div class="big">Support you can <span class="c">see.</span> A movement in one <span class="c">shareable link.</span></div>
+  </div>
+
+  <div style="height:30px"></div>
+  <div class="grid3">
+    <div class="card"><div class="ic">1</div><h3>The name</h3><p>Ollabs, from collabs, from collaboration. Coming together is the whole point.</p></div>
+    <div class="card"><div class="ic">2</div><h3>The one-liner</h3><p>Rally your people, one link. Use it as the tagline everywhere.</p></div>
+    <div class="card"><div class="ic">3</div><h3>The promise</h3><p>Clean, fast, free. No ads, no signup, no clutter. The anti-Twibbon.</p></div>
+  </div>
+
+  <div style="height:30px"></div>
+  <div class="grid2">
+    <div class="card"><h3>Who it is for</h3><p>Causes, sports teams, events, fundraisers, communities, and small brands who want their people wearing the same badge without hiring a designer.</p></div>
+    <div class="card"><h3>Why it wins</h3><p>Twibbon is slow, cluttered, and full of ads. Ollabs is the opposite: one clean link, a frame on your photo in seconds, nothing in the way.</p></div>
+  </div>
+</div></section>
+
+<!-- PERSONALITY -->
+<section id="personality"><div class="page">
+  <div class="eyebrow">02 · Personality</div>
+  <h2 class="sec-title">Warm and human, never corporate</h2>
+  <p class="lead">If Ollabs were a person, it would be the friend who gets the whole group to show up wearing the same shirt, and makes it feel easy and fun rather than like a chore. Four traits guide every choice.</p>
+  <div style="height:24px"></div>
+  <div class="grid2">
+    <div class="card"><div class="ic">W</div><h3>Welcoming</h3><p>Anyone can start or join in under a minute. We lower the bar, we never gatekeep, and we assume good intent.</p></div>
+    <div class="card"><div class="ic">R</div><h3>Rallying</h3><p>There is real energy here. We celebrate the count climbing and the people showing up. We are proud, not pushy.</p></div>
+    <div class="card"><div class="ic">H</div><h3>Honest</h3><p>Plain words, real claims, no fake hype. We say what the tool does and let it do it. No dark patterns.</p></div>
+    <div class="card"><div class="ic">C</div><h3>Crafted</h3><p>It looks made, not generated. Warm cream, a confident blue, type with character. Small details, done with care.</p></div>
+  </div>
+</div></section>
+
+<!-- VOICE -->
+<section id="voice"><div class="page">
+  <div class="eyebrow">03 · Voice &amp; tone</div>
+  <h2 class="sec-title">How Ollabs talks</h2>
+  <p class="lead">Short sentences. Second person. Verbs over adjectives. Talk like a helpful friend, not a marketing deck. When in doubt, cut words until only the point is left.</p>
+  <div style="height:24px"></div>
+  <div class="vt">
+    <div class="h say cell left">Say this</div>
+    <div class="h not cell">Not this</div>
+
+    <div class="cell left">Rally your people, one link.</div>
+    <div class="cell">The premier platform for digital advocacy engagement solutions.</div>
+
+    <div class="cell left">Make a frame. Share the link. Watch the count climb.</div>
+    <div class="cell">Leverage our robust suite of tools to maximize supporter activation.</div>
+
+    <div class="cell left">Add your photo. That is it.</div>
+    <div class="cell">Complete the following steps to begin your onboarding journey.</div>
+
+    <div class="cell left">3,204 people are wearing it.</div>
+    <div class="cell">Join thousands of users who trust our platform.</div>
+
+    <div class="cell left">Free, no signup, no ads. Really.</div>
+    <div class="cell">Sign up today to unlock exclusive premium features.</div>
+  </div>
+  <div style="height:20px"></div>
+  <div class="grid3">
+    <div class="card"><h3>Do</h3><p>Use contractions. Use numbers. Speak to one person. Keep it kind and a little proud.</p></div>
+    <div class="card"><h3>Avoid</h3><p>Buzzwords, hype, exclamation pile-ups, corporate hedging, and em dashes.</p></div>
+    <div class="card"><h3>Punctuation</h3><p>Commas and periods carry the rhythm. No em dashes anywhere. Sentence case for almost everything.</p></div>
+  </div>
+</div></section>
+
+<!-- LOGO -->
+<section id="logo"><div class="page">
+  <div class="eyebrow">04 · Logo &amp; the ring</div>
+  <h2 class="sec-title">The O is the product</h2>
+  <p class="lead">Ollabs comes from collabs, and the mark tells that story. The C in collabs opens up into the O, a ring, and that ring is the frame you put around a photo. Collaboration, a circle, a frame, one idea in one mark. Lead with the ring and the wordmark reads instantly.</p>
+  <div style="height:26px"></div>
+  <div class="grid2">
+    <div class="card" style="display:flex;align-items:center;justify-content:center;min-height:170px;background:var(--white)">
+      <img src="ollabs-logo-black.png" alt="Ollabs logo on light" style="height:52px;width:auto" />
+    </div>
+    <div class="card" style="display:flex;align-items:center;justify-content:center;min-height:170px;background:var(--ink)">
+      <img src="ollabs-logo-white.png" alt="Ollabs logo on dark" style="height:52px;width:auto" />
+    </div>
+  </div>
+  <div style="height:18px"></div>
+  <div class="grid3">
+    <div class="card"><h3>Clear space</h3><p>Keep space equal to the height of one O on all sides. Let the mark breathe.</p></div>
+    <div class="card"><h3>The ring alone</h3><p>The blue ring works solo as an app icon, favicon, or avatar badge.</p></div>
+    <div class="card"><h3>Minimum size</h3><p>Never below 20px tall on screen. Below that, use the ring only.</p></div>
+  </div>
+  <div style="height:18px"></div>
+  <div class="dd">
+    <div class="col do"><h4><span class="mark y">✓</span> Do</h4><ul>
+      <li>Blue ring on cream, white, or ink.</li>
+      <li>Ink or cream wordmark, whichever has contrast.</li>
+      <li>Keep the ring a true circle, even weight.</li>
+    </ul></div>
+    <div class="col dont"><h4><span class="mark n">✕</span> Don't</h4><ul>
+      <li>Recolor the ring to coral or amber.</li>
+      <li>Add gradients, shadows, or glows to the mark.</li>
+      <li>Stretch, outline, or tilt the wordmark.</li>
+    </ul></div>
+  </div>
+</div></section>
+
+<!-- COLOR -->
+<section id="color"><div class="page">
+  <div class="eyebrow">05 · Color</div>
+  <h2 class="sec-title">Blue leads, cream carries, coral sparks</h2>
+  <p class="lead">One confident blue does the branding. A warm cream keeps it human and away from the generic dark template look. Ink gives contrast and legibility. Coral and amber are small sparks, used rarely.</p>
+  <div style="height:26px"></div>
+  <div class="pal">
+    <div class="swatch"><div class="fill" style="background:#01BEF6"><span class="tagink">on ink / cream</span></div><div class="info"><div class="name">Ollabs Blue</div><div class="hex">#01BEF6</div><div class="role">Primary. Brand mark, primary buttons, the ring, key highlights. Pair with ink text, not white.</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#06141F"><span class="tagwhite">on cream / blue</span></div><div class="info"><div class="name">Ink</div><div class="hex">#06141F</div><div class="role">Text, dark surfaces, high-contrast buttons, and label text sitting on blue.</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#F4F1EA"><span class="tagink">base</span></div><div class="info"><div class="name">Cream Paper</div><div class="hex">#F4F1EA</div><div class="role">The main background. Warm, human, and the fastest way to stop looking AI-made.</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#FF5C39"><span class="tagwhite">spark</span></div><div class="info"><div class="name">Coral</div><div class="hex">#FF5C39</div><div class="role">Secondary accent. Supporter moments, small emphasis, celebration. Use sparingly.</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#FFC24B"><span class="tagink">spark</span></div><div class="info"><div class="name">Amber</div><div class="hex">#FFC24B</div><div class="role">Tertiary highlight. Badges and tiny flourishes only. Never a large field.</div></div></div>
+    <div class="swatch"><div class="fill" style="background:#0288B8"><span class="tagwhite">text-safe blue</span></div><div class="info"><div class="name">Blue Deep</div><div class="hex">#0288B8</div><div class="role">Use when blue must be text or a link on a light background, where #01BEF6 is too light to read.</div></div></div>
+  </div>
+  <div class="contrast-note"><b>Contrast rule:</b> Ollabs Blue is bright. White text on blue fails legibility, so text and labels on a blue fill are always Ink. When blue needs to be text or a link on cream, step down to Blue Deep #0288B8. Body text is Ink on cream at all times.</div>
+  <div style="height:18px"></div>
+  <div class="card"><h3>Rough usage split</h3><p>About 60 percent cream, 25 percent ink, 12 percent blue, and 3 percent coral and amber combined. The sparks stay rare so they keep their pop.</p></div>
+</div></section>
+
+<!-- TYPE -->
+<section id="type"><div class="page">
+  <div class="eyebrow">06 · Typography</div>
+  <h2 class="sec-title">Bricolage Grotesque + Inter</h2>
+  <p class="lead">Headlines in Bricolage Grotesque give instant character, a little wonky and very human. Inter handles body and UI, clean and legible. Two fonts, clear jobs, no exceptions.</p>
+  <div style="height:24px"></div>
+  <div class="ui scale">
+    <div><div class="lbl">Display / Bricolage Grotesque 800</div><div class="d1">Rally your people</div></div>
+    <div><div class="lbl">Heading / Bricolage Grotesque 800</div><div class="d2">One frame, one link</div></div>
+    <div><div class="lbl">Subhead / Bricolage Grotesque 700</div><div class="d3">Everyone shows up wearing it</div></div>
+    <div><div class="lbl">Body large / Inter 400</div><div class="body-lg">Make a frame for your cause, team, or event, share one link, and watch your people put it on.</div></div>
+    <div><div class="lbl">Body / Inter 400</div><div class="body">Ollabs turns support into something you can see. No ads, no signup, no clutter. Just add your photo.</div></div>
+    <div style="border-bottom:0"><div class="lbl">Label / Inter 700 uppercase</div><div class="small">People supporting</div></div>
+  </div>
+  <div style="height:18px"></div>
+  <div class="grid3">
+    <div class="card"><h3>Headlines</h3><p>Bricolage Grotesque, weight 800, tight tracking. Sentence case. Highlight one phrase in Blue Deep.</p></div>
+    <div class="card"><h3>Body &amp; UI</h3><p>Inter, 400 to 600. Comfortable line height. Never set body in the display face.</p></div>
+    <div class="card"><h3>Labels</h3><p>Inter 700, uppercase, wide tracking, small. Used for counters and eyebrows.</p></div>
+  </div>
+</div></section>
+
+<!-- UI -->
+<section id="ui"><div class="page">
+  <div class="eyebrow">07 · UI components</div>
+  <h2 class="sec-title">The building blocks</h2>
+  <p class="lead">Rounded, warm, and calm. Generous radius, soft borders on cream, one clear primary action per screen. Here is how the core pieces look in the new system.</p>
+  <div style="height:24px"></div>
+  <div class="grid2">
+    <div class="ui">
+      <div class="small" style="margin-bottom:14px">Buttons</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-primary">Create a campaign</button>
+        <button class="btn btn-dark">Download</button>
+        <button class="btn btn-ghost">Share</button>
+        <button class="btn btn-coral">Support</button>
+      </div>
+      <p style="font-size:13.5px;color:var(--muted);margin-top:16px">Primary is blue with ink text. Dark is the calm alternative. Ghost for tertiary. Coral only for supporter or celebration moments.</p>
+    </div>
+    <div class="ui">
+      <div class="small" style="margin-bottom:14px">Inputs</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <input class="input" placeholder="Campaign title, e.g. Support Team USA" />
+        <input class="input" placeholder="What's this campaign for?" />
+      </div>
+      <p style="font-size:13.5px;color:var(--muted);margin-top:16px">Cream field, soft border, blue focus ring. Placeholder is muted, never a fake label.</p>
+    </div>
+  </div>
+  <div style="height:18px"></div>
+  <div class="grid3">
+    <div class="counter"><div class="n"><span class="dot"></span>3,204</div><div class="cap">people supporting</div></div>
+    <div class="card"><h3>Cards</h3><p>White on cream, 18px radius, 1px warm border. No heavy shadows, no glow.</p></div>
+    <div class="card"><h3>Radius &amp; spacing</h3><p>12px on controls, 18 to 24px on cards. Roomy padding. Let things breathe.</p></div>
+  </div>
+</div></section>
+
+<!-- FRAMES -->
+<section id="frames"><div class="page">
+  <div class="eyebrow">08 · Frames &amp; imagery</div>
+  <h2 class="sec-title">The frame is the hero</h2>
+  <p class="lead">Every campaign is a circular frame around a real person's photo. Keep rings clean and even. Blue is the default. Coral and amber rings are for campaigns that need a different tone. Custom uploads keep the outer design and open a window in the center.</p>
+  <div style="height:26px"></div>
+  <div class="ui">
+    <div class="frames">
+      <div class="frame"><div class="ringimg"><div class="face"></div><div class="body"></div></div><div class="cap">Blue, default</div></div>
+      <div class="frame"><div class="ringimg thin"><div class="face"></div><div class="body"></div></div><div class="cap">Blue, thin</div></div>
+      <div class="frame"><div class="ringimg coral"><div class="face"></div><div class="body"></div></div><div class="cap">Coral</div></div>
+      <div class="frame"><div class="ringimg amber"><div class="face"></div><div class="body"></div></div><div class="cap">Amber</div></div>
+    </div>
+  </div>
+  <div style="height:18px"></div>
+  <div class="grid2">
+    <div class="card"><h3>Photography</h3><p>Real people, real phones, warm natural light. Candid over posed. Faces welcome. No slick stock, no fake smiles.</p></div>
+    <div class="card"><h3>Shapes</h3><p>Rings and circles echo the logo. Use them as decoration, cropped off edges, at low opacity behind content.</p></div>
+  </div>
+</div></section>
+
+<!-- DO / DON'T -->
+<section id="dodont"><div class="page">
+  <div class="eyebrow">09 · Quick rules</div>
+  <h2 class="sec-title">Keep it on brand</h2>
+  <div style="height:18px"></div>
+  <div class="dd">
+    <div class="col do"><h4><span class="mark y">✓</span> Do</h4><ul>
+      <li>Lead with cream and the blue ring.</li>
+      <li>Write short, kind, plainspoken lines.</li>
+      <li>Put ink text on any blue fill.</li>
+      <li>Let the frame and the count be the stars.</li>
+      <li>Keep one clear primary action per screen.</li>
+    </ul></div>
+    <div class="col dont"><h4><span class="mark n">✕</span> Don't</h4><ul>
+      <li>Fall back to dark-zinc plus purple gradients.</li>
+      <li>Use white text on the bright blue.</li>
+      <li>Pile on glows, blurs, and grid backgrounds.</li>
+      <li>Write corporate hype or use em dashes.</li>
+      <li>Add ads, signup walls, or clutter.</li>
+    </ul></div>
+  </div>
+</div></section>
+
+<!-- APPLIED -->
+<section id="applied"><div class="page">
+  <div class="eyebrow">10 · Applied</div>
+  <h2 class="sec-title">What the home page becomes</h2>
+  <p class="lead">A preview of the direction on a real screen. This is the target for the redesign once you approve the book.</p>
+  <div style="height:24px"></div>
+  <div class="applied">
+    <div class="ah">
+      <div class="bigring"></div>
+      <div class="coralblob"></div>
+      <div class="nav">
+        <img src="ollabs-logo-black.png" alt="Ollabs" style="height:26px;width:auto" />
+        <button class="btn btn-primary" style="padding:9px 16px;font-size:14px">Create a campaign</button>
+      </div>
+      <h2>Bring your people <span class="c">together.</span></h2>
+      <p class="sub">One frame, one link, and everyone shows up wearing it. Free, no signup, no ads.</p>
+      <div class="row">
+        <button class="btn btn-dark">Start a campaign</button>
+        <button class="btn btn-ghost">See examples</button>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="page">
+  Ollabs Brand Book v1 · July 2026 · Warm &amp; human · Primary #01BEF6 · Bricolage Grotesque + Inter. Fonts load from Google Fonts, so view online. Reply with approve or edits, and we redo the site to match.
+</div></footer>
+
+</body>
+</html>

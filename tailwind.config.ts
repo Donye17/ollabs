@@ -9,11 +9,26 @@ const config: Config = {
         extend: {
             fontFamily: {
                 sans: ['var(--font-inter)', 'sans-serif'],
+                display: ['var(--font-display)', 'var(--font-inter)', 'sans-serif'],
             },
             colors: {
-                primary: '#3b82f6', // blue-500
-                secondary: '#27272a', // zinc-800
-                cta: '#F43F5E',
+                // Ollabs brand system
+                ink: '#06141F',
+                paper: '#F4F1EA',
+                paper2: '#EAE6DC',
+                cream: '#FDFCF9',
+                brand: {
+                    DEFAULT: '#01BEF6',
+                    deep: '#0288B8',
+                    wash: '#E4F7FE',
+                },
+                coral: '#FF5C39',
+                amber: '#FFC24B',
+                muted: '#726C5F',
+                // legacy aliases kept so existing components compile
+                primary: '#01BEF6',
+                secondary: '#EAE6DC',
+                cta: '#FF5C39',
             },
             animation: {
                 'fade-in': 'fade-in 0.5s ease-out',

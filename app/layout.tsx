@@ -2,7 +2,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Bricolage_Grotesque } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
@@ -11,34 +11,41 @@ const inter = Inter({
     display: 'swap',
 });
 
+const bricolage = Bricolage_Grotesque({
+    subsets: ['latin'],
+    weight: ['400', '600', '700', '800'],
+    variable: '--font-display',
+    display: 'swap',
+});
+
 export const metadata: Metadata = {
     metadataBase: new URL('https://ollabs.studio'),
     title: {
         template: '%s | Ollabs',
-        default: 'Ollabs — Free Profile Picture Frame Maker for Campaigns & Causes',
+        default: 'Ollabs: Free Profile Picture Frame Maker for Campaigns & Causes',
     },
-    description: 'Create a profile-picture frame for your cause, team, or event and share one link. Supporters add it to their photo in seconds — no signup, no ads. A clean, free alternative to Twibbon.',
+    description: 'Create a profile-picture frame for your cause, team, or event and share one link. Supporters add it to their photo in seconds, no signup, no ads. A clean, free alternative to Twibbon.',
     keywords: ['profile picture frame maker', 'profile picture frame', 'pfp frame', 'twibbon alternative', 'profile picture campaign', 'support frame maker', 'add frame to profile picture', 'campaign frame', 'fundraiser profile frame', 'flag overlay', 'avatar frame', 'no signup pfp frame'],
     openGraph: {
         type: 'website',
         locale: 'en_US',
         url: 'https://ollabs.studio',
         siteName: 'Ollabs',
-        title: 'Ollabs — Free Profile Picture Frame Maker for Campaigns & Causes',
-        description: 'Rally your people with a profile-picture frame. Share one link — supporters add it to their photo in seconds. Free, no signup, no ads.',
+        title: 'Ollabs: Free Profile Picture Frame Maker for Campaigns & Causes',
+        description: 'Rally your people with a profile-picture frame. Share one link, supporters add it to their photo in seconds. Free, no signup, no ads.',
         images: [
             {
                 url: 'https://ollabs.studio/Ollabs%20Logo%20White.png',
                 width: 1200,
                 height: 630,
-                alt: 'Ollabs — Profile Picture Frame Campaigns',
+                alt: 'Ollabs, Profile Picture Frame Campaigns',
             },
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Ollabs — Free Profile Picture Frame Maker for Campaigns & Causes',
-        description: 'Rally your people with a profile-picture frame. Share one link — supporters add it to their photo in seconds. Free, no signup, no ads.',
+        title: 'Ollabs: Free Profile Picture Frame Maker for Campaigns & Causes',
+        description: 'Rally your people with a profile-picture frame. Share one link, supporters add it to their photo in seconds. Free, no signup, no ads.',
         images: ['https://ollabs.studio/Ollabs%20Logo%20White.png'],
     },
     icons: {
@@ -100,8 +107,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" className="dark">
-            <body className={`${inter.variable} font-sans bg-zinc-950 text-zinc-400 antialiased selection:bg-blue-500/30 selection:text-blue-200`}>
+        <html lang="en">
+            <body className={`${inter.variable} ${bricolage.variable} font-sans bg-paper text-ink antialiased`}>
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

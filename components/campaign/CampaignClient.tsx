@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FrameRendererFactory } from '@/components/renderer/FrameRendererFactory';
 import { FrameConfig, FrameType } from '@/lib/types';
-import { Upload, Download, Share2, Check, Users, Loader2 } from 'lucide-react';
+import { Upload, Download, Share2, Check, Loader2 } from 'lucide-react';
 
 const CANVAS = 1024;
 
@@ -56,7 +56,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
             ctx.drawImage(img, cx - w / 2 + pos.x, cy - h / 2 + pos.y, w, h);
             ctx.restore();
         } else {
-            ctx.fillStyle = '#18181b';
+            ctx.fillStyle = '#EAE6DC';
             ctx.beginPath();
             ctx.arc(cx, cy, radius, 0, Math.PI * 2);
             ctx.fill();
@@ -160,14 +160,16 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     };
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-white flex flex-col items-center px-4 py-6">
-            <a href="/" className="text-2xl font-black tracking-tight mb-6"><span className="text-sky-400">O</span>llabs</a>
+        <div className="min-h-screen bg-paper text-ink flex flex-col items-center px-4 py-6">
+            <a href="/" className="mb-6">
+                <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-7 w-auto" />
+            </a>
 
             <div className="w-full max-w-sm flex flex-col items-center gap-4">
                 <div className="text-center">
-                    <p className="text-[11px] uppercase tracking-widest text-zinc-500">Ollabs campaign</p>
-                    <h1 className="text-2xl font-bold mt-1">{title}</h1>
-                    {description && <p className="text-sm text-zinc-400 mt-1">{description}</p>}
+                    <p className="text-[11px] uppercase tracking-[0.2em] font-bold text-muted">Ollabs campaign</p>
+                    <h1 className="font-display text-2xl font-extrabold mt-1">{title}</h1>
+                    {description && <p className="text-sm text-ink/70 mt-1">{description}</p>}
                 </div>
 
                 <canvas
@@ -182,19 +184,19 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     onDragLeave={onDragLeave}
                     onDrop={onDrop}
                     onClick={() => { if (!hasImage) fileRef.current?.click(); }}
-                    className={`w-64 h-64 sm:w-72 sm:h-72 rounded-full touch-none transition-all ${hasImage ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${dragOver ? 'ring-4 ring-sky-500/70 scale-[1.03]' : ''}`}
+                    className={`w-64 h-64 sm:w-72 sm:h-72 rounded-full touch-none transition-all ${hasImage ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${dragOver ? 'ring-4 ring-brand/70 scale-[1.03]' : ''}`}
                     style={{ background: 'transparent' }}
                 />
 
                 {hasImage ? (
                     <div className="w-full flex items-center gap-3 px-2">
-                        <span className="text-xs text-zinc-500">Size</span>
+                        <span className="text-xs font-semibold text-muted">Size</span>
                         <input type="range" min={0.3} max={3} step={0.01} value={zoom}
                             onChange={(e) => setZoom(parseFloat(e.target.value))}
-                            className="flex-1 accent-sky-500" />
+                            className="flex-1 accent-brand" />
                     </div>
                 ) : (
-                    <p className="text-sm text-zinc-500">Tap the circle or drag a photo onto it.</p>
+                    <p className="text-sm text-muted">Tap the circle or drag a photo onto it.</p>
                 )}
 
                 <input ref={fileRef} type="file" accept="image/*" className="hidden"
@@ -202,36 +204,36 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
 
                 {!hasImage ? (
                     <button onClick={() => fileRef.current?.click()}
-                        className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-400 text-white transition-colors">
+                        className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all">
                         <Upload size={18} /> Upload your photo
                     </button>
                 ) : (
                     <>
                         <button onClick={handleDownload} disabled={downloading}
-                            className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-400 text-white transition-colors disabled:opacity-50">
+                            className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50">
                             {downloading ? <Loader2 size={18} className="animate-spin" /> : <><Download size={18} /> Download</>}
                         </button>
                         <div className="w-full flex gap-3">
                             <button onClick={() => fileRef.current?.click()}
-                                className="flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white transition-colors">
+                                className="flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                 <Upload size={16} /> New photo
                             </button>
                             <button onClick={handleShare}
-                                className="flex-1 py-3 rounded-xl font-medium flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white transition-colors">
-                                {copied ? <><Check size={16} className="text-green-400" /> Copied</> : <><Share2 size={16} /> Share</>}
+                                className="flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                {copied ? <><Check size={16} className="text-brand-deep" /> Copied</> : <><Share2 size={16} /> Share</>}
                             </button>
                         </div>
                     </>
                 )}
 
-                <div className="w-full bg-zinc-900 rounded-xl py-3 text-center mt-1">
-                    <div className="flex items-center justify-center gap-2 text-2xl font-bold">
-                        <Users size={20} className="text-zinc-500" /> {count.toLocaleString()}
+                <div className="w-full bg-cream border border-ink/10 rounded-xl py-4 text-center mt-1">
+                    <div className="font-display flex items-center justify-center gap-2 text-2xl font-extrabold">
+                        <span className="w-2.5 h-2.5 rounded-full bg-coral" /> {count.toLocaleString()}
                     </div>
-                    <p className="text-xs text-zinc-500 mt-0.5">people supporting</p>
+                    <p className="text-xs text-muted mt-0.5">people supporting</p>
                 </div>
 
-                <a href="/create" className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors mt-1">Make your own with Ollabs</a>
+                <a href="/create" className="text-xs text-muted hover:text-brand-deep transition-colors mt-1">Make your own with Ollabs</a>
             </div>
         </div>
     );

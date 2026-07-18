@@ -65,8 +65,8 @@ export const HomeExamples: React.FC<{ campaigns: HomeCampaign[] }> = ({ campaign
                 <Link key={c.slug} href={`/c/${c.slug}`} className="group flex flex-col items-center gap-3 transition-transform hover:-translate-y-1">
                     <ExampleCanvas frame={c.frame} />
                     <div className="text-center">
-                        <p className="text-sm font-medium text-white group-hover:text-blue-300 transition-colors">{c.title}</p>
-                        <p className="text-xs text-zinc-500">{c.supporterCount.toLocaleString()} supporting</p>
+                        <p className="text-sm font-semibold text-ink group-hover:text-brand-deep transition-colors">{c.title}</p>
+                        <p className="text-xs text-muted">{c.supporterCount.toLocaleString()} supporting</p>
                     </div>
                 </Link>
             ))}

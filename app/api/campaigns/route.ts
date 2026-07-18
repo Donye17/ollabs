@@ -17,7 +17,7 @@ function randomSuffix(len = 4): string {
     return Math.random().toString(36).slice(2, 2 + len);
 }
 
-// GET /api/campaigns — list public campaigns, newest first
+// GET /api/campaigns, list public campaigns, newest first
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 }
 
-// POST /api/campaigns — create a campaign (anonymous-first; attaches creator if signed in)
+// POST /api/campaigns, create a campaign (anonymous-first; attaches creator if signed in)
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();

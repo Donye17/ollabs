@@ -127,15 +127,15 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-50 font-sans">
-                <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-                <p className="text-zinc-400 text-sm animate-pulse">Loading Template...</p>
+            <div className="min-h-screen bg-ink flex flex-col items-center justify-center text-paper font-sans">
+                <Loader2 className="w-12 h-12 text-brand animate-spin mb-4" />
+                <p className="text-paper/60 text-sm animate-pulse">Loading template...</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen bg-ink text-paper font-sans">
             <NavBar />
             <OnboardingOverlay />
 
@@ -171,24 +171,24 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         />
 
                         {/* Tip Box */}
-                        <div className="mt-8 p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10 text-sm text-blue-200 max-w-md flex gap-3 items-start animate-fade-in">
-                            <AlertCircle className="shrink-0 text-blue-400 mt-0.5" size={18} />
-                            <p><strong>Tip:</strong> Drag & Drop a photo to start. Pinch to zoom/pan.</p>
+                        <div className="mt-8 p-4 bg-brand/10 rounded-2xl border border-brand/20 text-sm text-paper/80 max-w-md flex gap-3 items-start animate-fade-in">
+                            <AlertCircle className="shrink-0 text-brand mt-0.5" size={18} />
+                            <p><strong className="text-paper">Tip:</strong> Drag and drop a photo to start. Pinch to zoom or pan.</p>
                         </div>
                     </div>
 
                     {/* Right Column: Key Controls */}
-                    <div className="lg:col-span-5 space-y-6 relative z-10 bg-zinc-950/95 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none p-4 -mx-4 rounded-t-3xl border-t border-white/10 lg:border-none lg:p-0 lg:m-0 lg:rounded-none shadow-[0_-10px_40px_rgba(0,0,0,0.5)] lg:shadow-none">
+                    <div className="lg:col-span-5 space-y-6 relative z-10 bg-ink/95 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none p-4 -mx-4 rounded-t-3xl border-t border-white/10 lg:border-none lg:p-0 lg:m-0 lg:rounded-none shadow-[0_-10px_40px_rgba(0,0,0,0.5)] lg:shadow-none">
 
                         {/* Creator Header */}
                         <div className="flex items-center justify-between px-2">
                             <div>
-                                <h1 className="text-2xl font-black text-white tracking-tight">Campaign builder</h1>
-                                <p className="text-xs text-zinc-400 font-medium">Design your frame, then share one link.</p>
+                                <h1 className="font-display text-2xl font-extrabold text-paper tracking-tight">Campaign builder</h1>
+                                <p className="text-xs text-paper/60 font-medium">Make your frame, then share one link.</p>
                             </div>
                             <button
                                 onClick={() => setIsPublishOpen(true)}
-                                className="bg-white text-zinc-950 px-3 py-2 sm:px-4 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-zinc-200 transition-colors shadow-lg shadow-white/5"
+                                className="bg-brand text-ink px-3 py-2 sm:px-4 rounded-xl text-sm font-bold flex items-center gap-2 hover:brightness-105 transition-all"
                             >
                                 <Upload size={16} /> <span className="hidden sm:inline">Create campaign</span>
                             </button>
@@ -316,8 +316,8 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                 parentId={remixId}
             />
 
-            <footer className="py-12 text-center text-zinc-600 text-sm border-t border-white/5 bg-zinc-950">
-                <p>&copy; {new Date().getFullYear()} Ollabs. Designed & Built for the Community.</p>
+            <footer className="py-12 text-center text-paper/40 text-sm border-t border-white/10 bg-ink">
+                <p>&copy; {new Date().getFullYear()} Ollabs. Bring your people together.</p>
             </footer>
         </div>
     );
