@@ -20,6 +20,8 @@ export const FramePreview: React.FC<{ frame: FrameConfig; className?: string }> 
 
         const draw = () => {
             ctx.clearRect(0, 0, CANVAS, CANVAS);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
             ctx.save();
             ctx.beginPath();
             ctx.arc(cx, cy, radius, 0, Math.PI * 2);

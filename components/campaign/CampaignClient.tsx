@@ -143,18 +143,23 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
 
         const cx = CANVAS / 2, cy = CANVAS / 2, radius = CANVAS / 2;
         ctx.clearRect(0, 0, CANVAS, CANVAS);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
 
         const img = imgRef.current;
         if (img) {
+            // Draw the photo, then mask to a circle with an anti-aliased arc fill
+            // (destination-in). This gives a smooth edge, unlike a hard clip().
             ctx.save();
-            ctx.beginPath();
-            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-            ctx.closePath();
-            ctx.clip();
             const ratio = Math.max((radius * 2) / img.width, (radius * 2) / img.height);
             const w = img.width * ratio * zoom;
             const h = img.height * ratio * zoom;
             ctx.drawImage(img, cx - w / 2 + pos.x, cy - h / 2 + pos.y, w, h);
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.fill();
             ctx.restore();
         } else {
             ctx.fillStyle = '#EAE6DC';

@@ -69,6 +69,8 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
 
         // Clear canvas
         ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
 
         const centerX = CANVAS_SIZE / 2;
         const centerY = CANVAS_SIZE / 2;
@@ -83,11 +85,10 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
         ctx.fill();
         ctx.restore();
 
-        // 2. Draw Image (Masked)
+        // 2. Draw Image, then mask with an anti-aliased path fill (destination-in)
+        // for a smooth edge instead of a hard clip().
         if (imageObject) {
             ctx.save();
-            renderer.createPath(ctx, centerX, centerY, radius);
-            ctx.clip();
             const imgWidth = imageObject.width;
             const imgHeight = imageObject.height;
             const scaleRatio = Math.max((radius * 2) / imgWidth, (radius * 2) / imgHeight);
@@ -98,6 +99,12 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
             ctx.translate(imageCenterX, imageCenterY);
             ctx.rotate((rotation * Math.PI) / 180);
             ctx.drawImage(imageObject, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+            ctx.restore();
+
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-in';
+            renderer.createPath(ctx, centerX, centerY, radius);
+            ctx.fill();
             ctx.restore();
         }
 
