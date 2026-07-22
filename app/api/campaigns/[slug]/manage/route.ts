@@ -1,5 +1,6 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
+import { CATEGORY_KEYS } from '@/lib/categories';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 401 });
 
         const result = await pool.query(
-            `SELECT id, slug, title, description, frame_config, supporter_count, view_count, goal, preview_url, is_public, created_at
+            `SELECT id, slug, title, description, frame_config, supporter_count, view_count, goal, category, preview_url, is_public, created_at
              FROM campaigns
              WHERE slug = $1 AND owner_token = $2
              LIMIT 1`,
@@ -97,6 +98,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             }
             sets.push(`goal = $${i++}`);
             values.push(goalValue);
+        }
+        if ('category' in body) {
+            const cat = typeof body.category === 'string' && CATEGORY_KEYS.includes(body.category) ? body.category : null;
+            sets.push(`category = $${i++}`);
+            values.push(cat);
         }
 
         let newSlug: string | null = null;

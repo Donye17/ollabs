@@ -5,6 +5,7 @@ import { FrameConfig } from '@/lib/types';
 import { upload } from '@vercel/blob/client';
 import { FramePreview } from './FramePreview';
 import { QRCode } from './QRCode';
+import { CATEGORIES } from '@/lib/categories';
 
 interface PublishTemplateModalProps {
     isOpen: boolean;
@@ -18,6 +19,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [goal, setGoal] = useState('');
+    const [category, setCategory] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [campaignUrl, setCampaignUrl] = useState<string | null>(null);
     const [manageUrl, setManageUrl] = useState<string | null>(null);
@@ -46,7 +48,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             const res = await fetch('/api/campaigns', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description, frameConfig: config, previewUrl, goal: goal || null })
+                body: JSON.stringify({ title, description, frameConfig: config, previewUrl, goal: goal || null, category: category || null })
             });
 
             if (res.ok) {
@@ -102,6 +104,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         setTitle('');
         setDescription('');
         setGoal('');
+        setCategory('');
         setCampaignUrl(null);
         setManageUrl(null);
         setShowQR(false);
@@ -198,19 +201,34 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Supporter goal (optional)</label>
-                                <input
-                                    type="number"
-                                    min={1}
-                                    inputMode="numeric"
-                                    value={goal}
-                                    onChange={(e) => setGoal(e.target.value)}
-                                    placeholder="e.g. 1000"
-                                    className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
-                                />
-                                <p className="text-[11px] text-muted">Shows a progress bar on your campaign page.</p>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Goal (optional)</label>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        inputMode="numeric"
+                                        value={goal}
+                                        onChange={(e) => setGoal(e.target.value)}
+                                        placeholder="e.g. 1000"
+                                        className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Category</label>
+                                    <select
+                                        value={category}
+                                        onChange={(e) => setCategory(e.target.value)}
+                                        className="w-full bg-cream border border-ink/10 rounded-xl px-3 py-3 text-ink focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
+                                    >
+                                        <option value="">None</option>
+                                        {CATEGORIES.map((c) => (
+                                            <option key={c.key} value={c.key}>{c.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
+                            <p className="text-[11px] text-muted">A goal shows a progress bar; a category helps people find you on Explore.</p>
                         </div>
                     )}
                 </div>

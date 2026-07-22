@@ -4,6 +4,7 @@ import { NavBar } from '@/components/NavBar';
 import { ExploreClient, ExploreCampaign } from '@/components/ExploreClient';
 import { FrameConfig } from '@/lib/types';
 import { pool } from '@/lib/neon';
+import { CATEGORIES, CATEGORY_KEYS } from '@/lib/categories';
 
 export const revalidate = 300;
 
@@ -17,9 +18,11 @@ export const metadata: Metadata = {
 
 type Sort = 'popular' | 'trending' | 'newest';
 
-async function getCampaigns(sort: Sort): Promise<ExploreCampaign[]> {
+async function getCampaigns(sort: Sort, category: string | null): Promise<ExploreCampaign[]> {
     const base = `SELECT c.slug, c.title, c.frame_config, c.supporter_count FROM campaigns c`;
-    const where = `WHERE c.is_public = true AND c.is_hidden IS NOT TRUE`;
+    // category is validated against the fixed allowlist before reaching here, so it is safe to inline.
+    const catClause = category ? ` AND c.category = '${category}'` : '';
+    const where = `WHERE c.is_public = true AND c.is_hidden IS NOT TRUE${catClause}`;
     let query: string;
     if (sort === 'newest') {
         query = `${base} ${where} ORDER BY c.created_at DESC LIMIT 60`;
@@ -57,10 +60,19 @@ const SORTS: { key: Sort; label: string }[] = [
     { key: 'newest', label: 'Newest' },
 ];
 
-export default async function ExplorePage({ searchParams }: { searchParams: Promise<{ sort?: string }> }) {
+function buildHref(sort: Sort, category: string | null): string {
+    const params = new URLSearchParams();
+    if (sort !== 'popular') params.set('sort', sort);
+    if (category) params.set('category', category);
+    const qs = params.toString();
+    return qs ? `/explore?${qs}` : '/explore';
+}
+
+export default async function ExplorePage({ searchParams }: { searchParams: Promise<{ sort?: string; category?: string }> }) {
     const sp = await searchParams;
     const sort: Sort = sp.sort === 'newest' ? 'newest' : sp.sort === 'trending' ? 'trending' : 'popular';
-    const campaigns = await getCampaigns(sort);
+    const category = sp.category && CATEGORY_KEYS.includes(sp.category) ? sp.category : null;
+    const campaigns = await getCampaigns(sort, category);
 
     return (
         <main className="min-h-screen bg-paper text-ink">
@@ -74,15 +86,33 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
             </section>
 
             <section className="px-6 pb-4">
-                <div className="max-w-5xl mx-auto flex justify-center">
+                <div className="max-w-5xl mx-auto flex flex-col items-center gap-4">
                     <div className="inline-flex p-1 bg-cream border border-ink/10 rounded-full">
                         {SORTS.map((s) => (
                             <Link
                                 key={s.key}
-                                href={s.key === 'popular' ? '/explore' : `/explore?sort=${s.key}`}
+                                href={buildHref(s.key, category)}
                                 className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${sort === s.key ? 'bg-ink text-paper' : 'text-muted hover:text-ink'}`}
                             >
                                 {s.label}
+                            </Link>
+                        ))}
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                        <Link
+                            href={buildHref(sort, null)}
+                            className={`px-3.5 py-1.5 rounded-full text-sm font-medium border transition-all ${category === null ? 'bg-brand/15 border-brand/40 text-brand-deep' : 'bg-cream border-ink/10 text-muted hover:text-ink'}`}
+                        >
+                            All
+                        </Link>
+                        {CATEGORIES.map((c) => (
+                            <Link
+                                key={c.key}
+                                href={buildHref(sort, c.key)}
+                                className={`px-3.5 py-1.5 rounded-full text-sm font-medium border transition-all ${category === c.key ? 'bg-brand/15 border-brand/40 text-brand-deep' : 'bg-cream border-ink/10 text-muted hover:text-ink'}`}
+                            >
+                                {c.label}
                             </Link>
                         ))}
                     </div>

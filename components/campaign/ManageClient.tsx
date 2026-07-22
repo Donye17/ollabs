@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from 'react';
 import { QRCode } from '@/components/QRCode';
+import { CATEGORIES } from '@/lib/categories';
 import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck } from 'lucide-react';
 
 interface ManageData {
@@ -10,6 +11,7 @@ interface ManageData {
     supporter_count: number;
     view_count: number;
     goal: number | null;
+    category: string | null;
     created_at: string;
     daily?: { day: string; n: number }[];
 }
@@ -25,6 +27,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [goalInput, setGoalInput] = useState('');
+    const [categoryInput, setCategoryInput] = useState('');
     const [slugInput, setSlugInput] = useState('');
     const [saving, setSaving] = useState(false);
     const [saveMsg, setSaveMsg] = useState<string | null>(null);
@@ -55,6 +58,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                 setTitle(d.title);
                 setDescription(d.description || '');
                 setGoalInput(d.goal != null ? String(d.goal) : '');
+                setCategoryInput(d.category || '');
                 setSlugInput(d.slug);
             })
             .catch((e) => setError(e.message))
@@ -74,7 +78,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
         setSaving(true);
         setSaveMsg(null);
         setSaveErr(null);
-        const payload: Record<string, string> = { token, title, description, goal: goalInput };
+        const payload: Record<string, string> = { token, title, description, goal: goalInput, category: categoryInput };
         if (slugInput && slugInput !== currentSlug) payload.slug = slugInput;
         try {
             const res = await fetch(`/api/campaigns/${currentSlug}/manage`, {
@@ -234,12 +238,23 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                     className="w-full bg-paper border border-ink/10 rounded-xl px-3 py-2.5 text-ink focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all min-h-[70px] resize-none" />
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-ink/70">Supporter goal</label>
-                                <input type="number" min={1} inputMode="numeric" value={goalInput} onChange={(e) => setGoalInput(e.target.value)}
-                                    placeholder="No goal set"
-                                    className="w-full bg-paper border border-ink/10 rounded-xl px-3 py-2.5 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all" />
-                                <p className="text-[11px] text-muted">Shows a progress bar on your campaign page. Leave blank for none.</p>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-ink/70">Supporter goal</label>
+                                    <input type="number" min={1} inputMode="numeric" value={goalInput} onChange={(e) => setGoalInput(e.target.value)}
+                                        placeholder="No goal"
+                                        className="w-full bg-paper border border-ink/10 rounded-xl px-3 py-2.5 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all" />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-ink/70">Category</label>
+                                    <select value={categoryInput} onChange={(e) => setCategoryInput(e.target.value)}
+                                        className="w-full bg-paper border border-ink/10 rounded-xl px-3 py-2.5 text-ink focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all">
+                                        <option value="">None</option>
+                                        {CATEGORIES.map((c) => (
+                                            <option key={c.key} value={c.key}>{c.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div className="space-y-1.5">
