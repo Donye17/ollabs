@@ -12,7 +12,7 @@ async function getExampleCampaigns(): Promise<HomeCampaign[]> {
     try {
         const res = await pool.query(
             `SELECT slug, title, frame_config, supporter_count
-             FROM campaigns WHERE is_public = true
+             FROM campaigns WHERE is_public = true AND is_hidden IS NOT TRUE
              ORDER BY created_at DESC LIMIT 3`
         );
         return res.rows.map((r) => ({
@@ -33,7 +33,14 @@ const steps = [
     { icon: Users, title: "They add it", body: "They drop in a photo, download it framed, and your counter ticks up." },
 ];
 
-const audiences = ["Causes", "Sports teams", "Events", "Fundraisers", "Communities", "Brands"];
+const audiences = [
+    { label: "Fundraisers", href: "/for/fundraisers" },
+    { label: "Nonprofits", href: "/for/nonprofits" },
+    { label: "Sports teams", href: "/for/sports-teams" },
+    { label: "Churches", href: "/for/churches" },
+    { label: "Schools", href: "/for/schools" },
+    { label: "Events", href: "/for/events" },
+];
 
 const reasons = [
     "No signup required",
@@ -113,8 +120,11 @@ export default async function Home() {
                     <p className="text-xs uppercase tracking-[0.2em] text-muted font-bold mb-6">Made for</p>
                     <div className="flex flex-wrap items-center justify-center gap-3">
                         {audiences.map((a) => (
-                            <span key={a} className="px-4 py-2 rounded-full bg-brand/12 border border-brand/30 text-brand-deep text-sm font-semibold">{a}</span>
+                            <Link key={a.href} href={a.href} className="px-4 py-2 rounded-full bg-brand/12 border border-brand/30 text-brand-deep text-sm font-semibold hover:bg-brand/20 transition-colors">{a.label}</Link>
                         ))}
+                    </div>
+                    <div className="mt-6">
+                        <Link href="/for" className="text-sm font-semibold text-brand-deep hover:underline">See all the ways people use Ollabs</Link>
                     </div>
                 </div>
             </section>
@@ -170,6 +180,8 @@ export default async function Home() {
                                 <h5 className="font-display font-bold mb-4">Product</h5>
                                 <ul className="space-y-2 text-sm text-muted">
                                     <li><Link href="/create" className="hover:text-brand-deep transition-colors">Create a campaign</Link></li>
+                                    <li><Link href="/explore" className="hover:text-brand-deep transition-colors">Explore campaigns</Link></li>
+                                    <li><Link href="/for" className="hover:text-brand-deep transition-colors">Use cases</Link></li>
                                 </ul>
                             </div>
                             <div>

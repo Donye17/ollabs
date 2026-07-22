@@ -8,7 +8,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     try {
         const { slug } = await params;
         const result = await pool.query(
-            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, is_public, created_at
+            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, is_public, is_hidden, created_at
              FROM campaigns
              WHERE slug = $1
              LIMIT 1`,
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         }
 
         const campaign = result.rows[0];
-        if (campaign.is_public === false) {
+        if (campaign.is_public === false || campaign.is_hidden === true) {
             return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
         }
 

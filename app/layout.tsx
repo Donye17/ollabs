@@ -35,10 +35,10 @@ export const metadata: Metadata = {
         description: 'Rally your people with a profile-picture frame. Share one link, supporters add it to their photo in seconds. Free, no signup, no ads.',
         images: [
             {
-                url: 'https://ollabs.studio/Ollabs%20Logo%20White.png',
+                url: 'https://ollabs.studio/og.png',
                 width: 1200,
                 height: 630,
-                alt: 'Ollabs, Profile Picture Frame Campaigns',
+                alt: 'Ollabs, bring your people together with a profile-picture frame',
             },
         ],
     },
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'Ollabs: Free Profile Picture Frame Maker for Campaigns & Causes',
         description: 'Rally your people with a profile-picture frame. Share one link, supporters add it to their photo in seconds. Free, no signup, no ads.',
-        images: ['https://ollabs.studio/Ollabs%20Logo%20White.png'],
+        images: ['https://ollabs.studio/og.png'],
     },
     icons: {
         icon: [

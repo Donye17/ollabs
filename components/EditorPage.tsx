@@ -4,10 +4,12 @@ import { Editor } from './Editor';
 import { FrameSelector } from './FrameSelector';
 import { FrameCustomizer } from './FrameCustomizer';
 import { CustomFramePanel } from './CustomFramePanel';
+import { CaptionControls } from './CaptionControls';
 import { ContactPreview } from './ContactPreview';
 import { TextControls } from './TextControls';
 import { NavBar } from '@/components/NavBar';
-import { AVAILABLE_FRAMES } from '@/lib/constants';
+import { DEFAULT_FRAME } from '@/lib/constants';
+import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { FrameConfig, StickerConfig, TextConfig, MotionEffect } from '@/lib/types';
 import { AlertCircle, Sparkles, Sliders, Eye, Type, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
@@ -16,7 +18,7 @@ import { removeBackground } from "@imgly/background-removal";
 
 export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     // History State (Frame Config)
-    const [history, setHistory] = useState<FrameConfig[]>([AVAILABLE_FRAMES[2]]);
+    const [history, setHistory] = useState<FrameConfig[]>([DEFAULT_FRAME]);
     const [historyIndex, setHistoryIndex] = useState<number>(0);
     const selectedFrame = history[historyIndex];
 
@@ -93,11 +95,13 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
         }
     };
 
-    const handleImageSelect = (file: File) => {
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => setImageSrc(event.target?.result as string);
-            reader.readAsDataURL(file);
+    const handleImageSelect = async (file: File) => {
+        if (!file) return;
+        try {
+            const dataUrl = await fileToDisplayDataUrl(file);
+            setImageSrc(dataUrl);
+        } catch {
+            alert('That image could not be opened. Try a JPG or PNG.');
         }
     };
 
@@ -218,12 +222,15 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         <div className="glass-panel p-6 rounded-3xl min-h-[400px]">
 
                             {activeTab === 'design' && (
-                                <div className="space-y-4 animate-fade-in">
+                                <div className="space-y-5 animate-fade-in">
                                     <div>
-                                        <h2 className="text-lg font-bold text-white mb-1">Choose a Style</h2>
+                                        <h2 className="text-lg font-bold text-white mb-1">Choose a style</h2>
                                         <p className="text-zinc-400 text-xs">Select a base frame to start with.</p>
                                     </div>
                                     <FrameSelector selectedFrameId={selectedFrame.id} onSelect={handlePresetSelect} />
+                                    <div className="pt-4 border-t border-white/10">
+                                        <CaptionControls frame={selectedFrame} onChange={handleFrameUpdate} />
+                                    </div>
                                 </div>
                             )}
 

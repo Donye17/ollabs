@@ -1,9 +1,10 @@
 "use client";
 import React, { useState } from 'react';
-import { X, Check, Loader2, Copy, ExternalLink, Rocket } from 'lucide-react';
+import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { upload } from '@vercel/blob/client';
 import { FramePreview } from './FramePreview';
+import { QRCode } from './QRCode';
 
 interface PublishTemplateModalProps {
     isOpen: boolean;
@@ -18,7 +19,10 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [campaignUrl, setCampaignUrl] = useState<string | null>(null);
+    const [manageUrl, setManageUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
+    const [manageCopied, setManageCopied] = useState(false);
+    const [showQR, setShowQR] = useState(false);
 
     if (!isOpen) return null;
 
@@ -47,6 +51,9 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             if (res.ok) {
                 const campaign = await res.json();
                 setCampaignUrl(`${window.location.origin}/c/${campaign.slug}`);
+                if (campaign.owner_token) {
+                    setManageUrl(`${window.location.origin}/c/${campaign.slug}/manage?k=${campaign.owner_token}`);
+                }
             } else {
                 const err = await res.json().catch(() => ({}));
                 alert(err.error || 'Failed to create campaign');
@@ -70,11 +77,24 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         }
     };
 
+    const handleCopyManage = async () => {
+        if (!manageUrl) return;
+        try {
+            await navigator.clipboard.writeText(manageUrl);
+            setManageCopied(true);
+            setTimeout(() => setManageCopied(false), 1500);
+        } catch {
+            // clipboard unavailable
+        }
+    };
+
     const handleClose = () => {
         onClose();
         setTitle('');
         setDescription('');
         setCampaignUrl(null);
+        setManageUrl(null);
+        setShowQR(false);
     };
 
     return (
@@ -106,14 +126,43 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     {copied ? <><Check size={14} className="text-brand-deep" /> Copied</> : <><Copy size={14} /> Copy</>}
                                 </button>
                             </div>
-                            <a
-                                href={campaignUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
-                            >
-                                <ExternalLink size={18} /> Open campaign
-                            </a>
+                            <div className="flex gap-2">
+                                <a
+                                    href={campaignUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
+                                >
+                                    <ExternalLink size={18} /> Open
+                                </a>
+                                <button
+                                    onClick={() => setShowQR((v) => !v)}
+                                    className="py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
+                                >
+                                    <QrCode size={18} /> QR
+                                </button>
+                            </div>
+
+                            {showQR && (
+                                <div className="flex flex-col items-center gap-2">
+                                    <QRCode value={campaignUrl} size={172} className="border border-ink/10" />
+                                    <p className="text-[11px] text-muted">Scan or download to print for events</p>
+                                </div>
+                            )}
+
+                            {manageUrl && (
+                                <div className="bg-brand/10 border border-brand/30 rounded-xl p-4 space-y-2">
+                                    <div className="flex items-center gap-2 text-ink">
+                                        <ShieldCheck size={16} className="text-brand-deep" />
+                                        <span className="text-sm font-bold">Your private manage link</span>
+                                    </div>
+                                    <p className="text-xs text-ink/70">Bookmark this. It is the only way to see your stats and edit the campaign later. Keep it private.</p>
+                                    <button onClick={handleCopyManage}
+                                        className="w-full py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                        {manageCopied ? <><Check size={15} className="text-brand-deep" /> Copied</> : <><Copy size={15} /> Copy manage link</>}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         /* Form */

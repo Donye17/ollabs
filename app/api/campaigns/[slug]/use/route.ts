@@ -10,7 +10,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const { slug } = await params;
 
         const campaignRes = await pool.query(
-            `SELECT id FROM campaigns WHERE slug = $1 AND is_public = true LIMIT 1`,
+            `SELECT id FROM campaigns WHERE slug = $1 AND is_public = true AND is_hidden IS NOT TRUE LIMIT 1`,
             [slug]
         );
         if (campaignRes.rows.length === 0) {

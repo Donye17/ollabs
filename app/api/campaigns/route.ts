@@ -1,5 +1,6 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, clientIp } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +18,10 @@ function randomSuffix(len = 4): string {
     return Math.random().toString(36).slice(2, 2 + len);
 }
 
+function ownerToken(): string {
+    return (crypto.randomUUID() + crypto.randomUUID()).replace(/-/g, '');
+}
+
 // GET /api/campaigns, list public campaigns, newest first
 export async function GET(request: NextRequest) {
     try {
@@ -25,7 +30,7 @@ export async function GET(request: NextRequest) {
         const result = await pool.query(
             `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, created_at
              FROM campaigns
-             WHERE is_public = true
+             WHERE is_public = true AND is_hidden IS NOT TRUE
              ORDER BY created_at DESC
              LIMIT $1`,
             [limit]
@@ -40,6 +45,11 @@ export async function GET(request: NextRequest) {
 // POST /api/campaigns, create a campaign (anonymous-first; attaches creator if signed in)
 export async function POST(request: NextRequest) {
     try {
+        // Best-effort abuse throttle: 12 new campaigns per 10 minutes per client.
+        if (!rateLimit(`create:${clientIp(request)}`, 12, 10 * 60 * 1000)) {
+            return NextResponse.json({ error: 'You are creating campaigns too fast. Please wait a minute and try again.' }, { status: 429 });
+        }
+
         const body = await request.json();
         const { title, description, frameConfig, isPublic, previewUrl } = body;
 
@@ -47,21 +57,34 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'title and frameConfig are required' }, { status: 400 });
         }
 
+        // Input caps to keep payloads sane and block junk.
+        if (typeof title !== 'string' || title.length > 120) {
+            return NextResponse.json({ error: 'Title is too long (max 120 characters).' }, { status: 400 });
+        }
+        if (description != null && (typeof description !== 'string' || description.length > 400)) {
+            return NextResponse.json({ error: 'Description is too long (max 400 characters).' }, { status: 400 });
+        }
+        const frameJson = JSON.stringify(frameConfig);
+        if (frameJson.length > 200_000) {
+            return NextResponse.json({ error: 'Frame data is too large.' }, { status: 400 });
+        }
+
         // Anonymous-first: campaigns are created without an account.
         const creatorId = null;
         const creatorName = 'Anonymous';
 
         const baseSlug = slugify(title);
+        const token = ownerToken();
 
         let campaign = null;
         for (let attempt = 0; attempt < 5; attempt++) {
             const slug = `${baseSlug}-${randomSuffix()}`;
             try {
                 const result = await pool.query(
-                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, created_at)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
-                     RETURNING id, slug, title, supporter_count, created_at`,
-                    [slug, title, description ?? null, JSON.stringify(frameConfig), creatorId, creatorName, isPublic !== false, previewUrl ?? null]
+                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, created_at)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+                     RETURNING id, slug, title, supporter_count, owner_token, created_at`,
+                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token]
                 );
                 campaign = result.rows[0];
                 break;

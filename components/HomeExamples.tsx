@@ -45,7 +45,7 @@ function ExampleCanvas({ frame }: { frame: FrameConfig }) {
             ctx.fill();
             ctx.restore();
             try {
-                FrameRendererFactory.getRenderer(frame.type as FrameType).drawFrame({ ctx, centerX: cx, centerY: cy, radius, frame, onImageLoad: () => setTick((t) => t + 1) });
+                FrameRendererFactory.render({ ctx, centerX: cx, centerY: cy, radius, frame, onImageLoad: () => setTick((t) => t + 1) });
             } catch (e) {
                 console.error('example frame render failed', e);
             }

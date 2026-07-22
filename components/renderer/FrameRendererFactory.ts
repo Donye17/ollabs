@@ -1,6 +1,7 @@
 
 import { FrameType } from '@/lib/types';
 import { IFrameRenderer, RenderContext } from './types';
+import { drawCaption } from './caption';
 import {
     CircleRenderer,
     StarRenderer,
@@ -32,6 +33,14 @@ export class FrameRendererFactory {
         const renderer = this.createRenderer(type);
         this.renderers.set(type, renderer);
         return renderer;
+    }
+
+    // Draws the frame overlay plus any curved caption. Use this everywhere a
+    // frame is rendered so the slogan shows consistently (builder, previews,
+    // supporter page, and the exported PNG).
+    static render(context: RenderContext): void {
+        this.getRenderer(context.frame.type as FrameType).drawFrame(context);
+        drawCaption(context);
     }
 
     private static createRenderer(type: FrameType): IFrameRenderer {

@@ -12,6 +12,7 @@ export async function POST(request: Request): Promise<NextResponse> {
                 // Anonymous-first: anyone can upload a frame image.
                 return {
                     allowedContentTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+                    maximumSizeInBytes: 8 * 1024 * 1024, // 8 MB cap
                 };
             },
             onUploadCompleted: async ({ blob }) => {

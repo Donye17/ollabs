@@ -216,13 +216,32 @@ export const campaigns = pgTable("campaigns", {
 	creatorId: text("creator_id"),
 	creatorName: text("creator_name").default('Anonymous'),
 	supporterCount: integer("supporter_count").default(0),
+	viewCount: integer("view_count").default(0),
+	ownerToken: text("owner_token"),
 	previewUrl: text("preview_url"),
 	isPublic: boolean("is_public").default(true),
+	isHidden: boolean("is_hidden").default(false),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
 	index("idx_campaigns_slug").using("btree", table.slug.asc().nullsLast()),
 	index("idx_campaigns_created_at").using("btree", table.createdAt.desc().nullsLast()),
 	unique("campaigns_slug_key").on(table.slug),
+]);
+
+export const campaignReports = pgTable("campaign_reports", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	campaignId: uuid("campaign_id").notNull(),
+	slug: text().notNull(),
+	reason: text(),
+	reporterIp: text("reporter_ip"),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("idx_campaign_reports_campaign_id").using("btree", table.campaignId.asc().nullsLast()),
+	foreignKey({
+		columns: [table.campaignId],
+		foreignColumns: [campaigns.id],
+		name: "campaign_reports_campaign_id_fkey"
+	}).onDelete("cascade"),
 ]);
 
 export const campaignUses = pgTable("campaign_uses", {

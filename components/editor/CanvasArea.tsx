@@ -101,10 +101,8 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
             ctx.restore();
         }
 
-        // 3. Draw Frame Overlay
-        if (selectedFrame.type !== FrameType.NONE) {
-            renderer.drawFrame({ ctx, centerX, centerY, radius, frame: selectedFrame, onImageLoad: () => setImgTick((t) => t + 1) });
-        }
+        // 3. Draw Frame Overlay (plus curved caption)
+        FrameRendererFactory.render({ ctx, centerX, centerY, radius, frame: selectedFrame, onImageLoad: () => setImgTick((t) => t + 1) });
 
         // 4. Draw Stickers
         stickers.forEach(sticker => {

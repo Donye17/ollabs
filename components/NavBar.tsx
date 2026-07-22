@@ -16,6 +16,9 @@ export const NavBar: React.FC = () => {
                 </Link>
 
                 <div className="flex items-center gap-4 sm:gap-5">
+                    <Link href="/explore" className="text-xs font-bold text-muted hover:text-brand-deep hidden sm:block transition-colors uppercase tracking-wider">
+                        Explore
+                    </Link>
                     <a
                         href="mailto:feedback@ollabs.studio?subject=Ollabs%20Feedback"
                         className="text-xs font-bold text-muted hover:text-brand-deep hidden sm:flex items-center gap-1.5 transition-colors uppercase tracking-wider"

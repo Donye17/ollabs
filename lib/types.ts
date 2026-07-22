@@ -18,6 +18,13 @@ export enum FrameType {
   CUSTOM_IMAGE = 'CUSTOM_IMAGE'
 }
 
+export interface FrameCaption {
+  text: string;
+  color?: string;                 // text color, defaults to white
+  position?: 'bottom' | 'top';    // arc placement, defaults to bottom
+  size?: number;                  // 0.6 - 1.6 scale multiplier, defaults to 1
+}
+
 export interface FrameConfig {
   id: string;
   type: FrameType;
@@ -27,6 +34,7 @@ export interface FrameConfig {
   width: number; // proportional thickness
   imageUrl?: string; // For CUSTOM_IMAGE type
   cutoutScale?: number; // 0-1: transparent center hole (photo window) for CUSTOM_IMAGE
+  caption?: FrameCaption; // Optional curved slogan text around the ring
   stickers?: StickerConfig[]; // Optional stickers array
   textLayers?: TextConfig[]; // Optional text layers
   motionEffect?: MotionEffect;

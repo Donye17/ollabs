@@ -9,12 +9,12 @@ export const dynamic = 'force-dynamic';
 async function getCampaign(slug: string) {
     try {
         const res = await pool.query(
-            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, preview_url, is_public
+            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, preview_url, is_public, is_hidden
              FROM campaigns WHERE slug = $1 LIMIT 1`,
             [slug]
         );
         const c = res.rows[0];
-        if (!c || c.is_public === false) return null;
+        if (!c || c.is_public === false || c.is_hidden === true) return null;
         return c;
     } catch (e) {
         console.error('Failed to load campaign', e);
