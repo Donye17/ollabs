@@ -181,6 +181,7 @@ export default async function Home() {
                                 <ul className="space-y-2 text-sm text-muted">
                                     <li><Link href="/create" className="hover:text-brand-deep transition-colors">Create a campaign</Link></li>
                                     <li><Link href="/explore" className="hover:text-brand-deep transition-colors">Explore campaigns</Link></li>
+                                    <li><Link href="/mine" className="hover:text-brand-deep transition-colors">My campaigns</Link></li>
                                     <li><Link href="/for" className="hover:text-brand-deep transition-colors">Use cases</Link></li>
                                 </ul>
                             </div>

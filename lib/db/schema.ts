@@ -217,6 +217,8 @@ export const campaigns = pgTable("campaigns", {
 	creatorName: text("creator_name").default('Anonymous'),
 	supporterCount: integer("supporter_count").default(0),
 	viewCount: integer("view_count").default(0),
+	goal: integer("goal"),
+	category: text("category"),
 	ownerToken: text("owner_token"),
 	previewUrl: text("preview_url"),
 	isPublic: boolean("is_public").default(true),

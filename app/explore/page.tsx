@@ -15,15 +15,30 @@ export const metadata: Metadata = {
     twitter: { card: 'summary_large_image', images: ['/og.png'] },
 };
 
-async function getCampaigns(): Promise<ExploreCampaign[]> {
+type Sort = 'popular' | 'trending' | 'newest';
+
+async function getCampaigns(sort: Sort): Promise<ExploreCampaign[]> {
+    const base = `SELECT c.slug, c.title, c.frame_config, c.supporter_count FROM campaigns c`;
+    const where = `WHERE c.is_public = true AND c.is_hidden IS NOT TRUE`;
+    let query: string;
+    if (sort === 'newest') {
+        query = `${base} ${where} ORDER BY c.created_at DESC LIMIT 60`;
+    } else if (sort === 'trending') {
+        query = `${base}
+            LEFT JOIN (
+                SELECT campaign_id, COUNT(*)::int AS recent
+                FROM campaign_uses
+                WHERE created_at >= now() - interval '7 days'
+                GROUP BY campaign_id
+            ) r ON r.campaign_id = c.id
+            ${where}
+            ORDER BY COALESCE(r.recent, 0) DESC, c.supporter_count DESC NULLS LAST, c.created_at DESC
+            LIMIT 60`;
+    } else {
+        query = `${base} ${where} ORDER BY c.supporter_count DESC NULLS LAST, c.created_at DESC LIMIT 60`;
+    }
     try {
-        const res = await pool.query(
-            `SELECT slug, title, frame_config, supporter_count
-             FROM campaigns
-             WHERE is_public = true AND is_hidden IS NOT TRUE
-             ORDER BY supporter_count DESC NULLS LAST, created_at DESC
-             LIMIT 60`
-        );
+        const res = await pool.query(query);
         return res.rows.map((r) => ({
             slug: r.slug,
             title: r.title,
@@ -36,8 +51,16 @@ async function getCampaigns(): Promise<ExploreCampaign[]> {
     }
 }
 
-export default async function ExplorePage() {
-    const campaigns = await getCampaigns();
+const SORTS: { key: Sort; label: string }[] = [
+    { key: 'popular', label: 'Popular' },
+    { key: 'trending', label: 'Trending' },
+    { key: 'newest', label: 'Newest' },
+];
+
+export default async function ExplorePage({ searchParams }: { searchParams: Promise<{ sort?: string }> }) {
+    const sp = await searchParams;
+    const sort: Sort = sp.sort === 'newest' ? 'newest' : sp.sort === 'trending' ? 'trending' : 'popular';
+    const campaigns = await getCampaigns(sort);
 
     return (
         <main className="min-h-screen bg-paper text-ink">
@@ -47,6 +70,22 @@ export default async function ExplorePage() {
                 <div className="max-w-3xl mx-auto text-center">
                     <h1 className="font-display text-4xl md:text-5xl font-extrabold mb-4">Explore campaigns</h1>
                     <p className="text-lg text-ink/70">Real campaigns people are rallying behind right now. Add one to your photo, or start your own.</p>
+                </div>
+            </section>
+
+            <section className="px-6 pb-4">
+                <div className="max-w-5xl mx-auto flex justify-center">
+                    <div className="inline-flex p-1 bg-cream border border-ink/10 rounded-full">
+                        {SORTS.map((s) => (
+                            <Link
+                                key={s.key}
+                                href={s.key === 'popular' ? '/explore' : `/explore?sort=${s.key}`}
+                                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${sort === s.key ? 'bg-ink text-paper' : 'text-muted hover:text-ink'}`}
+                            >
+                                {s.label}
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </section>
 

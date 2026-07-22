@@ -17,6 +17,7 @@ interface PublishTemplateModalProps {
 export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [goal, setGoal] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [campaignUrl, setCampaignUrl] = useState<string | null>(null);
     const [manageUrl, setManageUrl] = useState<string | null>(null);
@@ -45,15 +46,23 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             const res = await fetch('/api/campaigns', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description, frameConfig: config, previewUrl })
+                body: JSON.stringify({ title, description, frameConfig: config, previewUrl, goal: goal || null })
             });
 
             if (res.ok) {
                 const campaign = await res.json();
-                setCampaignUrl(`${window.location.origin}/c/${campaign.slug}`);
-                if (campaign.owner_token) {
-                    setManageUrl(`${window.location.origin}/c/${campaign.slug}/manage?k=${campaign.owner_token}`);
-                }
+                const cUrl = `${window.location.origin}/c/${campaign.slug}`;
+                const mUrl = campaign.owner_token ? `${window.location.origin}/c/${campaign.slug}/manage?k=${campaign.owner_token}` : null;
+                setCampaignUrl(cUrl);
+                if (mUrl) setManageUrl(mUrl);
+
+                // Remember this campaign on the device so the owner can find it again.
+                try {
+                    const key = 'ollabs_my_campaigns';
+                    const list = JSON.parse(localStorage.getItem(key) || '[]');
+                    list.unshift({ slug: campaign.slug, title, url: cUrl, manageUrl: mUrl, createdAt: Date.now() });
+                    localStorage.setItem(key, JSON.stringify(list.slice(0, 50)));
+                } catch { /* ignore */ }
             } else {
                 const err = await res.json().catch(() => ({}));
                 alert(err.error || 'Failed to create campaign');
@@ -92,6 +101,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         onClose();
         setTitle('');
         setDescription('');
+        setGoal('');
         setCampaignUrl(null);
         setManageUrl(null);
         setShowQR(false);
@@ -186,6 +196,20 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     placeholder="What's this campaign for?"
                                     className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all min-h-[80px] resize-none"
                                 />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Supporter goal (optional)</label>
+                                <input
+                                    type="number"
+                                    min={1}
+                                    inputMode="numeric"
+                                    value={goal}
+                                    onChange={(e) => setGoal(e.target.value)}
+                                    placeholder="e.g. 1000"
+                                    className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
+                                />
+                                <p className="text-[11px] text-muted">Shows a progress bar on your campaign page.</p>
                             </div>
                         </div>
                     )}

@@ -77,10 +77,10 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
     frame.type === FrameType.MEMPHIS;
 
   return (
-    <div className="bg-slate-800/30 p-4 rounded-2xl border border-slate-700/50 space-y-4">
+    <div className="bg-cream p-4 rounded-2xl border border-ink/10 space-y-4">
       {/* Header with Undo/Redo */}
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2 text-slate-200 font-medium">
+        <div className="flex items-center gap-2 text-ink font-medium">
           <Sliders size={16} />
           <span>Customize</span>
         </div>
@@ -88,7 +88,7 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
           <button
             onClick={onUndo}
             disabled={!canUndo}
-            className="p-1.5 rounded-lg bg-slate-700 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-600 transition-colors"
+            className="p-1.5 rounded-lg bg-paper2 text-ink/80 hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-paper2 transition-colors"
             title="Undo last change"
           >
             <RotateCcw size={14} />
@@ -96,7 +96,7 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
           <button
             onClick={onRedo}
             disabled={!canRedo}
-            className="p-1.5 rounded-lg bg-slate-700 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-600 transition-colors"
+            className="p-1.5 rounded-lg bg-paper2 text-ink/80 hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-paper2 transition-colors"
             title="Redo last change"
           >
             <RotateCw size={14} />
@@ -108,7 +108,7 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
 
         {/* Border Style Selection */}
         <div className="space-y-2">
-          <label className="text-xs text-slate-400 flex items-center gap-1" title="Choose the style of the frame border">
+          <label className="text-xs text-muted flex items-center gap-1" title="Choose the style of the frame border">
             <BoxSelect size={12} /> Border Style
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -119,8 +119,8 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
                 className={`
                             px-2 py-2 rounded-lg text-[11px] font-medium border transition-all
                             ${frame.type === style.type
-                    ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/50'
-                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-200'}
+                    ? 'bg-brand border-brand text-ink shadow-lg shadow-blue-900/50'
+                    : 'bg-cream border-ink/10 text-muted hover:border-ink/15 hover:text-ink'}
                         `}
                 title={`Change frame style to ${style.label}`}
               >
@@ -134,16 +134,16 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
         {onAutoMatch && (
           <button
             onClick={onAutoMatch}
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-900/20 transition-all hover:scale-[1.02]"
+            className="w-full py-2.5 rounded-xl bg-brand hover:brightness-105 text-ink font-bold text-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
           >
-            <Sparkles size={14} /> ✨ Auto-Match Colors
+            <Sparkles size={14} /> Auto-match colors
           </button>
         )}
 
         {/* Color Palette Swatches */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <label className="text-xs text-slate-400 flex items-center gap-1" title="Select a preset color to apply to the primary color">
+            <label className="text-xs text-muted flex items-center gap-1" title="Select a preset color to apply to the primary color">
               <Palette size={12} /> Quick Colors
             </label>
           </div>
@@ -152,13 +152,13 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
               <button
                 key={c}
                 onClick={() => handleColorChange('color1', c)}
-                className="w-5 h-5 rounded-full ring-1 ring-slate-600 hover:scale-110 transition-transform relative group"
+                className="w-5 h-5 rounded-full ring-1 ring-ink/15 hover:scale-110 transition-transform relative group"
                 style={{ backgroundColor: c }}
                 title={`Apply color: ${c}`}
               >
                 {frame.color1.toLowerCase() === c.toLowerCase() && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-slate-900 rounded-full shadow-sm ring-1 ring-white/50" />
+                    <div className="w-1.5 h-1.5 bg-cream rounded-full shadow-sm ring-1 ring-ink/20" />
                   </div>
                 )}
               </button>
@@ -166,16 +166,16 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
           </div>
         </div>
 
-        <div className="border-t border-slate-700/50 pt-3 space-y-3">
+        <div className="border-t border-ink/10 pt-3 space-y-3">
           {/* Color 1 */}
           <div className="flex items-center justify-between group">
-            <label className="text-xs text-slate-400 flex items-center gap-2 group-hover:text-slate-300 transition-colors" title="The main color of the frame">
+            <label className="text-xs text-muted flex items-center gap-2 group-hover:text-ink transition-colors" title="The main color of the frame">
               <Pipette size={12} /> Primary Color
             </label>
             <div className="flex items-center gap-2">
               {/* Hex Input */}
               <div className="relative">
-                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-500 font-mono">#</span>
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted font-mono">#</span>
                 <input
                   type="text"
                   value={frame.color1.replace('#', '')}
@@ -185,13 +185,13 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
                       handleColorChange('color1', '#' + val);
                     }
                   }}
-                  className="w-20 bg-slate-900 border border-slate-700 rounded-md py-1 pl-4 pr-1 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-mono uppercase"
+                  className="w-20 bg-cream border border-ink/10 rounded-md py-1 pl-4 pr-1 text-xs text-ink focus:outline-none focus:border-brand font-mono uppercase"
                   maxLength={6}
                 />
               </div>
 
               {/* Color Picker */}
-              <div className="relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-slate-600 group-hover:ring-blue-500 transition-all cursor-pointer" title="Click to open color spectrum">
+              <div className="relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-ink/15 group-hover:ring-brand transition-all cursor-pointer" title="Click to open color spectrum">
                 <input
                   type="color"
                   value={frame.color1}
@@ -205,13 +205,13 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
           {/* Color 2 (Conditional) */}
           {hasSecondaryColor && (
             <div className="flex items-center justify-between group animate-in fade-in slide-in-from-top-2 duration-200">
-              <label className="text-xs text-slate-400 flex items-center gap-2 group-hover:text-slate-300 transition-colors" title="The secondary color for gradients, shadows, or dual effects">
-                <Pipette size={12} className="text-blue-400" />
+              <label className="text-xs text-muted flex items-center gap-2 group-hover:text-ink transition-colors" title="The secondary color for gradients, shadows, or dual effects">
+                <Pipette size={12} className="text-brand-deep" />
                 {frame.type === FrameType.MEMPHIS ? 'Shadow Color' : 'Secondary Color'}
               </label>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-500 font-mono uppercase">{frame.color2}</span>
-                <div className="relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-slate-600 group-hover:ring-blue-500 transition-all cursor-pointer" title="Click to open color picker">
+                <span className="text-[10px] text-muted font-mono uppercase">{frame.color2}</span>
+                <div className="relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-ink/15 group-hover:ring-brand transition-all cursor-pointer" title="Click to open color picker">
                   <input
                     type="color"
                     value={frame.color2 || '#ffffff'}
@@ -225,18 +225,18 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
         </div>
 
         {/* Thickness Slider with Visual Feedback */}
-        <div className="space-y-3 pt-4 border-t border-slate-700/50">
-          <div className="flex justify-between items-center text-xs text-slate-400">
+        <div className="space-y-3 pt-4 border-t border-ink/10">
+          <div className="flex justify-between items-center text-xs text-muted">
             <div className="flex items-center gap-1.5">
               <MoveHorizontal size={12} />
-              <span className="font-medium text-slate-300">Frame Thickness</span>
+              <span className="font-medium text-ink/80">Frame Thickness</span>
             </div>
-            <span className="bg-slate-700 px-2 py-0.5 rounded text-slate-200 font-mono text-[10px]">{frame.width}px</span>
+            <span className="bg-paper2 px-2 py-0.5 rounded text-ink font-mono text-[10px]">{frame.width}px</span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Thin visual indicator */}
-            <div className="w-5 h-5 rounded-full border border-slate-500 shrink-0" title="Thin (5px)"></div>
+            <div className="w-5 h-5 rounded-full border border-ink/20 shrink-0" title="Thin (5px)"></div>
 
             <input
               type="range"
@@ -245,15 +245,15 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
               step="1"
               value={frame.width}
               onChange={(e) => handleWidthChange(parseInt(e.target.value))}
-              className="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+              className="flex-1 h-2 bg-paper2 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 focus:outline-none focus:ring-2 focus:ring-brand/50 transition-all"
               title="Drag to adjust frame thickness"
             />
 
             {/* Thick visual indicator */}
-            <div className="w-5 h-5 rounded-full border-[5px] border-slate-500 shrink-0" title="Thick (50px)"></div>
+            <div className="w-5 h-5 rounded-full border-[5px] border-ink/20 shrink-0" title="Thick (50px)"></div>
           </div>
 
-          <div className="flex justify-between text-[10px] text-slate-600 px-1 font-medium uppercase tracking-wider">
+          <div className="flex justify-between text-[10px] text-muted px-1 font-medium uppercase tracking-wider">
             <span>5px</span>
             <span>50px</span>
           </div>

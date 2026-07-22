@@ -31,10 +31,11 @@ interface CampaignClientProps {
     description?: string | null;
     creatorName?: string | null;
     initialCount: number;
+    goal?: number | null;
     frame: FrameConfig;
 }
 
-export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, description, initialCount, frame }) => {
+export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, description, initialCount, goal, frame }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const imgRef = useRef<HTMLImageElement | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
@@ -56,6 +57,30 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     const [reportOpen, setReportOpen] = useState(false);
     const [reportReason, setReportReason] = useState('');
     const [reportDone, setReportDone] = useState(false);
+    const [canCopyImage, setCanCopyImage] = useState(false);
+    const [imageCopied, setImageCopied] = useState(false);
+
+    useEffect(() => {
+        setCanCopyImage(
+            typeof window !== 'undefined' &&
+            typeof window.ClipboardItem !== 'undefined' &&
+            !!navigator.clipboard && typeof navigator.clipboard.write === 'function'
+        );
+    }, []);
+
+    const handleCopyImage = async () => {
+        const canvas = canvasRef.current;
+        if (!canvas || !hasImage) return;
+        try {
+            const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/png', 1));
+            if (!blob) return;
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+            setImageCopied(true);
+            setTimeout(() => setImageCopied(false), 1500);
+            bumpCount();
+            setJustDownloaded(true);
+        } catch { /* clipboard image unavailable */ }
+    };
 
     const submitReport = async () => {
         try {
@@ -308,6 +333,13 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                             {downloading ? <Loader2 size={18} className="animate-spin" /> : <>{justDownloaded ? <><Check size={18} /> Downloaded, download again</> : <><Download size={18} /> Download</>}</>}
                         </button>
 
+                        {canCopyImage && (
+                            <button onClick={handleCopyImage}
+                                className="w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                {imageCopied ? <><Check size={16} className="text-brand-deep" /> Image copied</> : <><Copy size={16} /> Copy image</>}
+                            </button>
+                        )}
+
                         {justDownloaded && (
                             <div className="w-full bg-cream border border-ink/10 rounded-2xl p-4 space-y-3 animate-fade-in">
                                 <div className="text-center">
@@ -372,11 +404,26 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     </>
                 )}
 
-                <div className="w-full bg-cream border border-ink/10 rounded-xl py-4 text-center mt-1">
+                <div className="w-full bg-cream border border-ink/10 rounded-xl py-4 px-4 text-center mt-1">
                     <div className="font-display flex items-center justify-center gap-2 text-2xl font-extrabold">
                         <span className="w-2.5 h-2.5 rounded-full bg-coral" /> {count.toLocaleString()}
                     </div>
-                    <p className="text-xs text-muted mt-0.5">people supporting</p>
+                    {goal && goal > 0 ? (
+                        <>
+                            <div className="mt-2 h-2 w-full rounded-full bg-paper2 overflow-hidden">
+                                <div
+                                    className="h-full rounded-full bg-brand transition-all"
+                                    style={{ width: `${Math.min(100, Math.round((count / goal) * 100))}%` }}
+                                />
+                            </div>
+                            <p className="text-xs text-muted mt-1.5">
+                                {count.toLocaleString()} of {goal.toLocaleString()} supporters
+                                {count >= goal ? ' · goal reached' : ''}
+                            </p>
+                        </>
+                    ) : (
+                        <p className="text-xs text-muted mt-0.5">people supporting</p>
+                    )}
                 </div>
 
                 <a href="/create" className="text-xs text-muted hover:text-brand-deep transition-colors mt-1">Make your own with Ollabs</a>

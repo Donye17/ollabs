@@ -57,7 +57,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
             {imageObject && (
                 <div className="flex gap-3 justify-center w-full px-4">
-                    <button onClick={onDownload} className="flex-1 flex items-center justify-center gap-2 bg-slate-800/80 hover:bg-slate-700/80 backdrop-blur-md text-white py-3.5 px-6 rounded-xl transition-all font-bold border border-white/5 hover:border-white/10 hover:-translate-y-0.5">
+                    <button onClick={onDownload} className="flex-1 flex items-center justify-center gap-2 bg-cream hover:bg-paper2/80 backdrop-blur-md text-ink py-3.5 px-6 rounded-xl transition-all font-bold border border-ink/10 hover:border-ink/10 hover:-translate-y-0.5">
                         <Download size={20} /> <span>Save</span>
                     </button>
                 </div>
@@ -65,9 +65,9 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
             {/* Advanced Controls (Scale/Rotate for Selection or Image) */}
             {(imageObject || stickers.length > 0) && (
-                <div className="w-full bg-slate-900/60 p-5 rounded-2xl border border-white/5 backdrop-blur-xl space-y-5 animate-in slide-in-from-bottom-4 duration-500">
+                <div className="w-full bg-cream p-5 rounded-2xl border border-ink/10 backdrop-blur-xl space-y-5 animate-in slide-in-from-bottom-4 duration-500">
                     <div className="flex justify-between items-center px-1">
-                        <h4 className="text-xs font-bold font-heading text-slate-400 uppercase tracking-widest">{selection ? 'Adjust Decoration' : 'Adjust Base Image'}</h4>
+                        <h4 className="text-xs font-bold font-heading text-muted uppercase tracking-widest">{selection ? 'Adjust Decoration' : 'Adjust Base Image'}</h4>
                         {selection && <span className="text-[10px] text-primary font-bold font-mono bg-primary/10 px-2 py-0.5 rounded border border-primary/20">Selected</span>}
                     </div>
 
@@ -76,20 +76,20 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                         <button
                             onClick={onRemoveBackground}
                             disabled={isRemovingBackground}
-                            className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 border border-violet-500/30 hover:border-violet-500/50 hover:from-violet-600/30 hover:to-fuchsia-600/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
+                            className="w-full py-3 rounded-xl bg-brand/10 border border-brand/30 hover:bg-brand/20 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
                         >
                             {isRemovingBackground ? (
-                                <Loader2 size={16} className="animate-spin text-violet-300" />
+                                <Loader2 size={16} className="animate-spin text-brand-deep" />
                             ) : (
-                                <Sparkles size={16} className="text-violet-300 group-hover:text-white transition-colors" />
+                                <Sparkles size={16} className="text-brand-deep transition-colors" />
                             )}
-                            <span className="text-xs font-bold text-violet-200 group-hover:text-white">Magic Remove Background</span>
+                            <span className="text-xs font-bold text-brand-deep">Magic remove background</span>
                         </button>
                     )}
 
                     {/* Scale Control */}
                     <div className="flex items-center gap-3">
-                        <ZoomOut size={16} className="text-slate-500" />
+                        <ZoomOut size={16} className="text-muted" />
                         <input type="range" min="0.1" max="3" step="0.1"
                             value={selection ? (stickers.find(s => s.id === selection)?.scale || 1) : scale}
                             onChange={(e) => {
@@ -100,15 +100,15 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                                     setScale(val);
                                 }
                             }}
-                            className={`flex-1 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-indigo-500'}`}
+                            className={`flex-1 h-1.5 bg-paper2 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-brand'}`}
                             aria-label="Zoom level"
                         />
-                        <ZoomIn size={16} className="text-slate-500" />
+                        <ZoomIn size={16} className="text-muted" />
                     </div>
 
                     {/* Rotate Control */}
                     <div className="flex items-center gap-3">
-                        <div className="relative group"><RotateCw size={16} className="text-slate-500 group-hover:text-white transition-colors" /></div>
+                        <div className="relative group"><RotateCw size={16} className="text-muted group-hover:text-ink transition-colors" /></div>
                         <input type="range" min="-180" max="180" step="1"
                             value={selection ? (stickers.find(s => s.id === selection)?.rotation || 0) : rotation}
                             onChange={(e) => {
@@ -119,17 +119,17 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                                     setRotation(val);
                                 }
                             }}
-                            className={`flex-1 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-purple-500'}`}
+                            className={`flex-1 h-1.5 bg-paper2 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-brand'}`}
                             aria-label="Rotation angle"
                         />
-                        <span className="text-[10px] w-8 text-right font-mono text-slate-400">{selection ? (stickers.find(s => s.id === selection)?.rotation || 0) : rotation}°</span>
+                        <span className="text-[10px] w-8 text-right font-mono text-muted">{selection ? (stickers.find(s => s.id === selection)?.rotation || 0) : rotation}°</span>
                     </div>
 
-                    <div className="flex gap-2 pt-3 border-t border-white/5 justify-between">
-                        <button onClick={onAutoFit} className="flex items-center gap-2 px-3 py-2 hover:bg-slate-800 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-colors bg-slate-800/50 border border-transparent hover:border-white/5">
+                    <div className="flex gap-2 pt-3 border-t border-ink/10 justify-between">
+                        <button onClick={onAutoFit} className="flex items-center gap-2 px-3 py-2 hover:bg-cream rounded-lg text-xs font-bold text-muted hover:text-ink transition-colors bg-cream border border-transparent hover:border-ink/10">
                             <Maximize size={14} /> <span>Fit to Frame</span>
                         </button>
-                        <button onClick={onReset} className="flex items-center gap-2 px-3 py-2 hover:bg-slate-800 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-colors bg-slate-800/50 border border-transparent hover:border-white/5">
+                        <button onClick={onReset} className="flex items-center gap-2 px-3 py-2 hover:bg-cream rounded-lg text-xs font-bold text-muted hover:text-ink transition-colors bg-cream border border-transparent hover:border-ink/10">
                             <RefreshCcw size={14} /> <span>Reset All</span>
                         </button>
                     </div>

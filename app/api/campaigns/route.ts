@@ -1,6 +1,7 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, clientIp } from '@/lib/rateLimit';
+import { CATEGORY_KEYS } from '@/lib/categories';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,10 +52,21 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { title, description, frameConfig, isPublic, previewUrl } = body;
+        const { title, description, frameConfig, isPublic, previewUrl, goal, category } = body;
+        const categoryValue = typeof category === 'string' && CATEGORY_KEYS.includes(category) ? category : null;
 
         if (!title || !frameConfig) {
             return NextResponse.json({ error: 'title and frameConfig are required' }, { status: 400 });
+        }
+
+        // Optional supporter goal.
+        let goalValue: number | null = null;
+        if (goal != null && goal !== '') {
+            const g = Math.floor(Number(goal));
+            if (!Number.isFinite(g) || g < 1 || g > 100_000_000) {
+                return NextResponse.json({ error: 'Goal must be a number between 1 and 100,000,000.' }, { status: 400 });
+            }
+            goalValue = g;
         }
 
         // Input caps to keep payloads sane and block junk.
@@ -81,10 +93,10 @@ export async function POST(request: NextRequest) {
             const slug = `${baseSlug}-${randomSuffix()}`;
             try {
                 const result = await pool.query(
-                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, created_at)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, goal, category, created_at)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
                      RETURNING id, slug, title, supporter_count, owner_token, created_at`,
-                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token]
+                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, goalValue, categoryValue]
                 );
                 campaign = result.rows[0];
                 break;

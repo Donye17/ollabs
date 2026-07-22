@@ -26,32 +26,32 @@ export const OnboardingOverlay: React.FC = () => {
             {/* Backdrop with hole punch effect (simulated via multiple divs or just a dark overlay with transparency) */}
             {/* For simplicity, we just use a floating card near the center/upload area */}
 
-            <div className="absolute inset-0 bg-black/40 pointer-events-auto transition-opacity duration-500" onClick={handleDismiss} />
+            <div className="absolute inset-0 bg-ink/40 pointer-events-auto transition-opacity duration-500" onClick={handleDismiss} />
 
-            <div className="relative pointer-events-auto bg-white text-slate-900 p-6 rounded-2xl shadow-2xl max-w-sm mx-4 animate-in slide-in-from-bottom-10 zoom-in-95 duration-300">
+            <div className="relative pointer-events-auto bg-white text-ink p-6 rounded-2xl shadow-2xl max-w-sm mx-4 animate-in slide-in-from-bottom-10 zoom-in-95 duration-300">
                 <button
                     onClick={handleDismiss}
-                    className="absolute top-2 right-2 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors"
+                    className="absolute top-2 right-2 text-muted hover:text-ink p-1 rounded-full hover:bg-paper2 transition-colors"
                 >
                     <X size={20} />
                 </button>
 
                 <h3 className="text-xl font-bold font-heading mb-2">Welcome to the Studio! 🎨</h3>
-                <p className="text-slate-600 mb-6 leading-relaxed">
+                <p className="text-muted mb-6 leading-relaxed">
                     Start by uploading your pfp or choosing a base frame.
                     Then add stickers, text, and motion effects to make it pop!
                 </p>
 
                 <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                        <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">1</span>
+                    <div className="flex items-center gap-3 text-sm font-medium text-ink/80">
+                        <span className="w-6 h-6 rounded-full bg-brand/15 text-brand-deep flex items-center justify-center text-xs font-bold">1</span>
                         Upload a photo
                     </div>
-                    <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
+                    <div className="flex items-center gap-3 text-sm font-medium text-ink/80">
                         <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold">2</span>
                         Customize your frame
                     </div>
-                    <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
+                    <div className="flex items-center gap-3 text-sm font-medium text-ink/80">
                         <span className="w-6 h-6 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-xs font-bold">3</span>
                         Export as GIF/PNG
                     </div>
@@ -59,7 +59,7 @@ export const OnboardingOverlay: React.FC = () => {
 
                 <button
                     onClick={handleDismiss}
-                    className="mt-6 w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20"
+                    className="mt-6 w-full bg-cream text-ink font-bold py-3 rounded-xl hover:bg-cream transition-colors shadow-lg shadow-slate-900/20"
                 >
                     Let's Create!
                 </button>

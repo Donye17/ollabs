@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { QRCode } from '@/components/QRCode';
 import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck } from 'lucide-react';
 
@@ -9,7 +9,9 @@ interface ManageData {
     description: string | null;
     supporter_count: number;
     view_count: number;
+    goal: number | null;
     created_at: string;
+    daily?: { day: string; n: number }[];
 }
 
 export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
@@ -22,6 +24,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     // edit fields
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [goalInput, setGoalInput] = useState('');
     const [slugInput, setSlugInput] = useState('');
     const [saving, setSaving] = useState(false);
     const [saveMsg, setSaveMsg] = useState<string | null>(null);
@@ -51,6 +54,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                 setCurrentSlug(d.slug);
                 setTitle(d.title);
                 setDescription(d.description || '');
+                setGoalInput(d.goal != null ? String(d.goal) : '');
                 setSlugInput(d.slug);
             })
             .catch((e) => setError(e.message))
@@ -70,7 +74,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
         setSaving(true);
         setSaveMsg(null);
         setSaveErr(null);
-        const payload: Record<string, string> = { token, title, description };
+        const payload: Record<string, string> = { token, title, description, goal: goalInput };
         if (slugInput && slugInput !== currentSlug) payload.slug = slugInput;
         try {
             const res = await fetch(`/api/campaigns/${currentSlug}/manage`, {
@@ -101,6 +105,21 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     const conversion = data && data.view_count > 0
         ? Math.round((data.supporter_count / data.view_count) * 100)
         : null;
+
+    const series = useMemo(() => {
+        const map = new Map((data?.daily || []).map((d) => [d.day, d.n]));
+        const out: { key: string; label: string; n: number }[] = [];
+        const now = new Date();
+        for (let i = 13; i >= 0; i--) {
+            const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - i));
+            const key = d.toISOString().slice(0, 10);
+            out.push({ key, label: d.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' }), n: map.get(key) || 0 });
+        }
+        return out;
+    }, [data]);
+
+    const seriesMax = Math.max(1, ...series.map((s) => s.n));
+    const seriesTotal = series.reduce((a, s) => a + s.n, 0);
 
     return (
         <div className="min-h-screen bg-paper text-ink flex flex-col items-center px-4 py-8">
@@ -146,6 +165,34 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                             </div>
                         </div>
 
+                        {/* Supporters over time */}
+                        <div className="bg-cream border border-ink/10 rounded-2xl p-4 mb-6">
+                            <div className="flex items-center justify-between mb-3">
+                                <p className="text-xs font-bold text-muted uppercase tracking-wider">New supporters, last 14 days</p>
+                                <span className="text-xs font-semibold text-ink">{seriesTotal.toLocaleString()} total</span>
+                            </div>
+                            {seriesTotal === 0 ? (
+                                <p className="text-sm text-muted py-4 text-center">No supporters yet in this window. Share your link to get started.</p>
+                            ) : (
+                                <>
+                                    <div className="flex items-end gap-1.5 h-24">
+                                        {series.map((s) => (
+                                            <div key={s.key} className="flex-1 flex flex-col justify-end" title={`${s.label}: ${s.n}`}>
+                                                <div
+                                                    className="w-full rounded-t bg-brand"
+                                                    style={{ height: `${Math.max(3, Math.round((s.n / seriesMax) * 100))}%` }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="flex justify-between mt-1.5 text-[10px] text-muted">
+                                        <span>{series[0].label}</span>
+                                        <span>{series[series.length - 1].label}</span>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
                         {/* Share */}
                         <div className="bg-cream border border-ink/10 rounded-2xl p-4 mb-6 space-y-3">
                             <p className="text-xs font-bold text-muted uppercase tracking-wider">Share link</p>
@@ -185,6 +232,14 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                 <label className="text-xs font-semibold text-ink/70">Description</label>
                                 <textarea value={description} onChange={(e) => setDescription(e.target.value)}
                                     className="w-full bg-paper border border-ink/10 rounded-xl px-3 py-2.5 text-ink focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all min-h-[70px] resize-none" />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-ink/70">Supporter goal</label>
+                                <input type="number" min={1} inputMode="numeric" value={goalInput} onChange={(e) => setGoalInput(e.target.value)}
+                                    placeholder="No goal set"
+                                    className="w-full bg-paper border border-ink/10 rounded-xl px-3 py-2.5 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all" />
+                                <p className="text-[11px] text-muted">Shows a progress bar on your campaign page. Leave blank for none.</p>
                             </div>
 
                             <div className="space-y-1.5">

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 401 });
 
         const result = await pool.query(
-            `SELECT slug, title, description, frame_config, supporter_count, view_count, preview_url, is_public, created_at
+            `SELECT id, slug, title, description, frame_config, supporter_count, view_count, goal, preview_url, is_public, created_at
              FROM campaigns
              WHERE slug = $1 AND owner_token = $2
              LIMIT 1`,
@@ -31,7 +31,24 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         if (result.rows.length === 0) {
             return NextResponse.json({ error: 'Not found or wrong key' }, { status: 404 });
         }
-        return NextResponse.json(result.rows[0]);
+        const { id, ...campaign } = result.rows[0];
+
+        // Real daily supporter counts for the last 30 days (from each recorded use).
+        let daily: { day: string; n: number }[] = [];
+        try {
+            const ts = await pool.query(
+                `SELECT to_char(date_trunc('day', created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS day, COUNT(*)::int AS n
+                 FROM campaign_uses
+                 WHERE campaign_id = $1 AND created_at >= now() - interval '30 days'
+                 GROUP BY 1 ORDER BY 1`,
+                [id]
+            );
+            daily = ts.rows;
+        } catch (e) {
+            console.error('timeseries failed', e);
+        }
+
+        return NextResponse.json({ ...campaign, daily });
     } catch (error) {
         console.error('Failed to load manage data:', error);
         return NextResponse.json({ error: 'Failed to load' }, { status: 500 });
@@ -68,6 +85,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         if (typeof body.description === 'string') {
             sets.push(`description = $${i++}`);
             values.push(body.description.trim().slice(0, 400) || null);
+        }
+        if ('goal' in body) {
+            let goalValue: number | null = null;
+            if (body.goal != null && body.goal !== '') {
+                const g = Math.floor(Number(body.goal));
+                if (!Number.isFinite(g) || g < 1 || g > 100_000_000) {
+                    return NextResponse.json({ error: 'Goal must be a number between 1 and 100,000,000.' }, { status: 400 });
+                }
+                goalValue = g;
+            }
+            sets.push(`goal = $${i++}`);
+            values.push(goalValue);
         }
 
         let newSlug: string | null = null;

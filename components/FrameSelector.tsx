@@ -69,8 +69,8 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({ selectedFrameId, o
             className={`
               relative group flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200
               ${isSelected
-                ? 'bg-slate-700 ring-2 ring-blue-500 ring-offset-2 ring-offset-slate-900'
-                : 'bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600'}
+                ? 'bg-paper2 ring-2 ring-brand ring-offset-2 ring-offset-paper'
+                : 'bg-cream hover:bg-paper2 border border-ink/10 hover:border-ink/15'}
             `}
             title={`Select ${frame.name}: ${getFrameDescription(frame)}`}
           >
@@ -81,7 +81,7 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({ selectedFrameId, o
                    but for a "Frame" maker, usually the "No Frame" part is a circle. 
                    We'll keep the circle bg for consistency unless it's a shape type. */}
               {frame.type !== FrameType.STAR && frame.type !== FrameType.HEXAGON && frame.type !== FrameType.HEART && (
-                <div className="absolute inset-0 bg-slate-600 rounded-full overflow-hidden shadow-inner" />
+                <div className="absolute inset-0 bg-paper2 rounded-full overflow-hidden shadow-inner" />
               )}
 
               {/* Actual Frame Preview */}
@@ -102,7 +102,7 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({ selectedFrameId, o
 
                 {/* Inner White Line for Neon */}
                 {(frame.type === FrameType.NEON) && (
-                  <div className="absolute inset-0 rounded-full border border-white/40"></div>
+                  <div className="absolute inset-0 rounded-full border border-ink/25"></div>
                 )}
                 {/* Double Frame Structure */}
                 {frame.type === FrameType.DOUBLE && (
@@ -154,7 +154,7 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({ selectedFrameId, o
 
               </div>
             </div>
-            <span className="text-[10px] font-medium text-slate-400 group-hover:text-slate-200 truncate w-full text-center">
+            <span className="text-[10px] font-medium text-muted group-hover:text-ink truncate w-full text-center">
               {frame.name}
             </span>
           </button>

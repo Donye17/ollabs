@@ -131,15 +131,15 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-ink flex flex-col items-center justify-center text-paper font-sans">
-                <Loader2 className="w-12 h-12 text-brand animate-spin mb-4" />
-                <p className="text-paper/60 text-sm animate-pulse">Loading template...</p>
+            <div className="min-h-screen bg-paper flex flex-col items-center justify-center text-ink font-sans">
+                <Loader2 className="w-12 h-12 text-brand-deep animate-spin mb-4" />
+                <p className="text-muted text-sm animate-pulse">Loading template...</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-ink text-paper font-sans">
+        <div className="min-h-screen bg-paper text-ink font-sans">
             <NavBar />
             <OnboardingOverlay />
 
@@ -175,20 +175,20 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         />
 
                         {/* Tip Box */}
-                        <div className="mt-8 p-4 bg-brand/10 rounded-2xl border border-brand/20 text-sm text-paper/80 max-w-md flex gap-3 items-start animate-fade-in">
-                            <AlertCircle className="shrink-0 text-brand mt-0.5" size={18} />
-                            <p><strong className="text-paper">Tip:</strong> Drag and drop a photo to start. Pinch to zoom or pan.</p>
+                        <div className="mt-8 p-4 bg-brand/10 rounded-2xl border border-brand/30 text-sm text-ink/70 max-w-md flex gap-3 items-start animate-fade-in">
+                            <AlertCircle className="shrink-0 text-brand-deep mt-0.5" size={18} />
+                            <p><strong className="text-ink">Tip:</strong> Drag and drop a photo to start. Pinch to zoom or pan.</p>
                         </div>
                     </div>
 
                     {/* Right Column: Key Controls */}
-                    <div className="lg:col-span-5 space-y-6 relative z-10 bg-ink/95 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none p-4 -mx-4 rounded-t-3xl border-t border-white/10 lg:border-none lg:p-0 lg:m-0 lg:rounded-none shadow-[0_-10px_40px_rgba(0,0,0,0.5)] lg:shadow-none">
+                    <div className="lg:col-span-5 space-y-6 relative z-10 bg-paper/95 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none p-4 -mx-4 rounded-t-3xl border-t border-ink/10 lg:border-none lg:p-0 lg:m-0 lg:rounded-none shadow-[0_-10px_40px_rgba(0,0,0,0.12)] lg:shadow-none">
 
                         {/* Creator Header */}
                         <div className="flex items-center justify-between px-2">
                             <div>
-                                <h1 className="font-display text-2xl font-extrabold text-paper tracking-tight">Campaign builder</h1>
-                                <p className="text-xs text-paper/60 font-medium">Make your frame, then share one link.</p>
+                                <h1 className="font-display text-2xl font-extrabold text-ink tracking-tight">Campaign builder</h1>
+                                <p className="text-xs text-muted font-medium">Make your frame, then share one link.</p>
                             </div>
                             <button
                                 onClick={() => setIsPublishOpen(true)}
@@ -199,7 +199,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         </div>
 
                         {/* Tab Switcher - Scrollable on mobile */}
-                        <div className="flex p-1 bg-zinc-900/50 backdrop-blur-sm border border-white/5 rounded-2xl overflow-x-auto scrollbar-hide">
+                        <div className="flex p-1 bg-cream border border-ink/10 rounded-2xl overflow-x-auto scrollbar-hide">
                             {[
                                 { id: 'design', icon: Sparkles, label: 'Design' },
                                 { id: 'custom', icon: ImageIcon, label: 'Custom' },
@@ -210,7 +210,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id as any)}
-                                    className={`flex-1 min-w-[60px] flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl text-[10px] uppercase font-bold tracking-wide transition-all ${activeTab === tab.id ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                    className={`flex-1 min-w-[60px] flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl text-[10px] uppercase font-bold tracking-wide transition-all ${activeTab === tab.id ? 'bg-ink text-paper shadow-sm' : 'text-muted hover:text-ink'}`}
                                 >
                                     <tab.icon size={18} />
                                     <span>{tab.label}</span>
@@ -219,16 +219,16 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         </div>
 
                         {/* Tab Content Panels */}
-                        <div className="glass-panel p-6 rounded-3xl min-h-[400px]">
+                        <div className="bg-cream border border-ink/10 p-6 rounded-3xl min-h-[400px]">
 
                             {activeTab === 'design' && (
                                 <div className="space-y-5 animate-fade-in">
                                     <div>
-                                        <h2 className="text-lg font-bold text-white mb-1">Choose a style</h2>
-                                        <p className="text-zinc-400 text-xs">Select a base frame to start with.</p>
+                                        <h2 className="font-display text-lg font-bold text-ink mb-1">Choose a style</h2>
+                                        <p className="text-muted text-xs">Select a base frame to start with.</p>
                                     </div>
                                     <FrameSelector selectedFrameId={selectedFrame.id} onSelect={handlePresetSelect} />
-                                    <div className="pt-4 border-t border-white/10">
+                                    <div className="pt-4 border-t border-ink/10">
                                         <CaptionControls frame={selectedFrame} onChange={handleFrameUpdate} />
                                     </div>
                                 </div>
@@ -244,8 +244,8 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             {activeTab === 'customize' && (
                                 <div className="space-y-4 animate-fade-in">
                                     <div>
-                                        <h2 className="text-lg font-bold text-white mb-1">Fine Tune</h2>
-                                        <p className="text-zinc-400 text-xs">Adjust colors, borders, and effects.</p>
+                                        <h2 className="font-display text-lg font-bold text-ink mb-1">Fine tune</h2>
+                                        <p className="text-muted text-xs">Adjust colors, borders, and effects.</p>
                                     </div>
                                     <FrameCustomizer
                                         frame={selectedFrame}
@@ -301,8 +301,8 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             {activeTab === 'preview' && (
                                 <div className="space-y-4 animate-fade-in flex flex-col items-center justify-center h-full">
                                     <div>
-                                        <h2 className="text-lg font-bold text-white mb-1 text-center">Live Preview</h2>
-                                        <p className="text-zinc-400 text-xs text-center mb-6">See how it looks in a contact list.</p>
+                                        <h2 className="font-display text-lg font-bold text-ink mb-1 text-center">Live preview</h2>
+                                        <p className="text-muted text-xs text-center mb-6">See how it looks in a contact list.</p>
                                     </div>
                                     <ContactPreview previewSrc={previewDataUrl} />
                                 </div>
@@ -323,7 +323,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                 parentId={remixId}
             />
 
-            <footer className="py-12 text-center text-paper/40 text-sm border-t border-white/10 bg-ink">
+            <footer className="py-12 text-center text-muted text-sm border-t border-ink/10 bg-paper">
                 <p>&copy; {new Date().getFullYear()} Ollabs. Bring your people together.</p>
             </footer>
         </div>

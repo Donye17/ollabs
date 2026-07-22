@@ -19,6 +19,9 @@ export const NavBar: React.FC = () => {
                     <Link href="/explore" className="text-xs font-bold text-muted hover:text-brand-deep hidden sm:block transition-colors uppercase tracking-wider">
                         Explore
                     </Link>
+                    <Link href="/mine" className="text-xs font-bold text-muted hover:text-brand-deep hidden sm:block transition-colors uppercase tracking-wider">
+                        My campaigns
+                    </Link>
                     <a
                         href="mailto:feedback@ollabs.studio?subject=Ollabs%20Feedback"
                         className="text-xs font-bold text-muted hover:text-brand-deep hidden sm:flex items-center gap-1.5 transition-colors uppercase tracking-wider"

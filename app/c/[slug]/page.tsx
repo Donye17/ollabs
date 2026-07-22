@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 async function getCampaign(slug: string) {
     try {
         const res = await pool.query(
-            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, preview_url, is_public, is_hidden
+            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, goal, preview_url, is_public, is_hidden
              FROM campaigns WHERE slug = $1 LIMIT 1`,
             [slug]
         );
@@ -56,6 +56,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
             description={campaign.description}
             creatorName={campaign.creator_name}
             initialCount={campaign.supporter_count ?? 0}
+            goal={campaign.goal ?? null}
             frame={frame}
         />
     );

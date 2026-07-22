@@ -79,7 +79,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
         // 1. Draw Background
         ctx.save();
         renderer.createPath(ctx, centerX, centerY, radius);
-        ctx.fillStyle = '#334155';
+        ctx.fillStyle = '#EAE6DC';
         ctx.fill();
         ctx.restore();
 
@@ -268,7 +268,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
     return (
         <div
             className={`relative group rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-                ${isDragOver ? 'scale-110 ring-8 ring-primary/50 shadow-[0_20px_50px_rgba(37,99,235,0.5)]' : 'scale-100 bg-slate-900/50 backdrop-blur-3xl shadow-2xl shadow-black/50'}`}
+                ${isDragOver ? 'scale-110 ring-8 ring-primary/50 shadow-[0_20px_50px_rgba(37,99,235,0.5)]' : 'scale-100 bg-cream backdrop-blur-3xl shadow-2xl shadow-black/50'}`}
             style={{
                 width: DISPLAY_SIZE,
                 height: DISPLAY_SIZE,
@@ -282,12 +282,12 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
         >
             <canvas ref={canvasRef} width={CANVAS_SIZE} height={CANVAS_SIZE} className="w-full h-full object-contain pointer-events-none drop-shadow-2xl" />
             {!imageObject && !isDragOver && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400 pointer-events-none p-4 text-center">
-                    <div className="w-20 h-20 rounded-2xl bg-white/5 border-2 border-dashed border-white/10 flex items-center justify-center mb-4 group-hover:border-brand/50 group-hover:bg-brand/10 transition-all duration-300">
-                        <Upload className="w-8 h-8 text-zinc-500 group-hover:text-brand transition-colors" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-muted pointer-events-none p-4 text-center">
+                    <div className="w-20 h-20 rounded-2xl bg-cream border-2 border-dashed border-ink/10 flex items-center justify-center mb-4 group-hover:border-brand/50 group-hover:bg-brand/10 transition-all duration-300">
+                        <Upload className="w-8 h-8 text-muted group-hover:text-brand transition-colors" />
                     </div>
-                    <span className="text-base font-bold text-zinc-300 tracking-wide mb-1">Start creating</span>
-                    <span className="text-xs text-zinc-500">Drag and drop an image here</span>
+                    <span className="text-base font-bold text-ink/80 tracking-wide mb-1">Start creating</span>
+                    <span className="text-xs text-muted">Drag and drop an image here</span>
                 </div>
             )}
             {isDragOver && (
