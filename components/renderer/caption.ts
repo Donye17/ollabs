@@ -44,8 +44,9 @@ function drawArcText(
             angle += (w / 2 + spacing / 2) / radius;
         }
     } else {
-        // Bottom arc, letters left to right, flipped upright.
+        // Bottom arc, letters left to right, upright.
         // With translate(0, radius), angle 0 sits at the bottom; go from +half to -half.
+        // No extra flip: at the bottom the glyph is already upright (its top points up).
         let angle = totalAngle / 2;
         for (let i = 0; i < text.length; i++) {
             const w = widths[i];
@@ -53,7 +54,6 @@ function drawArcText(
             ctx.save();
             ctx.rotate(angle);
             ctx.translate(0, radius);
-            ctx.rotate(Math.PI);
             drawGlyph(ctx, text[i]);
             ctx.restore();
             angle -= (w / 2 + spacing / 2) / radius;
