@@ -6,6 +6,7 @@ import { upload } from '@vercel/blob/client';
 import { FramePreview } from './FramePreview';
 import { QRCode } from './QRCode';
 import { CATEGORIES } from '@/lib/categories';
+import { track } from '@/lib/analytics';
 
 interface PublishTemplateModalProps {
     isOpen: boolean;
@@ -57,6 +58,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 const mUrl = campaign.owner_token ? `${window.location.origin}/c/${campaign.slug}/manage?k=${campaign.owner_token}` : null;
                 setCampaignUrl(cUrl);
                 if (mUrl) setManageUrl(mUrl);
+                track('campaign_created', { campaign: campaign.slug, category: category || 'none' });
 
                 // Remember this campaign on the device so the owner can find it again.
                 try {

@@ -4,6 +4,8 @@ import { FrameRendererFactory } from '@/components/renderer/FrameRendererFactory
 import { FrameConfig, FrameType } from '@/lib/types';
 import { QRCode } from '@/components/QRCode';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
+import { addPngMetadata } from '@/lib/pngMeta';
+import { track, withUtm } from '@/lib/analytics';
 import { Upload, Download, Share2, Check, Loader2, Copy, QrCode } from 'lucide-react';
 
 const CANVAS = 1024;
@@ -72,13 +74,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         const canvas = canvasRef.current;
         if (!canvas || !hasImage) return;
         try {
-            const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/png', 1));
+            const blob = await taggedBlob();
             if (!blob) return;
             await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
             setImageCopied(true);
             setTimeout(() => setImageCopied(false), 1500);
             bumpCount();
             setJustDownloaded(true);
+            track('frame_copy_image', { campaign: slug });
         } catch { /* clipboard image unavailable */ }
     };
 
@@ -96,7 +99,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
 
     useEffect(() => {
         setCanNativeShare(typeof navigator !== 'undefined' && !!navigator.share);
-        if (typeof window !== 'undefined') setPageUrl(window.location.href);
+        if (typeof window !== 'undefined') setPageUrl(`${window.location.origin}/c/${slug}`);
     }, []);
 
     // Record a real view once per browser session (no inflation on reload).
@@ -110,17 +113,19 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         } catch { /* ignore */ }
     }, [slug]);
 
-    const shareUrl = () => (typeof window !== 'undefined' ? window.location.href : `https://ollabs.studio/c/${slug}`);
+    // Canonical clean URL for this campaign (avoids leaking inbound utm params).
+    const shareUrl = () => (typeof window !== 'undefined' ? `${window.location.origin}/c/${slug}` : `https://ollabs.studio/c/${slug}`);
     const shareText = `I just added the "${title}" frame to my photo on Ollabs. Add yours:`;
 
     const openShare = (platform: 'x' | 'whatsapp' | 'facebook') => {
-        const url = shareUrl();
+        const url = withUtm(shareUrl(), platform);
         const map: Record<string, string> = {
             x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`,
             whatsapp: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${url}`)}`,
             facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
         };
         window.open(map[platform], '_blank', 'noopener,noreferrer');
+        track('frame_share', { campaign: slug, platform });
     };
 
     const copyLink = async () => {
@@ -128,6 +133,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
             await navigator.clipboard.writeText(shareUrl());
             setLinkCopied(true);
             setTimeout(() => setLinkCopied(false), 1500);
+            track('copy_link', { campaign: slug });
         } catch { /* clipboard unavailable */ }
     };
 
@@ -236,12 +242,34 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
             .catch(() => { countedRef.current = false; });
     };
 
+    const pngEntries = (): Record<string, string> => ({
+        Software: 'Ollabs (ollabs.studio)',
+        Title: title,
+        Source: shareUrl(),
+        Comment: `Made with Ollabs. Campaign "${title}" at ${shareUrl()}`,
+        'Creation Time': new Date().toISOString(),
+    });
+
+    // Render the canvas to a PNG blob with provenance metadata embedded.
+    const taggedBlob = async (): Promise<Blob | null> => {
+        const canvas = canvasRef.current;
+        if (!canvas) return null;
+        const blob = await new Promise<Blob | null>(res => canvas.toBlob(res, 'image/png', 1));
+        if (!blob) return null;
+        try {
+            const tagged = addPngMetadata(new Uint8Array(await blob.arrayBuffer()), pngEntries());
+            return new Blob([tagged as unknown as BlobPart], { type: 'image/png' });
+        } catch {
+            return blob;
+        }
+    };
+
     const handleDownload = async () => {
         const canvas = canvasRef.current;
         if (!canvas || !hasImage) return;
         setDownloading(true);
         try {
-            const blob = await new Promise<Blob | null>(res => canvas.toBlob(res, 'image/png', 1));
+            const blob = await taggedBlob();
             if (blob) {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -251,6 +279,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 URL.revokeObjectURL(url);
                 bumpCount();
                 setJustDownloaded(true);
+                track('frame_download', { campaign: slug });
             }
         } finally {
             setDownloading(false);
@@ -258,12 +287,16 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     };
 
     const handleShare = async () => {
-        const url = shareUrl();
+        const url = withUtm(shareUrl(), 'native');
         if (navigator.share) {
-            try { await navigator.share({ title, text: shareText, url }); return; } catch { /* cancelled */ }
+            try {
+                await navigator.share({ title, text: shareText, url });
+                track('frame_share', { campaign: slug, platform: 'native' });
+                return;
+            } catch { /* cancelled */ }
         }
         try {
-            await navigator.clipboard.writeText(url);
+            await navigator.clipboard.writeText(shareUrl());
             setCopied(true);
             setTimeout(() => setCopied(false), 1500);
         } catch { /* clipboard unavailable */ }
