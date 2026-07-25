@@ -1,12 +1,17 @@
+import { cache } from 'react';
 import { pool } from '@/lib/neon';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { CampaignClient } from '@/components/campaign/CampaignClient';
 import { FrameConfig } from '@/lib/types';
 
-export const dynamic = 'force-dynamic';
+// Cache the rendered page for 60s per slug. Repeat visits and crawler hits are
+// served from cache instead of querying Postgres every time, which keeps Neon
+// compute low. Supporter counts refresh within a minute for other visitors.
+export const revalidate = 60;
 
-async function getCampaign(slug: string) {
+// Dedupe: generateMetadata and the page share one DB query per render.
+const getCampaign = cache(async (slug: string) => {
     try {
         const res = await pool.query(
             `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, goal, preview_url, is_public, is_hidden
@@ -20,7 +25,7 @@ async function getCampaign(slug: string) {
         console.error('Failed to load campaign', e);
         return null;
     }
-}
+});
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
