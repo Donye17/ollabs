@@ -5,15 +5,24 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { HomeExamples, HomeCampaign } from "@/components/HomeExamples";
 import { FrameConfig } from "@/lib/types";
 import { pool } from "@/lib/neon";
+import { visibleFrameSql, HOME_SHOWCASE_LIMIT } from "@/lib/frameValidity";
 
 export const revalidate = 600;
 
 async function getExampleCampaigns(): Promise<HomeCampaign[]> {
     try {
+        // Feeds the spotlight carousel, newest first, so the row always opens on the most
+        // recent campaign and the page looks alive. The frame has to actually render
+        // something, which is what keeps half-finished campaigns out of the showcase.
         const res = await pool.query(
-            `SELECT slug, title, frame_config, supporter_count
-             FROM campaigns WHERE is_public = true AND is_hidden IS NOT TRUE
-             ORDER BY created_at DESC LIMIT 3`
+            `SELECT c.slug, c.title, c.frame_config, c.supporter_count
+             FROM campaigns c
+             WHERE c.is_public = true
+               AND c.is_hidden IS NOT TRUE
+               AND ${visibleFrameSql('c')}
+             ORDER BY c.created_at DESC
+             LIMIT $1`,
+            [HOME_SHOWCASE_LIMIT]
         );
         return res.rows.map((r) => ({
             slug: r.slug,
@@ -88,9 +97,13 @@ export default async function Home() {
                 </div>
 
                 {examples.length > 0 && (
-                    <div id="examples" className="max-w-4xl mx-auto mt-20 relative z-10 scroll-mt-24">
-                        <p className="text-center text-xs uppercase tracking-[0.2em] text-muted font-bold mb-8">Live campaigns</p>
-                        <HomeExamples campaigns={examples} />
+                    <div id="examples" className="mt-20 relative z-10 scroll-mt-24">
+                        <p className="text-center text-xs uppercase tracking-[0.2em] text-muted font-bold mb-4">Live campaigns</p>
+                        {/* -mx-6 cancels the section's px-6 so the track runs edge to edge and
+                            the cards carry off both sides of the screen. */}
+                        <div className="-mx-6">
+                            <HomeExamples campaigns={examples} />
+                        </div>
                     </div>
                 )}
             </section>

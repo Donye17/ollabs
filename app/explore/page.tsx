@@ -5,6 +5,7 @@ import { ExploreClient, ExploreCampaign } from '@/components/ExploreClient';
 import { FrameConfig } from '@/lib/types';
 import { pool } from '@/lib/neon';
 import { CATEGORIES, CATEGORY_KEYS } from '@/lib/categories';
+import { visibleFrameSql } from '@/lib/frameValidity';
 
 export const revalidate = 300;
 
@@ -22,7 +23,10 @@ async function getCampaigns(sort: Sort, category: string | null): Promise<Explor
     const base = `SELECT c.slug, c.title, c.frame_config, c.supporter_count FROM campaigns c`;
     // category is validated against the fixed allowlist before reaching here, so it is safe to inline.
     const catClause = category ? ` AND c.category = '${category}'` : '';
-    const where = `WHERE c.is_public = true AND c.is_hidden IS NOT TRUE${catClause}`;
+    // Explore filters on frame validity only, no supporter floor. A brand new campaign
+    // has 0 supporters by definition, and gating discovery on traction would mean a
+    // legitimate campaign can never surface here.
+    const where = `WHERE c.is_public = true AND c.is_hidden IS NOT TRUE AND ${visibleFrameSql('c')}${catClause}`;
     let query: string;
     if (sort === 'newest') {
         query = `${base} ${where} ORDER BY c.created_at DESC LIMIT 60`;

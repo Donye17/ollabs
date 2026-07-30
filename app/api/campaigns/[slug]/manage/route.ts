@@ -1,6 +1,7 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { CATEGORY_KEYS } from '@/lib/categories';
+import { hasVisibleFrame } from '@/lib/frameValidity';
 
 export const dynamic = 'force-dynamic';
 
@@ -105,6 +106,34 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             values.push(cat);
         }
 
+        // The frame itself is editable. Without this an owner who published a broken or
+        // wrong frame has no way to correct it and has to start a whole new campaign,
+        // abandoning the supporters and the link they already shared.
+        if ('frameConfig' in body && body.frameConfig != null) {
+            if (!hasVisibleFrame(body.frameConfig)) {
+                return NextResponse.json(
+                    { error: 'That frame would not show up on anyone\'s photo. Pick a border style or upload a frame image.' },
+                    { status: 400 }
+                );
+            }
+            const frameJson = JSON.stringify(body.frameConfig);
+            if (frameJson.length > 200_000) {
+                return NextResponse.json({ error: 'Frame data is too large.' }, { status: 400 });
+            }
+            sets.push(`frame_config = $${i++}`);
+            values.push(frameJson);
+        }
+
+        // Preview thumbnail travels with the frame, so it can be refreshed alongside it.
+        if ('previewUrl' in body) {
+            const preview = typeof body.previewUrl === 'string' && body.previewUrl.trim() ? body.previewUrl.trim() : null;
+            if (preview && !/^https:\/\//i.test(preview)) {
+                return NextResponse.json({ error: 'Preview URL must be https.' }, { status: 400 });
+            }
+            sets.push(`preview_url = $${i++}`);
+            values.push(preview);
+        }
+
         let newSlug: string | null = null;
         if (typeof body.slug === 'string' && body.slug.trim()) {
             newSlug = slugify(body.slug);
@@ -122,7 +151,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         values.push(id);
         try {
             const result = await pool.query(
-                `UPDATE campaigns SET ${sets.join(', ')} WHERE id = $${i} RETURNING slug, title, description`,
+                `UPDATE campaigns SET ${sets.join(', ')} WHERE id = $${i} RETURNING slug, title, description, frame_config, preview_url`,
                 values
             );
             return NextResponse.json(result.rows[0]);

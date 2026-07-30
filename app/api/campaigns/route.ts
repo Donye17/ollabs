@@ -2,6 +2,7 @@ import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, clientIp } from '@/lib/rateLimit';
 import { CATEGORY_KEYS } from '@/lib/categories';
+import { hasVisibleFrame, visibleFrameSql } from '@/lib/frameValidity';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,10 +30,10 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
         const result = await pool.query(
-            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, created_at
-             FROM campaigns
-             WHERE is_public = true AND is_hidden IS NOT TRUE
-             ORDER BY created_at DESC
+            `SELECT c.id, c.slug, c.title, c.description, c.frame_config, c.creator_name, c.supporter_count, c.created_at
+             FROM campaigns c
+             WHERE c.is_public = true AND c.is_hidden IS NOT TRUE AND ${visibleFrameSql('c')}
+             ORDER BY c.created_at DESC
              LIMIT $1`,
             [limit]
         );
@@ -57,6 +58,15 @@ export async function POST(request: NextRequest) {
 
         if (!title || !frameConfig) {
             return NextResponse.json({ error: 'title and frameConfig are required' }, { status: 400 });
+        }
+
+        // A config can be well-formed and still render nothing on top of the photo.
+        // Publishing one of those gives every supporter their own photo back, unchanged.
+        if (!hasVisibleFrame(frameConfig)) {
+            return NextResponse.json(
+                { error: 'This campaign has no frame on it yet. Pick a border style or upload your frame image, then publish.' },
+                { status: 400 }
+            );
         }
 
         // Optional supporter goal.
