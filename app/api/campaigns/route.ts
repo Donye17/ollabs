@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, clientIp } from '@/lib/rateLimit';
 import { CATEGORY_KEYS } from '@/lib/categories';
 import { hasVisibleFrame, visibleFrameSql } from '@/lib/frameValidity';
+import { campaignLiveEmail, isValidEmail, normalizeEmail, sendEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,8 +54,18 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { title, description, frameConfig, isPublic, previewUrl, goal, category } = body;
+        const { title, description, frameConfig, isPublic, previewUrl, goal, category, organizerEmail } = body;
         const categoryValue = typeof category === 'string' && CATEGORY_KEYS.includes(category) ? category : null;
+
+        // Optional, and it stays optional. Creating a campaign never requires an
+        // account; this is purely so the organizer can get back in later.
+        let emailValue: string | null = null;
+        if (organizerEmail != null && organizerEmail !== '') {
+            if (!isValidEmail(organizerEmail)) {
+                return NextResponse.json({ error: 'That email address does not look right.' }, { status: 400 });
+            }
+            emailValue = normalizeEmail(organizerEmail);
+        }
 
         if (!title || !frameConfig) {
             return NextResponse.json({ error: 'title and frameConfig are required' }, { status: 400 });
@@ -103,10 +114,10 @@ export async function POST(request: NextRequest) {
             const slug = `${baseSlug}-${randomSuffix()}`;
             try {
                 const result = await pool.query(
-                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, goal, category, created_at)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, goal, category, organizer_email, created_at)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
                      RETURNING id, slug, title, supporter_count, owner_token, created_at`,
-                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, goalValue, categoryValue]
+                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, goalValue, categoryValue, emailValue]
                 );
                 campaign = result.rows[0];
                 break;
@@ -119,6 +130,26 @@ export async function POST(request: NextRequest) {
 
         if (!campaign) {
             return NextResponse.json({ error: 'Could not generate a unique link, please try again' }, { status: 409 });
+        }
+
+        // Fire the "your campaign is live" email. Never let a mail failure fail
+        // the create; the organizer already has their link in the response.
+        if (emailValue) {
+            const msg = campaignLiveEmail({
+                title: campaign.title,
+                slug: campaign.slug,
+                ownerToken: campaign.owner_token,
+            });
+            sendEmail({ to: emailValue, ...msg })
+                .then((ok) => {
+                    if (ok) {
+                        return pool.query(
+                            `UPDATE campaigns SET email_sent_at = NOW() WHERE id = $1`,
+                            [campaign.id]
+                        );
+                    }
+                })
+                .catch((e) => console.error('[campaigns] welcome email failed', e));
         }
 
         return NextResponse.json(campaign, { status: 201 });

@@ -21,6 +21,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     const [description, setDescription] = useState('');
     const [goal, setGoal] = useState('');
     const [category, setCategory] = useState('');
+    const [organizerEmail, setOrganizerEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [campaignUrl, setCampaignUrl] = useState<string | null>(null);
     const [manageUrl, setManageUrl] = useState<string | null>(null);
@@ -49,7 +50,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             const res = await fetch('/api/campaigns', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description, frameConfig: config, previewUrl, goal: goal || null, category: category || null })
+                body: JSON.stringify({ title, description, frameConfig: config, previewUrl, goal: goal || null, category: category || null, organizerEmail: organizerEmail || null })
             });
 
             if (res.ok) {
@@ -107,6 +108,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         setDescription('');
         setGoal('');
         setCategory('');
+        setOrganizerEmail('');
         setCampaignUrl(null);
         setManageUrl(null);
         setShowQR(false);
@@ -171,7 +173,11 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                         <ShieldCheck size={16} className="text-brand-deep" />
                                         <span className="text-sm font-bold">Your private manage link</span>
                                     </div>
-                                    <p className="text-xs text-ink/70">Bookmark this. It is the only way to see your stats and edit the campaign later. Keep it private.</p>
+                                    <p className="text-xs text-ink/70">
+                                        {organizerEmail
+                                            ? `Bookmark this, and we have also emailed it to ${organizerEmail}. Keep it private.`
+                                            : 'Bookmark this. It is the only way to see your stats and edit the campaign later. Keep it private.'}
+                                    </p>
                                     <button onClick={handleCopyManage}
                                         className="w-full py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                         {manageCopied ? <><Check size={15} className="text-brand-deep" /> Copied</> : <><Copy size={15} /> Copy manage link</>}
@@ -231,6 +237,22 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 </div>
                             </div>
                             <p className="text-[11px] text-muted">A goal shows a progress bar; a category helps people find you on Explore.</p>
+
+                            <div className="space-y-2 pt-1">
+                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Email me my links (optional)</label>
+                                <input
+                                    type="email"
+                                    autoComplete="email"
+                                    value={organizerEmail}
+                                    onChange={(e) => setOrganizerEmail(e.target.value)}
+                                    placeholder="you@organization.org"
+                                    className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
+                                />
+                                <p className="text-[11px] text-muted">
+                                    No account, no password. It is how you get back to your dashboard if you switch
+                                    devices, plus a note when your campaign hits milestones. We never email supporters.
+                                </p>
+                            </div>
                         </div>
                     )}
                 </div>

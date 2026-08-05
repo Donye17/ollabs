@@ -13,11 +13,13 @@ export default function PrivacyPage() {
                     <section>
                         <h2 className="font-display text-xl font-bold text-ink mb-2">1. Information we collect</h2>
                         <p>Ollabs works without an account. You can create a campaign and add a frame to a photo without signing up. Photos you add to a frame are processed in your browser and are not stored on our servers. When you create a campaign, we store the campaign details you enter, such as its title, description, and frame design.</p>
+                        <p className="mt-3">If you are creating a campaign, you may optionally give us an email address. This is never required, and supporters are never asked for one. We store it only so we can send you your dashboard link, let you recover your campaigns if you switch devices or clear your browser, and tell you when your campaign reaches a supporter milestone.</p>
                     </section>
 
                     <section>
                         <h2 className="font-display text-xl font-bold text-ink mb-2">2. How we use information</h2>
                         <p>We use the limited information we collect to provide, maintain, and improve the service, and to show public campaign pages and supporter counts.</p>
+                        <p className="mt-3">We only ever email campaign organizers who chose to give us an address, and only about their own campaigns. We do not send marketing email, we do not email supporters, and we do not sell or share email addresses. To have your address removed, email <a href="mailto:hello@ollabs.studio" className="text-brand-deep font-semibold hover:underline">hello@ollabs.studio</a>.</p>
                     </section>
 
                     <section>
