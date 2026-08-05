@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ use: stri
     const { use } = await params;
     const uc = getUseCase(use);
     if (!uc) return {};
-    const title = `${uc.h1} | Ollabs`;
+    const title = uc.h1;
     const description = `${uc.subtitle} Free, no signup, no ads. Make a frame and share one link.`;
     const url = `https://ollabs.studio/for/${uc.slug}`;
     return {

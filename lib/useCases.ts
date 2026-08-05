@@ -174,6 +174,48 @@ export const USE_CASES: UseCase[] = [
             { q: 'Do you inflate the supporter count?', a: 'Never. Every count is a real person who added the frame.' },
         ],
     },
+    {
+        slug: 'companies',
+        audience: 'Companies',
+        h1: 'Profile picture frames for companies',
+        subtitle: 'Mark a milestone, a launch, or a culture moment across your whole team.',
+        keyword: 'company profile picture frame',
+        intro: [
+            'Internal moments spread best when people opt into them. An anniversary, a funding milestone, a product launch, a values week: give your team one link and they can put it on their own profile in seconds, on LinkedIn or anywhere else.',
+            'No signup, no ads, and nothing watermarked. Upload your logo or set your exact brand colors, and every framed photo looks like it came from your design team.',
+        ],
+        benefits: [
+            { title: 'Your brand, exactly', body: 'Upload a transparent PNG of your own design, or set precise hex colors so the ring matches your brand guide.' },
+            { title: 'Nobody has to sign up', body: 'Employees, contractors, and partners all use the same link. No accounts to provision and nothing for IT to approve.' },
+            { title: 'Clean enough for LinkedIn', body: 'No ads, no watermark, and no third-party branding on the photo your team posts publicly.' },
+        ],
+        faqs: [
+            { q: 'Can we use our exact brand colors?', a: 'Yes. Set any hex value, or upload a finished frame design as a transparent PNG.' },
+            { q: 'Will our employees see ads or a watermark?', a: 'No. Supporters never see an ad, never create an account, and never get a watermark on their photo. That does not change.' },
+            { q: 'Can we run this for an internal-only moment?', a: 'Yes. Set the campaign to unlisted so it does not appear on the public Explore page, and share the link internally.' },
+        ],
+    },
+    {
+        slug: 'universities',
+        audience: 'Universities',
+        h1: 'Profile picture frames for universities',
+        subtitle: 'Homecoming, commencement, admitted students, Greek life, and giving days.',
+        keyword: 'university profile picture frame',
+        intro: [
+            'Campus moments run on a calendar and repeat every year. Homecoming, commencement, admitted students day, founders day, and the annual giving push all work the same way: one frame, one link, thousands of profiles.',
+            'Free and ad-free, with no signup for students, alumni, or staff. Make it in your school colors, share the link, and watch the counter move.',
+        ],
+        benefits: [
+            { title: 'Built for repeat moments', body: 'Run one for homecoming, another for commencement, another for giving day. Each gets its own link and its own numbers.' },
+            { title: 'Alumni do not need an account', body: 'The people least likely to sign up for anything are exactly the people you need. They do not have to.' },
+            { title: 'Chapters and departments can self-serve', body: 'Anyone can make their own campaign, so Greek chapters, athletics, and departments do not have to queue behind central marketing.' },
+        ],
+        faqs: [
+            { q: 'Can individual chapters or departments make their own?', a: 'Yes. Creating a campaign is free and takes a minute, so any group on campus can run their own without going through a central team.' },
+            { q: 'Do students need to install anything?', a: 'No. It works in a phone browser. They open the link, add their photo, and download.' },
+            { q: 'Can we reuse the same frame next year?', a: 'Yes. Make a new campaign with the same design so the new one gets its own supporter count.' },
+        ],
+    },
 ];
 
 export function getUseCase(slug: string): UseCase | undefined {
