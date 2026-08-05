@@ -10,7 +10,7 @@ import { visibleFrameSql } from '@/lib/frameValidity';
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-    title: 'Explore campaigns | Ollabs',
+    title: 'Explore campaigns',
     description: 'Browse live profile-picture frame campaigns for causes, teams, events, and more. Add one to your photo, or make your own for free.',
     alternates: { canonical: 'https://ollabs.studio/explore' },
     openGraph: { type: 'website', url: 'https://ollabs.studio/explore', title: 'Explore campaigns', description: 'Browse live profile-picture frame campaigns and add one to your photo.', siteName: 'Ollabs', images: ['/og.png'] },

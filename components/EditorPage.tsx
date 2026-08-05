@@ -14,7 +14,9 @@ import { FrameConfig, StickerConfig, TextConfig, MotionEffect } from '@/lib/type
 import { AlertCircle, Sparkles, Sliders, Eye, Type, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
 import { OnboardingOverlay } from './editor/OnboardingOverlay';
-import { removeBackground } from "@imgly/background-removal";
+// Loaded on demand (see handleRemoveBackground). This library is ~5.5MB of WASM;
+// importing it statically made every visitor to /create download it whether or
+// not they ever removed a background.
 
 export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     // History State (Frame Config)
@@ -31,7 +33,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const [selectedTextId, setSelectedTextId] = useState<string | null>(null); // For Text
 
     // Refs
-    const editorRef = useRef<{ exportGif: () => void; generateGif: () => Promise<Blob>; getDominantColors: () => Promise<string[]> }>(null);
+    const editorRef = useRef<{ getDominantColors: () => Promise<string[]> }>(null);
 
     const handleAutoMatch = async () => {
         if (!editorRef.current) return;
@@ -84,6 +86,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
         if (!imageSrc) return;
         setIsRemovingBg(true);
         try {
+            const { removeBackground } = await import("@imgly/background-removal");
             const blob = await removeBackground(imageSrc);
             const url = URL.createObjectURL(blob);
             setImageSrc(url);

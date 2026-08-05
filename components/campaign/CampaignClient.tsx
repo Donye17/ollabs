@@ -193,9 +193,10 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 setZoom(1);
                 setPos({ x: 0, y: 0 });
                 setJustDownloaded(false);
+                track('photo_uploaded', { campaign: slug });
                 draw();
             };
-            img.onerror = () => alert('That image could not be opened. Try a JPG or PNG.');
+            img.onerror = () => { track('photo_upload_failed', { campaign: slug }); alert('That image could not be opened. Try a JPG or PNG.'); };
             img.src = dataUrl;
         } catch {
             alert('That image could not be opened. Try a JPG or PNG.');

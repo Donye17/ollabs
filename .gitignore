@@ -33,3 +33,7 @@ build/
 
 # TypeScript build cache
 tsconfig.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc

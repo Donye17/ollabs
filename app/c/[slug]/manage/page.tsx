@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 // Private owner dashboard. Never index it.
 export const metadata: Metadata = {
-    title: 'Manage campaign | Ollabs',
+    title: 'Manage campaign',
     robots: { index: false, follow: false },
 };
 

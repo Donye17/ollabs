@@ -2,7 +2,7 @@ import { EditorPage } from '@/components/EditorPage';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Create a campaign | Ollabs',
+    title: 'Create a campaign',
     description: 'Design a profile-picture frame for your cause, team, or event and share one link. No login required.',
 };
 

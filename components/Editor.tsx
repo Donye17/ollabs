@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect } from 'react';
-import GIF from 'gif.js';
 import { CANVAS_SIZE } from '@/lib/constants';
 import { FrameConfig, Position, StickerConfig, MotionEffect, TextConfig } from '@/lib/types';
 import { useEditorLogic } from './editor/useEditorLogic';
@@ -29,7 +28,7 @@ interface EditorProps {
   onSelectText: (id: string | null) => void;
 
   // Export Ref
-  editorRef?: React.RefObject<{ exportGif: () => void; generateGif: () => Promise<Blob>; getDominantColors: () => Promise<string[]> } | null>;
+  editorRef?: React.RefObject<{ getDominantColors: () => Promise<string[]> } | null>;
 
   // Background Removal
   onRemoveBackground?: () => void;
@@ -224,55 +223,7 @@ export const Editor: React.FC<EditorProps> = ({
 
   const handleEnd = () => { logic.setInteractionMode('none'); logic.setInitialStickerState(null); logic.setInitialTextState(null); };
 
-  // --- Export Logic (GIF & Image) ---
-  // Updated to use the new structure
-  const handleExportGif = async () => {
-    logic.setIsRecording(true);
-    onSelectSticker(null);
-    onSelectText(null);
-    const gif = new GIF({
-      workers: 2,
-      quality: 10,
-      width: CANVAS_SIZE,
-      height: CANVAS_SIZE,
-      workerScript: '/gif.worker.js',
-    });
-    // This part requires access to draw function which is inside CanvasArea
-    // Since CanvasArea is a child, we can't easily call draw from here without forwarding refs or state.
-    // However, the original Editor had it all in one file. 
-    // To solve this properly, we should probably Move `draw` to useEditorLogic or keep it here 
-    // BUT `CanvasArea` needs to render it. 
-    // Actually, `CanvasArea` is responsible for rendering. 
-    // We can use `html2canvas` or just grab the context from `canvasRef` which we have access to via `logic.canvasRef`.
-    // The issue is `draw()` update loop.
-
-    // For now, to keep this refactor safe, we will rely on the fact that `CanvasArea` is reactive to props.
-    // But `gif.js` needs to actuaully TRIGGER draws at specific timesteps.
-    // This dictates that `draw(time)` function might need to be hoisted OR exposed via ref from CanvasArea.
-  };
-
-  // Re-implementing Export Handle via Ref to CanvasArea?
-  // Easier approach for this refactor:
-  // We passed `canvasRef` to `logic`. 
-  // We can recreate `draw` here just for Export if we want, OR better:
-  // Move `draw` logic entirely into `useEditorLogic`? No, that mixes UI concerns.
-  // Move `draw` into a standalone Helper `renderFrame(ctx, ...state)` that both CanvasArea and Export can use.
-
-  // Given current constraints, I will leave the GIF generation stubbed/alerted IF I can't easily port it, 
-  // OR I will implement the loop here using the `logic.canvasRef` and a static renderer.
-  // The `CanvasArea` has the `draw` effect loop.
-  // Let's rely on the `onPreviewUpdate` for the static thumbnail.
-  // For GIF, we might need a follow-up to "Extract Renderer" to be truly clean. 
-  // For this step, I will simplify and say "GIF Export Temporarily Disabled during Refactor" if needed, 
-  // or just copy the render logic to `handleExportGif` so it runs independently.
-
   React.useImperativeHandle(editorRef, () => ({
-    exportGif: async () => {
-      alert("GIF Export is coming back in the next update!");
-    },
-    generateGif: async () => {
-      return new Blob(); // Placeholder
-    },
     getDominantColors: logic.getDominantColors
   }));
 

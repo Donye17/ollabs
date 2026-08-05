@@ -30,10 +30,10 @@ const getCampaign = cache(async (slug: string) => {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
     const c = await getCampaign(slug);
-    if (!c) return { title: 'Campaign not found | Ollabs' };
+    if (!c) return { title: 'Campaign not found' };
     const description = c.description || `Add the ${c.title} frame to your profile picture and show your support.`;
     return {
-        title: `${c.title} | Ollabs`,
+        title: c.title,
         description,
         openGraph: {
             title: c.title,
