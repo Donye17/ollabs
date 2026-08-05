@@ -1,6 +1,8 @@
 # Ollabs — Road to MVP Launch
 
-*Updated July 14, 2026. The MVP is the campaign-first, circle-only, ad-free Twibbon alternative.*
+> **⚠️ SUPERSEDED as of August 1, 2026.** Phases 1 through 4 all shipped between July 14 and July 29. The product is live at ollabs.studio with real organic supporters. **See [LAUNCH_PLAN.md](./LAUNCH_PLAN.md) for current state and next steps.** This document is kept for history. Checkboxes below have been updated to reflect what actually shipped.
+
+*Originally written July 14, 2026. The MVP is the campaign-first, circle-only, ad-free Twibbon alternative.*
 
 ## Definition of done (what "MVP" means)
 
@@ -23,52 +25,52 @@ Critical path to launch: **Phase 2 (campaign primitive) → Phase 3 (supporter p
 
 ## Phase 1 — Cleanup & hygiene (small, do alongside Phase 2)
 
-- [ ] Remove or auth-gate the public `/api/debug/*` and `/api/seed` endpoints
-- [ ] Move the hardcoded seed key (`ollabs-2026-master-key`) out of code/docs into an env var
-- [ ] Add `tsconfig.tsbuildinfo` to `.gitignore` and untrack it (build artifact)
-- [ ] Remove the dead `text` tab/panel left in the editor
-- [ ] Replace or remove the fake homepage activity ticker (Leo/Sarah/… demo data reads as fake social proof)
+- [x] Remove or auth-gate the public `/api/debug/*` and `/api/seed` endpoints (both gone; `debug-db` is now an empty dir)
+- [x] Move the hardcoded seed key out of code/docs into an env var (no references remain)
+- [x] Add `tsconfig.tsbuildinfo` to `.gitignore` and untrack it
+- [x] Remove the dead `text` tab/panel left in the editor
+- [x] Replace the fake homepage activity ticker (now a real live-campaign carousel)
 
 Low effort, high polish. None of it blocks launch, but it should be clean before real traffic.
 
 ---
 
-## Phase 2 — The campaign primitive (core build) 🎯
+## ✅ Phase 2 — The campaign primitive (shipped)
 
 This is the heart of the MVP — the piece that turns a tool into a growth engine.
 
-- [ ] **Data model.** Add a `campaigns` table: `id`, `slug`, `title`, `description`, `frame_config` (jsonb), `creator_id` (nullable), `supporter_count`, `is_public`, `created_at`. Add a `campaign_uses` table: `campaign_id`, `created_at`, optional `user_id`, optional opt-in `image_url` (powers the count + supporter wall). One clean Drizzle migration.
-- [ ] **Builder → campaign.** Rename "Publish template" to "Create campaign." On create, generate a unique `slug` and save the frame config as a campaign. Return the shareable link.
-- [ ] **API.** `POST /api/campaigns` (create), `GET /api/campaigns/[slug]` (fetch), `POST /api/campaigns/[slug]/use` (increment supporter count).
-- [ ] **Decision to make:** anonymous-create for MVP (anyone makes a campaign, no login) vs. require an organizer login. Recommend anonymous-first with an optional "claim this campaign" link.
+- [x] **Data model.** Add a `campaigns` table: `id`, `slug`, `title`, `description`, `frame_config` (jsonb), `creator_id` (nullable), `supporter_count`, `is_public`, `created_at`. Add a `campaign_uses` table: `campaign_id`, `created_at`, optional `user_id`, optional opt-in `image_url` (powers the count + supporter wall). One clean Drizzle migration.
+- [x] **Builder → campaign.** Rename "Publish template" to "Create campaign." On create, generate a unique `slug` and save the frame config as a campaign. Return the shareable link.
+- [x] **API.** `POST /api/campaigns` (create), `GET /api/campaigns/[slug]` (fetch), `POST /api/campaigns/[slug]/use` (increment supporter count).
+- [x] **Decision to make:** anonymous-create for MVP (anyone makes a campaign, no login) vs. require an organizer login. Recommend anonymous-first with an optional "claim this campaign" link.
 
 ---
 
-## Phase 3 — The supporter page (the differentiator) 🎯
+## ✅ Phase 3 — The supporter page (shipped)
 
 The public campaign experience at `/c/[slug]`. This is what has to beat Twibbon on feel.
 
-- [ ] **New route `/c/[slug]`** — completely separate from the builder. Supporters never see tabs or style pickers.
-- [ ] **The flow:** upload photo → auto-fit into the frame → drag/pinch to adjust → Download / Share. One primary action at each step.
-- [ ] **Mobile-first.** Thumb-friendly, fast, zero ad interstitials. This is where most supporters will be.
-- [ ] **Live supporter counter** — increments on download/use.
-- [ ] **Share** — copy link + native share sheet; "Make your own" link back to the builder.
-- [ ] *(Optional for MVP)* opt-in supporter wall of recent photos.
+- [x] **New route `/c/[slug]`** — completely separate from the builder. Supporters never see tabs or style pickers.
+- [x] **The flow:** upload photo → auto-fit into the frame → drag/pinch to adjust → Download / Share. One primary action at each step.
+- [x] **Mobile-first.** Thumb-friendly, fast, zero ad interstitials. This is where most supporters will be.
+- [x] **Live supporter counter** — increments on download/use.
+- [x] **Share** — copy link + native share sheet; "Make your own" link back to the builder.
+- [ ] *(Optional for MVP, not built)* opt-in supporter wall of recent photos.
 
 ---
 
-## Phase 4 — Launch hardening & polish
+## ✅ Phase 4 — Launch hardening & polish (shipped, two manual items open)
 
-- [ ] **SEO for campaigns** — repoint the existing OG-image generator at campaigns so shared links preview nicely; per-campaign meta tags.
-- [ ] **Graceful degradation** — the builder/editor should still work if the DB is down (it's client-side), and the supporter page should fail softly.
-- [ ] **Sentry alerting** — actually wire alerts so an outage pings you in minutes (the last one was invisible until someone looked).
-- [ ] **Analytics** — track campaigns created and **supporter conversion (uses ÷ page views)** — the single metric that tells you it's working.
-- [ ] **Auth simplification** — anonymous-first; keep at most one social login for organizers who want to manage campaigns. (Trim the three-provider setup.)
-- [ ] **QA pass** — full run-through on mobile + desktop: create a campaign, open its link as a supporter, upload, adjust, download, share, watch the count move.
+- [x] **SEO for campaigns** — repoint the existing OG-image generator at campaigns so shared links preview nicely; per-campaign meta tags.
+- [x] **Graceful degradation** — the builder/editor should still work if the DB is down (it's client-side), and the supporter page should fail softly.
+- [ ] **Sentry alerting** — SDK is wired and collecting, but no alert *rule* is configured. This is a Sentry dashboard setting, not code. An outage is still invisible until someone looks. **Still open.**
+- [x] **Analytics** — GA4 tracks `campaign_created`, `frame_download`, `frame_share`, `copy_link`, `frame_copy_image`, plus `photo_uploaded` (added Aug 1) so the upload drop-off step is visible.
+- [x] **Auth simplification** — anonymous-first; organizers can create without an account.
+- [ ] **QA pass** — full run-through on mobile + desktop. Checklist lives in LAUNCH_PLAN.md. **Still open.**
 
 ---
 
-## Phase 5 — MVP launch
+## 🎯 Phase 5 — MVP launch (current focus — see LAUNCH_PLAN.md)
 
 - [ ] **Pick a launch wedge** — one real community, event, or cause to seed the first genuine campaigns (a Discord server, a sports team, a fundraiser). Distribution beats features here.
 - [ ] **Seed 2–3 flagship campaigns** yourself so the format is obvious.
