@@ -37,6 +37,7 @@
   ],
   "exclude": [
     "node_modules",
-    "legacy_mvp"
+    "legacy_mvp",
+    "scripts/_archive"
   ]
 }

@@ -1,211 +1,10 @@
-import { pgTable, index, foreignKey, unique, text, timestamp, uuid, boolean, jsonb, integer, serial, primaryKey } from "drizzle-orm/pg-core"
-import { sql } from "drizzle-orm"
+import { pgTable, index, foreignKey, unique, text, timestamp, uuid, boolean, jsonb, integer } from "drizzle-orm/pg-core"
 
-
-
-export const session = pgTable("session", {
-	id: text().primaryKey().notNull(),
-	expiresAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
-	token: text().notNull(),
-	createdAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
-	ipAddress: text(),
-	userAgent: text(),
-	userId: text().notNull(),
-}, (table) => [
-	index("session_userId_idx").using("btree", table.userId.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.userId],
-		foreignColumns: [user.id],
-		name: "session_userId_fkey"
-	}).onDelete("cascade"),
-	unique("session_token_key").on(table.token),
-]);
-
-export const account = pgTable("account", {
-	id: text().primaryKey().notNull(),
-	accountId: text().notNull(),
-	providerId: text().notNull(),
-	userId: text().notNull(),
-	accessToken: text(),
-	refreshToken: text(),
-	idToken: text(),
-	accessTokenExpiresAt: timestamp({ withTimezone: true, mode: 'string' }),
-	refreshTokenExpiresAt: timestamp({ withTimezone: true, mode: 'string' }),
-	scope: text(),
-	password: text(),
-	createdAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
-}, (table) => [
-	index("account_userId_idx").using("btree", table.userId.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.userId],
-		foreignColumns: [user.id],
-		name: "account_userId_fkey"
-	}).onDelete("cascade"),
-]);
-
-export const notifications = pgTable("notifications", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	userId: text("user_id").notNull(),
-	actorId: text("actor_id").notNull(),
-	type: text().notNull(),
-	entityId: uuid("entity_id").notNull(),
-	read: boolean().default(false),
-	metadata: text(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-}, (table) => [
-	index("idx_notifications_created_at").using("btree", table.createdAt.desc().nullsFirst().op("timestamptz_ops")),
-	index("idx_notifications_user_id").using("btree", table.userId.asc().nullsLast().op("text_ops")),
-]);
-
-export const collections = pgTable("collections", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	userId: text("user_id").notNull(),
-	name: text().notNull(),
-	description: text(),
-	isPublic: boolean("is_public").default(true),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-}, (table) => [
-	index("idx_collections_user_id").using("btree", table.userId.asc().nullsLast().op("text_ops")),
-	foreignKey({
-		columns: [table.userId],
-		foreignColumns: [user.id],
-		name: "collections_user_id_fkey"
-	}).onDelete("cascade"),
-]);
-
-export const collectionItems = pgTable("collection_items", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	collectionId: uuid("collection_id").notNull(),
-	frameId: uuid("frame_id").notNull(),
-	addedAt: timestamp("added_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-}, (table) => [
-	index("idx_collection_items_collection_id").using("btree", table.collectionId.asc().nullsLast().op("uuid_ops")),
-	index("idx_collection_items_frame_id").using("btree", table.frameId.asc().nullsLast().op("uuid_ops")),
-	foreignKey({
-		columns: [table.collectionId],
-		foreignColumns: [collections.id],
-		name: "collection_items_collection_id_fkey"
-	}).onDelete("cascade"),
-	foreignKey({
-		columns: [table.frameId],
-		foreignColumns: [frames.id],
-		name: "collection_items_frame_id_fkey"
-	}).onDelete("cascade"),
-	unique("collection_items_collection_id_frame_id_key").on(table.collectionId, table.frameId),
-]);
-
-export const userProfiles = pgTable("user_profiles", {
-	id: text().primaryKey().notNull(),
-	username: text().notNull(),
-	bio: text(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-}, (table) => [
-	unique("user_profiles_username_key").on(table.username),
-]);
-
-export const frames = pgTable("frames", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	creatorId: text("creator_id").notNull(),
-	parentId: uuid("parent_id"),
-	name: text().notNull(),
-	config: jsonb().notNull(),
-	isPublic: boolean("is_public").default(true),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-	likesCount: integer("likes_count").default(0),
-	creatorName: text("creator_name").default('Unknown'),
-	description: text(),
-	viewsCount: integer("views_count").default(0),
-	tags: text().array().default([""]),
-	previewUrl: text("preview_url"),
-	mediaType: text("media_type").default('image/png'),
-}, (table) => [
-	index("idx_frames_tags").using("gin", table.tags),
-	index("idx_frames_is_public").using("btree", table.isPublic.desc().nullsLast()),
-	index("idx_frames_created_at").using("btree", table.createdAt.desc().nullsLast()),
-	index("idx_frames_likes_count").using("btree", table.likesCount.desc().nullsLast()),
-	index("idx_frames_views_count").using("btree", table.viewsCount.desc().nullsLast()),
-	index("idx_frames_creator_id").using("btree", table.creatorId.asc().nullsLast()),
-]);
-
-export const verification = pgTable("verification", {
-	id: text().primaryKey().notNull(),
-	identifier: text().notNull(),
-	value: text().notNull(),
-	expiresAt: timestamp("expiresAt", { mode: 'string' }),
-	// createdAt: timestamp("created_at", { mode: 'string' }),
-	// updatedAt: timestamp("updated_at", { mode: 'string' }),
-	// expiresAt: timestamp({ withTimezone: true, mode: 'string' }),
-	createdAt: timestamp("createdAt", { withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp("updatedAt", { withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-});
-
-export const user = pgTable("user", {
-	id: text().primaryKey().notNull(),
-	name: text().notNull(),
-	username: text().unique(),
-	email: text().notNull(),
-	emailVerified: boolean().notNull(),
-	image: text(),
-	createdAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ withTimezone: true, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	role: text(),
-	bio: text(),
-	location: text(),
-	website: text(),
-	socialLinks: jsonb("social_links").default({}),
-	isVerified: boolean("isverified").default(false),
-}, (table) => [
-	unique("user_email_key").on(table.email),
-]);
-
-export const frameComments = pgTable("frame_comments", {
-	id: serial().primaryKey().notNull(),
-	frameId: uuid("frame_id").notNull(),
-	userId: text("user_id").notNull(),
-	content: text().notNull(),
-	userName: text("user_name"),
-	userImage: text("user_image"),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-}, (table) => [
-	index("idx_frame_comments_frame_id").using("btree", table.frameId.asc().nullsLast().op("uuid_ops")),
-]);
-
-export const frameLikes = pgTable("frame_likes", {
-	frameId: uuid("frame_id").notNull(),
-	userId: text("user_id").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-}, (table) => [
-	foreignKey({
-		columns: [table.frameId],
-		foreignColumns: [frames.id],
-		name: "frame_likes_frame_id_fkey"
-	}).onDelete("cascade"),
-	primaryKey({ columns: [table.frameId, table.userId], name: "frame_likes_pkey" }),
-]);
-
-export const userFavorites = pgTable("user_favorites", {
-	userId: text("user_id").notNull(),
-	frameId: uuid("frame_id").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-}, (table) => [
-	foreignKey({
-		columns: [table.frameId],
-		foreignColumns: [frames.id],
-		name: "user_favorites_frame_id_fkey"
-	}).onDelete("cascade"),
-	primaryKey({ columns: [table.userId, table.frameId], name: "user_favorites_pkey" }),
-]);
-
-export const likes = pgTable("likes", {
-	userId: text("user_id").notNull(),
-	frameId: uuid("frame_id").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-}, (table) => [
-	primaryKey({ columns: [table.userId, table.frameId], name: "likes_pkey" }),
-]);
+// Campaign-only schema.
+//
+// The social model (frames, likes, comments, collections, notifications) and
+// the better-auth tables were dropped in migration 0008. Everything Ollabs
+// does now lives in these four tables.
 
 export const campaigns = pgTable("campaigns", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
@@ -213,6 +12,8 @@ export const campaigns = pgTable("campaigns", {
 	title: text().notNull(),
 	description: text(),
 	frameConfig: jsonb("frame_config").notNull(),
+	// Nullable and always null today. Kept so organizer accounts can be added
+	// later without another migration.
 	creatorId: text("creator_id"),
 	creatorName: text("creator_name").default('Anonymous'),
 	supporterCount: integer("supporter_count").default(0),
@@ -223,11 +24,34 @@ export const campaigns = pgTable("campaigns", {
 	previewUrl: text("preview_url"),
 	isPublic: boolean("is_public").default(true),
 	isHidden: boolean("is_hidden").default(false),
+	// Optional. Creating a campaign never requires an account; this exists only
+	// so an organizer can recover their dashboard after switching devices.
+	organizerEmail: text("organizer_email"),
+	emailSentAt: timestamp("email_sent_at", { withTimezone: true, mode: 'string' }),
+	milestoneNotified: integer("milestone_notified").default(0),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
 	index("idx_campaigns_slug").using("btree", table.slug.asc().nullsLast()),
 	index("idx_campaigns_created_at").using("btree", table.createdAt.desc().nullsLast()),
+	index("idx_campaigns_category").using("btree", table.category.asc().nullsLast()),
+	index("idx_campaigns_organizer_email").using("btree", table.organizerEmail.asc().nullsLast()),
 	unique("campaigns_slug_key").on(table.slug),
+]);
+
+export const campaignUses = pgTable("campaign_uses", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	campaignId: uuid("campaign_id").notNull(),
+	userId: text("user_id"),
+	// Set only when a supporter opts in to the supporter wall.
+	imageUrl: text("image_url"),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("idx_campaign_uses_campaign_id").using("btree", table.campaignId.asc().nullsLast()),
+	foreignKey({
+		columns: [table.campaignId],
+		foreignColumns: [campaigns.id],
+		name: "campaign_uses_campaign_id_fkey"
+	}).onDelete("cascade"),
 ]);
 
 export const campaignReports = pgTable("campaign_reports", {
@@ -246,17 +70,13 @@ export const campaignReports = pgTable("campaign_reports", {
 	}).onDelete("cascade"),
 ]);
 
-export const campaignUses = pgTable("campaign_uses", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	campaignId: uuid("campaign_id").notNull(),
-	userId: text("user_id"),
-	imageUrl: text("image_url"),
+export const campaignRecoveryTokens = pgTable("campaign_recovery_tokens", {
+	token: text().primaryKey().notNull(),
+	email: text().notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+	expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'string' }).notNull(),
+	usedAt: timestamp("used_at", { withTimezone: true, mode: 'string' }),
 }, (table) => [
-	index("idx_campaign_uses_campaign_id").using("btree", table.campaignId.asc().nullsLast()),
-	foreignKey({
-		columns: [table.campaignId],
-		foreignColumns: [campaigns.id],
-		name: "campaign_uses_campaign_id_fkey"
-	}).onDelete("cascade"),
+	index("idx_recovery_tokens_email").using("btree", table.email.asc().nullsLast()),
+	index("idx_recovery_tokens_expires").using("btree", table.expiresAt.asc().nullsLast()),
 ]);
