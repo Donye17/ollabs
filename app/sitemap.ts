@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { pool } from '@/lib/neon';
 import { USE_CASES } from '@/lib/useCases';
+import { DAYS } from '@/lib/days';
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -17,6 +18,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             lastModified: new Date(),
             changeFrequency: 'monthly' as const,
             priority: 0.8,
+        })),
+        { url: `${baseUrl}/day`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+        ...DAYS.map((d) => ({
+            url: `${baseUrl}/day/${d.slug}`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly' as const,
+            priority: 0.9,
         })),
         { url: `${baseUrl}/vs/twibbonize`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
         { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
