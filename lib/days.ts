@@ -184,13 +184,17 @@ export const DAYS: AwarenessDay[] = [
             { q: 'Can we use our own logo and brand colours?', a: 'Yes. Set exact hex values, or upload a finished frame design as a transparent PNG.' },
             { q: 'Can we reuse the campaign next year?', a: 'Yes. Keep the dashboard link, or start a fresh campaign with the same design so the new year gets its own supporter count.' },
         ],
+        // Designed overlay from scripts/frames/national_nonprofit_day.py.
+        // cutoutScale 0 because the PNG already carries its own transparent
+        // photo window; anything higher punches a second hole in the middle.
         frame: {
             id: 'day-national-nonprofit-day',
-            type: FrameType.SOLID,
+            type: FrameType.CUSTOM_IMAGE,
             name: 'National Nonprofit Day',
-            color1: '#01BEF6',
-            width: 22,
-            caption: { text: 'NONPROFIT DAY', color: '#06141F', position: 'bottom', size: 1 },
+            color1: 'transparent',
+            width: 0,
+            imageUrl: '/frames/national-nonprofit-day.png',
+            cutoutScale: 0,
         },
         relatedUseCases: ['nonprofits', 'fundraisers', 'companies'],
         relatedDays: [],
