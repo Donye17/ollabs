@@ -1,5 +1,5 @@
 import { pool } from '@/lib/neon';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { milestoneEmail, sendEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
@@ -60,14 +60,18 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const hit = campaign.organizer_email
             ? milestoneReached(count, campaign.milestone_notified)
             : null;
+        // Runs through after() for the same reason as the welcome email: a
+        // floating promise would be killed when the function freezes on
+        // returning the response.
         if (hit != null) {
-            pool.query(
-                `UPDATE campaigns SET milestone_notified = $2
-                 WHERE id = $1 AND COALESCE(milestone_notified, 0) < $2
-                 RETURNING id`,
-                [campaignId, hit]
-            )
-                .then((claim) => {
+            after(async () => {
+                try {
+                    const claim = await pool.query(
+                        `UPDATE campaigns SET milestone_notified = $2
+                         WHERE id = $1 AND COALESCE(milestone_notified, 0) < $2
+                         RETURNING id`,
+                        [campaignId, hit]
+                    );
                     if (claim.rowCount === 0) return; // another request already sent it
                     const msg = milestoneEmail({
                         title: campaign.title,
@@ -76,9 +80,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                         count,
                         goal: campaign.goal,
                     });
-                    return sendEmail({ to: campaign.organizer_email, ...msg });
-                })
-                .catch((e) => console.error('[use] milestone email failed', e));
+                    await sendEmail({ to: campaign.organizer_email, ...msg });
+                } catch (e) {
+                    console.error('[use] milestone email failed', e);
+                }
+            });
         }
 
         return NextResponse.json({ supporter_count: count });

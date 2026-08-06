@@ -1,5 +1,5 @@
 import { pool } from '@/lib/neon';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { rateLimit, clientIp } from '@/lib/rateLimit';
 import { CATEGORY_KEYS } from '@/lib/categories';
 import { hasVisibleFrame, visibleFrameSql } from '@/lib/frameValidity';
@@ -132,24 +132,31 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Could not generate a unique link, please try again' }, { status: 409 });
         }
 
-        // Fire the "your campaign is live" email. Never let a mail failure fail
-        // the create; the organizer already has their link in the response.
+        // Send the "your campaign is live" email after the response, so a slow
+        // or failing mail provider never delays or fails the create. This has
+        // to go through after() rather than a bare floating promise: on
+        // serverless the function is frozen the moment the response is
+        // returned, and unawaited work is killed before it runs.
         if (emailValue) {
-            const msg = campaignLiveEmail({
-                title: campaign.title,
-                slug: campaign.slug,
-                ownerToken: campaign.owner_token,
-            });
-            sendEmail({ to: emailValue, ...msg })
-                .then((ok) => {
+            const to = emailValue;
+            after(async () => {
+                try {
+                    const msg = campaignLiveEmail({
+                        title: campaign.title,
+                        slug: campaign.slug,
+                        ownerToken: campaign.owner_token,
+                    });
+                    const ok = await sendEmail({ to, ...msg });
                     if (ok) {
-                        return pool.query(
+                        await pool.query(
                             `UPDATE campaigns SET email_sent_at = NOW() WHERE id = $1`,
                             [campaign.id]
                         );
                     }
-                })
-                .catch((e) => console.error('[campaigns] welcome email failed', e));
+                } catch (e) {
+                    console.error('[campaigns] welcome email failed', e);
+                }
+            });
         }
 
         return NextResponse.json(campaign, { status: 201 });
