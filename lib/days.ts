@@ -35,9 +35,24 @@ export interface AwarenessDay {
     howOrgsMark: { title: string; body: string }[];
     campaignIdeas: string[];
     faqs: { q: string; a: string }[];
-    frame: FrameConfig;
+    // Optional. A day ships with a generated ring in its own colour and gets
+    // upgraded to custom artwork later, so writing a page is never blocked on
+    // someone drawing a frame first.
+    frame?: FrameConfig;
     relatedUseCases: string[];
     relatedDays: string[];
+}
+
+/** The day's own artwork, or a clean ring built from its primary colour. */
+export function resolveFrame(day: AwarenessDay): FrameConfig {
+    if (day.frame) return day.frame;
+    return {
+        id: `day-${day.slug}`,
+        type: FrameType.SOLID,
+        name: day.name,
+        color1: day.colors[0]?.hex ?? '#01BEF6',
+        width: 22,
+    };
 }
 
 // ---------------------------------------------------------------- date math
@@ -280,4 +295,54 @@ export function daysByUpcoming(from: Date = new Date()): { day: AwarenessDay; oc
     return DAYS
         .map((day) => ({ day, occ: nextOccurrence(day.date, from) }))
         .sort((a, b) => a.occ.start.getTime() - b.occ.start.getTime());
+}
+
+export interface CalendarEntry {
+    day: AwarenessDay;
+    occ: { start: Date; end: Date };
+    past: boolean;
+}
+
+/**
+ * A window of entries around today, for the home page timeline.
+ *
+ * Every day here recurs annually, so "past" means this year's occurrence has
+ * already been and gone. We look back one year and forward one so the strip
+ * still reads as a continuous timeline when only a handful of days exist.
+ */
+export function calendarWindow(
+    from: Date = new Date(),
+    pastCount = 4,
+    futureCount = 8,
+    // Only look back this far. Without a limit, a day that has not come round
+    // yet this year surfaces last year's date instead, so in August you would
+    // see "August 10, 2025" sitting two days before the 2026 one.
+    pastWindowDays = 120,
+): CalendarEntry[] {
+    const today = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()));
+    const earliest = today.getTime() - pastWindowDays * 86_400_000;
+    const seen = new Set<string>();
+    const all: CalendarEntry[] = [];
+
+    for (const day of DAYS) {
+        // this year's and next year's occurrence, so a passed date still
+        // appears behind us rather than vanishing to twelve months ahead
+        for (const probe of [
+            new Date(Date.UTC(today.getUTCFullYear() - 1, 0, 1)),
+            today,
+        ]) {
+            const occ = nextOccurrence(day.date, probe);
+            const key = `${day.slug}:${occ.start.getTime()}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            const past = occ.end.getTime() < today.getTime();
+            if (past && occ.start.getTime() < earliest) continue;
+            all.push({ day, occ, past });
+        }
+    }
+
+    all.sort((a, b) => a.occ.start.getTime() - b.occ.start.getTime());
+    const past = all.filter((e) => e.past).slice(-pastCount);
+    const future = all.filter((e) => !e.past).slice(0, futureCount);
+    return [...past, ...future];
 }

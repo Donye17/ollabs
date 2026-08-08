@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { pool } from '@/lib/neon';
 import { NavBar } from '@/components/NavBar';
 import { DayFrameTool } from '@/components/day/DayFrameTool';
-import { DAYS, getDay, nextOccurrence, formatOccurrence, countdownLabel } from '@/lib/days';
+import { DAYS, getDay, nextOccurrence, formatOccurrence, countdownLabel, resolveFrame } from '@/lib/days';
 import { getUseCase } from '@/lib/useCases';
 import { visibleFrameSql } from '@/lib/frameValidity';
 import { ArrowRight, CalendarDays, Users } from 'lucide-react';
@@ -131,7 +131,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                         <p className="text-sm text-ink/70 mb-7 text-center">
                             Free, no signup, and no watermark. Your photo never leaves your browser.
                         </p>
-                        <DayFrameTool frame={day.frame} dayName={day.name} daySlug={day.slug} />
+                        <DayFrameTool frame={resolveFrame(day)} dayName={day.name} daySlug={day.slug} />
                     </div>
                 </div>
             </section>
