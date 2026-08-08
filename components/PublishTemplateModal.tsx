@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { upload } from '@vercel/blob/client';
@@ -17,6 +17,15 @@ interface PublishTemplateModalProps {
 }
 
 export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl }) => {
+    // Set when the builder was opened from a /day page, so the campaign can be
+    // attributed to that day rather than guessed at by category.
+    const [daySlug, setDaySlug] = useState<string | null>(null);
+    useEffect(() => {
+        try {
+            const d = new URLSearchParams(window.location.search).get('day');
+            if (d) setDaySlug(d);
+        } catch { /* ignore */ }
+    }, []);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [goal, setGoal] = useState('');
@@ -50,7 +59,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             const res = await fetch('/api/campaigns', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description, frameConfig: config, previewUrl, goal: goal || null, category: category || null, organizerEmail: organizerEmail || null })
+                body: JSON.stringify({ title, description, frameConfig: config, previewUrl, goal: goal || null, category: category || null, organizerEmail: organizerEmail || null, daySlug })
             });
 
             if (res.ok) {
@@ -59,7 +68,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 const mUrl = campaign.owner_token ? `${window.location.origin}/c/${campaign.slug}/manage?k=${campaign.owner_token}` : null;
                 setCampaignUrl(cUrl);
                 if (mUrl) setManageUrl(mUrl);
-                track('campaign_created', { campaign: campaign.slug, category: category || 'none' });
+                track('campaign_created', { campaign: campaign.slug, category: category || 'none', day: daySlug || 'none' });
 
                 // Remember this campaign on the device so the owner can find it again.
                 try {

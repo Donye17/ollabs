@@ -45,21 +45,23 @@ type LiveCampaign = { slug: string; title: string; supporter_count: number };
  * This block is what keeps the page off the thin-content pile: it is data a
  * competitor cannot copy into a blog post, and it changes as the platform does.
  */
-async function liveCampaigns(category: string): Promise<LiveCampaign[]> {
+async function liveCampaigns(slug: string): Promise<LiveCampaign[]> {
     try {
         const res = await pool.query(
-            // Only campaigns with actual supporters. A grid of six zeroes is
-            // worse than an empty state: it reads as a dead platform, and the
-            // heading promises real counts. Same reasoning as the home page
-            // hiding counts below a threshold.
+            // Campaigns actually started from this day, not merely sharing its
+            // category. Category matching put St Patrick's Day frames on the
+            // s'mores page, because both are 'event'.
+            //
+            // Zero-supporter campaigns are excluded: a grid of six zeroes reads
+            // as a dead platform and makes the heading a lie.
             `SELECT c.slug, c.title, COALESCE(c.supporter_count, 0) AS supporter_count
              FROM campaigns c
              WHERE c.is_public = true AND c.is_hidden IS NOT TRUE
-               AND c.category = $1 AND COALESCE(c.supporter_count, 0) > 0
+               AND c.day_slug = $1 AND COALESCE(c.supporter_count, 0) > 0
                AND ${visibleFrameSql('c')}
              ORDER BY c.supporter_count DESC, c.created_at DESC
              LIMIT 6`,
-            [category]
+            [slug]
         );
         return res.rows as LiveCampaign[];
     } catch (e) {
@@ -77,7 +79,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
     const when = formatOccurrence(day, occ);
     const countdown = countdownLabel(occ);
     const [campaigns, overrideUrl] = await Promise.all([
-        liveCampaigns(day.category),
+        liveCampaigns(day.slug),
         getFrameOverride(day.slug),
     ]);
 
@@ -217,7 +219,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                             <p className="text-ink/75 mb-5">
                                 Make the frame, share one link, and your supporter count starts moving today.
                             </p>
-                            <Link href="/create" className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all">
+                            <Link href={`/create?day=${day.slug}`} className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all">
                                 Create a campaign <ArrowRight size={16} />
                             </Link>
                         </div>
@@ -268,6 +270,28 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                 </div>
             </section>
 
+            {/* Day-specific callout. Only Coffee Day has a standing campaign
+                behind it so far, so this stays a narrow special case rather
+                than another field on every entry. */}
+            {day.slug === 'national-coffee-day' && (
+                <section className="px-6 pb-12">
+                    <div className="max-w-3xl mx-auto bg-ink text-paper rounded-3xl p-8 md:p-10">
+                        <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-3">The Independents List</h2>
+                        <p className="text-paper/80 leading-relaxed mb-6">
+                            The chains own this day with free-cup offers. We think it should point at the shops that
+                            actually make the coffee, so we keep a public, permanent record of every independent
+                            marking it on their own terms. Published every year.
+                        </p>
+                        <Link
+                            href="/day/national-coffee-day/independents"
+                            className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all"
+                        >
+                            See the list <ArrowRight size={16} />
+                        </Link>
+                    </div>
+                </section>
+            )}
+
             {/* Related */}
             <section className="px-6 pb-24">
                 <div className="max-w-3xl mx-auto">
@@ -276,7 +300,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                         <p className="text-ink/70 mb-7 max-w-xl mx-auto">
                             Make the frame once, share one link, and watch the supporter count move. Takes about a minute.
                         </p>
-                        <Link href="/create" className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all">
+                        <Link href={`/create?day=${day.slug}`} className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all">
                             Create a campaign <ArrowRight size={16} />
                         </Link>
                     </div>

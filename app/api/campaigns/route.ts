@@ -4,6 +4,7 @@ import { rateLimit, clientIp } from '@/lib/rateLimit';
 import { CATEGORY_KEYS } from '@/lib/categories';
 import { hasVisibleFrame, visibleFrameSql } from '@/lib/frameValidity';
 import { campaignLiveEmail, isValidEmail, normalizeEmail, sendEmail } from '@/lib/email';
+import { getDay } from '@/lib/days';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,7 +55,9 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { title, description, frameConfig, isPublic, previewUrl, goal, category, organizerEmail } = body;
+        const { title, description, frameConfig, isPublic, previewUrl, goal, category, organizerEmail, daySlug } = body;
+        // Only a real day, so this cannot be used to stash arbitrary strings.
+        const dayValue = typeof daySlug === 'string' && getDay(daySlug) ? daySlug : null;
         const categoryValue = typeof category === 'string' && CATEGORY_KEYS.includes(category) ? category : null;
 
         // Optional, and it stays optional. Creating a campaign never requires an
@@ -114,10 +117,10 @@ export async function POST(request: NextRequest) {
             const slug = `${baseSlug}-${randomSuffix()}`;
             try {
                 const result = await pool.query(
-                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, goal, category, organizer_email, created_at)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
+                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, goal, category, organizer_email, day_slug, created_at)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW())
                      RETURNING id, slug, title, supporter_count, owner_token, created_at`,
-                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, goalValue, categoryValue, emailValue]
+                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, goalValue, categoryValue, emailValue, dayValue]
                 );
                 campaign = result.rows[0];
                 break;

@@ -212,7 +212,7 @@ export const DayFrameTool: React.FC<{ frame: FrameConfig; dayName: string; daySl
                         gets the same frame and you can see how many joined.
                     </p>
                     <Link
-                        href="/create"
+                        href={`/create?day=${daySlug}`}
                         onClick={() => track('day_to_create', { day: daySlug })}
                         className="inline-flex h-11 px-6 rounded-xl bg-ink text-paper font-bold items-center gap-2 hover:opacity-90 transition-opacity"
                     >
