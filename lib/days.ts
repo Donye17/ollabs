@@ -43,8 +43,25 @@ export interface AwarenessDay {
     relatedDays: string[];
 }
 
-/** The day's own artwork, or a clean ring built from its primary colour. */
-export function resolveFrame(day: AwarenessDay): FrameConfig {
+/**
+ * The frame to render for a day.
+ *
+ * Order: admin override -> artwork bundled with the entry -> a clean ring in
+ * the day's own colour. The fallback chain means a day always renders
+ * something, whether or not anyone has drawn for it yet.
+ */
+export function resolveFrame(day: AwarenessDay, overrideUrl?: string | null): FrameConfig {
+    if (overrideUrl) {
+        return {
+            id: `day-${day.slug}`,
+            type: FrameType.CUSTOM_IMAGE,
+            name: day.name,
+            color1: 'transparent',
+            width: 0,
+            imageUrl: overrideUrl,
+            cutoutScale: 0,
+        };
+    }
     if (day.frame) return day.frame;
     return {
         id: `day-${day.slug}`,

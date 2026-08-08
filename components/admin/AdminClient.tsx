@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { Loader2, EyeOff, Eye, ExternalLink, ShieldAlert } from 'lucide-react';
+import { Loader2, EyeOff, Eye, ExternalLink, ShieldAlert, Images } from 'lucide-react';
+import { DayFramesPanel } from './DayFramesPanel';
 
 interface ReportRow {
     slug: string;
@@ -65,8 +66,20 @@ export const AdminClient: React.FC = () => {
             <div className="max-w-3xl mx-auto">
                 <div className="flex items-center gap-2 mb-6">
                     <ShieldAlert size={20} className="text-brand-deep" />
-                    <h1 className="font-display text-2xl font-extrabold">Reported campaigns</h1>
+                    <h1 className="font-display text-2xl font-extrabold">Admin</h1>
                 </div>
+
+                {key && (
+                    <section className="mb-12">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Images size={18} className="text-brand-deep" />
+                            <h2 className="font-display text-xl font-extrabold">Day frames</h2>
+                        </div>
+                        <DayFramesPanel adminKey={key} />
+                    </section>
+                )}
+
+                <h2 className="font-display text-xl font-extrabold mb-4">Reported campaigns</h2>
 
                 {loading && <div className="flex items-center gap-2 text-muted"><Loader2 size={18} className="animate-spin" /> Loading...</div>}
 

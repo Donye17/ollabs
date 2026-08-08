@@ -5,6 +5,7 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { HomeExamples, HomeCampaign } from "@/components/HomeExamples";
 import { CalendarStrip, StripItem } from "@/components/home/CalendarStrip";
 import { calendarWindow, formatOccurrence, countdownLabel, resolveFrame } from "@/lib/days";
+import { getFrameOverrides } from "@/lib/dayFrames";
 import { FrameConfig } from "@/lib/types";
 import { pool } from "@/lib/neon";
 import { visibleFrameSql, HOME_SHOWCASE_LIMIT } from "@/lib/frameValidity";
@@ -63,16 +64,19 @@ const reasons = [
 ];
 
 export default async function Home() {
-    const examples = await getExampleCampaigns();
+    const [examples, frameOverrides] = await Promise.all([
+        getExampleCampaigns(),
+        getFrameOverrides(),
+    ]);
 
-    // Timeline of awareness days around today. Pure data, no query.
+    // Timeline of awareness days around today.
     const calendarItems: StripItem[] = calendarWindow().map(({ day, occ, past }) => ({
         slug: day.slug,
         name: day.name,
         when: formatOccurrence(day, occ),
         countdown: past ? formatOccurrence(day, occ) : countdownLabel(occ),
         past,
-        frame: resolveFrame(day),
+        frame: resolveFrame(day, frameOverrides.get(day.slug)),
     }));
 
     return (

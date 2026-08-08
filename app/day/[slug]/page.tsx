@@ -7,6 +7,7 @@ import { DayFrameTool } from '@/components/day/DayFrameTool';
 import { DAYS, getDay, nextOccurrence, formatOccurrence, countdownLabel, resolveFrame } from '@/lib/days';
 import { getUseCase } from '@/lib/useCases';
 import { visibleFrameSql } from '@/lib/frameValidity';
+import { getFrameOverride } from '@/lib/dayFrames';
 import { ArrowRight, CalendarDays, Users } from 'lucide-react';
 
 // Matches the campaign pages: fresh enough for the live campaign block without
@@ -75,7 +76,10 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
     const occ = nextOccurrence(day.date);
     const when = formatOccurrence(day, occ);
     const countdown = countdownLabel(occ);
-    const campaigns = await liveCampaigns(day.category);
+    const [campaigns, overrideUrl] = await Promise.all([
+        liveCampaigns(day.category),
+        getFrameOverride(day.slug),
+    ]);
 
     const ld = [
         {
@@ -131,7 +135,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                         <p className="text-sm text-ink/70 mb-7 text-center">
                             Free, no signup, and no watermark. Your photo never leaves your browser.
                         </p>
-                        <DayFrameTool frame={resolveFrame(day)} dayName={day.name} daySlug={day.slug} />
+                        <DayFrameTool frame={resolveFrame(day, overrideUrl)} dayName={day.name} daySlug={day.slug} />
                     </div>
                 </div>
             </section>
