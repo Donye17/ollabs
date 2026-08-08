@@ -197,7 +197,77 @@ export const DAYS: AwarenessDay[] = [
             cutoutScale: 0,
         },
         relatedUseCases: ['nonprofits', 'fundraisers', 'companies'],
-        relatedDays: [],
+        relatedDays: ['national-smores-day'],
+    },
+    {
+        slug: 'national-smores-day',
+        name: "National S'mores Day",
+        kind: 'day',
+        date: { type: 'fixed', month: 8, day: 10 },
+        colors: [
+            { name: 'Chocolate', hex: '#603018' },
+            { name: 'Graham', hex: '#D89060' },
+            { name: 'Campfire', hex: '#F97316' },
+        ],
+        category: 'event',
+        audience: ['Summer camps', 'Scout troops', 'Youth programs', 'Campgrounds', 'Cafes and bakeries'],
+        keyword: "national s'mores day profile picture frame",
+        tagline: 'The last great excuse of the summer, and the easiest one to get a whole camp to join in on.',
+        intro: [
+            "National S'mores Day lands on August 10, which is almost perfectly placed: peak camp season, a couple of weeks before school starts, and right when everyone is trying to hold on to summer a little longer.",
+            'It is a low-stakes day, and that is the point. Nobody needs convincing to celebrate s\'mores. Share one link, and camp staff, counsellors, scouts, parents, and alumni can all put the same frame on their photo in about ten seconds.',
+        ],
+        background: [
+            "The first published s'mores recipe appeared in 1927, in a Girl Scouts handbook called Tramping and Trailing with the Girl Scouts, under the name \"Some More\" and credited to troop leader Loretta Scott Crew. It was written to feed sixteen scouts around a fire.",
+            "It was not the invention, though. A 1925 Memphis Commercial Appeal column reporting from a Girl Scout camp already carried the recipe, so troops were making them before anyone wrote it down. The contracted spelling we use now did not show up in print until the 1970s.",
+            'That history is the reason this day belongs to camps and scout troops more than to brands. It started around a real campfire, with real kids, and the organisations that own that story authentically are the ones whose posts land.',
+        ],
+        howOrgsMark: [
+            {
+                title: 'Close out the camp season',
+                body: 'For most summer camps August 10 falls in the final session or just after it. A shared frame gives departing campers and counsellors something to post while the summer is still fresh, which is exactly when they are most likely to say something nice about you unprompted.',
+            },
+            {
+                title: 'Give staff and counsellors the link first',
+                body: 'Counsellors have the audience that matters: other counsellors, parents, and prospective families. Send them the link a day early so the frames are already up when families start posting.',
+            },
+            {
+                title: 'Pair it with registration',
+                body: 'Early registration for next summer usually opens in the autumn. A warm, no-ask post in August costs nothing and puts you back in the feed of every family who spent this summer with you.',
+            },
+            {
+                title: 'Food businesses have the easiest version of this',
+                body: 'If you sell anything remotely s\'mores adjacent, this is a day with built-in search demand and no competition for the frame. Put the link on the counter with a QR code and let customers do the posting.',
+            },
+        ],
+        campaignIdeas: [
+            'Send the frame link to camp staff and counsellors the evening of August 9, so the frames are live first thing.',
+            'Run a "best campfire photo" thread and ask everyone entering to wear the frame.',
+            'Scout troops: pair it with the 1927 origin story. It is a genuinely good piece of trivia and it belongs to scouting.',
+            'Print the campaign QR code for a camp noticeboard or a shop counter.',
+            'Ask alumni families to post a photo from the summer they attended, framed.',
+            'Save the campaign and run it again next August. It is the same date every year.',
+        ],
+        faqs: [
+            { q: "When is National S'mores Day?", a: 'August 10 every year. In 2026 it falls on a Monday.' },
+            { q: 'Who actually invented s\'mores?', a: 'Nobody knows for certain. The first published recipe was in a 1927 Girl Scouts handbook, credited to troop leader Loretta Scott Crew, but a 1925 newspaper column from a Girl Scout camp shows troops were already making them.' },
+            { q: 'Is this free to use?', a: 'Yes. No signup, no ads, and no watermark on the photo anyone downloads. We never charge supporters.' },
+            { q: 'Can we put our camp or business logo on it?', a: 'Yes. Upload your own frame design as a transparent PNG, or set your own colours in the builder.' },
+            { q: 'Do campers and parents need an account?', a: 'No. They open the link, add a photo, and download. Nothing to install and nothing to join.' },
+        ],
+        // Illustrated overlay, inset so the circular crop does not slice the
+        // outermost marshmallows and graham crackers.
+        frame: {
+            id: 'day-national-smores-day',
+            type: FrameType.CUSTOM_IMAGE,
+            name: "National S'mores Day",
+            color1: 'transparent',
+            width: 0,
+            imageUrl: '/frames/national-smores-day.png',
+            cutoutScale: 0,
+        },
+        relatedUseCases: ['events', 'schools', 'companies'],
+        relatedDays: ['national-nonprofit-day'],
     },
 ];
 
