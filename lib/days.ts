@@ -32,6 +32,19 @@ export interface AwarenessDay {
     tagline: string;
     intro: string[];
     background: string[];
+    // Written for a person, not an organisation.
+    //
+    // Google's generative AI features work partly by "query fan-out": the model
+    // invents related questions like "how to celebrate national s'mores day"
+    // and retrieves pages answering those. Every other section here is aimed at
+    // organisers, which answers a different question entirely. This section is
+    // the one that matches how an individual actually searches.
+    //
+    // Keep it specific and first-hand. Google's own guidance rewards a unique
+    // point of view over a summary of what is already out there, and a generic
+    // listicle is exactly the commodity content it filters out. The frame is
+    // one item among genuinely useful ones, never the whole list.
+    howToCelebrate: { title: string; body: string }[];
     howOrgsMark: { title: string; body: string }[];
     campaignIdeas: string[];
     faqs: { q: string; a: string }[];
@@ -197,6 +210,28 @@ export const DAYS: AwarenessDay[] = [
             'National Nonprofit Day is marked each year on August 17. It was established to recognise the sector\'s contribution and, just as importantly, the individual people inside it who rarely get named in an annual report.',
             'It sits at a useful point in the calendar. Late August is after the summer lull and before the autumn fundraising season begins in earnest, which makes it a natural moment to re-engage a list that has gone quiet without asking anyone for money.',
         ],
+        howToCelebrate: [
+            {
+                title: 'Name one person, publicly',
+                body: 'Not "thank you to all nonprofit workers". One name, and the specific thing they did. It takes thirty seconds, it is the post they will screenshot, and it is the version their board actually reads.',
+            },
+            {
+                title: 'Give an hour instead of a dollar',
+                body: 'Most small nonprofits are short on hands before they are short on money. Ask a local organisation what they need doing in August rather than guessing, and you will usually get a very concrete answer.',
+            },
+            {
+                title: 'Share their post, not yours',
+                body: 'A repost from a real person reaches people the organisation cannot. If you only do one thing, find a nonprofit you care about and put their words in front of your network instead of your own.',
+            },
+            {
+                title: 'Set up something small and recurring',
+                body: 'Ten dollars a month is worth more to a small nonprofit than a hundred once, because it is money they can plan around. August is a quiet enough month that the decision is not competing with year-end appeals.',
+            },
+            {
+                title: 'Wear the frame for the day',
+                body: 'Add it to your profile picture so the people who follow you see the day exists. It takes about ten seconds, costs nothing, and asks nothing of anyone who sees it.',
+            },
+        ],
         howOrgsMark: [
             {
                 title: 'Thank staff and volunteers by name',
@@ -269,6 +304,28 @@ export const DAYS: AwarenessDay[] = [
             "It was not the invention, though. A 1925 Memphis Commercial Appeal column reporting from a Girl Scout camp already carried the recipe, so troops were making them before anyone wrote it down. The contracted spelling we use now did not show up in print until the 1970s.",
             'That history is the reason this day belongs to camps and scout troops more than to brands. It started around a real campfire, with real kids, and the organisations that own that story authentically are the ones whose posts land.',
         ],
+        howToCelebrate: [
+            {
+                title: 'You do not need a campfire',
+                body: 'A gas hob works: hold the marshmallow on a metal skewer just above the flame and keep turning. Under a grill or broiler, put the graham cracker and chocolate on a tray, marshmallow on top, and watch it constantly, because it goes from golden to black in about fifteen seconds.',
+            },
+            {
+                title: 'Change the chocolate, not the marshmallow',
+                body: 'The usual complaint is that the chocolate never melts. A thick chunky bar will not, in the time a marshmallow stays hot. A thin bar, or squares left in the sun for ten minutes first, fixes it completely.',
+            },
+            {
+                title: 'Toast it slower than feels right',
+                body: 'Flames char the outside and leave the middle cold. Embers, or a few inches above the flame, give you the molten centre that makes the whole thing work. It takes two or three minutes, not twenty seconds.',
+            },
+            {
+                title: 'Try the 1927 version',
+                body: 'The original recipe in Tramping and Trailing with the Girl Scouts calls for two toasted marshmallows, not one, which is closer to the ratio the chocolate actually needs. It also notes that although it tastes like you want "some more", one is usually enough.',
+            },
+            {
+                title: 'Get everyone to wear the frame',
+                body: 'If you are doing this with a group, a shared profile frame is a way to make it a thing rather than a snack. Free, and nobody has to sign up for anything.',
+            },
+        ],
         howOrgsMark: [
             {
                 title: 'Close out the camp season',
@@ -334,6 +391,28 @@ export const DAYS: AwarenessDay[] = [
             'National Dog Day was founded in 2004 by animal rescue advocate Colleen Paige. She chose August 26 because it is the date her family adopted their first dog, a Sheltie, from a local shelter when she was ten.',
             'The intent was never just cute pictures. It was to draw attention to how many dogs need rescuing each year, alongside working dogs and family dogs. Roughly a million adoptions in the US have been credited to the day since it started.',
             'That origin is useful context for a shelter: the day was built for you, not for brands borrowing a hashtag. Posts that lead with real adoptable dogs tend to outperform generic celebration content on this date.',
+        ],
+        howToCelebrate: [
+            {
+                title: 'Tag the shelter your dog came from',
+                body: 'Everyone posts their dog on August 26. The posts that do any good name where the dog came from, because that is the one detail a stranger can act on. If you adopted, say so and link them.',
+            },
+            {
+                title: 'Do the thing your dog actually likes',
+                body: 'Not the photogenic thing. A longer walk on a route they have not sniffed, a car ride, or twenty minutes of the game they pick themselves. Dogs do not know it is a holiday; they know the day was better.',
+            },
+            {
+                title: 'Check the shelter wishlist before you buy anything',
+                body: 'Most shelters publish exactly what they need, and it is rarely what people assume. Old towels, specific food brands, and cleaning supplies are usually further up the list than toys.',
+            },
+            {
+                title: 'Foster for two weeks, not forever',
+                body: 'Fostering is the ask shelters are most short on and the one people most often assume they cannot do. Two weeks of a spare room frees a kennel and is genuinely how many dogs get adopted.',
+            },
+            {
+                title: 'Put the frame on your photo',
+                body: 'Whether the picture is you or the dog, the frame tells everyone scrolling past what the day is. Ten seconds, no signup, no watermark.',
+            },
         ],
         howOrgsMark: [
             {
@@ -402,6 +481,28 @@ export const DAYS: AwarenessDay[] = [
             'It falls on the first Monday of September, so the date moves each year. In 2026 that is September 7.',
             'The origin matters for tone. It is a labour holiday before it is a summer send-off, which is why posts that name actual workers land better than generic long-weekend graphics.',
         ],
+        howToCelebrate: [
+            {
+                title: 'Say something to someone working that day',
+                body: 'Labor Day is a day off for some people precisely because others are covering. Shops, restaurants, hospitals and transport all run. Saying so out loud to the person serving you costs nothing and is closer to the point of the holiday than a barbecue.',
+            },
+            {
+                title: 'Learn what it is actually for',
+                body: 'The first Labor Day was a demonstration in New York City on September 5, 1882, organised by the Central Labor Union. It became federal in 1894, days after the Pullman Strike ended. It is a labour holiday that happens to fall on a long weekend, not the other way round.',
+            },
+            {
+                title: 'Tip like it is a working day, because it is',
+                body: 'Holiday shifts are usually short-staffed and busier than normal. If you are out, the single most useful thing you can do for the people around you is tip on the higher end of what you would normally.',
+            },
+            {
+                title: 'Spend it somewhere small',
+                body: 'The weekend is dominated by chain sales. An independent shop or restaurant is where your money reaches a worker most directly, which is a more literal way to mark the day than a discount.',
+            },
+            {
+                title: 'Wear the frame if your work has a crew',
+                body: 'If you are part of a local, a trade, or a team, a shared frame is a way to be visibly part of it for the day. One link, no account.',
+            },
+        ],
         howOrgsMark: [
             {
                 title: 'Name the work, not the weekend',
@@ -466,6 +567,32 @@ export const DAYS: AwarenessDay[] = [
             'National Coffee Day is marked in the US on September 29. International Coffee Day, organised by the International Coffee Organization, falls on October 1, so the two sit days apart and often get treated as one long moment.',
             'Its exact origins are murky. Unlike days with a documented founder, this one accumulated through trade groups and retail promotions rather than being established at a single point, which is worth knowing before you write history into a caption.',
             'What is reliable is the behaviour: it is one of the highest-volume days of the year for coffee posts, and independent shops compete for that attention against national chains running discounts.',
+        ],
+        howToCelebrate: [
+            {
+                title: 'Go to an independent, not a chain',
+                body: 'The chains run the discounts on September 29, which is exactly why the day is worth almost nothing to the small shop down the road. Going there instead, and paying full price, is the version of celebrating that has any effect.',
+            },
+            {
+                title: 'Brew it a way you never do',
+                body: 'If you always use a machine, try a pour-over. If you always filter, try an immersion brew. The variable that changes the taste most is not the bean, it is the method, and the difference is obvious side by side.',
+            },
+            {
+                title: 'Find out where your coffee came from',
+                body: 'Any decent bag names a country, and a good one names a region, a farm, or a cooperative. Reading that once changes how you buy afterwards, and it is a better use of the day than a free cup.',
+            },
+            {
+                title: 'Grind it right before you brew it',
+                body: 'Ground coffee goes flat within minutes as the aromatics escape. Grinding immediately before brewing is the single change that improves a home cup most, ahead of any equipment upgrade.',
+            },
+            {
+                title: 'It is not the same as International Coffee Day',
+                body: 'National Coffee Day is September 29 in the US. International Coffee Day, run by the International Coffee Organization, is October 1. They get conflated constantly, so if you are posting about one, it is worth knowing which.',
+            },
+            {
+                title: 'Wear the frame if you are a regular somewhere',
+                body: 'A frame on your own photo naming your local shop does more for them than a repost of the shop account. Free, and nothing to install.',
+            },
         ],
         howOrgsMark: [
             {

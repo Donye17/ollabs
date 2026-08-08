@@ -85,10 +85,20 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
         {
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
-            mainEntity: day.faqs.map((f) => ({
-                '@type': 'Question', name: f.q,
-                acceptedAnswer: { '@type': 'Answer', text: f.a },
-            })),
+            mainEntity: [
+                {
+                    '@type': 'Question',
+                    name: `How do you celebrate ${day.name}?`,
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: day.howToCelebrate.map((b) => `${b.title}. ${b.body}`).join(' '),
+                    },
+                },
+                ...day.faqs.map((f) => ({
+                    '@type': 'Question', name: f.q,
+                    acceptedAnswer: { '@type': 'Answer', text: f.a },
+                })),
+            ],
         },
         {
             '@context': 'https://schema.org',
@@ -144,6 +154,26 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             <section className="px-6 pb-4">
                 <div className="max-w-3xl mx-auto space-y-4">
                     {day.intro.map((p, i) => <p key={i} className="text-lg text-ink/75 leading-relaxed">{p}</p>)}
+                </div>
+            </section>
+
+            {/* How to celebrate, written for a person.
+                Placed directly after the intro because retrieval weighs opening
+                content most, and this is the section that answers the question
+                an individual actually searches. */}
+            <section className="px-6 py-12">
+                <div className="max-w-3xl mx-auto">
+                    <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-6">
+                        How to celebrate {day.name}
+                    </h2>
+                    <div className="space-y-4">
+                        {day.howToCelebrate.map((b) => (
+                            <div key={b.title} className="bg-cream border border-ink/10 rounded-2xl p-5">
+                                <h3 className="font-display font-bold mb-1.5">{b.title}</h3>
+                                <p className="text-ink/75 leading-relaxed">{b.body}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </section>
 
