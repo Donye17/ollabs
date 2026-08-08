@@ -151,6 +151,20 @@ export function formatOccurrence(day: AwarenessDay, occ: { start: Date; end: Dat
     return `${a} to ${b}`;
 }
 
+/**
+ * Date split for a calendar tile: month over day number.
+ *
+ * Month-long and multi-month observances have no single day to show, so they
+ * return an empty `main` and the card falls back to rendering the month.
+ */
+export function calendarDateParts(day: AwarenessDay, occ: { start: Date; end: Date }): { top: string; main: string } {
+    const mon = MONTHS[occ.start.getUTCMonth()].slice(0, 3).toUpperCase();
+    if (day.kind === 'month' || occ.start.getTime() !== occ.end.getTime()) {
+        return { top: mon, main: '' };
+    }
+    return { top: mon, main: String(occ.start.getUTCDate()) };
+}
+
 /** "12 days away", "Happening now", "Today". Drives the countdown in the hero. */
 export function countdownLabel(occ: { start: Date; end: Date }, from: Date = new Date()): string {
     const today = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()));

@@ -4,7 +4,7 @@ import { NavBar } from "@/components/NavBar";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { HomeExamples, HomeCampaign } from "@/components/HomeExamples";
 import { CalendarStrip, StripItem } from "@/components/home/CalendarStrip";
-import { calendarWindow, formatOccurrence, countdownLabel, resolveFrame } from "@/lib/days";
+import { calendarWindow, formatOccurrence, countdownLabel, calendarDateParts, resolveFrame } from "@/lib/days";
 import { getFrameOverrides } from "@/lib/dayFrames";
 import { FrameConfig } from "@/lib/types";
 import { pool } from "@/lib/neon";
@@ -70,14 +70,18 @@ export default async function Home() {
     ]);
 
     // Timeline of awareness days around today.
-    const calendarItems: StripItem[] = calendarWindow().map(({ day, occ, past }) => ({
-        slug: day.slug,
-        name: day.name,
-        when: formatOccurrence(day, occ),
-        countdown: past ? formatOccurrence(day, occ) : countdownLabel(occ),
-        past,
-        frame: resolveFrame(day, frameOverrides.get(day.slug)),
-    }));
+    const calendarItems: StripItem[] = calendarWindow().map(({ day, occ, past }) => {
+        const parts = calendarDateParts(day, occ);
+        return {
+            slug: day.slug,
+            name: day.name,
+            dateTop: parts.top,
+            dateMain: parts.main,
+            countdown: past ? formatOccurrence(day, occ) : countdownLabel(occ),
+            past,
+            frame: resolveFrame(day, frameOverrides.get(day.slug)),
+        };
+    });
 
     return (
         <main className="min-h-screen bg-paper text-ink">
@@ -124,6 +128,22 @@ export default async function Home() {
                 )}
             </section>
 
+            {/* Calendar */}
+            {calendarItems.length > 0 && (
+                <section className="py-16 overflow-hidden">
+                    <div className="max-w-4xl mx-auto px-6 text-center mb-10">
+                        <h2 className="font-display text-3xl md:text-4xl font-extrabold mb-3">What is coming up</h2>
+                        <p className="text-ink/70">
+                            Days worth marking, with a frame ready for each one. Pick a day, use the frame, or run it as
+                            your own campaign.
+                        </p>
+                    </div>
+                    <div className="max-w-6xl mx-auto">
+                        <CalendarStrip items={calendarItems} />
+                    </div>
+                </section>
+            )}
+
             {/* How it works */}
             <section className="px-6 py-20">
                 <div className="max-w-5xl mx-auto">
@@ -142,22 +162,6 @@ export default async function Home() {
                     </div>
                 </div>
             </section>
-
-            {/* Calendar */}
-            {calendarItems.length > 0 && (
-                <section className="py-16 overflow-hidden">
-                    <div className="max-w-4xl mx-auto px-6 text-center mb-10">
-                        <h2 className="font-display text-3xl md:text-4xl font-extrabold mb-3">What is coming up</h2>
-                        <p className="text-ink/70">
-                            Days worth marking, with a frame ready for each one. Pick a day, use the frame, or run it as
-                            your own campaign.
-                        </p>
-                    </div>
-                    <div className="max-w-6xl mx-auto">
-                        <CalendarStrip items={calendarItems} />
-                    </div>
-                </section>
-            )}
 
             {/* Made for */}
             <section className="px-6 py-14">
