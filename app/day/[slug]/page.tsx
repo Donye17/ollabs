@@ -47,11 +47,16 @@ type LiveCampaign = { slug: string; title: string; supporter_count: number };
 async function liveCampaigns(category: string): Promise<LiveCampaign[]> {
     try {
         const res = await pool.query(
+            // Only campaigns with actual supporters. A grid of six zeroes is
+            // worse than an empty state: it reads as a dead platform, and the
+            // heading promises real counts. Same reasoning as the home page
+            // hiding counts below a threshold.
             `SELECT c.slug, c.title, COALESCE(c.supporter_count, 0) AS supporter_count
              FROM campaigns c
              WHERE c.is_public = true AND c.is_hidden IS NOT TRUE
-               AND c.category = $1 AND ${visibleFrameSql('c')}
-             ORDER BY c.supporter_count DESC NULLS LAST, c.created_at DESC
+               AND c.category = $1 AND COALESCE(c.supporter_count, 0) > 0
+               AND ${visibleFrameSql('c')}
+             ORDER BY c.supporter_count DESC, c.created_at DESC
              LIMIT 6`,
             [category]
         );
@@ -165,11 +170,19 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             {/* Live campaigns, real data */}
             <section className="px-6 pb-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-2">Campaigns running now</h2>
-                    <p className="text-ink/70 mb-6">Live {day.category} campaigns on Ollabs, with real supporter counts.</p>
+                    <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-2">
+                        {campaigns.length === 0 ? 'Be the first' : 'Campaigns running now'}
+                    </h2>
+                    <p className="text-ink/70 mb-6">
+                        {campaigns.length === 0
+                            ? `No one has run a ${day.name} campaign yet.`
+                            : `Live ${day.category} campaigns on Ollabs, with real supporter counts.`}
+                    </p>
                     {campaigns.length === 0 ? (
                         <div className="bg-cream border border-ink/10 rounded-2xl p-8 text-center">
-                            <p className="text-ink/75 mb-5">No campaigns in this category yet. Yours would be the first.</p>
+                            <p className="text-ink/75 mb-5">
+                                Make the frame, share one link, and your supporter count starts moving today.
+                            </p>
                             <Link href="/create" className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all">
                                 Create a campaign <ArrowRight size={16} />
                             </Link>
