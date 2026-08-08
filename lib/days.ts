@@ -390,7 +390,7 @@ export const DAYS: AwarenessDay[] = [
         background: [
             'National Dog Day was founded in 2004 by animal rescue advocate Colleen Paige. She chose August 26 because it is the date her family adopted their first dog, a Sheltie, from a local shelter when she was ten.',
             'The intent was never just cute pictures. It was to draw attention to how many dogs need rescuing each year, alongside working dogs and family dogs. Roughly a million adoptions in the US have been credited to the day since it started.',
-            'That origin is useful context for a shelter: the day was built for you, not for brands borrowing a hashtag. Posts that lead with real adoptable dogs tend to outperform generic celebration content on this date.',
+            'So the day started in a shelter, not a marketing meeting. That is still where it lands hardest: on August 26 the posts that actually move dogs are the ones naming real animals waiting for homes.',
         ],
         howToCelebrate: [
             {
@@ -558,15 +558,15 @@ export const DAYS: AwarenessDay[] = [
         category: 'business',
         audience: ['Cafes', 'Roasters', 'Coffee shops', 'Offices', 'Campus groups'],
         keyword: 'national coffee day profile picture frame',
-        tagline: 'A day where the whole point is that people post about where they got their coffee.',
+        tagline: 'One day a year the whole internet posts its coffee. Give yours somewhere to point.',
         intro: [
-            'National Coffee Day is a light one, and that is exactly why it works. Nobody needs a reason to post their coffee, so a frame just gives the post somewhere to point.',
-            'For a cafe or a roaster it is the cheapest reach of the quarter: put the link on the counter, let regulars do the posting, and every framed photo carries your name into a feed you do not own.',
+            'On September 29 an enormous number of people post a cup of coffee. Most of those posts say nothing about where it came from, which is a shame, because the shop that made it is usually the interesting part.',
+            'A shared frame fixes that. Put the link on the counter, and a regular\'s own photo carries your name instead of a chain\'s discount code. Free, no signup, and nothing on the photo they download.',
         ],
         background: [
-            'National Coffee Day is marked in the US on September 29. International Coffee Day, organised by the International Coffee Organization, falls on October 1, so the two sit days apart and often get treated as one long moment.',
-            'Its exact origins are murky. Unlike days with a documented founder, this one accumulated through trade groups and retail promotions rather than being established at a single point, which is worth knowing before you write history into a caption.',
-            'What is reliable is the behaviour: it is one of the highest-volume days of the year for coffee posts, and independent shops compete for that attention against national chains running discounts.',
+            'National Coffee Day is September 29 in the US. International Coffee Day is a separate thing, run by the International Coffee Organization, and falls on October 1. The two get treated as one long weekend of coffee, which is why you will see both dates cited for the same posts.',
+            'Nobody agrees on who started the American one. It grew out of trade groups and shop promotions rather than a single founding, so unlike most calendar days there is no first year to point at.',
+            'What is not in doubt is the shape of the day: it is one of the biggest coffee posting days of the year, and the national chains own it with free-cup offers. That is the gap an independent shop is working against.',
         ],
         howToCelebrate: [
             {
@@ -587,7 +587,7 @@ export const DAYS: AwarenessDay[] = [
             },
             {
                 title: 'It is not the same as International Coffee Day',
-                body: 'National Coffee Day is September 29 in the US. International Coffee Day, run by the International Coffee Organization, is October 1. They get conflated constantly, so if you are posting about one, it is worth knowing which.',
+                body: 'National Coffee Day is September 29 in the US. International Coffee Day, run by the International Coffee Organization, is October 1. Two different days, constantly mixed up, and now you know which is which.',
             },
             {
                 title: 'Wear the frame if you are a regular somewhere',
