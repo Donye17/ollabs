@@ -170,7 +170,7 @@ export const DAYS: AwarenessDay[] = [
         name: 'National Nonprofit Day',
         kind: 'day',
         date: { type: 'fixed', month: 8, day: 17 },
-        colors: [{ name: 'Ollabs cyan', hex: '#01BEF6' }],
+        colors: [{ name: 'Warm orange', hex: '#F5A047' }, { name: 'Deep blue', hex: '#2A6C9B' }],
         category: 'cause',
         audience: ['Nonprofits', 'Foundations', 'Volunteers', 'Board members'],
         keyword: 'national nonprofit day profile picture frame',
@@ -216,9 +216,10 @@ export const DAYS: AwarenessDay[] = [
             { q: 'Can we use our own logo and brand colours?', a: 'Yes. Set exact hex values, or upload a finished frame design as a transparent PNG.' },
             { q: 'Can we reuse the campaign next year?', a: 'Yes. Keep the dashboard link, or start a fresh campaign with the same design so the new year gets its own supporter count.' },
         ],
-        // Designed overlay from scripts/frames/national_nonprofit_day.py.
-        // cutoutScale 0 because the PNG already carries its own transparent
-        // photo window; anything higher punches a second hole in the middle.
+        // Illustrated overlay. Shipped at full size: the ring's outer edge sits
+        // 3.2% past the inscribed circle, but that is only 0.4% of the artwork
+        // and it is the ring edge itself, so the crop just thins it slightly.
+        // cutoutScale 0 because the PNG carries its own transparent window.
         frame: {
             id: 'day-national-nonprofit-day',
             type: FrameType.CUSTOM_IMAGE,
