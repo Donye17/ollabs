@@ -278,9 +278,8 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                     <div className="max-w-3xl mx-auto bg-ink text-paper rounded-3xl p-8 md:p-10">
                         <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-3">The Independents List</h2>
                         <p className="text-paper/80 leading-relaxed mb-6">
-                            The chains own this day with free-cup offers. We think it should point at the shops that
-                            actually make the coffee, so we keep a public, permanent record of every independent
-                            marking it on their own terms. Published every year.
+                            The chains own this day with free-cup offers. Your shop made the coffee. Run a frame and
+                            you go on a public list of every independent marking the day, published every year.
                         </p>
                         <Link
                             href="/day/national-coffee-day/independents"

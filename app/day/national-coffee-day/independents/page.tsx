@@ -12,14 +12,14 @@ const URL = 'https://ollabs.studio/day/national-coffee-day/independents';
 export const metadata: Metadata = {
     title: 'The Independents List: National Coffee Day',
     description:
-        'National Coffee Day belongs to the shops that actually make the coffee, not to whoever is giving cups away. A public, permanent record of the independent coffee shops running a frame each year.',
+        'The chains own National Coffee Day with free-cup offers. Your shop made the coffee. A public record of every independent running a frame, published every year.',
     keywords: ['national coffee day independent coffee shops', 'support local coffee shop',
         'national coffee day 2026', 'independent coffee day'],
     alternates: { canonical: URL },
     openGraph: {
         type: 'website', url: URL, siteName: 'Ollabs',
         title: 'The Independents List: National Coffee Day',
-        description: 'A public record of the independent coffee shops marking National Coffee Day on their own terms.',
+        description: 'The chains own the day. Your shop made the coffee. A public record of every independent running a frame, published every year.',
         images: ['/og.png'],
     },
 };
@@ -70,7 +70,7 @@ export default async function IndependentsPage() {
                         The Independents List
                     </h1>
                     <p className="text-lg md:text-xl text-ink/70 max-w-2xl">
-                        National Coffee Day belongs to the shops that actually make the coffee.
+                        The chains own this day. Your shop made the coffee.
                     </p>
                 </div>
             </section>
@@ -79,28 +79,23 @@ export default async function IndependentsPage() {
             <section className="px-6 pb-12">
                 <div className="max-w-3xl mx-auto space-y-4 text-lg text-ink/75 leading-relaxed">
                     <p>
-                        Every September 29, the national chains give away a free cup and call it a holiday. It is a
-                        customer acquisition promotion wearing a holiday&apos;s clothes, and it works, because a
-                        holiday with no owner is easy to take.
+                        Every September 29 the big chains give away a free cup and call it a holiday. It works,
+                        because a day with no owner is easy to take.
                     </p>
                     <p>
-                        Meanwhile the shop that actually made your coffee this morning gets nothing out of the day.
-                        They cannot afford to give a thousand cups away, and competing on a discount against a company
-                        with a national marketing budget is a fight nobody wins.
+                        Your shop made the coffee. You cannot give away a thousand cups, and you cannot outspend a
+                        national ad budget. Competing on the discount is a fight nobody wins.
                     </p>
                     <p>
-                        So we think the day should point somewhere else. Not at whoever is giving the most away, but at
-                        the people who make the thing. That is the whole argument.
+                        So let the day point at the people who make the thing instead. That is the whole idea.
                     </p>
                     <p className="font-semibold text-ink">
-                        Here is what we are doing about it. Ollabs gives every independent coffee shop a free profile
-                        frame for the day, with no ads, no signup, and nothing charged to the customer who uses it. And
-                        we keep this list: a public, permanent record of every shop that marked the day on its own
-                        terms. We will publish it again every year, and it will not be deleted.
+                        Ollabs gives every independent shop a free frame for National Coffee Day. No signup, no ads,
+                        and nothing charged to the customer who uses it. Run one and your shop goes on this list. It
+                        gets published every year, and it does not come down.
                     </p>
                     <p>
-                        We are starting this in 2026. It will be small at first. That is fine, because the only way a
-                        thing like this becomes real is by actually happening, more than once, for a long time.
+                        This starts in 2026, so the list is short. That is what day one looks like.
                     </p>
                 </div>
             </section>
@@ -121,8 +116,8 @@ export default async function IndependentsPage() {
                         <div className="bg-cream border border-ink/10 rounded-2xl p-8 text-center">
                             <p className="text-ink/75 mb-2 font-semibold">Nobody is on it yet.</p>
                             <p className="text-ink/70 mb-6 text-sm max-w-md mx-auto">
-                                Whoever goes first is the first name on a list that gets published every year from
-                                here on. Make a frame, share it with your regulars, and you are on it.
+                                Go first and yours is the first name on it. Make a frame, share it with your
+                                regulars, and you are on the list.
                             </p>
                             <Link
                                 href="/create?day=national-coffee-day"
@@ -164,8 +159,8 @@ export default async function IndependentsPage() {
                 <div className="max-w-3xl mx-auto bg-cream border border-ink/10 rounded-3xl p-10 text-center">
                     <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-3">Put your shop on it</h2>
                     <p className="text-ink/70 mb-7 max-w-xl mx-auto">
-                        Make a frame in your own colours, print the QR code for the counter, and let your regulars do
-                        the posting. It takes about a minute and costs nothing, now or later.
+                        Make a frame in your colors, print the QR code for the counter, and let your regulars do the
+                        posting. It takes a minute. It is free, and it stays free.
                     </p>
                     <Link
                         href="/create?day=national-coffee-day"
