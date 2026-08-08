@@ -368,6 +368,17 @@ export const DAYS: AwarenessDay[] = [
             { q: 'Can we use our shelter logo and colours?', a: 'Yes. Upload your own frame design as a transparent PNG, or set exact colours in the builder.' },
             { q: 'Do adopters need an account to use it?', a: 'No. They open the link, add a photo of their dog, and download it.' },
         ],
+        // Illustrated overlay, full size: the ring's outer edge sits on the
+        // inscribed circle, so the crop thins it very slightly and nothing else.
+        frame: {
+            id: 'day-national-dog-day',
+            type: FrameType.CUSTOM_IMAGE,
+            name: 'National Dog Day',
+            color1: 'transparent',
+            width: 0,
+            imageUrl: '/frames/national-dog-day.png',
+            cutoutScale: 0,
+        },
         relatedUseCases: ['nonprofits', 'fundraisers', 'companies'],
         relatedDays: ['national-nonprofit-day', 'national-coffee-day'],
     },
@@ -423,6 +434,17 @@ export const DAYS: AwarenessDay[] = [
             { q: 'Is Ollabs free for unions and employers?', a: 'Yes. Unlimited campaigns and unlimited supporters, no ads, and no watermark on anyone\'s photo.' },
             { q: 'Can we use our local\'s logo?', a: 'Yes. Upload it as a transparent PNG, or set your exact colours in the builder.' },
         ],
+        // Illustrated overlay, full size: the ring's outer edge sits on the
+        // inscribed circle, so the crop thins it very slightly and nothing else.
+        frame: {
+            id: 'day-labor-day',
+            type: FrameType.CUSTOM_IMAGE,
+            name: 'Labor Day',
+            color1: 'transparent',
+            width: 0,
+            imageUrl: '/frames/labor-day.png',
+            cutoutScale: 0,
+        },
         relatedUseCases: ['companies', 'events', 'nonprofits'],
         relatedDays: ['national-nonprofit-day', 'national-dog-day'],
     },
@@ -478,6 +500,17 @@ export const DAYS: AwarenessDay[] = [
             { q: 'Can we put our shop logo on the frame?', a: 'Yes. Upload a transparent PNG of your design, or set your own colours.' },
             { q: 'Do customers need to download anything?', a: 'No. They scan or tap the link, add a photo, and download it. It works in a phone browser.' },
         ],
+        // Illustrated overlay, full size: the ring's outer edge sits on the
+        // inscribed circle, so the crop thins it very slightly and nothing else.
+        frame: {
+            id: 'day-national-coffee-day',
+            type: FrameType.CUSTOM_IMAGE,
+            name: 'National Coffee Day',
+            color1: 'transparent',
+            width: 0,
+            imageUrl: '/frames/national-coffee-day.png',
+            cutoutScale: 0,
+        },
         relatedUseCases: ['companies', 'events', 'schools'],
         relatedDays: ['national-dog-day', 'labor-day'],
     },
