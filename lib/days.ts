@@ -314,7 +314,172 @@ export const DAYS: AwarenessDay[] = [
             cutoutScale: 0,
         },
         relatedUseCases: ['events', 'schools', 'companies'],
-        relatedDays: ['national-nonprofit-day'],
+        relatedDays: ['national-nonprofit-day', 'national-dog-day'],
+    },
+    {
+        slug: 'national-dog-day',
+        name: 'National Dog Day',
+        kind: 'day',
+        date: { type: 'fixed', month: 8, day: 26 },
+        colors: [{ name: 'Warm amber', hex: '#E8912F' }, { name: 'Deep brown', hex: '#5B3A21' }],
+        category: 'cause',
+        audience: ['Animal shelters', 'Rescues', 'Foster networks', 'Vets', 'Pet businesses'],
+        keyword: 'national dog day profile picture frame',
+        tagline: 'The biggest adoption day of the year, and the easiest one to get people posting.',
+        intro: [
+            'National Dog Day is the rare awareness day where the audience needs no persuading. People already want to post their dog. A frame turns that into something that points back at your shelter, your rescue, or your clinic.',
+            'Share one link with fosters, adopters, volunteers and staff, and the whole network posts the same frame on the same day. Free, no signup, and no watermark on anyone\'s photo.',
+        ],
+        background: [
+            'National Dog Day was founded in 2004 by animal rescue advocate Colleen Paige. She chose August 26 because it is the date her family adopted their first dog, a Sheltie, from a local shelter when she was ten.',
+            'The intent was never just cute pictures. It was to draw attention to how many dogs need rescuing each year, alongside working dogs and family dogs. Roughly a million adoptions in the US have been credited to the day since it started.',
+            'That origin is useful context for a shelter: the day was built for you, not for brands borrowing a hashtag. Posts that lead with real adoptable dogs tend to outperform generic celebration content on this date.',
+        ],
+        howOrgsMark: [
+            {
+                title: 'Lead with dogs who are actually available',
+                body: 'Engagement on this day is unusually high and unusually broad, so it reaches people outside your normal audience. Naming specific adoptable dogs converts that reach into applications rather than just likes.',
+            },
+            {
+                title: 'Give the frame to your fosters first',
+                body: 'Foster families already post their dogs constantly and already have the trust of their own network. They are the highest-yield people to hand a link to, and they will use it without being asked twice.',
+            },
+            {
+                title: 'Alumni adopters are an untapped list',
+                body: 'Everyone who ever adopted from you has a dog and a reason to post about where that dog came from. One email with the frame link turns years of past adoptions into a day of visible proof.',
+            },
+            {
+                title: 'Pair it with the ask you actually need',
+                body: 'Whether it is fosters, supplies, or donations, this is the day your reach is highest. Put one clear ask alongside the celebration rather than saving it for a quieter week.',
+            },
+        ],
+        campaignIdeas: [
+            'Send the frame link to every current foster the night before, so their posts go up first thing.',
+            'Email past adopters with the link and ask them to post a then-and-now photo of their dog, framed.',
+            'Feature five adoptable dogs by name, and ask people who share to wear the frame.',
+            'Vets and groomers: put the campaign QR code at the counter for the day.',
+            'Run a staff and volunteer version so the whole team is visibly matching.',
+            'Keep the campaign and run it again next August 26. Same date every year.',
+        ],
+        faqs: [
+            { q: 'When is National Dog Day?', a: 'August 26 every year. In 2026 it falls on a Wednesday.' },
+            { q: 'Who started National Dog Day?', a: 'Animal rescue advocate Colleen Paige, in 2004. She picked August 26 because it is the day her family adopted their first dog from a shelter when she was ten.' },
+            { q: 'Is this free for shelters and rescues?', a: 'Yes, completely. No signup, no ads, and no watermark on the photo anyone downloads. We never charge supporters.' },
+            { q: 'Can we use our shelter logo and colours?', a: 'Yes. Upload your own frame design as a transparent PNG, or set exact colours in the builder.' },
+            { q: 'Do adopters need an account to use it?', a: 'No. They open the link, add a photo of their dog, and download it.' },
+        ],
+        relatedUseCases: ['nonprofits', 'fundraisers', 'companies'],
+        relatedDays: ['national-nonprofit-day', 'national-coffee-day'],
+    },
+    {
+        slug: 'labor-day',
+        name: 'Labor Day',
+        kind: 'day',
+        // First Monday of September. weekday 1 = Monday under getUTCDay().
+        date: { type: 'nth-weekday', month: 9, weekday: 1, n: 1 },
+        colors: [{ name: 'Union blue', hex: '#1E4B7A' }, { name: 'Flag red', hex: '#C8332B' }],
+        category: 'community',
+        audience: ['Unions', 'Employers', 'Trade associations', 'Local businesses', 'Community groups'],
+        keyword: 'labor day profile picture frame',
+        tagline: 'A day about workers, which makes it a day about the people who work for you.',
+        intro: [
+            'Labor Day is a long weekend for most people and a genuine anniversary for some. If your organisation is built on the people who do its work, it is a natural moment to say so publicly rather than post a sale.',
+            'A shared frame lets your crew, your members, or your staff mark it together. One link, no signup, nothing to install.',
+        ],
+        background: [
+            'The first Labor Day was held in New York City on September 5, 1882, organised by the Central Labor Union. It became a federal holiday in 1894, signed into law by President Grover Cleveland days after the Pullman Strike ended.',
+            'It falls on the first Monday of September, so the date moves each year. In 2026 that is September 7.',
+            'The origin matters for tone. It is a labour holiday before it is a summer send-off, which is why posts that name actual workers land better than generic long-weekend graphics.',
+        ],
+        howOrgsMark: [
+            {
+                title: 'Name the work, not the weekend',
+                body: 'Almost every brand post on this day is about a sale or the end of summer. Recognising specific crews, shifts, or trades is both more accurate to the holiday and far less crowded.',
+            },
+            {
+                title: 'Unions and trades have the strongest claim',
+                body: 'This is your holiday by origin. A shared frame across a local gives visible scale to a membership that is usually spread across dozens of sites.',
+            },
+            {
+                title: 'Employers: let staff opt in',
+                body: 'A frame people choose to add reads as pride. One pushed onto everyone reads as a mandate. Share the link, say why, and leave it there.',
+            },
+            {
+                title: 'Local businesses can point at the neighbourhood',
+                body: 'A frame that celebrates local workers rather than your own storefront gets shared by other businesses, which is reach you cannot buy.',
+            },
+        ],
+        campaignIdeas: [
+            'Make a frame in your local or company colours and share it with members the Friday before.',
+            'Post portraits of workers by name and trade, each wearing the frame.',
+            'Unions: run one campaign per local and compare the supporter counts.',
+            'Ask retired members to join in. They usually want to and are rarely invited.',
+            'Pair the frame with one concrete thing you did for workers this year.',
+            'Save the campaign and reuse the design next September.',
+        ],
+        faqs: [
+            { q: 'When is Labor Day 2026?', a: 'Monday, September 7, 2026. Labor Day is always the first Monday in September, so the date moves each year.' },
+            { q: 'Why is Labor Day in September?', a: 'The first one was held in New York City on September 5, 1882, organised by the Central Labor Union. Congress made it a federal holiday on the first Monday of September in 1894.' },
+            { q: 'Is Ollabs free for unions and employers?', a: 'Yes. Unlimited campaigns and unlimited supporters, no ads, and no watermark on anyone\'s photo.' },
+            { q: 'Can we use our local\'s logo?', a: 'Yes. Upload it as a transparent PNG, or set your exact colours in the builder.' },
+        ],
+        relatedUseCases: ['companies', 'events', 'nonprofits'],
+        relatedDays: ['national-nonprofit-day', 'national-dog-day'],
+    },
+    {
+        slug: 'national-coffee-day',
+        name: 'National Coffee Day',
+        kind: 'day',
+        date: { type: 'fixed', month: 9, day: 29 },
+        colors: [{ name: 'Espresso', hex: '#4A2C1A' }, { name: 'Crema', hex: '#C89563' }],
+        category: 'business',
+        audience: ['Cafes', 'Roasters', 'Coffee shops', 'Offices', 'Campus groups'],
+        keyword: 'national coffee day profile picture frame',
+        tagline: 'A day where the whole point is that people post about where they got their coffee.',
+        intro: [
+            'National Coffee Day is a light one, and that is exactly why it works. Nobody needs a reason to post their coffee, so a frame just gives the post somewhere to point.',
+            'For a cafe or a roaster it is the cheapest reach of the quarter: put the link on the counter, let regulars do the posting, and every framed photo carries your name into a feed you do not own.',
+        ],
+        background: [
+            'National Coffee Day is marked in the US on September 29. International Coffee Day, organised by the International Coffee Organization, falls on October 1, so the two sit days apart and often get treated as one long moment.',
+            'Its exact origins are murky. Unlike days with a documented founder, this one accumulated through trade groups and retail promotions rather than being established at a single point, which is worth knowing before you write history into a caption.',
+            'What is reliable is the behaviour: it is one of the highest-volume days of the year for coffee posts, and independent shops compete for that attention against national chains running discounts.',
+        ],
+        howOrgsMark: [
+            {
+                title: 'Let regulars do the posting',
+                body: 'A frame on a customer\'s own photo outperforms anything from the shop account, because it comes with a personal recommendation attached. A QR code by the register is the whole mechanic.',
+            },
+            {
+                title: 'Independents should not compete on discounts',
+                body: 'Chains will win the price angle on this day every time. A frame that names your shop and your neighbourhood competes on the thing chains cannot copy.',
+            },
+            {
+                title: 'Roasters can point at the farm',
+                body: 'If you know your producers, this is the day to say so. A frame paired with where the coffee actually came from separates you from every generic latte post.',
+            },
+            {
+                title: 'Offices get an easy internal moment',
+                body: 'A no-stakes shared frame for a coffee run is a low-effort way to test whether your team will use one at all, before you need them to for something that matters.',
+            },
+        ],
+        campaignIdeas: [
+            'Print the campaign QR code as a table card and put it on every table for the day.',
+            'Offer nothing for using it. The frame is the participation, and it keeps the day from turning into a discount.',
+            'Roasters: pair the frame with a post naming the producer behind your current single origin.',
+            'Ask staff to post their own order, framed, with what they actually drink.',
+            'Campus coffee groups and study spots can run their own version.',
+            'Keep the campaign for October 1, which is International Coffee Day, and get two moments from one design.',
+        ],
+        faqs: [
+            { q: 'When is National Coffee Day?', a: 'September 29 in the US. In 2026 that is a Tuesday. International Coffee Day is separate and falls on October 1.' },
+            { q: 'What is the difference between National and International Coffee Day?', a: 'National Coffee Day is the US observance on September 29. International Coffee Day is organised by the International Coffee Organization and is marked on October 1.' },
+            { q: 'Is this free for a small cafe?', a: 'Yes, and it stays free. No signup, no ads, and no watermark on the photo your customers download.' },
+            { q: 'Can we put our shop logo on the frame?', a: 'Yes. Upload a transparent PNG of your design, or set your own colours.' },
+            { q: 'Do customers need to download anything?', a: 'No. They scan or tap the link, add a photo, and download it. It works in a phone browser.' },
+        ],
+        relatedUseCases: ['companies', 'events', 'schools'],
+        relatedDays: ['national-dog-day', 'labor-day'],
     },
 ];
 
