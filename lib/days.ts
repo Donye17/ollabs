@@ -203,8 +203,8 @@ export const DAYS: AwarenessDay[] = [
         keyword: 'national nonprofit day profile picture frame',
         tagline: 'One day to say thank you to the people who keep the work going.',
         intro: [
-            'National Nonprofit Day is a chance to point the spotlight at the people who usually stand behind it: the staff, volunteers, and board members who keep a mission running when nobody is watching.',
-            'A profile frame is a small way to do that publicly. Your team, your volunteers, and your donors add it to their photo, and for a day your whole network is visibly part of the same thing. It takes a minute, it costs nothing, and nobody has to sign up.',
+            'National Nonprofit Day is August 17. Most of the work at a nonprofit is done by people nobody names, and this is the one day the sector points at them.',
+            'A frame makes that visible. Your staff, your volunteers, and your donors put the same thing on their photo, and for a day your whole network is wearing it. Free, no signup, and nothing on the photo they download.',
         ],
         background: [
             'National Nonprofit Day is marked each year on August 17. It was established to recognise the sector\'s contribution and, just as importantly, the individual people inside it who rarely get named in an annual report.',
@@ -296,8 +296,8 @@ export const DAYS: AwarenessDay[] = [
         keyword: "national s'mores day profile picture frame",
         tagline: 'The last great excuse of the summer, and the easiest one to get a whole camp to join in on.',
         intro: [
-            "National S'mores Day lands on August 10, which is almost perfectly placed: peak camp season, a couple of weeks before school starts, and right when everyone is trying to hold on to summer a little longer.",
-            'It is a low-stakes day, and that is the point. Nobody needs convincing to celebrate s\'mores. Share one link, and camp staff, counsellors, scouts, parents, and alumni can all put the same frame on their photo in about ten seconds.',
+            "National S'mores Day, August 10, falls in the last weeks of camp season. Nobody needs convincing to celebrate s'mores, which makes it the easiest post your camp will make all summer.",
+            'Share one link and camp staff, counsellors, scouts, parents and alumni all put the same frame on their photo in about ten seconds. Free, no signup, and nothing on the photo they download.',
         ],
         background: [
             "The first published s'mores recipe appeared in 1927, in a Girl Scouts handbook called Tramping and Trailing with the Girl Scouts, under the name \"Some More\" and credited to troop leader Loretta Scott Crew. It was written to feed sixteen scouts around a fire.",
@@ -384,8 +384,8 @@ export const DAYS: AwarenessDay[] = [
         keyword: 'national dog day profile picture frame',
         tagline: 'The biggest adoption day of the year, and the easiest one to get people posting.',
         intro: [
-            'National Dog Day is the rare awareness day where the audience needs no persuading. People already want to post their dog. A frame turns that into something that points back at your shelter, your rescue, or your clinic.',
-            'Share one link with fosters, adopters, volunteers and staff, and the whole network posts the same frame on the same day. Free, no signup, and no watermark on anyone\'s photo.',
+            'On National Dog Day, August 26, everyone posts their dog. Most of those posts never say where the dog came from.',
+            'A frame fixes that. Share one link with fosters, adopters, volunteers and staff, and every photo points back at your shelter. Free, no signup, and no watermark on anyone\'s photo.',
         ],
         background: [
             'National Dog Day was founded in 2004 by animal rescue advocate Colleen Paige. She chose August 26 because it is the date her family adopted their first dog, a Sheltie, from a local shelter when she was ten.',
@@ -473,8 +473,8 @@ export const DAYS: AwarenessDay[] = [
         keyword: 'labor day profile picture frame',
         tagline: 'A day about workers, which makes it a day about the people who work for you.',
         intro: [
-            'Labor Day is a long weekend for most people and a genuine anniversary for some. If your organisation is built on the people who do its work, it is a natural moment to say so publicly rather than post a sale.',
-            'A shared frame lets your crew, your members, or your staff mark it together. One link, no signup, nothing to install.',
+            'Labor Day, September 7, is a day off for some people because others are covering the shift. It is a good day to say so out loud instead of posting a sale.',
+            'A shared frame lets your crew, your members or your staff mark it together. One link, no signup, nothing to install.',
         ],
         background: [
             'The first Labor Day was held in New York City on September 5, 1882, organised by the Central Labor Union. It became a federal holiday in 1894, signed into law by President Grover Cleveland days after the Pullman Strike ended.',
@@ -560,7 +560,7 @@ export const DAYS: AwarenessDay[] = [
         keyword: 'national coffee day profile picture frame',
         tagline: 'One day a year the whole internet posts its coffee. Give yours somewhere to point.',
         intro: [
-            'On September 29 an enormous number of people post a cup of coffee. Most of those posts say nothing about where it came from, which is a shame, because the shop that made it is usually the interesting part.',
+            'On National Coffee Day, September 29, an enormous number of people post a cup of coffee. Most of those posts say nothing about where it came from, which is a shame, because the shop that made it is usually the interesting part.',
             'A shared frame fixes that. Put the link on the counter, and a regular\'s own photo carries your name instead of a chain\'s discount code. Free, no signup, and nothing on the photo they download.',
         ],
         background: [
@@ -652,7 +652,7 @@ export const DAYS: AwarenessDay[] = [
         keyword: 'national cat day profile picture frame',
         tagline: 'Cats sit in shelters far longer than dogs. One day a year the internet is paying attention.',
         intro: [
-            'On October 29 the whole internet posts a cat. That attention is worth something, and most of it goes nowhere near the cats that need it.',
+            'On National Cat Day, October 29, the whole internet posts a cat. That attention is worth something, and most of it goes nowhere near the cats that need it.',
             'A frame gives your shelter a way to ride the day. Share one link, and fosters, adopters, staff and volunteers all post the same thing. Free, no signup, and nothing on the photo they download.',
         ],
         background: [
