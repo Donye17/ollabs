@@ -459,7 +459,7 @@ export const DAYS: AwarenessDay[] = [
             cutoutScale: 0,
         },
         relatedUseCases: ['nonprofits', 'fundraisers', 'companies'],
-        relatedDays: ['national-nonprofit-day', 'national-coffee-day'],
+        relatedDays: ['national-cat-day', 'national-nonprofit-day'],
     },
     {
         slug: 'labor-day',
@@ -640,6 +640,98 @@ export const DAYS: AwarenessDay[] = [
         },
         relatedUseCases: ['companies', 'events', 'schools'],
         relatedDays: ['national-dog-day', 'labor-day'],
+    },
+    {
+        slug: 'national-cat-day',
+        name: 'National Cat Day',
+        kind: 'day',
+        date: { type: 'fixed', month: 10, day: 29 },
+        colors: [{ name: 'Warm cream', hex: '#F5D6B3' }, { name: 'Slate', hex: '#7C7A85' }],
+        category: 'cause',
+        audience: ['Shelters', 'Cat rescues', 'Foster networks', 'Vets', 'TNR groups'],
+        keyword: 'national cat day profile picture frame',
+        tagline: 'Cats sit in shelters far longer than dogs. One day a year the internet is paying attention.',
+        intro: [
+            'On October 29 the whole internet posts a cat. That attention is worth something, and most of it goes nowhere near the cats that need it.',
+            'A frame gives your shelter a way to ride the day. Share one link, and fosters, adopters, staff and volunteers all post the same thing. Free, no signup, and nothing on the photo they download.',
+        ],
+        background: [
+            'National Cat Day was started in 2005 by Colleen Paige, the same animal welfare advocate who founded National Dog Day the year before. The point was never the pictures. It was the number of cats sitting in shelters waiting.',
+            'Cats are the harder half of that problem. They arrive in bigger litters, they get adopted more slowly, and black cats and adults wait longest of all. A shelter posting a kitten on October 29 is playing an easy hand; posting the seven-year-old who has been there since spring is the one that matters.',
+            'The day falls two days before Halloween, which is worth knowing if you are a shelter. Your feed is about to be full of costumes, so October 29 is the last quiet moment to be heard.',
+        ],
+        howToCelebrate: [
+            {
+                title: 'Post the cat nobody is posting',
+                body: 'Everyone shares a kitten. Adults, black cats, and bonded pairs wait months longer for exactly that reason. If you only post one cat on October 29, make it one of those.',
+            },
+            {
+                title: 'Say where yours came from',
+                body: 'A cat photo is worth nothing to a shelter unless it is tagged. One line naming where you adopted, and a link, turns a picture into something a stranger can act on.',
+            },
+            {
+                title: 'Ask a shelter what it actually needs',
+                body: 'It is rarely toys. Litter, cleaning supplies, and towels run out constantly, and most shelters publish a list. Reading it takes a minute and beats guessing.',
+            },
+            {
+                title: 'Foster a cat, not forever',
+                body: 'Cats need less space and less walking than dogs, which makes fostering one genuinely doable in a flat. A few weeks frees a kennel, and it is how a lot of cats end up adopted.',
+            },
+            {
+                title: 'Do the thing your cat likes, which is usually nothing',
+                body: 'A new box, a sunny windowsill, twenty minutes of the string. Cats are not impressed by occasions. They are impressed by you sitting still nearby.',
+            },
+            {
+                title: 'Put the frame on your photo',
+                body: 'It tells everyone scrolling what the day is, and it takes ten seconds. No signup, no watermark.',
+            },
+        ],
+        howOrgsMark: [
+            {
+                title: 'Lead with the long-stay cats',
+                body: 'Reach on this day is unusually broad, which means it lands on people who were not looking for a cat. That audience is exactly who adopts an adult, because they have no fixed idea of what they came for.',
+            },
+            {
+                title: 'Get the frame to fosters the night before',
+                body: 'Fosters post their cats constantly and already have their own network\'s trust. Give them the link on October 28 so their posts are up before the feed fills.',
+            },
+            {
+                title: 'Beat Halloween by two days',
+                body: 'October 31 buries everything. The 29th is the last clear air your shelter gets before the costume posts start, so put the ask out on the day rather than saving it for the weekend.',
+            },
+            {
+                title: 'Ask past adopters to show their cat now',
+                body: 'Everyone who adopted from you has a cat that looks nothing like its intake photo. A then-and-now from a real adopter is the most persuasive thing on your feed, and it costs one email to collect.',
+            },
+        ],
+        campaignIdeas: [
+            'Send the frame link to every foster on October 28, so their posts go up first.',
+            'Feature five long-stay cats by name and how long they have been waiting.',
+            'Email past adopters and ask for a then-and-now photo, framed.',
+            'Run a black cat campaign specifically. They wait longest and the day is the best cover you get.',
+            'Vets and groomers: put the QR code at the counter for the week.',
+            'Keep the campaign and run it again next October 29.',
+        ],
+        faqs: [
+            { q: 'When is National Cat Day?', a: 'October 29 every year. In 2026 it falls on a Thursday.' },
+            { q: 'Who started National Cat Day?', a: 'Colleen Paige, an animal welfare advocate, in 2005. She founded National Dog Day the year before, and both days exist to draw attention to how many animals are waiting in shelters.' },
+            { q: 'Is this free for shelters and rescues?', a: 'Yes, completely. No signup, no ads, and no watermark on the photo anyone downloads. We never charge supporters.' },
+            { q: 'Can we use our shelter logo and colors?', a: 'Yes. Upload your own design as a transparent PNG, or set exact colors in the builder.' },
+            { q: 'Is it the same as International Cat Day?', a: 'No. International Cat Day is August 8, run by International Cat Care. National Cat Day is the US observance on October 29.' },
+        ],
+        // Illustrated overlay, full size: the ring's outer edge sits on the
+        // inscribed circle, so the crop thins it very slightly and nothing else.
+        frame: {
+            id: 'day-national-cat-day',
+            type: FrameType.CUSTOM_IMAGE,
+            name: 'National Cat Day',
+            color1: 'transparent',
+            width: 0,
+            imageUrl: '/frames/national-cat-day.png',
+            cutoutScale: 0,
+        },
+        relatedUseCases: ['nonprofits', 'fundraisers', 'companies'],
+        relatedDays: ['national-dog-day', 'national-nonprofit-day'],
     },
 ];
 
