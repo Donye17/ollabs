@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { QRCode } from '@/components/QRCode';
 import { CATEGORIES } from '@/lib/categories';
-import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck } from 'lucide-react';
+import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck, Palette } from 'lucide-react';
 
 interface ManageData {
     slug: string;
@@ -12,6 +12,7 @@ interface ManageData {
     view_count: number;
     goal: number | null;
     category: string | null;
+    preview_url: string | null;
     created_at: string;
     daily?: { day: string; n: number }[];
 }
@@ -222,9 +223,38 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                             )}
                         </div>
 
+                        {/* Frame. The API has always accepted a new frame_config, but until
+                            this there was no way to send one, so organizers who disliked their
+                            frame built an entire second campaign and left the first one and its
+                            supporters behind. */}
+                        <div className="bg-cream border border-ink/10 rounded-2xl p-4 mb-6 space-y-3">
+                            <p className="text-xs font-bold text-muted uppercase tracking-wider">Frame</p>
+                            <div className="flex items-center gap-4">
+                                {data.preview_url ? (
+                                    <img
+                                        src={data.preview_url}
+                                        alt=""
+                                        className="w-16 h-16 rounded-full object-cover border-2 border-paper shadow-sm shrink-0"
+                                    />
+                                ) : (
+                                    <div className="w-16 h-16 rounded-full bg-paper border border-ink/10 shrink-0" />
+                                )}
+                                <p className="text-xs text-ink/70 flex-1">
+                                    Change the design without starting over. Your link, your supporter count, and
+                                    everyone who already has the link stay exactly as they are.
+                                </p>
+                            </div>
+                            <a
+                                href={`/create?edit=${encodeURIComponent(currentSlug)}&k=${encodeURIComponent(token || '')}`}
+                                className="w-full py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-brand text-ink hover:brightness-105 transition-all"
+                            >
+                                <Palette size={15} /> Change the frame
+                            </a>
+                        </div>
+
                         {/* Edit */}
                         <div className="bg-cream border border-ink/10 rounded-2xl p-4 space-y-4">
-                            <p className="text-xs font-bold text-muted uppercase tracking-wider">Edit campaign</p>
+                            <p className="text-xs font-bold text-muted uppercase tracking-wider">Campaign details</p>
 
                             <div className="space-y-1.5">
                                 <label className="text-xs font-semibold text-ink/70">Title</label>

@@ -32,6 +32,31 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const c = await getCampaign(slug);
     if (!c) return { title: 'Campaign not found' };
     const description = c.description || `Add the ${c.title} frame to your profile picture and show your support.`;
+
+    // Share image, in priority order.
+    //
+    // 1. The campaign's own frame artwork, for CUSTOM_IMAGE campaigns. This is
+    //    the branding the organizer actually uploaded, it stays correct when
+    //    they edit the frame, and it does not depend on whatever the editor
+    //    canvas happened to be showing at the moment they hit publish.
+    //
+    //    That last part was a real bug. ImageFrameRenderer bails out early
+    //    while the uploaded PNG is still decoding, so publishing during that
+    //    window stored a bare default ring as the campaign's permanent share
+    //    image. Three of the twelve largest campaigns were affected, including
+    //    the biggest one at 934 supporters, which had been sharing to WhatsApp
+    //    as an empty blue donut.
+    //
+    // 2. The stored composite preview, which is still the best image for the
+    //    plain geometric frame types that have no artwork of their own.
+    //
+    // 3. The Ollabs card, so a link is never shared with no image at all.
+    const frameImage = typeof c.frame_config?.imageUrl === 'string'
+        && c.frame_config.imageUrl.startsWith('https://')
+        ? c.frame_config.imageUrl as string
+        : null;
+    const shareImage = frameImage || c.preview_url || 'https://ollabs.studio/og.png';
+
     return {
         title: c.title,
         description,
@@ -39,9 +64,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             title: c.title,
             description,
             url: `https://ollabs.studio/c/${c.slug}`,
-            images: c.preview_url ? [{ url: c.preview_url, width: 1024, height: 1024, alt: c.title }] : undefined,
+            images: [{ url: shareImage, width: 1024, height: 1024, alt: c.title }],
         },
-        twitter: { card: 'summary_large_image', title: c.title, description, images: c.preview_url ? [c.preview_url] : undefined },
+        twitter: { card: 'summary_large_image', title: c.title, description, images: [shareImage] },
     };
 }
 

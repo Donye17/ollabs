@@ -37,3 +37,14 @@ tsconfig.tsbuildinfo
 # Python
 __pycache__/
 *.pyc
+
+# Session notes and deliverables, not application code
+/OLLABS_LOGIN_AND_MONETIZATION.md
+/OLLABS_SOCIAL_PLAN.md
+/Ollabs_Projections_By_Month.xlsx
+
+# Flag pages, parked out of the build until the artwork is fixed
+/_parked/
+
+# Stale git lock files, safe to delete
+/_to_delete/

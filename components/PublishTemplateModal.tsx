@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode } from 'lucide-react';
+import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode, UserPlus, KeyRound, Pencil, Save } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { upload } from '@vercel/blob/client';
 import { FramePreview } from './FramePreview';
@@ -8,15 +8,28 @@ import { QRCode } from './QRCode';
 import { CATEGORIES } from '@/lib/categories';
 import { track } from '@/lib/analytics';
 
+interface EditTarget {
+    slug: string;
+    token: string;
+    title: string;
+}
+
 interface PublishTemplateModalProps {
     isOpen: boolean;
     onClose: () => void;
     config: FrameConfig;
     previewDataUrl: string | null;
     parentId?: string;
+    /** When set, saving updates this campaign's frame instead of creating one. */
+    editTarget?: EditTarget | null;
 }
 
-export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl }) => {
+// Steps for the inline account panel that appears after a campaign publishes.
+// Deliberately part of creating the campaign rather than a cleanup task later:
+// the account is how the organizer keeps the campaign, so it belongs here.
+type AccountStep = 'offer' | 'sending' | 'code' | 'verifying' | 'saved';
+
+export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl, editTarget }) => {
     // Set when the builder was opened from a /day page, so the campaign can be
     // attributed to that day rather than guessed at by category.
     const [daySlug, setDaySlug] = useState<string | null>(null);
@@ -26,6 +39,21 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             if (d) setDaySlug(d);
         } catch { /* ignore */ }
     }, []);
+
+    // Whether an organizer is already signed in. Null means not checked yet.
+    // When they are, the campaign attaches to their account server side and the
+    // whole account panel disappears, because there is nothing left to ask.
+    const [sessionEmail, setSessionEmail] = useState<string | null>(null);
+    useEffect(() => {
+        if (!isOpen) return;
+        let cancelled = false;
+        fetch('/api/auth/me')
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => { if (!cancelled && d?.email) setSessionEmail(d.email); })
+            .catch(() => { /* signed out, which is the normal case */ });
+        return () => { cancelled = true; };
+    }, [isOpen]);
+
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [goal, setGoal] = useState('');
@@ -34,11 +62,149 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [campaignUrl, setCampaignUrl] = useState<string | null>(null);
     const [manageUrl, setManageUrl] = useState<string | null>(null);
+    const [ownerToken, setOwnerToken] = useState<string | null>(null);
+    const [campaignSlug, setCampaignSlug] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [manageCopied, setManageCopied] = useState(false);
     const [showQR, setShowQR] = useState(false);
 
+    // Inline account creation
+    const [accountStep, setAccountStep] = useState<AccountStep>('offer');
+    const [accountEmail, setAccountEmail] = useState('');
+    const [accountCode, setAccountCode] = useState('');
+    const [accountError, setAccountError] = useState<string | null>(null);
+
+    // Editing an existing campaign's frame
+    const [savingFrame, setSavingFrame] = useState(false);
+    const [frameSaved, setFrameSaved] = useState(false);
+    const [frameError, setFrameError] = useState<string | null>(null);
+
+    const saveFrame = async () => {
+        if (!editTarget || savingFrame) return;
+        setSavingFrame(true);
+        setFrameError(null);
+        try {
+            // Only refresh the stored thumbnail when a new one was actually
+            // rendered. Editing the frame without dropping a photo in leaves the
+            // old preview alone rather than blanking it.
+            let previewUrl: string | null = null;
+            if (previewDataUrl) {
+                try {
+                    const blob = await (await fetch(previewDataUrl)).blob();
+                    const uploaded = await upload(`preview-${Date.now()}.png`, blob, { access: 'public', handleUploadUrl: '/api/upload' });
+                    previewUrl = uploaded.url;
+                } catch (e) {
+                    console.error('preview upload failed', e);
+                }
+            }
+
+            const payload: Record<string, unknown> = { token: editTarget.token, frameConfig: config };
+            if (previewUrl) payload.previewUrl = previewUrl;
+
+            const res = await fetch(`/api/campaigns/${editTarget.slug}/manage`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                setFrameError(data?.error || 'Could not save your frame. Try again.');
+                return;
+            }
+            track('frame_updated', { campaign: editTarget.slug });
+            setFrameSaved(true);
+        } catch {
+            setFrameError('Could not reach the server. Try again.');
+        } finally {
+            setSavingFrame(false);
+        }
+    };
+
     if (!isOpen) return null;
+
+    // ------------------------------------------------------------- edit mode
+    // A separate, much smaller modal. Nothing here creates a campaign, asks for
+    // an email, or writes to localStorage: the campaign already exists and this
+    // only swaps its frame, so the link and the supporters are untouched.
+    if (editTarget) {
+        const manageUrlForEdit = `/c/${editTarget.slug}/manage?k=${editTarget.token}`;
+        return (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                <div className="bg-paper border border-ink/10 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="px-6 py-4 border-b border-ink/10 flex items-center justify-between">
+                        <h2 className="font-display text-lg font-extrabold text-ink">
+                            {frameSaved ? 'Frame updated' : 'Save your changes'}
+                        </h2>
+                        <button onClick={onClose} className="p-2 hover:bg-ink/10 rounded-full transition-colors">
+                            <X size={18} className="text-muted" />
+                        </button>
+                    </div>
+
+                    <div className="p-6 space-y-5">
+                        <div className="flex justify-center py-2">
+                            <FramePreview frame={config} className="w-40 h-40 rounded-full border-4 border-cream bg-paper2 shadow-lg mx-auto" />
+                        </div>
+
+                        {frameSaved ? (
+                            <>
+                                <p className="text-sm text-ink/70 text-center">
+                                    <span className="font-semibold text-ink">{editTarget.title}</span> now uses this frame.
+                                    Everyone who already has your link will see it, and anyone who downloaded the old one
+                                    keeps what they downloaded.
+                                </p>
+                                <div className="flex gap-2">
+                                    <a
+                                        href={manageUrlForEdit}
+                                        className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all"
+                                    >
+                                        <Pencil size={17} /> Back to campaign
+                                    </a>
+                                    <a
+                                        href={`/c/${editTarget.slug}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
+                                    >
+                                        <ExternalLink size={17} /> View
+                                    </a>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <p className="text-sm text-ink/70 text-center">
+                                    This replaces the frame on <span className="font-semibold text-ink">{editTarget.title}</span>.
+                                    The campaign link, the supporter count, and your stats all stay exactly as they are.
+                                </p>
+                                {!previewDataUrl && (
+                                    <p className="text-[11px] text-muted text-center leading-relaxed">
+                                        Drop a photo into the editor before saving if you also want to refresh the preview
+                                        image people see when your link is shared. Otherwise the old one stays.
+                                    </p>
+                                )}
+                                {frameError && <p className="text-sm text-red-600 text-center">{frameError}</p>}
+                            </>
+                        )}
+                    </div>
+
+                    <div className="p-6 border-t border-ink/10">
+                        {frameSaved ? (
+                            <button onClick={onClose} className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper transition-all">
+                                <Check size={20} /> Done
+                            </button>
+                        ) : (
+                            <button
+                                onClick={saveFrame}
+                                disabled={savingFrame}
+                                className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
+                            >
+                                {savingFrame ? <Loader2 className="animate-spin" size={20} /> : <><Save size={20} /> Save frame</>}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     const handleCreate = async () => {
         if (!title) return;
@@ -67,7 +233,12 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 const cUrl = `${window.location.origin}/c/${campaign.slug}`;
                 const mUrl = campaign.owner_token ? `${window.location.origin}/c/${campaign.slug}/manage?k=${campaign.owner_token}` : null;
                 setCampaignUrl(cUrl);
+                setCampaignSlug(campaign.slug);
+                setOwnerToken(campaign.owner_token ?? null);
                 if (mUrl) setManageUrl(mUrl);
+                // Carry whatever they typed into the account panel so they do not
+                // have to enter the same address twice.
+                setAccountEmail(organizerEmail || '');
                 track('campaign_created', { campaign: campaign.slug, category: category || 'none', day: daySlug || 'none' });
 
                 // Remember this campaign on the device so the owner can find it again.
@@ -86,6 +257,68 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             alert('Error creating campaign');
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const sendAccountCode = async () => {
+        if (!accountEmail) return;
+        setAccountError(null);
+        setAccountStep('sending');
+        try {
+            const res = await fetch('/api/auth/code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: accountEmail }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                setAccountError(data?.error || 'Could not send a code. Try again.');
+                setAccountStep('offer');
+                return;
+            }
+            setAccountCode('');
+            setAccountStep('code');
+        } catch {
+            setAccountError('Could not reach the server. Try again.');
+            setAccountStep('offer');
+        }
+    };
+
+    const verifyAccountCode = async () => {
+        if (accountCode.length !== 6) return;
+        setAccountError(null);
+        setAccountStep('verifying');
+        try {
+            const res = await fetch('/api/auth/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: accountEmail, code: accountCode }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                setAccountError(data?.error || 'That code did not work.');
+                setAccountStep('code');
+                return;
+            }
+
+            // Signing in claims every campaign created with this address. This one
+            // may have been created without an email, so attach it explicitly with
+            // the owner token as well. Doing both covers either path.
+            if (campaignSlug && ownerToken) {
+                try {
+                    await fetch(`/api/campaigns/${campaignSlug}/claim`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: ownerToken }),
+                    });
+                } catch { /* the email match above usually covers it anyway */ }
+            }
+
+            setSessionEmail(accountEmail);
+            setAccountStep('saved');
+        } catch {
+            setAccountError('Could not reach the server. Try again.');
+            setAccountStep('code');
         }
     };
 
@@ -120,15 +353,25 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         setOrganizerEmail('');
         setCampaignUrl(null);
         setManageUrl(null);
+        setOwnerToken(null);
+        setCampaignSlug(null);
         setShowQR(false);
+        setAccountStep('offer');
+        setAccountEmail('');
+        setAccountCode('');
+        setAccountError(null);
     };
+
+    // Already signed in when the campaign was created, or signed in just now via
+    // the panel below. Either way it is already on their account.
+    const onAccount = Boolean(sessionEmail);
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-paper border border-ink/10 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
+            <div className="bg-paper border border-ink/10 rounded-3xl w-full max-w-md max-h-[92vh] overflow-y-auto shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
 
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-ink/10 flex items-center justify-between">
+                <div className="px-6 py-4 border-b border-ink/10 flex items-center justify-between sticky top-0 bg-paper z-10">
                     <h2 className="font-display text-lg font-extrabold text-ink">{campaignUrl ? 'Campaign is live' : 'Create a campaign'}</h2>
                     <button onClick={handleClose} className="p-2 hover:bg-ink/10 rounded-full transition-colors">
                         <X size={18} className="text-muted" />
@@ -176,21 +419,121 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 </div>
                             )}
 
-                            {manageUrl && (
-                                <div className="bg-brand/10 border border-brand/30 rounded-xl p-4 space-y-2">
-                                    <div className="flex items-center gap-2 text-ink">
-                                        <ShieldCheck size={16} className="text-brand-deep" />
-                                        <span className="text-sm font-bold">Your private manage link</span>
-                                    </div>
-                                    <p className="text-xs text-ink/70">
-                                        {organizerEmail
-                                            ? `Bookmark this, and we have also emailed it to ${organizerEmail}. Keep it private.`
-                                            : 'Bookmark this. It is the only way to see your stats and edit the campaign later. Keep it private.'}
+                            {/* Account. Skipped entirely for someone already signed in. */}
+                            {onAccount ? (
+                                <div className="bg-brand/10 border border-brand/30 rounded-xl p-4 flex items-start gap-2.5">
+                                    <Check size={16} className="text-brand-deep mt-0.5 shrink-0" />
+                                    <p className="text-xs text-ink/80">
+                                        Saved to your account, <span className="font-semibold">{sessionEmail}</span>. Open it from
+                                        any device by signing in with a code.
                                     </p>
-                                    <button onClick={handleCopyManage}
-                                        className="w-full py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
-                                        {manageCopied ? <><Check size={15} className="text-brand-deep" /> Copied</> : <><Copy size={15} /> Copy manage link</>}
-                                    </button>
+                                </div>
+                            ) : (
+                                <div className="bg-cream border border-ink/10 rounded-xl p-4 space-y-3">
+                                    <div className="flex items-center gap-2 text-ink">
+                                        <UserPlus size={16} className="text-brand-deep" />
+                                        <span className="text-sm font-bold">Keep this campaign</span>
+                                    </div>
+
+                                    {accountStep === 'code' || accountStep === 'verifying' ? (
+                                        <>
+                                            <p className="text-xs text-ink/70">
+                                                Enter the 6 digit code sent to <span className="font-semibold">{accountEmail}</span>.
+                                            </p>
+                                            <div className="relative">
+                                                <KeyRound className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
+                                                <input
+                                                    type="text"
+                                                    autoFocus
+                                                    inputMode="numeric"
+                                                    autoComplete="one-time-code"
+                                                    maxLength={6}
+                                                    value={accountCode}
+                                                    onChange={(e) => setAccountCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                                    placeholder="123456"
+                                                    className="w-full bg-paper border border-ink/10 rounded-xl pl-10 pr-4 py-3 text-ink tracking-[0.35em] font-semibold placeholder:tracking-normal placeholder:font-normal placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
+                                                />
+                                            </div>
+                                            {accountError && <p className="text-xs text-red-600">{accountError}</p>}
+                                            <button
+                                                onClick={verifyAccountCode}
+                                                disabled={accountStep === 'verifying' || accountCode.length !== 6}
+                                                className="w-full py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
+                                            >
+                                                {accountStep === 'verifying' ? <><Loader2 size={15} className="animate-spin" /> Checking</> : 'Save my campaign'}
+                                            </button>
+                                            <button
+                                                onClick={sendAccountCode}
+                                                className="w-full text-[11px] text-muted hover:text-brand-deep transition-colors"
+                                            >
+                                                Send a new code
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="text-xs text-ink/70">
+                                                Get a 6 digit code by email and this campaign is yours on any device, even if
+                                                you lose the link below. No password. Supporters still never sign in.
+                                            </p>
+                                            <input
+                                                type="email"
+                                                autoComplete="email"
+                                                value={accountEmail}
+                                                onChange={(e) => setAccountEmail(e.target.value)}
+                                                placeholder="you@organization.org"
+                                                className="w-full bg-paper border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
+                                            />
+                                            {accountError && <p className="text-xs text-red-600">{accountError}</p>}
+                                            <button
+                                                onClick={sendAccountCode}
+                                                disabled={accountStep === 'sending' || !accountEmail}
+                                                className="w-full py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
+                                            >
+                                                {accountStep === 'sending' ? <><Loader2 size={15} className="animate-spin" /> Sending</> : 'Email me a code'}
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+
+                            {manageUrl && (
+                                <div className="bg-brand/10 border border-brand/30 rounded-xl p-4 space-y-2.5">
+                                    <div className="flex items-center gap-2 text-ink">
+                                        <Pencil size={16} className="text-brand-deep" />
+                                        <span className="text-sm font-bold">Manage campaign</span>
+                                    </div>
+                                    {/* Leads with editing on purpose. Organizers were publishing a
+                                        campaign, spotting a typo, and building a whole second campaign
+                                        because nothing here told them the first one could be changed. */}
+                                    <p className="text-xs text-ink/70">
+                                        Spotted a typo? Change the title, description, goal, category, and even the
+                                        link from here. Your supporters keep working links, so nothing breaks. Your
+                                        stats live here too.
+                                    </p>
+                                    <div className="flex gap-2">
+                                        <a
+                                            href={manageUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex-1 py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all"
+                                        >
+                                            <ExternalLink size={15} /> Open
+                                        </a>
+                                        <button onClick={handleCopyManage}
+                                            className="py-2.5 px-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                            {manageCopied ? <><Check size={15} className="text-brand-deep" /> Copied</> : <><Copy size={15} /> Copy link</>}
+                                        </button>
+                                    </div>
+                                    <p className="text-[11px] text-muted flex items-start gap-1.5">
+                                        <ShieldCheck size={13} className="mt-0.5 shrink-0" />
+                                        <span>
+                                            {onAccount
+                                                ? 'This link is a private key to your campaign. Keep it to yourself.'
+                                                : organizerEmail
+                                                    ? `Private key to your campaign. Also emailed to ${organizerEmail}. Keep it to yourself.`
+                                                    : 'Private key to your campaign. Without an account it is the only way back in, so save it somewhere.'}
+                                        </span>
+                                    </p>
                                 </div>
                             )}
                         </div>
@@ -247,21 +590,32 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             </div>
                             <p className="text-[11px] text-muted">A goal shows a progress bar; a category helps people find you on Explore.</p>
 
-                            <div className="space-y-2 pt-1">
-                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Email me my links (optional)</label>
-                                <input
-                                    type="email"
-                                    autoComplete="email"
-                                    value={organizerEmail}
-                                    onChange={(e) => setOrganizerEmail(e.target.value)}
-                                    placeholder="you@organization.org"
-                                    className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
-                                />
-                                <p className="text-[11px] text-muted">
-                                    No account, no password. It is how you get back to your dashboard if you switch
-                                    devices, plus a note when your campaign hits milestones. We never email supporters.
-                                </p>
-                            </div>
+                            {onAccount ? (
+                                <div className="bg-brand/10 border border-brand/30 rounded-xl p-3 flex items-start gap-2.5">
+                                    <Check size={15} className="text-brand-deep mt-0.5 shrink-0" />
+                                    <p className="text-[11px] text-ink/80">
+                                        Signed in as <span className="font-semibold">{sessionEmail}</span>. This campaign goes
+                                        straight onto your account.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-2 pt-1">
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Your email (optional)</label>
+                                    <input
+                                        type="email"
+                                        autoComplete="email"
+                                        value={organizerEmail}
+                                        onChange={(e) => setOrganizerEmail(e.target.value)}
+                                        placeholder="you@organization.org"
+                                        className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
+                                    />
+                                    <p className="text-[11px] text-muted">
+                                        Publishing never requires an account. Leave an address and you can save the campaign
+                                        to one on the next screen, which is how you get back to it from another device.
+                                        Supporters are never emailed.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

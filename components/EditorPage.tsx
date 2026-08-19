@@ -11,18 +11,33 @@ import { NavBar } from '@/components/NavBar';
 import { DEFAULT_FRAME } from '@/lib/constants';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { FrameConfig, StickerConfig, TextConfig, MotionEffect } from '@/lib/types';
-import { AlertCircle, Sparkles, Sliders, Eye, Type, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
+import { getFlag, resolveFlagFrame } from '@/lib/flags';
+import { AlertCircle, Sparkles, Sliders, Eye, Type, Image as ImageIcon, Upload, Loader2, Save } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
 import { OnboardingOverlay } from './editor/OnboardingOverlay';
 // Loaded on demand (see handleRemoveBackground). This library is ~5.5MB of WASM;
 // importing it statically made every visitor to /create download it whether or
 // not they ever removed a background.
 
+/** Set when /create is opened as ?edit=<slug>&k=<owner token>. */
+export interface EditTarget {
+    slug: string;
+    token: string;
+    title: string;
+}
+
 export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     // History State (Frame Config)
     const [history, setHistory] = useState<FrameConfig[]>([DEFAULT_FRAME]);
     const [historyIndex, setHistoryIndex] = useState<number>(0);
     const selectedFrame = history[historyIndex];
+
+    // Editing an existing campaign's frame rather than building a new one.
+    // Organizers were rebuilding whole campaigns to change a frame, abandoning
+    // the link they had already shared, because there was no way back in here.
+    const [editTarget, setEditTarget] = useState<EditTarget | null>(null);
+    const [editLoading, setEditLoading] = useState(false);
+    const [editError, setEditError] = useState<string | null>(null);
 
     // Editor State (Lifted Up)
     const [stickers, setStickers] = useState<StickerConfig[]>([]);
@@ -59,9 +74,58 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
     const [imageSrc, setImageSrc] = useState<string | null>(null);
 
-    // Initial load: restore an in-progress frame from local storage.
+    // Editing an existing campaign: load its saved frame into the editor.
+    useEffect(() => {
+        let slug: string | null = null;
+        let token: string | null = null;
+        try {
+            const params = new URLSearchParams(window.location.search);
+            slug = params.get('edit');
+            token = params.get('k');
+        } catch { /* ignore */ }
+        if (!slug || !token) return;
+
+        const key = token;
+        setEditLoading(true);
+        fetch(`/api/campaigns/${slug}/manage?token=${encodeURIComponent(key)}`)
+            .then(async (r) => {
+                if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Could not open this campaign');
+                return r.json();
+            })
+            .then((d) => {
+                const raw = d.frame_config;
+                const config = typeof raw === 'string' ? JSON.parse(raw) : raw;
+                if (!config) throw new Error('This campaign has no frame saved on it.');
+                setHistory([config]);
+                setHistoryIndex(0);
+                if (Array.isArray(config.stickers)) setStickers(config.stickers);
+                if (Array.isArray(config.textLayers)) setTextLayers(config.textLayers);
+                if (config.motionEffect) setMotionEffect(config.motionEffect);
+                setEditTarget({ slug: d.slug, token: key, title: d.title });
+            })
+            .catch((e) => setEditError(e.message || 'Could not open this campaign'))
+            .finally(() => setEditLoading(false));
+    }, []);
+
+    // Arriving from a /flags page: start on that country's frame.
     useEffect(() => {
         try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('edit')) return;
+            const flag = getFlag(params.get('flag') || '');
+            if (!flag) return;
+            setHistory([resolveFlagFrame(flag)]);
+            setHistoryIndex(0);
+        } catch { /* ignore */ }
+    }, []);
+
+    // Initial load: restore an in-progress frame from local storage. Skipped when
+    // editing or when a flag was requested, so neither can be overwritten by a
+    // half-finished draft.
+    useEffect(() => {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('edit') || params.get('flag')) return;
             const stored = localStorage.getItem('temp_frame');
             if (stored) {
                 const frame = JSON.parse(stored);
@@ -132,11 +196,29 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
 
 
-    if (isLoading) {
+    if (isLoading || editLoading) {
         return (
             <div className="min-h-screen bg-paper flex flex-col items-center justify-center text-ink font-sans">
                 <Loader2 className="w-12 h-12 text-brand-deep animate-spin mb-4" />
-                <p className="text-muted text-sm animate-pulse">Loading template...</p>
+                <p className="text-muted text-sm animate-pulse">{editLoading ? 'Loading your frame...' : 'Loading template...'}</p>
+            </div>
+        );
+    }
+
+    if (editError) {
+        return (
+            <div className="min-h-screen bg-paper text-ink font-sans">
+                <NavBar />
+                <div className="max-w-md mx-auto pt-32 px-6 text-center">
+                    <div className="bg-cream border border-ink/10 rounded-2xl p-8">
+                        <AlertCircle className="w-8 h-8 text-coral mx-auto mb-3" />
+                        <p className="font-display font-bold text-lg mb-1">Can&apos;t open that campaign</p>
+                        <p className="text-sm text-ink/70 mb-6">{editError}</p>
+                        <a href="/create" className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">
+                            Build a new frame
+                        </a>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -189,15 +271,23 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
                         {/* Creator Header */}
                         <div className="flex items-center justify-between px-2">
-                            <div>
-                                <h1 className="font-display text-2xl font-extrabold text-ink tracking-tight">Campaign builder</h1>
-                                <p className="text-xs text-muted font-medium">Make your frame, then share one link.</p>
+                            <div className="min-w-0">
+                                <h1 className="font-display text-2xl font-extrabold text-ink tracking-tight">
+                                    {editTarget ? 'Edit your frame' : 'Campaign builder'}
+                                </h1>
+                                <p className="text-xs text-muted font-medium truncate">
+                                    {editTarget
+                                        ? `Saves to "${editTarget.title}". Your link and supporters stay put.`
+                                        : 'Make your frame, then share one link.'}
+                                </p>
                             </div>
                             <button
                                 onClick={() => setIsPublishOpen(true)}
-                                className="bg-brand text-ink px-3 py-2 sm:px-4 rounded-xl text-sm font-bold flex items-center gap-2 hover:brightness-105 transition-all"
+                                className="bg-brand text-ink px-3 py-2 sm:px-4 rounded-xl text-sm font-bold flex items-center gap-2 hover:brightness-105 transition-all shrink-0"
                             >
-                                <Upload size={16} /> <span className="hidden sm:inline">Create campaign</span>
+                                {editTarget
+                                    ? <><Save size={16} /> <span className="hidden sm:inline">Save changes</span></>
+                                    : <><Upload size={16} /> <span className="hidden sm:inline">Create campaign</span></>}
                             </button>
                         </div>
 
@@ -324,6 +414,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                 config={{ ...selectedFrame, stickers, textLayers }}
                 previewDataUrl={previewDataUrl}
                 parentId={remixId}
+                editTarget={editTarget}
             />
 
             <footer className="py-12 text-center text-muted text-sm border-t border-ink/10 bg-paper">

@@ -18,9 +18,21 @@ const CANVAS = 1024;
  * visitor act on the day immediately, then hand them to /create if they want to
  * run one properly for their own organisation.
  */
-export const DayFrameTool: React.FC<{ frame: FrameConfig; dayName: string; daySlug: string }> = ({
-    frame, dayName, daySlug,
-}) => {
+export const DayFrameTool: React.FC<{
+    frame: FrameConfig;
+    dayName: string;
+    daySlug: string;
+    /**
+     * Which section the tool is embedded in. Controls the provenance URL, the
+     * download filename, the analytics dimension, and the closing prompt.
+     * Defaults to 'day' so the existing day pages behave exactly as before.
+     */
+    section?: 'day' | 'flags';
+}> = ({ frame, dayName, daySlug, section = 'day' }) => {
+    const isFlag = section === 'flags';
+    // Keep the day dimension clean: flag downloads report under their own key
+    // rather than masquerading as an awareness day in GA.
+    const dimension = isFlag ? { flag: daySlug } : { day: daySlug };
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const imgRef = useRef<HTMLImageElement | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
@@ -86,7 +98,7 @@ export const DayFrameTool: React.FC<{ frame: FrameConfig; dayName: string; daySl
                 setZoom(1);
                 setPos({ x: 0, y: 0 });
                 setDone(false);
-                track('photo_uploaded', { day: daySlug });
+                track('photo_uploaded', dimension);
                 draw();
             };
             img.onerror = () => alert('That image could not be opened. Try a JPG or PNG.');
@@ -109,7 +121,7 @@ export const DayFrameTool: React.FC<{ frame: FrameConfig; dayName: string; daySl
                 const tagged = addPngMetadata(new Uint8Array(await blob.arrayBuffer()), {
                     Software: 'Ollabs (ollabs.studio)',
                     Title: dayName,
-                    Source: `https://ollabs.studio/day/${daySlug}`,
+                    Source: `https://ollabs.studio/${section}/${daySlug}`,
                 });
                 out = new Blob([tagged as unknown as BlobPart], { type: 'image/png' });
             } catch { /* fall back to the untagged blob */ }
@@ -120,7 +132,7 @@ export const DayFrameTool: React.FC<{ frame: FrameConfig; dayName: string; daySl
             a.click();
             URL.revokeObjectURL(url);
             setDone(true);
-            track('frame_download', { day: daySlug });
+            track('frame_download', dimension);
         } finally {
             setDownloading(false);
         }
@@ -208,12 +220,13 @@ export const DayFrameTool: React.FC<{ frame: FrameConfig; dayName: string; daySl
                 <div className="mt-5 bg-cream border border-ink/10 rounded-2xl p-5 text-center">
                     <p className="font-display font-bold mb-1">Saved. Go set it as your profile picture.</p>
                     <p className="text-sm text-ink/70 mb-4">
-                        Running {dayName} for your own organisation? Make a campaign and share one link, so everyone
-                        gets the same frame and you can see how many joined.
+                        {isFlag
+                            ? `Want everyone in your group behind the same ${dayName} frame? Make a campaign and share one link, so you can see how many joined.`
+                            : `Running ${dayName} for your own organisation? Make a campaign and share one link, so everyone gets the same frame and you can see how many joined.`}
                     </p>
                     <Link
-                        href={`/create?day=${daySlug}`}
-                        onClick={() => track('day_to_create', { day: daySlug })}
+                        href={isFlag ? `/create?flag=${daySlug}` : `/create?day=${daySlug}`}
+                        onClick={() => track(isFlag ? 'flag_to_create' : 'day_to_create', dimension)}
                         className="inline-flex h-11 px-6 rounded-xl bg-ink text-paper font-bold items-center gap-2 hover:opacity-90 transition-opacity"
                     >
                         Create a campaign <ArrowRight size={16} />

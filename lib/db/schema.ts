@@ -80,3 +80,54 @@ export const campaignRecoveryTokens = pgTable("campaign_recovery_tokens", {
 	index("idx_recovery_tokens_email").using("btree", table.email.asc().nullsLast()),
 	index("idx_recovery_tokens_expires").using("btree", table.expiresAt.asc().nullsLast()),
 ]);
+
+// --------------------------------------------------------------------------
+// Optional organizer accounts (migration 0011).
+//
+// Creating a campaign still needs no account and supporters still never sign
+// in. These three tables exist so an organizer can reach their dashboard from a
+// device that is not the one they created on. campaigns.creator_id holds
+// organizers.id as text, since that column predates these tables.
+// --------------------------------------------------------------------------
+
+export const organizers = pgTable("organizers", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	// Always stored lowercased and trimmed.
+	email: text().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+	lastLoginAt: timestamp("last_login_at", { withTimezone: true, mode: 'string' }),
+}, (table) => [
+	unique("idx_organizers_email").on(table.email),
+]);
+
+// Six digit sign-in codes, stored hashed. Codes rather than magic links because
+// most organizers open Ollabs inside an in-app browser, where a mailed link
+// launches a different browser and signs in a session they cannot see.
+export const organizerLoginCodes = pgTable("organizer_login_codes", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	email: text().notNull(),
+	codeHash: text("code_hash").notNull(),
+	attempts: integer().default(0).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+	expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'string' }).notNull(),
+	usedAt: timestamp("used_at", { withTimezone: true, mode: 'string' }),
+}, (table) => [
+	index("idx_login_codes_email").using("btree", table.email.asc().nullsLast()),
+	index("idx_login_codes_expires").using("btree", table.expiresAt.asc().nullsLast()),
+]);
+
+// Session tokens are hashed too. The plaintext lives only in the user's cookie.
+export const organizerSessions = pgTable("organizer_sessions", {
+	tokenHash: text("token_hash").primaryKey().notNull(),
+	organizerId: uuid("organizer_id").notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+	expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'string' }).notNull(),
+}, (table) => [
+	index("idx_organizer_sessions_organizer").using("btree", table.organizerId.asc().nullsLast()),
+	index("idx_organizer_sessions_expires").using("btree", table.expiresAt.asc().nullsLast()),
+	foreignKey({
+		columns: [table.organizerId],
+		foreignColumns: [organizers.id],
+		name: "organizer_sessions_organizer_id_fkey"
+	}).onDelete("cascade"),
+]);

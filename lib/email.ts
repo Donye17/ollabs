@@ -164,3 +164,28 @@ This link works once and expires in 24 hours. If you did not ask for it, you can
 </td></tr>`),
     };
 }
+
+export function loginCodeEmail(opts: { code: string; minutes: number }) {
+    const spaced = opts.code.split('').join(' ');
+    return {
+        subject: `${opts.code} is your Ollabs sign-in code`,
+        text: [
+            `Your Ollabs sign-in code is ${opts.code}`,
+            ``,
+            `Type it into the tab you already have open. It expires in ${opts.minutes} minutes.`,
+            ``,
+            `If you did not ask to sign in, you can ignore this email.`,
+        ].join('\n'),
+        html: shell(`
+<tr><td style="font-size:22px;font-weight:800;padding-bottom:8px;">Your sign-in code</td></tr>
+<tr><td style="font-size:15px;line-height:1.6;color:#374151;padding-bottom:20px;">
+Type this back into the Ollabs tab you already have open.
+</td></tr>
+<tr><td style="padding-bottom:20px;">
+<div style="background:#F7F4EE;border:1px solid #E8E3DA;border-radius:14px;padding:18px;text-align:center;font-size:30px;font-weight:800;letter-spacing:8px;font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;">${esc(spaced)}</div>
+</td></tr>
+<tr><td style="font-size:13px;line-height:1.6;color:#6B7280;">
+It expires in ${opts.minutes} minutes and works once. If you did not ask to sign in, ignore this email and nothing happens.
+</td></tr>`),
+    };
+}

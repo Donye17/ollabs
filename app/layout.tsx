@@ -1,7 +1,7 @@
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Bricolage_Grotesque } from 'next/font/google';
 import './globals.css';
 
@@ -53,22 +53,26 @@ export const metadata: Metadata = {
             { url: '/favicon/favicon.ico' },
             { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
             { url: '/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+            // Google chooses the search result icon from rel="icon" and wants a
+            // square at least 48px and a multiple of 48. With only 16 and 32
+            // declared it was upscaling one of them, which is why the icon
+            // looked rough in results.
+            { url: '/favicon/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
         ],
         apple: [
-            { url: '/favicon/apple-touch-icon.png' },
+            { url: '/favicon/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
         ],
-        other: [
-            {
-                rel: 'android-chrome-192x192',
-                url: '/favicon/android-chrome-192x192.png',
-            },
-            {
-                rel: 'android-chrome-512x512',
-                url: '/favicon/android-chrome-512x512.png',
-            },
-        ],
+        // The android-chrome files are declared in site.webmanifest, which is
+        // where Android actually reads them. They used to be listed here too
+        // under invented rel values that no browser recognises.
     },
     manifest: '/favicon/site.webmanifest',
+};
+
+// Colours the iOS status bar and the Android system chrome when the site is
+// installed. Next wants this in the viewport export, not in metadata.
+export const viewport: Viewport = {
+    themeColor: '#01BEF6',
 };
 
 const jsonLd = {

@@ -5,6 +5,7 @@ import { CATEGORY_KEYS } from '@/lib/categories';
 import { hasVisibleFrame, visibleFrameSql } from '@/lib/frameValidity';
 import { campaignLiveEmail, isValidEmail, normalizeEmail, sendEmail } from '@/lib/email';
 import { getDay } from '@/lib/days';
+import { getSessionOrganizer } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,6 +71,12 @@ export async function POST(request: NextRequest) {
             emailValue = normalizeEmail(organizerEmail);
         }
 
+        // If an organizer happens to be signed in, attach the campaign to their
+        // account and fall back to their address for the welcome email. Being
+        // signed out changes nothing: creating stays fully anonymous.
+        const organizer = await getSessionOrganizer(request);
+        if (organizer && !emailValue) emailValue = organizer.email;
+
         if (!title || !frameConfig) {
             return NextResponse.json({ error: 'title and frameConfig are required' }, { status: 400 });
         }
@@ -105,8 +112,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Frame data is too large.' }, { status: 400 });
         }
 
-        // Anonymous-first: campaigns are created without an account.
-        const creatorId = null;
+        // Anonymous-first: campaigns are created without an account. creator_id
+        // is set only when the creator already had a session open.
+        const creatorId = organizer?.id ?? null;
         const creatorName = 'Anonymous';
 
         const baseSlug = slugify(title);
