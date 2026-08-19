@@ -73,6 +73,11 @@ export const metadata: Metadata = {
 // installed. Next wants this in the viewport export, not in metadata.
 export const viewport: Viewport = {
     themeColor: '#01BEF6',
+    // Next supplies these by default, but almost everyone here is on a phone,
+    // so they are worth stating rather than inheriting. No maximumScale and no
+    // userScalable false: pinch zoom stays available, which people rely on.
+    width: 'device-width',
+    initialScale: 1,
 };
 
 const jsonLd = {

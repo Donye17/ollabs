@@ -1,0 +1,80 @@
+// Share helpers shared by the publish screen and the campaign page.
+//
+// Both screens now open WhatsApp directly rather than asking the person to
+// copy a link and go find the app themselves. Worth writing down why, because
+// it is the highest-leverage measurement we have:
+//
+// Of the 88 campaigns that ever got a supporter, the median got its first one
+// 4.5 minutes after publishing, 84% inside the first hour, and not one single
+// campaign got its first supporter after 24 hours. A campaign either gets
+// shared in the minutes right after it is built or it never does. Meanwhile
+// 58% of campaigns created since Aug 15 have zero supporters, and those dead
+// campaigns average 1.61 views each, so the link was never sent anywhere.
+//
+// The publish screen offered a Copy button and a QR code. That asks a person
+// on a phone, very often already inside WhatsApp's in-app browser, to copy,
+// leave the app, find the right group, long press and paste. Every step there
+// is somewhere to lose them, at the one moment that decides the outcome.
+
+/**
+ * Whether to write share copy in Portuguese.
+ *
+ * The interface is English, but the people sharing are overwhelmingly
+ * Brazilian: every one of the twelve largest campaigns is a Brazilian
+ * candidate. The share text is the one string that does not stay on our site,
+ * it gets pasted into a WhatsApp group full of Brazilians, so it is worth
+ * matching the reader rather than the interface.
+ *
+ * Deliberately narrow. This switches a couple of sentences of share copy, it
+ * does not attempt to localize the product.
+ */
+export function prefersPortuguese(): boolean {
+    if (typeof navigator === 'undefined') return false;
+    const langs = [navigator.language, ...(navigator.languages || [])];
+    return langs.some((l) => typeof l === 'string' && l.toLowerCase().startsWith('pt'));
+}
+
+/** What an organizer sends when they have just published their campaign. */
+export function organizerShareText(title: string): string {
+    return prefersPortuguese()
+        ? `Coloque a moldura "${title}" na sua foto de perfil:`
+        : `Add the "${title}" frame to your profile picture:`;
+}
+
+/** What a supporter sends after adding the frame to their own photo. */
+export function supporterShareText(title: string): string {
+    return prefersPortuguese()
+        ? `Adicionei a moldura "${title}" na minha foto. Adicione a sua:`
+        : `I just added the "${title}" frame to my photo on Ollabs. Add yours:`;
+}
+
+/**
+ * A wa.me link with the message and URL already written.
+ *
+ * wa.me with no phone number opens WhatsApp's own contact picker, which is
+ * exactly right here: the organizer chooses the group, and the message is
+ * already composed so there is nothing to type.
+ */
+export function whatsappUrl(text: string, url: string): string {
+    return `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`;
+}
+
+/**
+ * Whether this browser can hand a PNG to the OS share sheet.
+ *
+ * This matters more than it looks. On iOS, an <a download> is ignored inside
+ * the WhatsApp and Instagram in-app browsers, which is where a large share of
+ * these visitors are, so "Download" can quietly do nothing. Handing the file
+ * to the share sheet gives them Save Image, or sending the picture straight
+ * into a chat, and it works in those browsers.
+ */
+export function canShareFiles(files: File[]): boolean {
+    if (typeof navigator === 'undefined') return false;
+    const n = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
+    if (typeof n.share !== 'function' || typeof n.canShare !== 'function') return false;
+    try {
+        return n.canShare({ files });
+    } catch {
+        return false;
+    }
+}

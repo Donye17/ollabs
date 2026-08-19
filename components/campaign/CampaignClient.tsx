@@ -6,26 +6,11 @@ import { QRCode } from '@/components/QRCode';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { addPngMetadata } from '@/lib/pngMeta';
 import { track, withUtm } from '@/lib/analytics';
-import { Upload, Download, Share2, Check, Loader2, Copy, QrCode } from 'lucide-react';
+import { XGlyph, WhatsAppGlyph, FacebookGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
+import { supporterShareText, whatsappUrl, canShareFiles } from '@/lib/share';
+import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles, ArrowRight } from 'lucide-react';
 
 const CANVAS = 1024;
-
-// Brand glyphs for share targets (inline so we stay self-contained).
-const XGlyph = ({ size = 16 }: { size?: number }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-);
-const WhatsAppGlyph = ({ size = 16 }: { size?: number }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-    </svg>
-);
-const FacebookGlyph = ({ size = 16 }: { size?: number }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-    </svg>
-);
 
 interface CampaignClientProps {
     slug: string;
@@ -61,6 +46,8 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     const [reportDone, setReportDone] = useState(false);
     const [canCopyImage, setCanCopyImage] = useState(false);
     const [imageCopied, setImageCopied] = useState(false);
+    const [canSharePhoto, setCanSharePhoto] = useState(false);
+    const [sharingPhoto, setSharingPhoto] = useState(false);
 
     useEffect(() => {
         setCanCopyImage(
@@ -68,6 +55,15 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
             typeof window.ClipboardItem !== 'undefined' &&
             !!navigator.clipboard && typeof navigator.clipboard.write === 'function'
         );
+        // Probe with a throwaway PNG. canShare inspects the file's type rather
+        // than its contents, so a one byte file answers the question honestly
+        // and costs nothing.
+        try {
+            const probe = new File([new Uint8Array([0])], 'probe.png', { type: 'image/png' });
+            setCanSharePhoto(canShareFiles([probe]));
+        } catch {
+            setCanSharePhoto(false);
+        }
     }, []);
 
     const handleCopyImage = async () => {
@@ -115,13 +111,17 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
 
     // Canonical clean URL for this campaign (avoids leaking inbound utm params).
     const shareUrl = () => (typeof window !== 'undefined' ? `${window.location.origin}/c/${slug}` : `https://ollabs.studio/c/${slug}`);
-    const shareText = `I just added the "${title}" frame to my photo on Ollabs. Add yours:`;
+
+    // A function rather than a value: it reads navigator.language, which differs
+    // between the server render and the browser, so it must not touch render.
+    const shareText = () => supporterShareText(title);
 
     const openShare = (platform: 'x' | 'whatsapp' | 'facebook') => {
         const url = withUtm(shareUrl(), platform);
+        const text = shareText();
         const map: Record<string, string> = {
-            x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`,
-            whatsapp: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${url}`)}`,
+            x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+            whatsapp: whatsappUrl(text, url),
             facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
         };
         window.open(map[platform], '_blank', 'noopener,noreferrer');
@@ -276,8 +276,17 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `ollabs-${slug}.png`;
+                // In the document and removed after, rather than a detached click.
+                // Some mobile browsers ignore a click on an element that was never
+                // in the tree, and this is the one action the whole page exists for.
+                a.style.display = 'none';
+                document.body.appendChild(a);
                 a.click();
-                URL.revokeObjectURL(url);
+                a.remove();
+                // Revoking straight away used to race the download on mobile: the
+                // browser had not finished reading the blob when the URL went away,
+                // so the file silently never arrived. Outlive the read instead.
+                setTimeout(() => URL.revokeObjectURL(url), 60_000);
                 bumpCount();
                 setJustDownloaded(true);
                 track('frame_download', { campaign: slug });
@@ -287,11 +296,41 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         }
     };
 
+    /**
+     * Hand the finished PNG to the OS share sheet.
+     *
+     * This is the reliable path on a phone. Inside the WhatsApp and Instagram
+     * in-app browsers on iOS, an <a download> is ignored, so Download can look
+     * like it worked and leave the person with nothing. The share sheet gives
+     * them Save Image, or sends the picture straight into a chat, and it is
+     * what most people wanted from the button anyway.
+     */
+    const handleSharePhoto = async () => {
+        const canvas = canvasRef.current;
+        if (!canvas || !hasImage) return;
+        setSharingPhoto(true);
+        try {
+            const blob = await taggedBlob();
+            if (!blob) return;
+            const file = new File([blob], `ollabs-${slug}.png`, { type: 'image/png' });
+            if (!canShareFiles([file])) return;
+            await navigator.share({ files: [file], title, text: shareText() });
+            // Only counted once the sheet resolves, so a cancel is not a download.
+            if (!justDownloaded) bumpCount();
+            setJustDownloaded(true);
+            track('frame_share_photo', { campaign: slug });
+        } catch {
+            // Cancelled from the sheet, or the OS refused the payload.
+        } finally {
+            setSharingPhoto(false);
+        }
+    };
+
     const handleShare = async () => {
         const url = withUtm(shareUrl(), 'native');
         if (navigator.share) {
             try {
-                await navigator.share({ title, text: shareText, url });
+                await navigator.share({ title, text: shareText(), url });
                 track('frame_share', { campaign: slug, platform: 'native' });
                 return;
             } catch { /* cancelled */ }
@@ -316,6 +355,10 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     {description && <p className="text-sm text-ink/70 mt-1">{description}</p>}
                 </div>
 
+                {/* Sized in vw so the preview fills a phone properly. It was a flat
+                    256px, which on a modern handset left a third of the screen empty
+                    while people were judging their own face in it. Capped at the old
+                    desktop size, so nothing above sm changes. */}
                 <canvas
                     ref={canvasRef}
                     width={CANVAS}
@@ -328,16 +371,19 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     onDragLeave={onDragLeave}
                     onDrop={onDrop}
                     onClick={() => { if (!hasImage) fileRef.current?.click(); }}
-                    className={`w-64 h-64 sm:w-72 sm:h-72 rounded-full touch-none transition-all ${hasImage ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${dragOver ? 'ring-4 ring-brand/70 scale-[1.03]' : ''}`}
+                    className={`w-[78vw] h-[78vw] max-w-[288px] max-h-[288px] rounded-full touch-none transition-all ${hasImage ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${dragOver ? 'ring-4 ring-brand/70 scale-[1.03]' : ''}`}
                     style={{ background: 'transparent' }}
                 />
 
                 {hasImage ? (
-                    <div className="w-full flex items-center gap-3 px-2">
+                    <div className="w-full flex items-center gap-3 px-2 py-1">
                         <span className="text-xs font-semibold text-muted">Size</span>
+                        {/* h-8 rather than the default hairline: a range input is one of
+                            the easiest things to miss with a thumb. */}
                         <input type="range" min={0.3} max={3} step={0.01} value={zoom}
                             onChange={(e) => setZoom(parseFloat(e.target.value))}
-                            className="flex-1 accent-brand" />
+                            aria-label="Photo size"
+                            className="flex-1 h-8 accent-brand cursor-pointer" />
                     </div>
                 ) : (
                     <p className="text-sm text-muted">Tap the circle or drag a photo onto it.</p>
@@ -349,7 +395,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 {!hasImage ? (
                     <>
                         <button onClick={() => fileRef.current?.click()}
-                            className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all">
+                            className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all">
                             <Upload size={18} /> Upload your photo
                         </button>
                         <div className="w-full grid grid-cols-3 gap-2 mt-1">
@@ -367,14 +413,31 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     </>
                 ) : (
                     <>
-                        <button onClick={handleDownload} disabled={downloading}
-                            className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50">
-                            {downloading ? <Loader2 size={18} className="animate-spin" /> : <>{justDownloaded ? <><Check size={18} /> Downloaded, download again</> : <><Download size={18} /> Download</>}</>}
-                        </button>
+                        {/* On a phone the share sheet is the reliable way to keep the
+                            picture, so it leads. iOS in-app browsers ignore <a download>
+                            entirely, and that is where a lot of these visitors are. On
+                            desktop, where the sheet does not exist, Download leads. */}
+                        {canSharePhoto ? (
+                            <>
+                                <button onClick={handleSharePhoto} disabled={sharingPhoto}
+                                    className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all disabled:opacity-50">
+                                    {sharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> Save or share photo</>}
+                                </button>
+                                <button onClick={handleDownload} disabled={downloading}
+                                    className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors disabled:opacity-50">
+                                    {downloading ? <Loader2 size={16} className="animate-spin" /> : <><Download size={16} /> Download</>}
+                                </button>
+                            </>
+                        ) : (
+                            <button onClick={handleDownload} disabled={downloading}
+                                className="w-full min-h-[56px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50">
+                                {downloading ? <Loader2 size={18} className="animate-spin" /> : <>{justDownloaded ? <><Check size={18} /> Downloaded, download again</> : <><Download size={18} /> Download</>}</>}
+                            </button>
+                        )}
 
                         {canCopyImage && (
                             <button onClick={handleCopyImage}
-                                className="w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                 {imageCopied ? <><Check size={16} className="text-brand-deep" /> Image copied</> : <><Copy size={16} /> Copy image</>}
                             </button>
                         )}
@@ -386,25 +449,28 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                                     <p className="text-xs text-muted mt-1">Post your framed photo, and share the link so others can add it too.</p>
                                 </div>
 
+                                {/* WhatsApp leads here for the same reason it leads on the
+                                    publish screen: it is where these links travel. */}
+                                <button onClick={() => openShare('whatsapp')}
+                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
+                                    style={{ backgroundColor: WHATSAPP_GREEN }}>
+                                    <WhatsAppGlyph size={18} /> Share on WhatsApp
+                                </button>
+
                                 {canNativeShare && (
                                     <button onClick={handleShare}
-                                        className="w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 transition-all">
-                                        <Share2 size={16} /> Share the link
+                                        className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 transition-all">
+                                        <Share2 size={16} /> Share another way
                                     </button>
                                 )}
 
-                                <div className="grid grid-cols-3 gap-2">
+                                <div className="grid grid-cols-2 gap-2">
                                     <button onClick={() => openShare('x')}
-                                        className="py-2.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 bg-ink text-white hover:brightness-125 transition-all">
+                                        className="min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 bg-ink text-white hover:brightness-125 transition-all">
                                         <XGlyph size={15} /> X
                                     </button>
-                                    <button onClick={() => openShare('whatsapp')}
-                                        className="py-2.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-all"
-                                        style={{ backgroundColor: '#25D366' }}>
-                                        <WhatsAppGlyph size={15} /> WhatsApp
-                                    </button>
                                     <button onClick={() => openShare('facebook')}
-                                        className="py-2.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-all"
+                                        className="min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-all"
                                         style={{ backgroundColor: '#1877F2' }}>
                                         <FacebookGlyph size={15} /> Facebook
                                     </button>
@@ -412,11 +478,11 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
 
                                 <div className="flex gap-2">
                                     <button onClick={copyLink}
-                                        className="flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                        className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                         {linkCopied ? <><Check size={15} className="text-brand-deep" /> Link copied</> : <><Copy size={15} /> Copy link</>}
                                     </button>
                                     <button onClick={() => setShowQR((v) => !v)}
-                                        className="py-2.5 px-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                        className="min-h-[48px] py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                         <QrCode size={15} /> QR
                                     </button>
                                 </div>
@@ -430,13 +496,40 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                             </div>
                         )}
 
+                        {/* The loop, closed.
+                            Six thousand people reached this screen this week and it
+                            ended with a download and a grey link at the bottom of the
+                            page. Someone who just put a frame on their own photo is
+                            the single warmest audience there is for making one, and
+                            this is the moment they are looking right at it. */}
+                        {justDownloaded && (
+                            <div className="w-full bg-brand/10 border border-brand/40 rounded-2xl p-4 text-center space-y-3 animate-fade-in">
+                                <div>
+                                    <p className="font-display font-extrabold text-lg leading-tight flex items-center justify-center gap-1.5">
+                                        <Sparkles size={17} className="text-brand-deep" /> Want one of your own?
+                                    </p>
+                                    <p className="text-xs text-ink/70 mt-1.5 leading-relaxed">
+                                        Make a frame for your team, your school, your campaign. It is free,
+                                        and you get a link just like this one to send out.
+                                    </p>
+                                </div>
+                                <a
+                                    href={withUtm('/create', 'campaign_page')}
+                                    onClick={() => track('create_from_campaign', { campaign: slug })}
+                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 active:brightness-110 transition-all"
+                                >
+                                    Make your own frame <ArrowRight size={17} />
+                                </a>
+                            </div>
+                        )}
+
                         <div className="w-full flex gap-3">
                             <button onClick={() => fileRef.current?.click()}
-                                className="flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                 <Upload size={16} /> New photo
                             </button>
                             <button onClick={handleShare}
-                                className="flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                 {copied ? <><Check size={16} className="text-brand-deep" /> Copied</> : <><Share2 size={16} /> Share</>}
                             </button>
                         </div>

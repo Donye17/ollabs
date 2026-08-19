@@ -1,12 +1,14 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode, UserPlus, KeyRound, Pencil, Save } from 'lucide-react';
+import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode, UserPlus, KeyRound, Pencil, Save, Share2 } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { upload } from '@vercel/blob/client';
 import { FramePreview } from './FramePreview';
 import { QRCode } from './QRCode';
+import { WhatsAppGlyph, WHATSAPP_GREEN } from './ShareGlyphs';
 import { CATEGORIES } from '@/lib/categories';
-import { track } from '@/lib/analytics';
+import { track, withUtm } from '@/lib/analytics';
+import { organizerShareText, whatsappUrl } from '@/lib/share';
 
 interface EditTarget {
     slug: string;
@@ -67,6 +69,13 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     const [copied, setCopied] = useState(false);
     const [manageCopied, setManageCopied] = useState(false);
     const [showQR, setShowQR] = useState(false);
+
+    // Whether the OS share sheet is available. Checked in an effect rather than
+    // read during render so the server and the first client render agree.
+    const [canNativeShare, setCanNativeShare] = useState(false);
+    useEffect(() => {
+        setCanNativeShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function');
+    }, []);
 
     // Inline account creation
     const [accountStep, setAccountStep] = useState<AccountStep>('offer');
@@ -333,6 +342,27 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         }
     };
 
+    // Sending the link, from the screen where sending it decides the outcome.
+    // See lib/share.ts for the numbers behind putting these here.
+
+    const shareWhatsApp = () => {
+        if (!campaignUrl) return;
+        const text = organizerShareText(title || 'Ollabs');
+        window.open(whatsappUrl(text, withUtm(campaignUrl, 'whatsapp')), '_blank', 'noopener,noreferrer');
+        track('campaign_share', { campaign: campaignSlug, platform: 'whatsapp', from: 'publish' });
+    };
+
+    const shareNative = async () => {
+        if (!campaignUrl) return;
+        const text = organizerShareText(title || 'Ollabs');
+        try {
+            await navigator.share({ title: title || 'Ollabs', text, url: withUtm(campaignUrl, 'native') });
+            track('campaign_share', { campaign: campaignSlug, platform: 'native', from: 'publish' });
+        } catch {
+            // Cancelled from the sheet, which is not an error worth surfacing.
+        }
+    };
+
     const handleCopyManage = async () => {
         if (!manageUrl) return;
         try {
@@ -388,25 +418,52 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                     {campaignUrl ? (
                         /* Success: shareable link */
                         <div className="space-y-4">
-                            <p className="text-sm text-ink/70 text-center">Share this link. Anyone who opens it can add your frame to their photo.</p>
+                            <div className="text-center">
+                                <p className="font-display text-lg font-extrabold leading-tight">Send it now.</p>
+                                <p className="text-sm text-ink/70 mt-1">
+                                    Campaigns that get shared in the first few minutes are the ones that fill up.
+                                    Anyone who opens your link can add the frame to their photo.
+                                </p>
+                            </div>
+
+                            {/* Primary action. One tap into WhatsApp with the message already
+                                written, because that is where these links actually get sent. */}
+                            <button
+                                onClick={shareWhatsApp}
+                                className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all shadow-sm"
+                                style={{ backgroundColor: WHATSAPP_GREEN }}
+                            >
+                                <WhatsAppGlyph size={20} /> Share on WhatsApp
+                            </button>
+
+                            {canNativeShare && (
+                                <button
+                                    onClick={shareNative}
+                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 active:brightness-110 transition-all"
+                                >
+                                    <Share2 size={18} /> Share another way
+                                </button>
+                            )}
+
                             <div className="bg-cream border border-ink/10 rounded-xl px-4 py-3 flex items-center gap-3">
                                 <span className="text-sm text-ink truncate flex-1">{campaignUrl}</span>
-                                <button onClick={handleCopy} className="text-muted hover:text-brand-deep transition-colors flex items-center gap-1 text-xs shrink-0 font-semibold">
+                                <button onClick={handleCopy} className="text-muted hover:text-brand-deep transition-colors flex items-center gap-1 text-xs shrink-0 font-semibold min-h-[36px] px-1">
                                     {copied ? <><Check size={14} className="text-brand-deep" /> Copied</> : <><Copy size={14} /> Copy</>}
                                 </button>
                             </div>
+
                             <div className="flex gap-2">
                                 <a
                                     href={campaignUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
+                                    className="flex-1 min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
                                 >
                                     <ExternalLink size={18} /> Open
                                 </a>
                                 <button
                                     onClick={() => setShowQR((v) => !v)}
-                                    className="py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
+                                    className="min-h-[48px] py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
                                 >
                                     <QrCode size={18} /> QR
                                 </button>
