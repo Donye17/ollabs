@@ -260,7 +260,7 @@ export const DAYS: AwarenessDay[] = [
         ],
         faqs: [
             { q: 'When is National Nonprofit Day?', a: 'August 17 every year. In 2026 it falls on a Monday, which makes it easy to build a full working day of posts around.' },
-            { q: 'Is Ollabs free for nonprofits?', a: 'Yes, and it stays free. No signup, no ads, and no watermark on the photo your supporters download. We never charge supporters, which is the difference between us and most alternatives.' },
+            { q: 'Is Ollabs free for nonprofits?', a: 'Yes, and it stays free. No signup, and no watermark on the photo your supporters download. We never charge supporters, which is the difference between us and most alternatives.' },
             { q: 'Do our staff and volunteers need accounts?', a: 'No. They open the link, add their photo, and download it. There is nothing to install and nothing to sign up for.' },
             { q: 'Can we use our own logo and brand colours?', a: 'Yes. Set exact hex values, or upload a finished frame design as a transparent PNG.' },
             { q: 'Can we reuse the campaign next year?', a: 'Yes. Keep the dashboard link, or start a fresh campaign with the same design so the new year gets its own supporter count.' },
@@ -355,7 +355,7 @@ export const DAYS: AwarenessDay[] = [
         faqs: [
             { q: "When is National S'mores Day?", a: 'August 10 every year. In 2026 it falls on a Monday.' },
             { q: 'Who actually invented s\'mores?', a: 'Nobody knows for certain. The first published recipe was in a 1927 Girl Scouts handbook, credited to troop leader Loretta Scott Crew, but a 1925 newspaper column from a Girl Scout camp shows troops were already making them.' },
-            { q: 'Is this free to use?', a: 'Yes. No signup, no ads, and no watermark on the photo anyone downloads. We never charge supporters.' },
+            { q: 'Is this free to use?', a: 'Yes. No signup, and no watermark on the photo anyone downloads. We never charge supporters.' },
             { q: 'Can we put our camp or business logo on it?', a: 'Yes. Upload your own frame design as a transparent PNG, or set your own colours in the builder.' },
             { q: 'Do campers and parents need an account?', a: 'No. They open the link, add a photo, and download. Nothing to install and nothing to join.' },
         ],
@@ -443,7 +443,7 @@ export const DAYS: AwarenessDay[] = [
         faqs: [
             { q: 'When is National Dog Day?', a: 'August 26 every year. In 2026 it falls on a Wednesday.' },
             { q: 'Who started National Dog Day?', a: 'Animal rescue advocate Colleen Paige, in 2004. She picked August 26 because it is the day her family adopted their first dog from a shelter when she was ten.' },
-            { q: 'Is this free for shelters and rescues?', a: 'Yes, completely. No signup, no ads, and no watermark on the photo anyone downloads. We never charge supporters.' },
+            { q: 'Is this free for shelters and rescues?', a: 'Yes, completely. No signup, and no watermark on the photo anyone downloads. We never charge supporters.' },
             { q: 'Can we use our shelter logo and colours?', a: 'Yes. Upload your own frame design as a transparent PNG, or set exact colours in the builder.' },
             { q: 'Do adopters need an account to use it?', a: 'No. They open the link, add a photo of their dog, and download it.' },
         ],
@@ -532,7 +532,7 @@ export const DAYS: AwarenessDay[] = [
         faqs: [
             { q: 'When is Labor Day 2026?', a: 'Monday, September 7, 2026. Labor Day is always the first Monday in September, so the date moves each year.' },
             { q: 'Why is Labor Day in September?', a: 'The first one was held in New York City on September 5, 1882, organised by the Central Labor Union. Congress made it a federal holiday on the first Monday of September in 1894.' },
-            { q: 'Is Ollabs free for unions and employers?', a: 'Yes. Unlimited campaigns and unlimited supporters, no ads, and no watermark on anyone\'s photo.' },
+            { q: 'Is Ollabs free for unions and employers?', a: 'Yes. Unlimited campaigns and unlimited supporters, and no watermark on any photo.' },
             { q: 'Can we use our local\'s logo?', a: 'Yes. Upload it as a transparent PNG, or set your exact colours in the builder.' },
         ],
         // Illustrated overlay, full size: the ring's outer edge sits on the
@@ -623,7 +623,7 @@ export const DAYS: AwarenessDay[] = [
         faqs: [
             { q: 'When is National Coffee Day?', a: 'September 29 in the US. In 2026 that is a Tuesday. International Coffee Day is separate and falls on October 1.' },
             { q: 'What is the difference between National and International Coffee Day?', a: 'National Coffee Day is the US observance on September 29. International Coffee Day is organised by the International Coffee Organization and is marked on October 1.' },
-            { q: 'Is this free for a small cafe?', a: 'Yes, and it stays free. No signup, no ads, and no watermark on the photo your customers download.' },
+            { q: 'Is this free for a small cafe?', a: 'Yes, and it stays free. No signup, and no watermark on the photo your customers download.' },
             { q: 'Can we put our shop logo on the frame?', a: 'Yes. Upload a transparent PNG of your design, or set your own colours.' },
             { q: 'Do customers need to download anything?', a: 'No. They scan or tap the link, add a photo, and download it. It works in a phone browser.' },
         ],
@@ -715,7 +715,7 @@ export const DAYS: AwarenessDay[] = [
         faqs: [
             { q: 'When is National Cat Day?', a: 'October 29 every year. In 2026 it falls on a Thursday.' },
             { q: 'Who started National Cat Day?', a: 'Colleen Paige, an animal welfare advocate, in 2005. She founded National Dog Day the year before, and both days exist to draw attention to how many animals are waiting in shelters.' },
-            { q: 'Is this free for shelters and rescues?', a: 'Yes, completely. No signup, no ads, and no watermark on the photo anyone downloads. We never charge supporters.' },
+            { q: 'Is this free for shelters and rescues?', a: 'Yes, completely. No signup, and no watermark on the photo anyone downloads. We never charge supporters.' },
             { q: 'Can we use our shelter logo and colors?', a: 'Yes. Upload your own design as a transparent PNG, or set exact colors in the builder.' },
             { q: 'Is it the same as International Cat Day?', a: 'No. International Cat Day is August 8, run by International Cat Care. National Cat Day is the US observance on October 29.' },
         ],

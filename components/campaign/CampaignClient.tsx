@@ -8,6 +8,7 @@ import { addPngMetadata } from '@/lib/pngMeta';
 import { track, withUtm } from '@/lib/analytics';
 import { XGlyph, WhatsAppGlyph, FacebookGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { supporterShareText, whatsappUrl, canShareFiles } from '@/lib/share';
+import { AdSlot } from '@/components/AdSlot';
 import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles, ArrowRight } from 'lucide-react';
 
 const CANVAS = 1024;
@@ -559,6 +560,13 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 </div>
 
                 <a href="/create" className="text-xs text-muted hover:text-brand-deep transition-colors mt-1">Make your own with Ollabs</a>
+
+                {/* The only ad on this page, and it does not exist until the job is
+                    done. Nobody sees it while they are uploading a photo, adjusting
+                    the fit, or reaching for Download. Rendering it conditionally
+                    rather than hiding it with CSS means there is no ad request at
+                    all during the part of the flow that converts. */}
+                {justDownloaded && <AdSlot className="mt-4" />}
 
                 {reportDone ? (
                     <p className="text-[11px] text-muted/70">Thanks, we will review this campaign.</p>

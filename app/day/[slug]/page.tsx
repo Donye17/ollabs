@@ -8,6 +8,7 @@ import { DAYS, getDay, nextOccurrence, formatOccurrence, countdownLabel, resolve
 import { getUseCase } from '@/lib/useCases';
 import { visibleFrameSql } from '@/lib/frameValidity';
 import { getFrameOverride } from '@/lib/dayFrames';
+import { AdSlot } from '@/components/AdSlot';
 import { ArrowRight, CalendarDays, Users } from 'lucide-react';
 
 // Matches the campaign pages: fresh enough for the live campaign block without
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const occ = nextOccurrence(day.date);
     const when = formatOccurrence(day, occ);
     const url = `https://ollabs.studio/day/${day.slug}`;
-    const description = `${day.name} is ${when}. ${day.tagline} Make a free profile picture frame and share one link. No signup, no ads, no watermark.`;
+    const description = `${day.name} is ${when}. ${day.tagline} Make a free profile picture frame and share one link. No signup, no watermark.`;
     return {
         title: `${day.name} Profile Picture Frame`,
         description,
@@ -252,6 +253,14 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                             </li>
                         ))}
                     </ul>
+                </div>
+            </section>
+
+            {/* One unit, below the tool and above the FAQ, in the normal flow of
+                the page. Never beside the frame tool itself. */}
+            <section className="px-6 pb-8">
+                <div className="max-w-3xl mx-auto">
+                    <AdSlot />
                 </div>
             </section>
 

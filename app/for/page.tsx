@@ -6,7 +6,7 @@ import { USE_CASES } from '@/lib/useCases';
 
 export const metadata: Metadata = {
     title: 'Who uses Ollabs | Profile picture frame campaigns',
-    description: 'Profile-picture frame campaigns for fundraisers, nonprofits, churches, schools, sports teams, events, and more. Free, no signup, no ads.',
+    description: 'Profile-picture frame campaigns for fundraisers, nonprofits, churches, schools, sports teams, events, and more. Free, no signup, no watermark.',
     alternates: { canonical: 'https://ollabs.studio/for' },
     openGraph: { type: 'website', url: 'https://ollabs.studio/for', title: 'Who uses Ollabs', description: 'Profile-picture frame campaigns for causes, teams, events, and more.', siteName: 'Ollabs', images: ['/og.png'] },
     twitter: { card: 'summary_large_image', images: ['/og.png'] },

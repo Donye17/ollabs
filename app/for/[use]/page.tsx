@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { USE_CASES, getUseCase } from '@/lib/useCases';
+import { AdSlot } from '@/components/AdSlot';
 
 export const revalidate = 86400;
 
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ use: stri
     const uc = getUseCase(use);
     if (!uc) return {};
     const title = uc.h1;
-    const description = `${uc.subtitle} Free, no signup, no ads. Make a frame and share one link.`;
+    const description = `${uc.subtitle} Free, no signup, no watermark. Make a frame and share one link.`;
     const url = `https://ollabs.studio/for/${uc.slug}`;
     return {
         title,
@@ -112,6 +113,12 @@ export default async function UseCasePage({ params }: { params: Promise<{ use: s
                             </div>
                         ))}
                     </div>
+                </div>
+            </section>
+
+            <section className="px-6 pt-8">
+                <div className="max-w-3xl mx-auto">
+                    <AdSlot />
                 </div>
             </section>
 

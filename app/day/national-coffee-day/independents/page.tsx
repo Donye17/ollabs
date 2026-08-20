@@ -90,7 +90,7 @@ export default async function IndependentsPage() {
                         So let the day point at the people who make the thing instead. That is the whole idea.
                     </p>
                     <p className="font-semibold text-ink">
-                        Ollabs gives every independent shop a free frame for National Coffee Day. No signup, no ads,
+                        Ollabs gives every independent shop a free frame for National Coffee Day. No signup,
                         and nothing charged to the customer who uses it. Run one and your shop goes on this list. It
                         gets published every year, and it does not come down.
                     </p>

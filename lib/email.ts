@@ -64,7 +64,7 @@ function shell(body: string): string {
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:16px;padding:32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#06141F;">
 ${body}
 <tr><td style="padding-top:28px;border-top:1px solid #E8E3DA;color:#6B7280;font-size:12px;line-height:1.6;">
-Ollabs is free, ad-free, and never watermarks your supporters' photos.<br>
+Ollabs is free and never watermarks your supporters' photos.<br>
 You are getting this because you gave your email when creating a campaign. We only email campaign organizers.
 </td></tr>
 </table>
@@ -94,7 +94,7 @@ export function campaignLiveEmail(opts: {
             `Your private dashboard (keep this, it is the key to your campaign):`,
             manage,
             ``,
-            `Supporters never need an account, never see an ad, and never get a watermark.`,
+            `Supporters never need an account and never get a watermark.`,
         ].join('\n'),
         html: shell(`
 <tr><td style="font-size:22px;font-weight:800;padding-bottom:8px;">Your campaign is live</td></tr>

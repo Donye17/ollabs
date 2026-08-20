@@ -24,7 +24,7 @@ export const metadata: Metadata = {
         template: '%s | Ollabs',
         default: 'Ollabs: Free Profile Picture Frame Maker for Campaigns & Causes',
     },
-    description: 'Create a profile-picture frame for your cause, team, or event and share one link. Supporters add it to their photo in seconds, no signup, no ads. A clean, free alternative to Twibbon.',
+    description: 'Create a profile-picture frame for your cause, team, or event and share one link. Supporters add it to their photo in seconds, no signup. A clean, free alternative to Twibbon.',
     keywords: ['profile picture frame maker', 'profile picture frame', 'pfp frame', 'twibbon alternative', 'profile picture campaign', 'support frame maker', 'add frame to profile picture', 'campaign frame', 'fundraiser profile frame', 'flag overlay', 'avatar frame', 'no signup pfp frame'],
     openGraph: {
         type: 'website',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
         url: 'https://ollabs.studio',
         siteName: 'Ollabs',
         title: 'Ollabs: Free Profile Picture Frame Maker for Campaigns & Causes',
-        description: 'Rally your people with a profile-picture frame. Share one link, supporters add it to their photo in seconds. Free, no signup, no ads.',
+        description: 'Rally your people with a profile-picture frame. Share one link, supporters add it to their photo in seconds. Free, no signup, no watermark.',
         images: [
             {
                 url: 'https://ollabs.studio/og.png',
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     twitter: {
         card: 'summary_large_image',
         title: 'Ollabs: Free Profile Picture Frame Maker for Campaigns & Causes',
-        description: 'Rally your people with a profile-picture frame. Share one link, supporters add it to their photo in seconds. Free, no signup, no ads.',
+        description: 'Rally your people with a profile-picture frame. Share one link, supporters add it to their photo in seconds. Free, no signup, no watermark.',
         images: ['https://ollabs.studio/og.png'],
     },
     icons: {
@@ -67,6 +67,11 @@ export const metadata: Metadata = {
         // under invented rel values that no browser recognises.
     },
     manifest: '/favicon/site.webmanifest',
+    other: {
+        // How AdSense confirms we own ollabs.studio. Google reads this from the
+        // <head> of any page on the domain. It does not serve or request an ad.
+        'google-adsense-account': 'ca-pub-5665798404376894',
+    },
 };
 
 // Colours the iOS status bar and the Android system chrome when the site is
@@ -110,6 +115,16 @@ const jsonLd = {
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-0E75K2XJ5Q';
 
+// The AdSense loader, only when a publisher ID is actually configured. Until
+// then not a single byte of it is requested, so the site is unchanged.
+//
+// Note for the AdSense dashboard rather than for this file: Auto ads must stay
+// OFF, along with the anchor and vignette formats. Those are the ones that
+// float over the page and interrupt it between screens, and they are switched
+// on by default. The placement in this codebase is deliberate and in-flow, and
+// none of that survives Auto ads being enabled behind it.
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || 'ca-pub-5665798404376894';
+
 export default function RootLayout({
     children,
 }: {
@@ -133,6 +148,14 @@ gtag('js', new Date());
 gtag('config', '${GA_ID}');`}
                         </Script>
                     </>
+                )}
+                {ADSENSE_CLIENT && (
+                    <Script
+                        id="adsbygoogle"
+                        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+                        strategy="afterInteractive"
+                        crossOrigin="anonymous"
+                    />
                 )}
                 <Analytics />
                 <SpeedInsights />

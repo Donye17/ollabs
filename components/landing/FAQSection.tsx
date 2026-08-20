@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 const faqs = [
     {
         question: "Is Ollabs free?",
-        answer: "Yes, completely free. Create a campaign, share the link, and let supporters add your frame. No cost, no ads."
+        answer: "Yes, completely free. Create a campaign, share the link, and let supporters add your frame. No cost, and no watermark on the photo anyone downloads."
     },
     {
         question: "Do I need an account?",

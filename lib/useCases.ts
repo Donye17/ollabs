@@ -22,7 +22,7 @@ export const USE_CASES: UseCase[] = [
         keyword: 'profile picture frame for fundraisers',
         intro: [
             'Running a fundraiser is a numbers game of attention. The more people who show your cause on their profile, the more the ask spreads. Ollabs lets you make one frame, share one link, and watch supporters add it to their photo in seconds.',
-            'No signup, no ads, and no cost. Make a frame with your colors or your logo, drop the link in your emails and group chats, and let your people carry the message for you.',
+            'No signup and no cost. Make a frame with your colors or your logo, drop the link in your emails and group chats, and let your people carry the message for you.',
         ],
         benefits: [
             { title: 'One link to share', body: 'Post it in your donation emails, texts, and socials. Everyone uses the same link.' },
@@ -30,7 +30,7 @@ export const USE_CASES: UseCase[] = [
             { title: 'Your brand, your frame', body: 'Upload your logo or pick your colors so every framed photo looks like your campaign.' },
         ],
         faqs: [
-            { q: 'Is it free for nonprofits and fundraisers?', a: 'Yes. Ollabs is completely free, with no ads and no signup for you or your supporters.' },
+            { q: 'Is it free for nonprofits and fundraisers?', a: 'Yes. Ollabs is completely free, with no signup and no watermark for you or your supporters.' },
             { q: 'Can supporters share their framed photo anywhere?', a: 'Yes. They download a normal image and can post it on any platform or set it as their profile picture.' },
         ],
     },
@@ -42,7 +42,7 @@ export const USE_CASES: UseCase[] = [
         keyword: 'profile picture frame for nonprofits',
         intro: [
             'Awareness spreads fastest when your community wears it. Ollabs gives your nonprofit a simple way to make a branded profile-picture frame and share it with one link, so supporters, staff, and volunteers can all show up together.',
-            'It is free, ad-free, and needs no account. Make a frame with your logo and colors, and let your people put your mission on their profile.',
+            'It is free and needs no account. Make a frame with your logo and colors, and let your people put your mission on their profile.',
         ],
         benefits: [
             { title: 'On-brand in minutes', body: 'Upload your logo or set your colors so every photo reinforces your identity.' },
@@ -62,7 +62,7 @@ export const USE_CASES: UseCase[] = [
         keyword: 'profile picture frame for churches',
         intro: [
             'Whether it is a sermon series, a mission trip, or a community drive, a shared profile frame helps your congregation rally around it together. Ollabs makes it simple: one frame, one link, and members add it to their photo.',
-            'Free, ad-free, and no signup. Make a frame with your church colors or logo and share it in your bulletin, app, and group chats.',
+            'Free, and no signup. Make a frame with your church colors or logo and share it in your bulletin, app, and group chats.',
         ],
         benefits: [
             { title: 'Perfect for a series', body: 'Spin up a frame for each series or event and retire it when you are done.' },
@@ -71,7 +71,7 @@ export const USE_CASES: UseCase[] = [
         ],
         faqs: [
             { q: 'Can we make a new frame for each series?', a: 'Yes. Create as many campaigns as you like, each with its own link.' },
-            { q: 'Is there any cost?', a: 'No. Ollabs is free with no ads.' },
+            { q: 'Is there any cost?', a: 'No. Ollabs is free, and supporters are never charged.' },
         ],
     },
     {
@@ -82,7 +82,7 @@ export const USE_CASES: UseCase[] = [
         keyword: 'profile picture frame for schools',
         intro: [
             'From spirit week to a class fundraiser to graduation, a shared profile frame gets students, parents, and staff showing school pride together. Ollabs lets you make one and share it with a single link.',
-            'It is free, has no ads, and needs no account, so the whole community can join in seconds.',
+            'It is free and needs no account, so the whole community can join in seconds.',
         ],
         benefits: [
             { title: 'School colors, instantly', body: 'Set your colors or upload the mascot and crest as a frame.' },
@@ -102,7 +102,7 @@ export const USE_CASES: UseCase[] = [
         keyword: 'profile picture frame for sports teams',
         intro: [
             'Nothing builds hype like a wall of fans wearing your colors. Ollabs lets your team or club make a profile frame and share it with one link, so players, families, and supporters can all rep the team.',
-            'Free, ad-free, and no signup. Use your team colors or crest and drop the link in your group chats and socials before the big game.',
+            'Free, and no signup. Use your team colors or crest and drop the link in your group chats and socials before the big game.',
         ],
         benefits: [
             { title: 'Team colors and crest', body: 'Pick your colors or upload the crest so every photo screams team pride.' },
@@ -111,7 +111,7 @@ export const USE_CASES: UseCase[] = [
         ],
         faqs: [
             { q: 'Can we use our crest as the frame?', a: 'Yes. Upload a transparent PNG of your crest and it wraps each photo.' },
-            { q: 'Is it free for clubs?', a: 'Yes, completely free with no ads.' },
+            { q: 'Is it free for clubs?', a: 'Yes, completely free, and no watermark on any photo.' },
         ],
     },
     {
@@ -122,7 +122,7 @@ export const USE_CASES: UseCase[] = [
         keyword: 'profile picture frame for events',
         intro: [
             'A shared profile frame turns your attendees into promoters. Ollabs lets you make an event frame and share one link, so people can show they are going and spread the word for you.',
-            'Free, ad-free, and no signup. Add your event branding, print the QR code for the venue, and let attendees join with a tap.',
+            'Free, and no signup. Add your event branding, print the QR code for the venue, and let attendees join with a tap.',
         ],
         benefits: [
             { title: 'Built-in QR code', body: 'Download a QR of your campaign to put on signage, badges, and slides.' },
@@ -142,7 +142,7 @@ export const USE_CASES: UseCase[] = [
         keyword: 'birthday profile picture frame',
         intro: [
             'Surprise someone by getting friends and family to all wear a birthday frame on their photos. Ollabs makes it easy: create a frame, share one link, and everyone joins the celebration.',
-            'It is free, with no ads and no signup, so even the least techy relatives can add it in seconds.',
+            'It is free, with no signup, so even the least techy relatives can add it in seconds.',
         ],
         benefits: [
             { title: 'A sweet surprise', body: 'Coordinate friends to all switch their photo at once.' },
@@ -151,7 +151,7 @@ export const USE_CASES: UseCase[] = [
         ],
         faqs: [
             { q: 'Can I add the birthday person’s name?', a: 'Yes. Upload a custom frame with their name, or pick a color and keep it simple.' },
-            { q: 'Is it free?', a: 'Yes, completely free with no ads.' },
+            { q: 'Is it free?', a: 'Yes, completely free, and no watermark on any photo.' },
         ],
     },
     {
@@ -162,7 +162,7 @@ export const USE_CASES: UseCase[] = [
         keyword: 'awareness profile picture frame',
         intro: [
             'Awareness months and solidarity campaigns spread when people wear them. Ollabs lets you make a frame for your cause and share one link, so anyone can add it to their photo and pass it on.',
-            'Free, ad-free, and no signup. Use a ribbon color or upload a custom design, and let the movement show.',
+            'Free, and no signup. Use a ribbon color or upload a custom design, and let the movement show.',
         ],
         benefits: [
             { title: 'Ribbon colors ready', body: 'Pick from clean color rings or upload your own awareness design.' },
@@ -182,16 +182,16 @@ export const USE_CASES: UseCase[] = [
         keyword: 'company profile picture frame',
         intro: [
             'Internal moments spread best when people opt into them. An anniversary, a funding milestone, a product launch, a values week: give your team one link and they can put it on their own profile in seconds, on LinkedIn or anywhere else.',
-            'No signup, no ads, and nothing watermarked. Upload your logo or set your exact brand colors, and every framed photo looks like it came from your design team.',
+            'No signup, and nothing watermarked. Upload your logo or set your exact brand colors, and every framed photo looks like it came from your design team.',
         ],
         benefits: [
             { title: 'Your brand, exactly', body: 'Upload a transparent PNG of your own design, or set precise hex colors so the ring matches your brand guide.' },
             { title: 'Nobody has to sign up', body: 'Employees, contractors, and partners all use the same link. No accounts to provision and nothing for IT to approve.' },
-            { title: 'Clean enough for LinkedIn', body: 'No ads, no watermark, and no third-party branding on the photo your team posts publicly.' },
+            { title: 'Clean enough for LinkedIn', body: 'No watermark and no third-party branding on the photo your team posts publicly.' },
         ],
         faqs: [
             { q: 'Can we use our exact brand colors?', a: 'Yes. Set any hex value, or upload a finished frame design as a transparent PNG.' },
-            { q: 'Will our employees see ads or a watermark?', a: 'No. Supporters never see an ad, never create an account, and never get a watermark on their photo. That does not change.' },
+            { q: 'Will our employees get a watermark on their photo?', a: 'No. The photo downloads clean, with no watermark and no Ollabs branding on it. Nobody has to create an account, and supporters are never charged.' },
             { q: 'Can we run this for an internal-only moment?', a: 'Yes. Set the campaign to unlisted so it does not appear on the public Explore page, and share the link internally.' },
         ],
     },
@@ -203,7 +203,7 @@ export const USE_CASES: UseCase[] = [
         keyword: 'university profile picture frame',
         intro: [
             'Campus moments run on a calendar and repeat every year. Homecoming, commencement, admitted students day, founders day, and the annual giving push all work the same way: one frame, one link, thousands of profiles.',
-            'Free and ad-free, with no signup for students, alumni, or staff. Make it in your school colors, share the link, and watch the counter move.',
+            'Free, with no signup for students, alumni, or staff. Make it in your school colors, share the link, and watch the counter move.',
         ],
         benefits: [
             { title: 'Built for repeat moments', body: 'Run one for homecoming, another for commencement, another for giving day. Each gets its own link and its own numbers.' },

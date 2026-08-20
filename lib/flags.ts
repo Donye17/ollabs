@@ -41,7 +41,7 @@ export const FLAGS: Flag[] = [
         demonym: 'brasileira',
         lang: 'pt-BR',
         title: 'Moldura da Bandeira do Brasil para Foto de Perfil',
-        description: 'Coloque a bandeira do Brasil na sua foto de perfil de graça. Sem cadastro, sem anúncio e sem marca d\'água. Funciona no Instagram, WhatsApp, Facebook e X.',
+        description: 'Coloque a bandeira do Brasil na sua foto de perfil de graça. Sem cadastro e sem marca d\'água. Funciona no Instagram, WhatsApp, Facebook e X.',
         heading: 'Moldura da bandeira do Brasil',
         intro: [
             'O verde e o amarelo vêm das casas de Bragança e Habsburgo, o losango e a esfera azul chegaram depois, e as 27 estrelas representam os estados e o Distrito Federal, dispostas como o céu do Rio na madrugada de 15 de novembro de 1889.',
@@ -56,7 +56,7 @@ export const FLAGS: Flag[] = [
         country: 'the United States',
         demonym: 'American',
         title: 'USA Flag Profile Picture Frame',
-        description: 'Add the American flag to your profile picture for free. No signup, no ads, no watermark. Works on Instagram, Facebook, X and LinkedIn.',
+        description: 'Add the American flag to your profile picture for free. No signup, no watermark. Works on Instagram, Facebook, X and LinkedIn.',
         heading: 'USA flag frame',
         intro: [
             'Thirteen stripes for the original colonies and fifty stars for the states, a design that has been amended twenty-seven times and last changed in 1960 when Hawaii joined.',
@@ -71,7 +71,7 @@ export const FLAGS: Flag[] = [
         country: 'the United Kingdom',
         demonym: 'British',
         title: 'UK Flag Profile Picture Frame',
-        description: 'Add the Union Jack to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Union Jack to your profile picture for free. No signup, no watermark.',
         heading: 'UK flag frame',
         intro: [
             'The Union Jack layers the crosses of St George, St Andrew and St Patrick, which is why the white diagonals sit off-centre and why hanging it upside down is a genuine mistake rather than a myth.',
@@ -86,7 +86,7 @@ export const FLAGS: Flag[] = [
         country: 'Canada',
         demonym: 'Canadian',
         title: 'Canada Flag Profile Picture Frame',
-        description: 'Add the Canadian flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Canadian flag to your profile picture for free. No signup, no watermark.',
         heading: 'Canada flag frame',
         intro: [
             'The Maple Leaf is young as flags go, raised for the first time in 1965 after a debate so heated it ran for months in Parliament. The eleven points on the leaf mean nothing in particular; they simply held up best in a wind tunnel.',
@@ -101,7 +101,7 @@ export const FLAGS: Flag[] = [
         country: 'Mexico',
         demonym: 'Mexican',
         title: 'Mexico Flag Profile Picture Frame',
-        description: 'Add the Mexican flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Mexican flag to your profile picture for free. No signup, no watermark.',
         heading: 'Mexico flag frame',
         intro: [
             'The eagle on the cactus devouring a serpent is the founding vision of Tenochtitlan, which makes this one of the few national flags whose centrepiece is a specific mythological scene rather than an abstract emblem.',
@@ -116,7 +116,7 @@ export const FLAGS: Flag[] = [
         country: 'Argentina',
         demonym: 'Argentine',
         title: 'Argentina Flag Profile Picture Frame',
-        description: 'Add the Argentine flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Argentine flag to your profile picture for free. No signup, no watermark.',
         heading: 'Argentina flag frame',
         intro: [
             'Light blue and white were chosen by Manuel Belgrano in 1812, and the Sol de Mayo in the centre is a representation of Inti, the Incan sun, with alternating straight and wavy rays.',
@@ -131,7 +131,7 @@ export const FLAGS: Flag[] = [
         country: 'France',
         demonym: 'French',
         title: 'France Flag Profile Picture Frame',
-        description: 'Add the French flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the French flag to your profile picture for free. No signup, no watermark.',
         heading: 'France flag frame',
         intro: [
             'The tricolore puts the white of the monarchy between the blue and red of Paris, a compromise from 1794 that outlived the thing it was compromising about.',
@@ -146,7 +146,7 @@ export const FLAGS: Flag[] = [
         country: 'Germany',
         demonym: 'German',
         title: 'Germany Flag Profile Picture Frame',
-        description: 'Add the German flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the German flag to your profile picture for free. No signup, no watermark.',
         heading: 'Germany flag frame',
         intro: [
             'Black, red and gold trace back to the uniforms of the Lützow Free Corps and were carried by the 1848 revolutionaries long before they belonged to any German state.',
@@ -161,7 +161,7 @@ export const FLAGS: Flag[] = [
         country: 'Italy',
         demonym: 'Italian',
         title: 'Italy Flag Profile Picture Frame',
-        description: 'Add the Italian flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Italian flag to your profile picture for free. No signup, no watermark.',
         heading: 'Italy flag frame',
         intro: [
             'Il Tricolore was first flown in Reggio Emilia in 1797, borrowing the French arrangement and swapping blue for green, reportedly after the green of the Milanese civic guard.',
@@ -176,7 +176,7 @@ export const FLAGS: Flag[] = [
         country: 'Spain',
         demonym: 'Spanish',
         title: 'Spain Flag Profile Picture Frame',
-        description: 'Add the Spanish flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Spanish flag to your profile picture for free. No signup, no watermark.',
         heading: 'Spain flag frame',
         intro: [
             'The red and yellow bands were picked by Charles III in 1785 for a practical reason: he wanted a naval ensign visible from a long way off, and the existing white Bourbon flags were indistinguishable at sea.',
@@ -191,7 +191,7 @@ export const FLAGS: Flag[] = [
         country: 'Poland',
         demonym: 'Polish',
         title: 'Poland Flag Profile Picture Frame',
-        description: 'Add the Polish flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Polish flag to your profile picture for free. No signup, no watermark.',
         heading: 'Poland flag frame',
         intro: [
             'White above red, taken from the white eagle on a red field that has been the Polish arms since the thirteenth century. The order matters: reversed, it is Monaco or Indonesia.',
@@ -206,7 +206,7 @@ export const FLAGS: Flag[] = [
         country: 'Ukraine',
         demonym: 'Ukrainian',
         title: 'Ukraine Flag Profile Picture Frame',
-        description: 'Add the Ukrainian flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Ukrainian flag to your profile picture for free. No signup, no watermark.',
         heading: 'Ukraine flag frame',
         intro: [
             'Blue over yellow, read almost universally as sky above ripe wheat. It was banned under Soviet rule and restored in 1991, which is part of why it carries the weight it does.',
@@ -221,7 +221,7 @@ export const FLAGS: Flag[] = [
         country: 'Russia',
         demonym: 'Russian',
         title: 'Russia Flag Profile Picture Frame',
-        description: 'Add the Russian flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Russian flag to your profile picture for free. No signup, no watermark.',
         heading: 'Russia flag frame',
         intro: [
             'The white, blue and red tricolour dates to Peter the Great, who took the arrangement from the Dutch ensign while studying shipbuilding in Amsterdam.',
@@ -236,7 +236,7 @@ export const FLAGS: Flag[] = [
         country: 'Türkiye',
         demonym: 'Turkish',
         title: 'Turkey Flag Profile Picture Frame',
-        description: 'Add the Turkish flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Turkish flag to your profile picture for free. No signup, no watermark.',
         heading: 'Turkey flag frame',
         intro: [
             'The crescent and star on red were carried by the Ottoman Empire and kept by the Republic in 1923 with the proportions fixed by law, down to the exact diameter of the crescent.',
@@ -251,7 +251,7 @@ export const FLAGS: Flag[] = [
         country: 'India',
         demonym: 'Indian',
         title: 'India Flag Profile Picture Frame',
-        description: 'Add the Indian flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Indian flag to your profile picture for free. No signup, no watermark.',
         heading: 'India flag frame',
         intro: [
             'Saffron, white and green with the Ashoka Chakra at the centre, its twenty-four spokes taken from the Lion Capital at Sarnath. The wheel replaced the spinning wheel of the earlier Congress flag in 1947.',
@@ -266,7 +266,7 @@ export const FLAGS: Flag[] = [
         country: 'Pakistan',
         demonym: 'Pakistani',
         title: 'Pakistan Flag Profile Picture Frame',
-        description: 'Add the Pakistani flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Pakistani flag to your profile picture for free. No signup, no watermark.',
         heading: 'Pakistan flag frame',
         intro: [
             'The green field with crescent and star carries a white band at the hoist that is there deliberately to represent the country\'s religious minorities, which few national flags do explicitly.',
@@ -281,7 +281,7 @@ export const FLAGS: Flag[] = [
         country: 'Bangladesh',
         demonym: 'Bangladeshi',
         title: 'Bangladesh Flag Profile Picture Frame',
-        description: 'Add the Bangladeshi flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Bangladeshi flag to your profile picture for free. No signup, no watermark.',
         heading: 'Bangladesh flag frame',
         intro: [
             'A red disc on bottle green, with the disc set slightly toward the hoist so that it appears centred when the flag is flying rather than lying flat.',
@@ -296,7 +296,7 @@ export const FLAGS: Flag[] = [
         country: 'China',
         demonym: 'Chinese',
         title: 'China Flag Profile Picture Frame',
-        description: 'Add the Chinese flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Chinese flag to your profile picture for free. No signup, no watermark.',
         heading: 'China flag frame',
         intro: [
             'One large star with four smaller ones arranged so that each of the small stars points its tip toward the centre of the large one, a detail specified precisely in the original 1949 design brief.',
@@ -311,7 +311,7 @@ export const FLAGS: Flag[] = [
         country: 'Japan',
         demonym: 'Japanese',
         title: 'Japan Flag Profile Picture Frame',
-        description: 'Add the Japanese flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Japanese flag to your profile picture for free. No signup, no watermark.',
         heading: 'Japan flag frame',
         intro: [
             'The Hinomaru is about as spare as a flag gets: a crimson disc on white, in use for centuries but only given legal definition in 1999.',
@@ -326,7 +326,7 @@ export const FLAGS: Flag[] = [
         country: 'South Korea',
         demonym: 'Korean',
         title: 'South Korea Flag Profile Picture Frame',
-        description: 'Add the South Korean flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the South Korean flag to your profile picture for free. No signup, no watermark.',
         heading: 'South Korea flag frame',
         intro: [
             'The Taegukgi puts the red and blue taeguk at the centre with four trigrams from the I Ching in the corners, standing for heaven, earth, water and fire.',
@@ -341,7 +341,7 @@ export const FLAGS: Flag[] = [
         country: 'Vietnam',
         demonym: 'Vietnamese',
         title: 'Vietnam Flag Profile Picture Frame',
-        description: 'Add the Vietnamese flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Vietnamese flag to your profile picture for free. No signup, no watermark.',
         heading: 'Vietnam flag frame',
         intro: [
             'A single gold star on red, the five points standing for the workers, peasants, soldiers, intellectuals and traders who made up the national front.',
@@ -356,7 +356,7 @@ export const FLAGS: Flag[] = [
         country: 'Thailand',
         demonym: 'Thai',
         title: 'Thailand Flag Profile Picture Frame',
-        description: 'Add the Thai flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Thai flag to your profile picture for free. No signup, no watermark.',
         heading: 'Thailand flag frame',
         intro: [
             'Five bands standing for nation, religion and monarchy. The blue centre stripe was added in 1917, partly to align Thailand visually with its First World War allies.',
@@ -371,7 +371,7 @@ export const FLAGS: Flag[] = [
         country: 'Indonesia',
         demonym: 'Indonesian',
         title: 'Indonesia Flag Profile Picture Frame',
-        description: 'Add the Indonesian flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Indonesian flag to your profile picture for free. No signup, no watermark.',
         heading: 'Indonesia flag frame',
         intro: [
             'Red above white, the Sang Saka Merah Putih, drawn from the banners of the Majapahit empire and near identical to Monaco\'s, which differs only in proportion.',
@@ -386,7 +386,7 @@ export const FLAGS: Flag[] = [
         country: 'the Philippines',
         demonym: 'Filipino',
         title: 'Philippines Flag Profile Picture Frame',
-        description: 'Add the Philippine flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Philippine flag to your profile picture for free. No signup, no watermark.',
         heading: 'Philippines flag frame',
         intro: [
             'The only national flag flown differently in wartime: blue on top in peace, red on top in war. The sun\'s eight rays stand for the first provinces to revolt against Spain.',
@@ -401,7 +401,7 @@ export const FLAGS: Flag[] = [
         country: 'Australia',
         demonym: 'Australian',
         title: 'Australia Flag Profile Picture Frame',
-        description: 'Add the Australian flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Australian flag to your profile picture for free. No signup, no watermark.',
         heading: 'Australia flag frame',
         intro: [
             'The Union Jack in the canton, the seven-pointed Commonwealth Star below it, and the Southern Cross on the fly, chosen through a public competition in 1901 with five winners who split the prize.',
@@ -416,7 +416,7 @@ export const FLAGS: Flag[] = [
         country: 'Nigeria',
         demonym: 'Nigerian',
         title: 'Nigeria Flag Profile Picture Frame',
-        description: 'Add the Nigerian flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Nigerian flag to your profile picture for free. No signup, no watermark.',
         heading: 'Nigeria flag frame',
         intro: [
             'Green, white, green, designed by a student, Michael Taiwo Akinkunmi, who entered a national competition in 1959. His original had a red sun in the middle; the judges removed it.',
@@ -431,7 +431,7 @@ export const FLAGS: Flag[] = [
         country: 'South Africa',
         demonym: 'South African',
         title: 'South Africa Flag Profile Picture Frame',
-        description: 'Add the South African flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the South African flag to your profile picture for free. No signup, no watermark.',
         heading: 'South Africa flag frame',
         intro: [
             'Six colours and a horizontal Y, designed in a week in 1994 and intended to read as convergence. It is the only national flag currently using six colours without a seal or crest.',
@@ -446,7 +446,7 @@ export const FLAGS: Flag[] = [
         country: 'Egypt',
         demonym: 'Egyptian',
         title: 'Egypt Flag Profile Picture Frame',
-        description: 'Add the Egyptian flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Egyptian flag to your profile picture for free. No signup, no watermark.',
         heading: 'Egypt flag frame',
         intro: [
             'Red, white and black with the Eagle of Saladin at the centre. The three bands became the template for much of the region after 1952, which is why several Arab flags share them.',
@@ -461,7 +461,7 @@ export const FLAGS: Flag[] = [
         country: 'Saudi Arabia',
         demonym: 'Saudi',
         title: 'Saudi Arabia Flag Profile Picture Frame',
-        description: 'Add the Saudi flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Saudi flag to your profile picture for free. No signup, no watermark.',
         heading: 'Saudi Arabia flag frame',
         intro: [
             'The shahada above a sword on green. Because the inscription is sacred, the flag is never flown at half mast and is printed on both sides so the text reads correctly from either direction.',
@@ -476,7 +476,7 @@ export const FLAGS: Flag[] = [
         country: 'Iran',
         demonym: 'Iranian',
         title: 'Iran Flag Profile Picture Frame',
-        description: 'Add the Iranian flag to your profile picture for free. No signup, no ads, no watermark.',
+        description: 'Add the Iranian flag to your profile picture for free. No signup, no watermark.',
         heading: 'Iran flag frame',
         intro: [
             'Green, white and red with the emblem at the centre, and the takbir repeated twenty-two times in stylised Kufic script along the inner edges of the bands.',

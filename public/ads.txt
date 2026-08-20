@@ -1,0 +1,9 @@
+# Authorized Digital Sellers for ollabs.studio.
+#
+# AdSense flags an account as "Earnings at risk" until this file answers at the
+# site root, because without it a buyer cannot confirm that Google is allowed to
+# sell this inventory. One line is all a single-network site needs.
+#
+# f08c47fec0942fa0 is Google's own TAG ID, the same for every publisher. The
+# pub- number is ours.
+google.com, pub-5665798404376894, DIRECT, f08c47fec0942fa0

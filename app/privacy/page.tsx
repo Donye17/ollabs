@@ -32,13 +32,23 @@ export default function PrivacyPage() {
                         <p>We use privacy-conscious analytics to understand how the site is used, such as page views and general device information. This helps us improve the product.</p>
                     </section>
 
+                    {/* Required before AdSense can serve here: Google's publisher
+                        policies oblige us to disclose third-party cookie use and to
+                        point people at their own ad settings. */}
                     <section>
-                        <h2 className="font-display text-xl font-bold text-ink mb-2">5. Data security</h2>
+                        <h2 className="font-display text-xl font-bold text-ink mb-2">5. Advertising</h2>
+                        <p>Ollabs is free to use and free to share, and we run ads on some pages to cover what it costs to keep it that way. Supporters are never charged, and the photo you download never carries a watermark or any Ollabs branding.</p>
+                        <p className="mt-3">Ads are served by Google, which as a third-party vendor uses cookies to serve them. Google&apos;s use of advertising cookies lets it and its partners serve ads based on your visit to this site and other sites on the internet. You can opt out of personalized advertising at <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-brand-deep font-semibold hover:underline">Google Ads Settings</a>, or opt out of a third-party vendor&apos;s use of cookies for personalized advertising at <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" className="text-brand-deep font-semibold hover:underline">aboutads.info</a>.</p>
+                        <p className="mt-3">We never place ads on the photo itself, and we do not sell advertising against any individual campaign or its cause.</p>
+                    </section>
+
+                    <section>
+                        <h2 className="font-display text-xl font-bold text-ink mb-2">6. Data security</h2>
                         <p>We take reasonable measures to protect information from loss, theft, misuse, and unauthorized access, disclosure, alteration, and destruction.</p>
                     </section>
 
                     <section>
-                        <h2 className="font-display text-xl font-bold text-ink mb-2">6. Contact us</h2>
+                        <h2 className="font-display text-xl font-bold text-ink mb-2">7. Contact us</h2>
                         <p>If you have any questions about this Privacy Policy, contact us at <a href="mailto:feedback@ollabs.studio" className="text-brand-deep hover:underline">feedback@ollabs.studio</a>.</p>
                     </section>
                 </div>

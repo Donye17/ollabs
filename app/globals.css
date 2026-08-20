@@ -49,3 +49,11 @@
         @apply hover:bg-white/10 transition-all duration-300;
     }
 }
+
+/* An unfilled AdSense unit should take up no room at all. Google marks the
+   <ins> with data-ad-status="unfilled" when nothing bid, and during account
+   review that is every unit on the site. Without this the page shows an
+   "Advertisement" label above a 100px hole. */
+.ad-slot:has(ins[data-ad-status="unfilled"]) {
+    display: none;
+}

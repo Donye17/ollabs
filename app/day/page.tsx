@@ -9,7 +9,7 @@ const URL = 'https://ollabs.studio/day';
 export const metadata: Metadata = {
     title: 'Awareness day calendar',
     description:
-        'Profile picture frames for awareness days, months, and campaigns. Free, no signup, no ads, and never a watermark on your supporters\' photos.',
+        'Profile picture frames for awareness days, months, and campaigns. Free, no signup, and never a watermark on your supporters\' photos.',
     keywords: ['awareness day calendar', 'awareness month profile picture frame', 'campaign frame calendar',
         'profile picture frame maker', 'twibbon alternative'],
     alternates: { canonical: URL },

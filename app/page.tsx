@@ -56,7 +56,7 @@ const audiences = [
 
 const reasons = [
     "No signup required",
-    "No ads, ever",
+    "No watermark, ever",
     "Completely free",
     "Upload your own design",
     "Live supporter counter",
@@ -101,7 +101,7 @@ export default async function Home() {
                         Bring your people <span className="text-brand-deep">together.</span>
                     </h1>
                     <p className="text-lg md:text-xl text-ink/70 mb-8 max-w-2xl mx-auto leading-relaxed">
-                        Make a profile-picture frame for your cause, team, or event. Share one link and your people add it to their photo in seconds. Free, no signup, no ads.
+                        Make a profile-picture frame for your cause, team, or event. Share one link and your people add it to their photo in seconds. Free, no signup, no watermark.
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-3">
                         <Link href="/create" className="group h-12 px-7 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all">
@@ -182,7 +182,7 @@ export default async function Home() {
             <section className="px-6 py-20">
                 <div className="max-w-3xl mx-auto">
                     <h2 className="font-display text-3xl md:text-4xl font-extrabold text-center mb-4">Why Ollabs</h2>
-                    <p className="text-center text-ink/70 mb-12">The clean, ad-free alternative to Twibbon.</p>
+                    <p className="text-center text-ink/70 mb-12">The clean alternative to Twibbon. Your supporters never pay and never get a watermark.</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {reasons.map((r) => (
                             <div key={r} className="flex items-center gap-3 bg-cream border border-ink/10 rounded-xl px-5 py-4">
@@ -221,7 +221,7 @@ export default async function Home() {
                         <div className="max-w-xs">
                             <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-7 w-auto mb-4" />
                             <p className="text-muted text-sm leading-relaxed">
-                                The fast, ad-free way to run a profile-picture campaign. Ollabs is a play on collabs, because coming together is the whole point.
+                                The fast way to run a profile-picture campaign. Ollabs is a play on collabs, because coming together is the whole point.
                             </p>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-8 sm:gap-16">
