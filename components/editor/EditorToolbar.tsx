@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Upload, ZoomIn, ZoomOut, RefreshCcw, RotateCw, Loader2, Sparkles, Maximize } from 'lucide-react';
+import { Download, Upload, ZoomIn, ZoomOut, RefreshCcw, RotateCw, Loader2, Sparkles, Maximize, ImageDown } from 'lucide-react';
 
 interface EditorToolbarProps {
     imageObject: HTMLImageElement | null;
@@ -14,6 +14,13 @@ interface EditorToolbarProps {
     isRemovingBackground?: boolean;
     // Download handler
     onDownload: () => void;
+    /**
+     * Hand the PNG to the OS share sheet. Only passed where the browser can
+     * actually do it, which in practice means a phone — iOS in-app browsers
+     * ignore <a download>, so this is the only way to keep the picture there.
+     */
+    onSharePhoto?: () => void;
+    isSharingPhoto?: boolean;
 }
 
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
@@ -27,7 +34,9 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     onImageSelect,
     onRemoveBackground,
     isRemovingBackground,
-    onDownload
+    onDownload,
+    onSharePhoto,
+    isSharingPhoto
 }) => {
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -47,9 +56,16 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             </div>
 
             {imageObject && (
-                <div className="flex gap-3 justify-center w-full px-4">
-                    <button onClick={onDownload} className="flex-1 flex items-center justify-center gap-2 bg-cream hover:bg-paper2/80 backdrop-blur-md text-ink py-3.5 px-6 rounded-xl transition-all font-bold border border-ink/10 hover:border-ink/10 hover:-translate-y-0.5">
-                        <Download size={20} /> <span>Save</span>
+                <div className="flex flex-col gap-3 w-full px-4">
+                    {/* Where the share sheet exists it leads: it is the only path
+                        that reliably saves the picture on a phone. */}
+                    {onSharePhoto && (
+                        <button onClick={onSharePhoto} disabled={isSharingPhoto} className="w-full flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-3.5 px-6 rounded-xl transition-all font-bold shadow-lg shadow-primary/20 disabled:opacity-50">
+                            {isSharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> <span>Save or share photo</span></>}
+                        </button>
+                    )}
+                    <button onClick={onDownload} className="w-full flex items-center justify-center gap-2 bg-cream hover:bg-paper2/80 backdrop-blur-md text-ink py-3.5 px-6 rounded-xl transition-all font-bold border border-ink/10 hover:border-ink/10 hover:-translate-y-0.5">
+                        <Download size={20} /> <span>{onSharePhoto ? 'Download' : 'Save'}</span>
                     </button>
                 </div>
             )}

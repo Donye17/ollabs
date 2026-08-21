@@ -1,6 +1,8 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FrameConfig } from '@/lib/types';
+import { canShareFiles } from '@/lib/share';
+import { downloadBlob } from '@/lib/download';
 import { useEditorLogic } from './editor/useEditorLogic';
 import { CanvasArea } from './editor/CanvasArea';
 import { EditorToolbar } from './editor/EditorToolbar';
@@ -32,6 +34,20 @@ export const Editor: React.FC<EditorProps> = ({
 }) => {
   const logic = useEditorLogic({ imageSrc, selectedFrame });
 
+  const [canSharePhoto, setCanSharePhoto] = useState(false);
+  const [sharingPhoto, setSharingPhoto] = useState(false);
+
+  // Probe with a throwaway PNG: canShare inspects the file's type rather than
+  // its contents, so a one byte file answers the question honestly.
+  useEffect(() => {
+    try {
+      const probe = new File([new Uint8Array([0])], 'probe.png', { type: 'image/png' });
+      setCanSharePhoto(canShareFiles([probe]));
+    } catch {
+      setCanSharePhoto(false);
+    }
+  }, []);
+
   // Panning the photo is the whole interaction model now. This used to open with
   // sticker rotate/scale handle hit tests, then a text hit test, then a sticker
   // hit test, before falling through to here.
@@ -58,24 +74,50 @@ export const Editor: React.FC<EditorProps> = ({
     getDominantColors: logic.getDominantColors
   }));
 
-  const handleDownload = async () => {
+  const renderedBlob = async (): Promise<Blob | null> => {
     const canvas = logic.canvasRef.current;
-    if (!canvas) return;
-    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
-    if (!blob) return;
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = `ollabs-frame-${Date.now()}.png`;
-    link.href = url;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    if (!canvas) return null;
+    return new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
   };
 
-  // Static preview update. This is what produces the campaign thumbnail, so the
-  // body stays exactly as it was; only the `isPlaying` guard around it is gone,
-  // along with the sticker and text-layer entries in the dependency list.
+  const handleDownload = async () => {
+    const blob = await renderedBlob();
+    if (!blob) return;
+    // See lib/download.ts: the anchor has to be in the document and the object
+    // URL has to outlive the click, or mobile silently drops the file.
+    downloadBlob(blob, `ollabs-frame-${Date.now()}.png`);
+  };
+
+  /**
+   * Hand the finished PNG to the OS share sheet.
+   *
+   * Inside the WhatsApp and Instagram in-app browsers on iOS an <a download>
+   * is ignored entirely, so Download can look like it worked and leave the
+   * person with nothing. The sheet gives them Save Image instead.
+   */
+  const handleSharePhoto = async () => {
+    setSharingPhoto(true);
+    try {
+      const blob = await renderedBlob();
+      if (!blob) return;
+      const file = new File([blob], `ollabs-frame-${Date.now()}.png`, { type: 'image/png' });
+      if (!canShareFiles([file])) return;
+      await navigator.share({ files: [file], title: 'Ollabs frame' });
+    } catch {
+      // Cancelled from the sheet, or the OS refused the payload.
+    } finally {
+      setSharingPhoto(false);
+    }
+  };
+
+  // Static preview update. This is what produces the campaign thumbnail and the
+  // image people see when the link is shared.
+  //
+  // selectedFrame was missing from the deps, which meant changing the frame
+  // never re-read the canvas: whatever frame happened to be selected the last
+  // time the photo moved got published as the share image. imageObject is here
+  // for the same reason — the first paint after a photo loads has to be picked
+  // up. Both repaint the canvas, so both have to re-read it.
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (logic.canvasRef.current) {
@@ -83,7 +125,7 @@ export const Editor: React.FC<EditorProps> = ({
       }
     }, 500);
     return () => clearTimeout(timeout);
-  }, [logic.canvasRef, logic.position, logic.scale, logic.rotation]);
+  }, [logic.canvasRef, logic.imageObject, logic.position, logic.scale, logic.rotation, selectedFrame, onPreviewUpdate]);
 
 
   return (
@@ -132,6 +174,8 @@ export const Editor: React.FC<EditorProps> = ({
         onRemoveBackground={onRemoveBackground}
         isRemovingBackground={isRemovingBackground}
         onDownload={handleDownload}
+        onSharePhoto={canSharePhoto ? handleSharePhoto : undefined}
+        isSharingPhoto={sharingPhoto}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode, UserPlus, KeyRound, Pencil, Save, Share2 } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { upload } from '@vercel/blob/client';
@@ -62,6 +62,10 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     const [category, setCategory] = useState('');
     const [organizerEmail, setOrganizerEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    // Shown above the button that failed. An alert() here was particularly bad:
+    // it sits on top of a form the organizer has just filled in, and on a phone
+    // it can be dismissed by a stray tap before it is read.
+    const [createError, setCreateError] = useState<string | null>(null);
     const [campaignUrl, setCampaignUrl] = useState<string | null>(null);
     const [manageUrl, setManageUrl] = useState<string | null>(null);
     const [ownerToken, setOwnerToken] = useState<string | null>(null);
@@ -129,7 +133,73 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         }
     };
 
+    const handleClose = useCallback(() => {
+        onClose();
+        setTitle('');
+        setDescription('');
+        setGoal('');
+        setCategory('');
+        setOrganizerEmail('');
+        setCampaignUrl(null);
+        setManageUrl(null);
+        setOwnerToken(null);
+        setCampaignSlug(null);
+        setShowQR(false);
+        setAccountStep('offer');
+        setAccountEmail('');
+        setAccountCode('');
+        setAccountError(null);
+        setCreateError(null);
+        setFrameError(null);
+        setFrameSaved(false);
+    }, [onClose]);
+
+    /**
+     * Escape closes the modal, and the page behind it stays where it was.
+     *
+     * Both of these were mobile problems. Without the scroll lock, a scroll
+     * inside the modal handed off to the builder underneath the moment it hit
+     * the end of the panel, so closing dropped the organizer somewhere else in
+     * the page than where they opened it — on a phone, usually the bottom.
+     * Pinning the body and restoring the offset on close keeps their place.
+     */
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
+        document.addEventListener('keydown', onKeyDown);
+
+        const body = document.body;
+        const scrollY = window.scrollY;
+        const prev = {
+            position: body.style.position,
+            top: body.style.top,
+            width: body.style.width,
+            overflow: body.style.overflow,
+        };
+        body.style.position = 'fixed';
+        body.style.top = `-${scrollY}px`;
+        body.style.width = '100%';
+        body.style.overflow = 'hidden';
+
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+            body.style.position = prev.position;
+            body.style.top = prev.top;
+            body.style.width = prev.width;
+            body.style.overflow = prev.overflow;
+            window.scrollTo(0, scrollY);
+        };
+    }, [isOpen, handleClose]);
+
     if (!isOpen) return null;
+
+    // Clicking the dimmed area closes, but only when the press started there:
+    // a drag that begins inside the panel and releases outside it is not a
+    // request to throw away what was typed.
+    const onBackdropMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) handleClose();
+    };
 
     // ------------------------------------------------------------- edit mode
     // A separate, much smaller modal. Nothing here creates a campaign, asks for
@@ -138,13 +208,24 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     if (editTarget) {
         const manageUrlForEdit = `/c/${editTarget.slug}/manage?k=${editTarget.token}`;
         return (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                <div className="bg-paper border border-ink/10 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
-                    <div className="px-6 py-4 border-b border-ink/10 flex items-center justify-between">
+            <div
+                onMouseDown={onBackdropMouseDown}
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/70 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+            >
+                {/* dvh, not vh: on iOS Safari 100vh is the height with the toolbars
+                    hidden, so a vh-capped panel runs under the address bar and the
+                    button at its bottom cannot be reached. */}
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label={frameSaved ? 'Frame updated' : 'Save your changes'}
+                    className="bg-paper border border-ink/10 rounded-3xl w-full max-w-md max-h-[92dvh] overflow-y-auto overscroll-contain shadow-2xl animate-in zoom-in-95 duration-200"
+                >
+                    <div className="px-6 py-4 border-b border-ink/10 flex items-center justify-between sticky top-0 bg-paper z-10">
                         <h2 className="font-display text-lg font-extrabold text-ink">
                             {frameSaved ? 'Frame updated' : 'Save your changes'}
                         </h2>
-                        <button onClick={onClose} className="p-2 hover:bg-ink/10 rounded-full transition-colors">
+                        <button onClick={handleClose} aria-label="Close" className="p-2 hover:bg-ink/10 rounded-full transition-colors">
                             <X size={18} className="text-muted" />
                         </button>
                     </div>
@@ -197,7 +278,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
                     <div className="p-6 border-t border-ink/10">
                         {frameSaved ? (
-                            <button onClick={onClose} className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper transition-all">
+                            <button onClick={handleClose} className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper transition-all">
                                 <Check size={20} /> Done
                             </button>
                         ) : (
@@ -218,6 +299,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     const handleCreate = async () => {
         if (!title) return;
         setIsSubmitting(true);
+        setCreateError(null);
 
         try {
             // Upload the rendered preview so the shared campaign link shows a rich image.
@@ -259,11 +341,11 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 } catch { /* ignore */ }
             } else {
                 const err = await res.json().catch(() => ({}));
-                alert(err.error || 'Failed to create campaign');
+                setCreateError(err.error || 'Could not create your campaign. Nothing was lost — try again.');
             }
         } catch (error) {
             console.error(error);
-            alert('Error creating campaign');
+            setCreateError('Could not reach the server. Check your connection and try again.');
         } finally {
             setIsSubmitting(false);
         }
@@ -374,36 +456,31 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         }
     };
 
-    const handleClose = () => {
-        onClose();
-        setTitle('');
-        setDescription('');
-        setGoal('');
-        setCategory('');
-        setOrganizerEmail('');
-        setCampaignUrl(null);
-        setManageUrl(null);
-        setOwnerToken(null);
-        setCampaignSlug(null);
-        setShowQR(false);
-        setAccountStep('offer');
-        setAccountEmail('');
-        setAccountCode('');
-        setAccountError(null);
-    };
-
     // Already signed in when the campaign was created, or signed in just now via
     // the panel below. Either way it is already on their account.
     const onAccount = Boolean(sessionEmail);
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-paper border border-ink/10 rounded-3xl w-full max-w-md max-h-[92vh] overflow-y-auto shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
+        <div
+            onMouseDown={onBackdropMouseDown}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/70 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+        >
+            {/* dvh, not vh: on iOS Safari 100vh is the height with the toolbars
+                hidden, so a vh-capped panel runs under the address bar and the
+                Create button at its bottom cannot be reached. overscroll-contain
+                stops a scroll that reaches the end of this panel from handing off
+                to the builder page behind it. */}
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-label={campaignUrl ? 'Campaign is live' : 'Create a campaign'}
+                className="bg-paper border border-ink/10 rounded-3xl w-full max-w-md max-h-[92dvh] overflow-y-auto overscroll-contain shadow-2xl scale-100 animate-in zoom-in-95 duration-200"
+            >
 
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-ink/10 flex items-center justify-between sticky top-0 bg-paper z-10">
                     <h2 className="font-display text-lg font-extrabold text-ink">{campaignUrl ? 'Campaign is live' : 'Create a campaign'}</h2>
-                    <button onClick={handleClose} className="p-2 hover:bg-ink/10 rounded-full transition-colors">
+                    <button onClick={handleClose} aria-label="Close" className="p-2 hover:bg-ink/10 rounded-full transition-colors">
                         <X size={18} className="text-muted" />
                     </button>
                 </div>
@@ -687,6 +764,12 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             <Check size={20} /> Done
                         </button>
                     ) : (
+                        <>
+                        {createError && (
+                            <p role="alert" className="mb-3 text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5">
+                                {createError}
+                            </p>
+                        )}
                         <button
                             onClick={handleCreate}
                             disabled={!title || isSubmitting}
@@ -694,6 +777,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                         >
                             {isSubmitting ? <Loader2 className="animate-spin" /> : <><Rocket size={20} /> Create campaign</>}
                         </button>
+                        </>
                     )}
                 </div>
             </div>

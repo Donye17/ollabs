@@ -6,7 +6,9 @@ import { FrameConfig } from '@/lib/types';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { addPngMetadata } from '@/lib/pngMeta';
 import { track } from '@/lib/analytics';
-import { Upload, Download, Loader2, ArrowRight } from 'lucide-react';
+import { canShareFiles } from '@/lib/share';
+import { downloadBlob } from '@/lib/download';
+import { Upload, Download, Loader2, ArrowRight, ImageDown, AlertCircle } from 'lucide-react';
 
 const CANVAS = 1024;
 
@@ -44,8 +46,25 @@ export const DayFrameTool: React.FC<{
     const [done, setDone] = useState(false);
     const [dragOver, setDragOver] = useState(false);
     const [tick, setTick] = useState(0);
+    const [canSharePhoto, setCanSharePhoto] = useState(false);
+    const [sharingPhoto, setSharingPhoto] = useState(false);
+    // An alert() is the wrong thing on a phone: it covers the page, and inside
+    // an in-app browser it can be dismissed before it is read. The message
+    // belongs next to the control that failed.
+    const [error, setError] = useState<string | null>(null);
 
     const drag = useRef({ active: false, startX: 0, startY: 0, baseX: 0, baseY: 0 });
+
+    // Probe with a throwaway PNG: canShare inspects the file's type rather than
+    // its contents, so a one byte file answers the question honestly.
+    useEffect(() => {
+        try {
+            const probe = new File([new Uint8Array([0])], 'probe.png', { type: 'image/png' });
+            setCanSharePhoto(canShareFiles([probe]));
+        } catch {
+            setCanSharePhoto(false);
+        }
+    }, []);
 
     const draw = useCallback(() => {
         const canvas = canvasRef.current;
@@ -89,6 +108,7 @@ export const DayFrameTool: React.FC<{
     useEffect(() => { draw(); }, [draw, tick]);
 
     const handleFile = async (file: File) => {
+        setError(null);
         try {
             const dataUrl = await fileToDisplayDataUrl(file);
             const img = new Image();
@@ -98,43 +118,77 @@ export const DayFrameTool: React.FC<{
                 setZoom(1);
                 setPos({ x: 0, y: 0 });
                 setDone(false);
+                setError(null);
                 track('photo_uploaded', dimension);
                 draw();
             };
-            img.onerror = () => alert('That image could not be opened. Try a JPG or PNG.');
+            img.onerror = () => setError('That image could not be opened. Try a JPG or PNG.');
             img.src = dataUrl;
         } catch {
-            alert('That image could not be opened. Try a JPG or PNG.');
+            setError('That image could not be opened. Try a JPG or PNG.');
+        }
+    };
+
+    /** The finished PNG, tagged with the same provenance the campaign download uses. */
+    const taggedBlob = async (): Promise<Blob | null> => {
+        const canvas = canvasRef.current;
+        if (!canvas) return null;
+        const blob: Blob | null = await new Promise((r) => canvas.toBlob(r, 'image/png', 1));
+        if (!blob) return null;
+        try {
+            const tagged = addPngMetadata(new Uint8Array(await blob.arrayBuffer()), {
+                Software: 'Ollabs (ollabs.studio)',
+                Title: dayName,
+                Source: `https://ollabs.studio/${section}/${daySlug}`,
+            });
+            return new Blob([tagged as unknown as BlobPart], { type: 'image/png' });
+        } catch {
+            return blob; // fall back to the untagged blob
         }
     };
 
     const download = async () => {
-        const canvas = canvasRef.current;
-        if (!canvas || !hasImage) return;
+        if (!canvasRef.current || !hasImage) return;
         setDownloading(true);
+        setError(null);
         try {
-            const blob: Blob | null = await new Promise((r) => canvas.toBlob(r, 'image/png', 1));
-            if (!blob) return;
-            // Same provenance tagging the campaign download uses.
-            let out = blob;
-            try {
-                const tagged = addPngMetadata(new Uint8Array(await blob.arrayBuffer()), {
-                    Software: 'Ollabs (ollabs.studio)',
-                    Title: dayName,
-                    Source: `https://ollabs.studio/${section}/${daySlug}`,
-                });
-                out = new Blob([tagged as unknown as BlobPart], { type: 'image/png' });
-            } catch { /* fall back to the untagged blob */ }
-            const url = URL.createObjectURL(out);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${daySlug}-ollabs.png`;
-            a.click();
-            URL.revokeObjectURL(url);
+            const blob = await taggedBlob();
+            if (!blob) {
+                setError('That image could not be saved. Try again.');
+                return;
+            }
+            downloadBlob(blob, `${daySlug}-ollabs.png`);
             setDone(true);
             track('frame_download', dimension);
         } finally {
             setDownloading(false);
+        }
+    };
+
+    /**
+     * Hand the finished PNG to the OS share sheet.
+     *
+     * The reliable path on a phone. Inside the WhatsApp and Instagram in-app
+     * browsers on iOS an <a download> is ignored, so Download can look like it
+     * worked and leave the person with nothing. The sheet gives them Save
+     * Image, or sends the picture straight into a chat.
+     */
+    const sharePhoto = async () => {
+        if (!canvasRef.current || !hasImage) return;
+        setSharingPhoto(true);
+        setError(null);
+        try {
+            const blob = await taggedBlob();
+            if (!blob) return;
+            const file = new File([blob], `${daySlug}-ollabs.png`, { type: 'image/png' });
+            if (!canShareFiles([file])) return;
+            await navigator.share({ files: [file], title: dayName });
+            setDone(true);
+            track('frame_share_photo', dimension);
+        } catch {
+            // Cancelled from the sheet, or the OS refused the payload.
+        } finally {
+            setSharingPhoto(false);
         }
     };
 
@@ -198,10 +252,22 @@ export const DayFrameTool: React.FC<{
                             className="w-full accent-brand-deep"
                         />
                     </div>
+                    {/* On a phone the share sheet is the reliable way to keep the
+                        picture, so it leads. On desktop, where the sheet does not
+                        exist, Download leads. */}
+                    {canSharePhoto && (
+                        <button
+                            onClick={sharePhoto} disabled={sharingPhoto}
+                            className="w-full h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 transition-all disabled:opacity-60"
+                        >
+                            {sharingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageDown size={18} />}
+                            Save or share photo
+                        </button>
+                    )}
                     <div className="flex gap-2">
                         <button
                             onClick={download} disabled={downloading}
-                            className="flex-1 h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 transition-all disabled:opacity-60"
+                            className={`flex-1 h-12 rounded-xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-60 ${canSharePhoto ? 'bg-cream border border-ink/10 text-ink hover:bg-ink/5' : 'bg-brand text-ink hover:brightness-105'}`}
                         >
                             {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={18} />}
                             Download
@@ -214,6 +280,12 @@ export const DayFrameTool: React.FC<{
                         </button>
                     </div>
                 </div>
+            )}
+
+            {error && (
+                <p role="alert" className="mt-4 flex items-start gap-2 text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5">
+                    <AlertCircle size={16} className="shrink-0 mt-0.5" /> {error}
+                </p>
             )}
 
             {done && (

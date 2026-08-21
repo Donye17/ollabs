@@ -40,7 +40,13 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     // Refs
     const editorRef = useRef<{ getDominantColors: () => Promise<string[]> }>(null);
 
+    // Things that went wrong surface under the canvas rather than through
+    // alert(). On a phone an alert covers the whole page, and inside an in-app
+    // browser it can be dismissed by a stray tap before it is read.
+    const [notice, setNotice] = useState<string | null>(null);
+
     const handleAutoMatch = async () => {
+        setNotice(null);
         if (!editorRef.current) return;
         try {
             const colors = await editorRef.current.getDominantColors();
@@ -53,7 +59,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             }
         } catch (e) {
             console.error("Auto match failed", e);
-            alert("Could not extract colors from this image.");
+            setNotice("Could not read the colours in that photo. Pick a colour by hand instead.");
         }
     };
 
@@ -133,6 +139,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const handleRemoveBackground = async () => {
         if (!imageSrc) return;
         setIsRemovingBg(true);
+        setNotice(null);
         try {
             const { removeBackground } = await import("@imgly/background-removal");
             const blob = await removeBackground(imageSrc);
@@ -140,7 +147,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             setImageSrc(url);
         } catch (error) {
             console.error("BG Removal failed", error);
-            alert("Failed to remove background. Please try again.");
+            setNotice("Could not remove the background. Your photo is unchanged — try again, or use it as it is.");
         } finally {
             setIsRemovingBg(false);
         }
@@ -148,17 +155,19 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
     const handleImageSelect = async (file: File) => {
         if (!file) return;
+        setNotice(null);
         try {
             const dataUrl = await fileToDisplayDataUrl(file);
             setImageSrc(dataUrl);
         } catch {
-            alert('That image could not be opened. Try a JPG or PNG.');
+            setNotice('That image could not be opened. Try a JPG or PNG.');
         }
     };
 
     const handleReset = () => {
         setImageSrc(null);
         setPreviewDataUrl(null);
+        setNotice(null);
     };
 
     // History Helpers
@@ -223,6 +232,20 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             onRemoveBackground={handleRemoveBackground}
                             isRemovingBackground={isRemovingBg}
                         />
+
+                        {notice && (
+                            <div role="alert" className="mt-6 p-4 bg-coral/10 rounded-2xl border border-coral/30 text-sm text-ink/80 max-w-md w-full flex gap-3 items-start animate-fade-in">
+                                <AlertCircle className="shrink-0 text-coral mt-0.5" size={18} />
+                                <p className="flex-1">{notice}</p>
+                                <button
+                                    onClick={() => setNotice(null)}
+                                    aria-label="Dismiss"
+                                    className="shrink-0 text-muted hover:text-ink transition-colors -mt-0.5 px-1"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+                        )}
 
                         {/* Tip Box */}
                         <div className="mt-8 p-4 bg-brand/10 rounded-2xl border border-brand/30 text-sm text-ink/70 max-w-md flex gap-3 items-start animate-fade-in">

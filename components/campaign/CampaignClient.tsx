@@ -37,6 +37,10 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     const [copied, setCopied] = useState(false);
     const [imgTick, setImgTick] = useState(0);
     const [dragOver, setDragOver] = useState(false);
+    // An alert() covers the page and, in an in-app browser, can be dismissed by
+    // a stray tap before it is read. The message belongs under the circle the
+    // photo was supposed to land in.
+    const [uploadError, setUploadError] = useState<string | null>(null);
     const [justDownloaded, setJustDownloaded] = useState(false);
     const [canNativeShare, setCanNativeShare] = useState(false);
     const [linkCopied, setLinkCopied] = useState(false);
@@ -185,6 +189,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     useEffect(() => { draw(); }, [draw, imgTick]);
 
     const handleFile = async (file: File) => {
+        setUploadError(null);
         try {
             const dataUrl = await fileToDisplayDataUrl(file);
             const img = new Image();
@@ -194,13 +199,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 setZoom(1);
                 setPos({ x: 0, y: 0 });
                 setJustDownloaded(false);
+                setUploadError(null);
                 track('photo_uploaded', { campaign: slug });
                 draw();
             };
-            img.onerror = () => { track('photo_upload_failed', { campaign: slug }); alert('That image could not be opened. Try a JPG or PNG.'); };
+            img.onerror = () => { track('photo_upload_failed', { campaign: slug }); setUploadError('That image could not be opened. Try a JPG or PNG.'); };
             img.src = dataUrl;
         } catch {
-            alert('That image could not be opened. Try a JPG or PNG.');
+            setUploadError('That image could not be opened. Try a JPG or PNG.');
         }
     };
 
@@ -388,6 +394,12 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     </div>
                 ) : (
                     <p className="text-sm text-muted">Tap the circle or drag a photo onto it.</p>
+                )}
+
+                {uploadError && (
+                    <p role="alert" className="w-full text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center">
+                        {uploadError}
+                    </p>
                 )}
 
                 <input ref={fileRef} type="file" accept="image/*" className="hidden"

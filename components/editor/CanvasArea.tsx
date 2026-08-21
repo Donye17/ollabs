@@ -111,6 +111,11 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
             style={{
                 width: DISPLAY_SIZE,
                 height: DISPLAY_SIZE,
+                // Without this the browser claims a vertical drag for scrolling
+                // before onTouchMove's preventDefault can run, so dragging a photo
+                // on a phone scrolled the builder page instead of moving the photo.
+                // 'none' rather than 'pan-x': both axes belong to the pan.
+                touchAction: 'none',
                 cursor: imageObject ? (interactionMode !== 'none' ? 'grabbing' : 'grab') : 'default',
                 borderRadius: selectedFrame.type === FrameType.STAR || selectedFrame.type === FrameType.HEXAGON || selectedFrame.type === FrameType.HEART ? '0%' : '9999px'
             }}
