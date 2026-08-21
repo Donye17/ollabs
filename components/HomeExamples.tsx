@@ -6,13 +6,29 @@ import { FrameRendererFactory } from '@/components/renderer/FrameRendererFactory
 import { FrameConfig } from '@/lib/types';
 import { MIN_SUPPORTERS_TO_DISPLAY } from '@/lib/frameValidity';
 
-// Card box and gap in px, per breakpoint. These live in JS rather than CSS because
-// the loop maths needs real numbers, and they stay fixed during a scroll so nothing
-// in the track ever changes size while you are dragging it.
+// Card box and gap in px, per breakpoint. These live in JS because the loop maths
+// needs real numbers, and they stay fixed during a scroll so nothing in the track
+// ever changes size while you are dragging it.
+//
+// They are ALSO published as CSS custom properties (see BREAKPOINT_CSS below) and
+// the markup lays itself out from those, not from these. The reason is hydration:
+// the server has no viewport, so it renders desktop sizing, and a phone used to
+// paint 176px cards and then snap them to 132px once the media query effect ran.
+// A media query resolves on the first paint, before any JavaScript, so the sizes
+// are right immediately and the JS state only drives scroll arithmetic.
 const SIZES = {
     mobile: { card: 132, gap: 12, canvas: 264 },
     desktop: { card: 176, gap: 16, canvas: 352 },
 };
+
+const MOBILE_QUERY = '(max-width: 639px)';
+
+// Keep these two in sync with SIZES above.
+const BREAKPOINT_CSS = `
+.ollabs-carousel{--ollabs-card:${SIZES.desktop.card}px;--ollabs-gap:${SIZES.desktop.gap}px}
+@media ${MOBILE_QUERY}{.ollabs-carousel{--ollabs-card:${SIZES.mobile.card}px;--ollabs-gap:${SIZES.mobile.gap}px}}
+.ollabs-spotlight::-webkit-scrollbar{display:none}
+`;
 
 // Three back-to-back copies of the list. You start in the middle one, so there is a
 // full copy of runway in both directions before a seam is ever reached.
@@ -86,11 +102,12 @@ export const HomeExamples: React.FC<{ campaigns: HomeCampaign[] }> = ({ campaign
     // and so the cards that get a canvas on first paint are the ones actually on screen.
     const [active, setActive] = useState(startIndex);
 
-    // Server renders at desktop sizing; phones correct on mount. Sizes are inline styles
-    // so the correction lands before anything is scrolled.
+    // Drives the scroll arithmetic only. Layout comes from the CSS variables, so a
+    // phone is laid out correctly on the first paint and this catching up a tick
+    // later moves nothing on screen.
     const [size, setSize] = useState(SIZES.desktop);
     useEffect(() => {
-        const mq = window.matchMedia('(max-width: 639px)');
+        const mq = window.matchMedia(MOBILE_QUERY);
         const apply = () => setSize(mq.matches ? SIZES.mobile : SIZES.desktop);
         apply();
         mq.addEventListener('change', apply);
@@ -166,8 +183,8 @@ export const HomeExamples: React.FC<{ campaigns: HomeCampaign[] }> = ({ campaign
     const fade = 'linear-gradient(to right,transparent,black 12%,black 88%,transparent)';
 
     return (
-        <div className="relative">
-            <style>{`.ollabs-spotlight::-webkit-scrollbar{display:none}`}</style>
+        <div className="ollabs-carousel relative">
+            <style>{BREAKPOINT_CSS}</style>
 
             <div
                 ref={trackRef}
@@ -175,9 +192,9 @@ export const HomeExamples: React.FC<{ campaigns: HomeCampaign[] }> = ({ campaign
                 style={{
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
-                    gap: `${GAP}px`,
-                    paddingLeft: `calc(50% - ${CARD / 2}px)`,
-                    paddingRight: `calc(50% - ${CARD / 2}px)`,
+                    gap: 'var(--ollabs-gap)',
+                    paddingLeft: 'calc(50% - var(--ollabs-card) / 2)',
+                    paddingRight: 'calc(50% - var(--ollabs-card) / 2)',
                     WebkitMaskImage: fade,
                     maskImage: fade,
                     WebkitOverflowScrolling: 'touch',
@@ -198,13 +215,13 @@ export const HomeExamples: React.FC<{ campaigns: HomeCampaign[] }> = ({ campaign
                             aria-hidden={!isReal || undefined}
                             tabIndex={isReal ? undefined : -1}
                             className="group shrink-0 flex flex-col items-center outline-none"
-                            style={{ width: `${CARD}px` }}
+                            style={{ width: 'var(--ollabs-card)' }}
                         >
                             <div
                                 className="rounded-full overflow-hidden"
                                 style={{
-                                    width: `${CARD}px`,
-                                    height: `${CARD}px`,
+                                    width: 'var(--ollabs-card)',
+                                    height: 'var(--ollabs-card)',
                                     // Scale and opacity only. The previous version animated width
                                     // and height, which reflowed the whole flex row every frame and
                                     // dragged the scroll position around with it.
@@ -225,7 +242,7 @@ export const HomeExamples: React.FC<{ campaigns: HomeCampaign[] }> = ({ campaign
                             >
                                 <p
                                     className="text-sm font-semibold text-ink group-hover:text-brand-deep transition-colors truncate"
-                                    style={{ maxWidth: `${CARD}px` }}
+                                    style={{ maxWidth: 'var(--ollabs-card)' }}
                                 >
                                     {c.title}
                                 </p>
@@ -243,7 +260,7 @@ export const HomeExamples: React.FC<{ campaigns: HomeCampaign[] }> = ({ campaign
                 onClick={() => step(-1)}
                 aria-label="Previous campaign"
                 className="hidden md:flex absolute left-4 h-11 w-11 items-center justify-center rounded-full bg-paper/80 backdrop-blur border border-ink/10 text-ink hover:bg-paper transition-colors"
-                style={{ top: `${CARD / 2}px`, transform: 'translateY(-50%)' }}
+                style={{ top: 'calc(var(--ollabs-card) / 2)', transform: 'translateY(-50%)' }}
             >
                 <ChevronLeft className="w-5 h-5" />
             </button>
@@ -252,7 +269,7 @@ export const HomeExamples: React.FC<{ campaigns: HomeCampaign[] }> = ({ campaign
                 onClick={() => step(1)}
                 aria-label="Next campaign"
                 className="hidden md:flex absolute right-4 h-11 w-11 items-center justify-center rounded-full bg-paper/80 backdrop-blur border border-ink/10 text-ink hover:bg-paper transition-colors"
-                style={{ top: `${CARD / 2}px`, transform: 'translateY(-50%)' }}
+                style={{ top: 'calc(var(--ollabs-card) / 2)', transform: 'translateY(-50%)' }}
             >
                 <ChevronRight className="w-5 h-5" />
             </button>

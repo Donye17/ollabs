@@ -9,9 +9,12 @@
         --brand: #01BEF6;
     }
 
-    html {
-        scroll-behavior: smooth;
-    }
+    /* No global scroll-behavior: smooth. It applies to every scroll on the site,
+       including the ones the browser performs itself — anchor navigation, restoring
+       position on back, and jumping to a focused element — which on a phone turns
+       an instant jump into an animation that competes with the user's own scroll.
+       The places that genuinely want an animated scroll pass behavior: 'smooth' to
+       scrollTo themselves. */
 
     body {
         background-color: #F4F1EA;

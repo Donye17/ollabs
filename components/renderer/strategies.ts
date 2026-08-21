@@ -2,12 +2,76 @@ import { FrameType } from '@/lib/types';
 import { IFrameRenderer, RenderContext } from './types';
 import { CANVAS_SIZE } from '@/lib/constants';
 
+// --- Overlay image cache, keyed by URL rather than held on a renderer ---
+//
+// FrameRendererFactory caches one renderer per frame type and hands that same
+// instance to every preview on the page. Anything a renderer stores on `this`
+// is therefore shared by all of them. When ImageFrameRenderer kept the current
+// image in an instance field, two campaigns with different overlays would each
+// see the other's URL there, decide their own image was stale, reload it, fire
+// onImageLoad, re-render, and knock the other one out again. That is the loop
+// that never settles and never paints — the homepage carousel and the Explore
+// grid both hit it as soon as more than one custom-image frame is on screen.
+//
+// Keying by URL puts the state on the image, where it belongs, and turns the
+// contention into sharing: the second preview of the same overlay reuses the
+// first one's decode instead of restarting it.
+const overlayImages = new Map<string, HTMLImageElement>();
+
+// Callbacks waiting on a URL that is still in flight. Fired once and cleared,
+// so a render pass that finds a loaded image never schedules another one.
+const overlayWaiters = new Map<string, Set<() => void>>();
+
+// Cut-out composites cost an offscreen canvas each, so they are capped. Explore
+// can show 60 campaigns and an uncapped map would pin that much canvas memory
+// on a phone for the rest of the session.
+const COMPOSITE_CACHE_LIMIT = 24;
+const composites = new Map<string, HTMLCanvasElement>();
+
+function rememberComposite(key: string, canvas: HTMLCanvasElement): void {
+    if (composites.size >= COMPOSITE_CACHE_LIMIT) {
+        const oldest = composites.keys().next().value;
+        if (oldest !== undefined) composites.delete(oldest);
+    }
+    composites.set(key, canvas);
+}
+
+// Returns the shared image for a URL, starting the load on first request.
+// `onLoad` is registered only while the image is genuinely still loading, which
+// is what keeps the caller's re-render from becoming a treadmill.
+function loadOverlay(url: string, onLoad?: () => void): HTMLImageElement {
+    const existing = overlayImages.get(url);
+    if (existing) {
+        if (!existing.complete && onLoad) overlayWaiters.get(url)?.add(onLoad);
+        return existing;
+    }
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    const waiting = new Set<() => void>();
+    if (onLoad) waiting.add(onLoad);
+    overlayWaiters.set(url, waiting);
+
+    const flush = () => {
+        const listeners = overlayWaiters.get(url);
+        overlayWaiters.delete(url);
+        listeners?.forEach((fn) => fn());
+    };
+    img.onload = flush;
+    // A failed image stays in the cache as a complete, zero-width entry. Every
+    // later draw skips it without registering a waiter, so a broken URL costs
+    // one failed request rather than an endless retry loop.
+    img.onerror = flush;
+
+    img.src = url;
+    overlayImages.set(url, img);
+    return img;
+}
+
 // --- Base Helper for standard shapes ---
 abstract class BaseShapeRenderer implements IFrameRenderer {
     abstract createPath(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number): void;
-
-    // Simplified Texture Cache (in-memory for session)
-    private static textureCache: Map<string, HTMLImageElement> = new Map();
 
     drawFrame(context: RenderContext): void {
         const { ctx, centerX, centerY, radius, frame } = context;
@@ -38,17 +102,21 @@ abstract class BaseShapeRenderer implements IFrameRenderer {
         const { ctx, frame, radius, centerX, centerY } = context;
 
         // 1. Texture Priority (Custom Image)
+        //
+        // Shares the same URL-keyed cache as ImageFrameRenderer. It used to keep
+        // a separate static map whose onload did nothing, so a textured frame
+        // stayed unpainted until something else happened to trigger a redraw.
+        // Passing onImageLoad through means it paints itself when it arrives.
         if (frame.imageUrl) {
-            const cachedImg = BaseShapeRenderer.textureCache.get(frame.imageUrl);
+            const img = loadOverlay(frame.imageUrl, context.onImageLoad);
 
-            if (cachedImg && cachedImg.complete) {
-                // Create Pattern
-                const pattern = ctx.createPattern(cachedImg, 'no-repeat');
+            if (img.complete && img.naturalWidth > 0) {
+                const pattern = ctx.createPattern(img, 'no-repeat');
                 if (pattern) {
                     const diameter = radius * 2;
                     // Scale logic same as ImageFrameRenderer
-                    const scaleX = diameter / cachedImg.width;
-                    const scaleY = diameter / cachedImg.height;
+                    const scaleX = diameter / img.width;
+                    const scaleY = diameter / img.height;
                     const scale = Math.max(scaleX, scaleY);
 
                     const matrix = new DOMMatrix();
@@ -62,16 +130,9 @@ abstract class BaseShapeRenderer implements IFrameRenderer {
                     ctx.strokeStyle = pattern;
                     return; // Texture overrides colors
                 }
-            } else if (!cachedImg) {
-                // Load Texture
-                const img = new Image();
-                img.src = frame.imageUrl;
-                img.onload = () => {
-                    // Trigger re-render? The loop/editor usually handles this via state or rAF.
-                    // For now, we assume the next pass catches it.
-                };
-                BaseShapeRenderer.textureCache.set(frame.imageUrl, img);
             }
+            // Not loaded yet (or failed): fall through and stroke frame.color1
+            // as the placeholder, exactly as before.
         }
     }
 }
@@ -296,12 +357,10 @@ export class GeometricRenderer extends CircleRenderer {
     }
 }
 
+// Stateless by requirement: see the note on the overlay cache above, and the
+// invariant documented in FrameRendererFactory. Every preview on the page runs
+// through the same instance of this class.
 export class ImageFrameRenderer extends CircleRenderer {
-    private img: HTMLImageElement | null = null;
-    private lastImageUrl: string | null = null;
-    private composited: HTMLCanvasElement | null = null;
-    private compositedKey: string | null = null;
-
     drawFrame(context: RenderContext): void {
         const { ctx, frame, centerX, centerY, radius, onImageLoad } = context;
 
@@ -310,19 +369,8 @@ export class ImageFrameRenderer extends CircleRenderer {
             return;
         }
 
-        if (this.lastImageUrl !== frame.imageUrl) {
-            this.lastImageUrl = frame.imageUrl;
-            this.composited = null;
-            this.compositedKey = null;
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => { if (onImageLoad) onImageLoad(); };
-            img.src = frame.imageUrl;
-            this.img = img;
-        }
-
-        const img = this.img;
-        if (!img || !img.complete || img.naturalWidth === 0) return;
+        const img = loadOverlay(frame.imageUrl, onImageLoad);
+        if (!img.complete || img.naturalWidth === 0) return;
 
         const cutout = frame.cutoutScale ?? 0;
 
@@ -336,7 +384,8 @@ export class ImageFrameRenderer extends CircleRenderer {
         if (cutout > 0) {
             const d = Math.max(2, Math.round(radius * 2));
             const key = `${frame.imageUrl}|${d}|${cutout}`;
-            if (this.compositedKey !== key || !this.composited) {
+            let composited = composites.get(key);
+            if (!composited) {
                 const off = document.createElement('canvas');
                 off.width = d;
                 off.height = d;
@@ -348,12 +397,12 @@ export class ImageFrameRenderer extends CircleRenderer {
                     octx.arc(d / 2, d / 2, (d / 2) * cutout, 0, Math.PI * 2);
                     octx.closePath();
                     octx.fill();
-                    this.composited = off;
-                    this.compositedKey = key;
+                    composited = off;
+                    rememberComposite(key, off);
                 }
             }
-            if (this.composited) {
-                ctx.drawImage(this.composited, centerX - radius, centerY - radius, radius * 2, radius * 2);
+            if (composited) {
+                ctx.drawImage(composited, centerX - radius, centerY - radius, radius * 2, radius * 2);
             }
         } else {
             ctx.drawImage(img, centerX - radius, centerY - radius, radius * 2, radius * 2);

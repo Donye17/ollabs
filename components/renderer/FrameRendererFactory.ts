@@ -23,6 +23,16 @@ class NoneRenderer extends CircleRenderer {
 }
 
 export class FrameRendererFactory {
+    // One renderer per frame type, shared by every canvas on the page: the
+    // homepage carousel, the Explore grid, the builder and the supporter page
+    // all draw through these same objects, often within the same frame.
+    //
+    // INVARIANT: a renderer must be stateless. Nothing that varies per frame
+    // config — an image, a URL, a cached composite — may live on the instance.
+    // ImageFrameRenderer used to keep the current overlay in an instance field
+    // and two previews with different overlays fought over it forever, each
+    // reload firing onImageLoad and re-rendering the other. Per-frame data
+    // belongs in a cache keyed by what it depends on; see strategies.ts.
     private static renderers: Map<FrameType, IFrameRenderer> = new Map();
 
     static getRenderer(type: FrameType): IFrameRenderer {
