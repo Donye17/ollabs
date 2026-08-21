@@ -38,6 +38,10 @@
   "exclude": [
     "node_modules",
     "legacy_mvp",
-    "scripts/_archive"
+    // Kept as a written record of the table layout, but no longer code: it
+    // imports drizzle-orm, which came out with the ORM itself, and nothing in
+    // the app imports it. The migrations in drizzle/*.sql are the
+    // authoritative schema; this file is the readable version of them.
+    "lib/db/schema.ts"
   ]
 }

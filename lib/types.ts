@@ -35,32 +35,12 @@ export interface FrameConfig {
   imageUrl?: string; // For CUSTOM_IMAGE type
   cutoutScale?: number; // 0-1: transparent center hole (photo window) for CUSTOM_IMAGE
   caption?: FrameCaption; // Optional curved slogan text around the ring
-  stickers?: StickerConfig[]; // Optional stickers array
-  textLayers?: TextConfig[]; // Optional text layers
-  motionEffect?: MotionEffect;
 }
 
-export type MotionEffect = 'none' | 'pulse' | 'spin' | 'glitch' | 'rain';
-
-export interface StickerConfig {
-  id: string;
-  icon: string; // Lucide icon name or image URL
-  x: number;
-  y: number;
-  scale: number;
-  rotation: number;
-}
-
-export interface TextConfig {
-  id: string;
-  text: string;
-  x: number;
-  y: number;
-  fontSize: number;
-  fontFamily: string;
-  color: string;
-  rotation: number;
-  align: 'left' | 'center' | 'right';
-  curved?: boolean;
-  flip?: boolean;
-}
+// Removed with the builder features they belonged to: stickers, textLayers and
+// motionEffect. All three were still being written into campaigns.frame_config
+// by the publish flow long after their UI was taken out, so every campaign
+// carried empty arrays for them. Checked before removing: across all 326
+// campaigns, zero had a sticker, zero had a text layer, and no row carried a
+// motionEffect key at all. Old rows keep their empty arrays harmlessly; nothing
+// reads them any more.

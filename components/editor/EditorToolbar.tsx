@@ -1,13 +1,8 @@
 import React from 'react';
-import { Download, Upload, ZoomIn, ZoomOut, RefreshCcw, RotateCw, User, Loader2, Sparkles, Maximize } from 'lucide-react';
-import { StickerConfig, TextConfig } from '@/lib/types';
+import { Download, Upload, ZoomIn, ZoomOut, RefreshCcw, RotateCw, Loader2, Sparkles, Maximize } from 'lucide-react';
 
 interface EditorToolbarProps {
-    canvasRef: React.RefObject<HTMLCanvasElement>;
     imageObject: HTMLImageElement | null;
-    selection: string | null;
-    stickers: StickerConfig[];
-    onStickersChange: (stickers: StickerConfig[]) => void;
     scale: number;
     setScale: (scale: number) => void;
     rotation: number;
@@ -22,11 +17,7 @@ interface EditorToolbarProps {
 }
 
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
-    canvasRef,
     imageObject,
-    selection,
-    stickers,
-    onStickersChange,
     scale,
     setScale,
     rotation,
@@ -63,16 +54,18 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                 </div>
             )}
 
-            {/* Advanced Controls (Scale/Rotate for Selection or Image) */}
-            {(imageObject || stickers.length > 0) && (
+            {/* Base image controls. Every control below used to be a
+                selection ? sticker : image ternary; with stickers gone only the
+                image branch is left, so the ternaries are collapsed rather than
+                deleted. */}
+            {imageObject && (
                 <div className="w-full bg-cream p-5 rounded-2xl border border-ink/10 backdrop-blur-xl space-y-5 animate-in slide-in-from-bottom-4 duration-500">
                     <div className="flex justify-between items-center px-1">
-                        <h4 className="text-xs font-bold font-heading text-muted uppercase tracking-widest">{selection ? 'Adjust Decoration' : 'Adjust Base Image'}</h4>
-                        {selection && <span className="text-[10px] text-primary font-bold font-mono bg-primary/10 px-2 py-0.5 rounded border border-primary/20">Selected</span>}
+                        <h4 className="text-xs font-bold font-heading text-muted uppercase tracking-widest">Adjust Base Image</h4>
                     </div>
 
                     {/* Magic Tools */}
-                    {!selection && imageObject && onRemoveBackground && (
+                    {onRemoveBackground && (
                         <button
                             onClick={onRemoveBackground}
                             disabled={isRemovingBackground}
@@ -91,16 +84,9 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                     <div className="flex items-center gap-3">
                         <ZoomOut size={16} className="text-muted" />
                         <input type="range" min="0.1" max="3" step="0.1"
-                            value={selection ? (stickers.find(s => s.id === selection)?.scale || 1) : scale}
-                            onChange={(e) => {
-                                const val = parseFloat(e.target.value);
-                                if (selection) {
-                                    onStickersChange(stickers.map(s => s.id === selection ? { ...s, scale: val } : s));
-                                } else {
-                                    setScale(val);
-                                }
-                            }}
-                            className={`flex-1 h-1.5 bg-paper2 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-brand'}`}
+                            value={scale}
+                            onChange={(e) => setScale(parseFloat(e.target.value))}
+                            className="flex-1 h-1.5 bg-paper2 rounded-lg appearance-none cursor-pointer accent-brand"
                             aria-label="Zoom level"
                         />
                         <ZoomIn size={16} className="text-muted" />
@@ -110,19 +96,12 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                     <div className="flex items-center gap-3">
                         <div className="relative group"><RotateCw size={16} className="text-muted group-hover:text-ink transition-colors" /></div>
                         <input type="range" min="-180" max="180" step="1"
-                            value={selection ? (stickers.find(s => s.id === selection)?.rotation || 0) : rotation}
-                            onChange={(e) => {
-                                const val = parseInt(e.target.value);
-                                if (selection) {
-                                    onStickersChange(stickers.map(s => s.id === selection ? { ...s, rotation: val } : s));
-                                } else {
-                                    setRotation(val);
-                                }
-                            }}
-                            className={`flex-1 h-1.5 bg-paper2 rounded-lg appearance-none cursor-pointer ${selection ? 'accent-primary' : 'accent-brand'}`}
+                            value={rotation}
+                            onChange={(e) => setRotation(parseInt(e.target.value))}
+                            className="flex-1 h-1.5 bg-paper2 rounded-lg appearance-none cursor-pointer accent-brand"
                             aria-label="Rotation angle"
                         />
-                        <span className="text-[10px] w-8 text-right font-mono text-muted">{selection ? (stickers.find(s => s.id === selection)?.rotation || 0) : rotation}°</span>
+                        <span className="text-[10px] w-8 text-right font-mono text-muted">{rotation}&deg;</span>
                     </div>
 
                     <div className="flex gap-2 pt-3 border-t border-ink/10 justify-between">

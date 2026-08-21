@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Position, StickerConfig, TextConfig, FrameConfig, FrameType } from '@/lib/types';
+import { Position, FrameConfig, FrameType } from '@/lib/types';
 import { CANVAS_SIZE } from '@/lib/constants';
 import ColorThief from 'colorthief';
 
@@ -10,19 +10,11 @@ const rgbToHex = (r: number, g: number, b: number) => '#' + [r, g, b].map(x => {
 
 interface UseEditorLogicProps {
     imageSrc: string | null;
-    stickers: StickerConfig[];
-    onStickersChange: (stickers: StickerConfig[]) => void;
-    textLayers: TextConfig[];
-    onTextLayersChange: (layers: TextConfig[]) => void;
     selectedFrame: FrameConfig;
 }
 
 export const useEditorLogic = ({
     imageSrc,
-    stickers,
-    onStickersChange,
-    textLayers,
-    onTextLayersChange,
     selectedFrame
 }: UseEditorLogicProps) => {
     // Canvas State
@@ -32,20 +24,12 @@ export const useEditorLogic = ({
     const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
     const [imageObject, setImageObject] = useState<HTMLImageElement | null>(null);
 
-    // Interaction State
-    const [selection, setSelection] = useState<string | null>(null); // Selected Sticker ID
-    const [selectedTextId, setSelectedTextId] = useState<string | null>(null); // Selected Text ID
-    const [interactionMode, setInteractionMode] = useState<'none' | 'drag' | 'scale' | 'rotate' | 'pan'>('none');
+    // Interaction State. Panning the photo is the only interaction left; the
+    // drag/scale/rotate modes belonged to sticker handles, and the selection and
+    // initial-state fields to stickers and text layers.
+    const [interactionMode, setInteractionMode] = useState<'none' | 'pan'>('none');
     const [dragStart, setDragStart] = useState<Position>({ x: 0, y: 0 });
     const [isDragOver, setIsDragOver] = useState<boolean>(false);
-    // Initial state for interactions to calculate deltas
-    const [initialStickerState, setInitialStickerState] = useState<{ x: number, y: number, scale: number, rotation: number } | null>(null);
-    const [initialTextState, setInitialTextState] = useState<{ x: number, y: number, rotation: number } | null>(null);
-
-    // Recording State (GIF)
-    const [isRecording, setIsRecording] = useState(false);
-    const requestRef = useRef<number | null>(null);
-    const startTimeRef = useRef<number>(0);
 
     // Texture Versioning for custom frames
     const [textureVersion, setTextureVersion] = useState(0);
@@ -116,16 +100,6 @@ export const useEditorLogic = ({
         });
     };
 
-    const rotatePoint = (px: number, py: number, cx: number, cy: number, angle: number) => {
-        const rad = (angle * Math.PI) / 180;
-        const cos = Math.cos(rad);
-        const sin = Math.sin(rad);
-        return {
-            x: (cos * (px - cx)) - (sin * (py - cy)) + cx,
-            y: (sin * (px - cx)) + (cos * (py - cy)) + cy
-        };
-    };
-
     const getMousePos = (e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent) => {
         const canvas = canvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
@@ -143,20 +117,12 @@ export const useEditorLogic = ({
         rotation, setRotation,
         position, setPosition,
         imageObject,
-        selection, setSelection,
-        selectedTextId, setSelectedTextId,
         interactionMode, setInteractionMode,
         dragStart, setDragStart,
         isDragOver, setIsDragOver,
-        initialStickerState, setInitialStickerState,
-        initialTextState, setInitialTextState,
-        isRecording, setIsRecording,
-        requestRef,
-        startTimeRef,
         textureVersion,
         handleAutoFit,
         getDominantColors,
-        rotatePoint,
         getMousePos
     };
 };

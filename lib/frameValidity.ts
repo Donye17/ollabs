@@ -4,11 +4,16 @@ import { FrameConfig, FrameType } from '@/lib/types';
  * A campaign frame is "visible" if it actually renders something on top of the
  * user's photo. A config can be structurally valid JSON and still produce a
  * completely bare image, which is what happened to somos-200mil-vidas-tzux:
- * type NONE, no imageUrl, no caption, no stickers, no text. Supporters ran their
- * photo through it and got the same photo back.
+ * type NONE, no imageUrl, no caption. Supporters ran their photo through it and
+ * got the same photo back.
  *
  * Anything other than NONE draws a ring, so it counts. A NONE frame only counts
- * if it carries an uploaded image, a caption, a sticker, or a text layer.
+ * if it carries an uploaded image or a caption.
+ *
+ * The sticker and text-layer arms of this test went out with those features.
+ * They were checked against production first: no campaign had a non-empty
+ * stickers or textLayers array, and every NONE-type campaign currently visible
+ * qualifies through its caption, so nothing drops out of the listings.
  */
 export function hasVisibleFrame(config: unknown): boolean {
     if (!config || typeof config !== 'object') return false;
@@ -28,8 +33,6 @@ export function hasVisibleFrame(config: unknown): boolean {
     // type NONE (or missing): only visible if decorated with something else.
     if (typeof frame.imageUrl === 'string' && frame.imageUrl.trim().length > 0) return true;
     if (frame.caption && typeof frame.caption.text === 'string' && frame.caption.text.trim().length > 0) return true;
-    if (Array.isArray(frame.stickers) && frame.stickers.length > 0) return true;
-    if (Array.isArray(frame.textLayers) && frame.textLayers.length > 0) return true;
 
     return false;
 }
@@ -52,8 +55,6 @@ export function visibleFrameSql(alias = 'c'): string {
             ELSE (
                 COALESCE(NULLIF(TRIM(${cfg} ->> 'imageUrl'), ''), NULL) IS NOT NULL
                 OR COALESCE(NULLIF(TRIM(${cfg} -> 'caption' ->> 'text'), ''), NULL) IS NOT NULL
-                OR (jsonb_typeof(${cfg} -> 'stickers') = 'array' AND jsonb_array_length(${cfg} -> 'stickers') > 0)
-                OR (jsonb_typeof(${cfg} -> 'textLayers') = 'array' AND jsonb_array_length(${cfg} -> 'textLayers') > 0)
             )
         END
     )`;

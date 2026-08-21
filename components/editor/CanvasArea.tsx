@@ -1,26 +1,18 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { Loader2, Upload, ImageIcon, Sparkles } from 'lucide-react';
+import { Upload, ImageIcon } from 'lucide-react';
 import { FrameRendererFactory } from '../renderer/FrameRendererFactory';
 import { CANVAS_SIZE, DISPLAY_SIZE } from '@/lib/constants';
-import { FrameConfig, FrameType, StickerConfig, TextConfig, MotionEffect, Position } from '@/lib/types';
-import { getIconSvg } from '@/lib/utils';
+import { FrameConfig, FrameType, Position } from '@/lib/types';
 
 interface CanvasAreaProps {
     canvasRef: React.RefObject<HTMLCanvasElement>;
     imageObject: HTMLImageElement | null;
     selectedFrame: FrameConfig;
-    stickers: StickerConfig[];
-    textLayers: TextConfig[];
     position: Position;
     scale: number;
     rotation: number;
-    motionEffect: MotionEffect;
-    isPlaying: boolean;
-    isRecording: boolean;
-    selection: string | null;
-    selectedTextId: string | null;
     isDragOver: boolean;
-    interactionMode: 'none' | 'drag' | 'scale' | 'rotate' | 'pan';
+    interactionMode: 'none' | 'pan';
 
     // Event Handlers
     onMouseDown: (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => void;
@@ -36,22 +28,13 @@ interface CanvasAreaProps {
     onDrop: (e: React.DragEvent) => void;
 }
 
-const STICKER_BASE_SIZE = 48;
-
 export const CanvasArea: React.FC<CanvasAreaProps> = ({
     canvasRef,
     imageObject,
     selectedFrame,
-    stickers,
-    textLayers,
     position,
     scale,
     rotation,
-    motionEffect,
-    isPlaying,
-    isRecording,
-    selection,
-    selectedTextId,
     isDragOver,
     interactionMode,
     onMouseDown, onMouseMove, onMouseUp, onMouseLeave,
@@ -61,7 +44,12 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
     const [imgTick, setImgTick] = useState(0);
 
     // Drawing Logic (Copied from original Editor.tsx but scoped)
-    const draw = useCallback((time: number = 0) => {
+    //
+    // This used to take an elapsed-time argument and be driven by a
+    // requestAnimationFrame loop for the motion effects. With those gone the
+    // canvas only ever needs repainting when something in the deps changes, so
+    // the loop is gone and the effect below is the single repaint path.
+    const draw = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -110,167 +98,11 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
 
         // 3. Draw Frame Overlay (plus curved caption)
         FrameRendererFactory.render({ ctx, centerX, centerY, radius, frame: selectedFrame, onImageLoad: () => setImgTick((t) => t + 1) });
+    }, [canvasRef, imageObject, position, scale, rotation, selectedFrame]);
 
-        // 4. Draw Stickers
-        stickers.forEach(sticker => {
-            const img = new Image();
-            img.src = getIconSvg(sticker.icon);
-            let effectScale = 1;
-            let effectRotation = 0;
-            let effectX = 0;
-            let effectY = 0;
-            if (motionEffect === 'pulse') {
-                effectScale = 1 + Math.sin(time / 200) * 0.15;
-            } else if (motionEffect === 'spin') {
-                effectRotation = (time / 5) % 360;
-            } else if (motionEffect === 'glitch') {
-                if (Math.random() > 0.8) {
-                    effectX = (Math.random() - 0.5) * 10;
-                    effectY = (Math.random() - 0.5) * 10;
-                }
-            }
-            ctx.save();
-            ctx.translate(sticker.x + centerX + effectX, sticker.y + centerY + effectY);
-            ctx.rotate(((sticker.rotation + effectRotation) * Math.PI) / 180);
-            const sSize = STICKER_BASE_SIZE * sticker.scale * effectScale;
-            ctx.drawImage(img, -sSize / 2, -sSize / 2, sSize, sSize);
-            if (selection === sticker.id && !isPlaying && !isRecording) {
-                ctx.strokeStyle = '#3b82f6';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([]);
-                ctx.strokeRect(-sSize / 2, -sSize / 2, sSize, sSize);
-            }
-            ctx.restore();
-        });
-
-        // 5. Draw Text Layers
-        textLayers.forEach(text => {
-            ctx.save();
-            ctx.font = `${text.fontSize}px "${text.fontFamily}", sans-serif`;
-            ctx.fillStyle = text.color;
-            ctx.textBaseline = 'middle';
-            ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 4;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
-
-            // Calculate radius based on frame width to center text in the stroke/path
-            // Scale logic matches renderer: scale = radius / (CANVAS_SIZE/2) => 1 for full canvas
-            const frameWidth = (selectedFrame.width || 20) * 2;
-            const pathRadius = (CANVAS_SIZE / 2) - (frameWidth / 2);
-
-            const characters = text.text.split('');
-            // Total angle occupied by text
-            const totalWidth = ctx.measureText(text.text).width;
-            const totalAngle = totalWidth / pathRadius;
-
-            // Start angle: Text Rotation is center point.
-            // If normal: start = rotation - totalAngle/2
-            // If flip: start = rotation + totalAngle/2 (reversed direction)
-            let currentAngle = (text.rotation * Math.PI) / 180;
-
-            if (text.flip) {
-                currentAngle += totalAngle / 2;
-            } else {
-                currentAngle -= totalAngle / 2;
-            }
-
-            characters.forEach((char) => {
-                const charWidth = ctx.measureText(char).width;
-                const charAngle = charWidth / pathRadius;
-
-                // For 'middle' of char
-                let theta = currentAngle;
-                if (text.flip) {
-                    theta -= charAngle / 2;
-                } else {
-                    theta += charAngle / 2;
-                }
-
-                ctx.save();
-                // Move to center + polar coordinate
-                // Note: Standard canvas rotation starts at 3 o'clock (0). Text rotation usually 0 is top (-PI/2).
-                // But our slider is 0-360. 
-                // Let's stick to standard behavior: 0 is right. -90 is top.
-                // Text rotation aligns with CSS/Stickers? usually 0 is upright. 
-                // Existing code: ctx.translate(centerX, centerY); ctx.rotate(theta + Math.PI/2);
-                // Implies theta=0 is top (-90deg).
-                // Let's assume text.rotation 0 means "Top".
-                // theta is in radians.
-
-                const x = centerX + pathRadius * Math.cos(theta - Math.PI / 2);
-                const y = centerY + pathRadius * Math.sin(theta - Math.PI / 2);
-
-                ctx.translate(x, y);
-
-                // Rotate character to match curve
-                // Normal: theta
-                // Flip: theta + PI (to point inward)
-                // Adjustment: -PI/2 is top?
-                // Existing: ctx.rotate(theta + Math.PI/2);
-                // If flip: ctx.rotate(theta - Math.PI/2);
-                const rotation = text.flip ? (theta - Math.PI / 2) : (theta + Math.PI / 2);
-                ctx.rotate(rotation);
-
-                ctx.fillText(char, 0, 0);
-                ctx.restore();
-
-                // Advance angle
-                if (text.flip) {
-                    currentAngle -= charAngle;
-                } else {
-                    currentAngle += charAngle;
-                }
-            });
-            ctx.restore();
-        });
-
-        // Rain Effect
-        if (motionEffect === 'rain') {
-            ctx.save();
-            ctx.strokeStyle = 'rgba(173, 216, 230, 0.5)';
-            ctx.lineWidth = 2;
-            for (let i = 0; i < 20; i++) {
-                const rx = ((time + i * 100) % CANVAS_SIZE);
-                const ry = ((time * 2 + i * 50) % CANVAS_SIZE);
-                ctx.beginPath();
-                ctx.moveTo(rx, ry);
-                ctx.lineTo(rx - 5, ry + 15);
-                ctx.stroke();
-            }
-            ctx.restore();
-        }
-    }, [imageObject, position, scale, rotation, selectedFrame, isDragOver, stickers, selection, motionEffect, isPlaying, isRecording, textLayers, selectedTextId]);
-
-    // Redraw when a custom frame image finishes loading.
+    // The only repaint path: runs on mount, on any drawing input changing, and
+    // again when a custom frame image finishes loading.
     useEffect(() => { draw(); }, [imgTick, draw]);
-
-    // Animation Loop
-    const requestRef = React.useRef<number | null>(null);
-    const startTimeRef = React.useRef<number>(0);
-
-    const animate = useCallback((time: number) => {
-        if (startTimeRef.current === 0) startTimeRef.current = time;
-        const elapsed = time - startTimeRef.current;
-        draw(elapsed);
-        if (isPlaying) {
-            requestRef.current = requestAnimationFrame(animate);
-        }
-    }, [draw, isPlaying]);
-
-    useEffect(() => {
-        if (isPlaying && motionEffect !== 'none') {
-            startTimeRef.current = 0;
-            requestRef.current = requestAnimationFrame(animate);
-        } else {
-            draw(0);
-            if (requestRef.current) cancelAnimationFrame(requestRef.current);
-        }
-        return () => {
-            if (requestRef.current) cancelAnimationFrame(requestRef.current);
-        };
-    }, [isPlaying, motionEffect, animate, draw]);
 
     return (
         <div

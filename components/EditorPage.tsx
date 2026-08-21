@@ -6,15 +6,13 @@ import { FrameCustomizer } from './FrameCustomizer';
 import { CustomFramePanel } from './CustomFramePanel';
 import { CaptionControls } from './CaptionControls';
 import { ContactPreview } from './ContactPreview';
-import { TextControls } from './TextControls';
 import { NavBar } from '@/components/NavBar';
 import { DEFAULT_FRAME } from '@/lib/constants';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
-import { FrameConfig, StickerConfig, TextConfig, MotionEffect } from '@/lib/types';
+import { FrameConfig } from '@/lib/types';
 import { getFlag, resolveFlagFrame } from '@/lib/flags';
-import { AlertCircle, Sparkles, Sliders, Eye, Type, Image as ImageIcon, Upload, Loader2, Save } from 'lucide-react';
+import { AlertCircle, Sparkles, Sliders, Eye, Image as ImageIcon, Upload, Loader2, Save } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
-import { OnboardingOverlay } from './editor/OnboardingOverlay';
 // Loaded on demand (see handleRemoveBackground). This library is ~5.5MB of WASM;
 // importing it statically made every visitor to /create download it whether or
 // not they ever removed a background.
@@ -39,14 +37,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const [editLoading, setEditLoading] = useState(false);
     const [editError, setEditError] = useState<string | null>(null);
 
-    // Editor State (Lifted Up)
-    const [stickers, setStickers] = useState<StickerConfig[]>([]);
-    const [textLayers, setTextLayers] = useState<TextConfig[]>([]);
-    const [motionEffect, setMotionEffect] = useState<MotionEffect>('none');
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [selection, setSelection] = useState<string | null>(null); // For Stickers
-    const [selectedTextId, setSelectedTextId] = useState<string | null>(null); // For Text
-
     // Refs
     const editorRef = useRef<{ getDominantColors: () => Promise<string[]> }>(null);
 
@@ -68,7 +58,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     };
 
 
-    const [activeTab, setActiveTab] = useState<'design' | 'custom' | 'customize' | 'text' | 'preview'>('design');
+    const [activeTab, setActiveTab] = useState<'design' | 'custom' | 'customize' | 'preview'>('design');
     const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(!!remixId);
 
@@ -98,9 +88,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                 if (!config) throw new Error('This campaign has no frame saved on it.');
                 setHistory([config]);
                 setHistoryIndex(0);
-                if (Array.isArray(config.stickers)) setStickers(config.stickers);
-                if (Array.isArray(config.textLayers)) setTextLayers(config.textLayers);
-                if (config.motionEffect) setMotionEffect(config.motionEffect);
                 setEditTarget({ slug: d.slug, token: key, title: d.title });
             })
             .catch((e) => setEditError(e.message || 'Could not open this campaign'))
@@ -132,9 +119,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                 const config = frame.config ? (typeof frame.config === 'string' ? JSON.parse(frame.config) : frame.config) : frame;
                 setHistory([{ ...config, id: frame.id }]);
                 setHistoryIndex(0);
-                if (config.stickers) setStickers(config.stickers);
-                if (config.textLayers) setTextLayers(config.textLayers);
-                if (config.motionEffect) setMotionEffect(config.motionEffect);
                 localStorage.removeItem('temp_frame');
             }
         } catch (e) {
@@ -175,9 +159,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const handleReset = () => {
         setImageSrc(null);
         setPreviewDataUrl(null);
-        setStickers([]);
-        setTextLayers([]);
-        setMotionEffect('none');
     };
 
     // History Helpers
@@ -226,7 +207,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     return (
         <div className="min-h-screen bg-paper text-ink font-sans">
             <NavBar />
-            <OnboardingOverlay />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 lg:py-24">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
@@ -239,21 +219,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             selectedFrame={selectedFrame}
                             onReset={handleReset}
                             onPreviewUpdate={handlePreviewUpdate}
-
-                            // State Props
-                            stickers={stickers}
-                            onStickersChange={setStickers}
-                            textLayers={textLayers}
-                            onTextLayersChange={setTextLayers}
-                            motionEffect={motionEffect}
-                            isPlaying={isPlaying}
-
-                            // Interaction Props
-                            selection={selection}
-                            onSelectSticker={setSelection}
-                            selectedTextId={selectedTextId}
-                            onSelectText={setSelectedTextId}
-
                             editorRef={editorRef}
                             onRemoveBackground={handleRemoveBackground}
                             isRemovingBackground={isRemovingBg}
@@ -297,7 +262,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                                 { id: 'design', icon: Sparkles, label: 'Design' },
                                 { id: 'custom', icon: ImageIcon, label: 'Custom' },
                                 { id: 'customize', icon: Sliders, label: 'Edit' },
-                                // Text tab removed as per user request
                                 { id: 'preview', icon: Eye, label: 'Preview' },
                             ].map((tab) => (
                                 <button
@@ -352,45 +316,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                                 </div>
                             )}
 
-                            {activeTab === 'text' && (
-                                <div className="space-y-4 animate-fade-in">
-                                    <TextControls
-                                        textLayers={textLayers}
-                                        selectedTextId={selectedTextId}
-                                        onAddText={() => {
-                                            const newText: TextConfig = {
-                                                id: Date.now().toString(),
-                                                text: 'New Text',
-                                                x: 0,
-                                                y: 0,
-                                                fontSize: 40,
-                                                fontFamily: 'Inter',
-                                                color: '#ffffff',
-                                                rotation: 0,
-                                                align: 'center',
-                                                flip: false,
-                                                curved: true
-                                            };
-                                            setTextLayers([...textLayers, newText]);
-                                            setSelectedTextId(newText.id);
-                                            setSelection(null);
-                                        }}
-                                        onUpdateText={(id, updates) => {
-                                            setTextLayers(textLayers.map(t => t.id === id ? { ...t, ...updates } : t));
-                                        }}
-                                        onDeleteText={(id) => {
-                                            setTextLayers(textLayers.filter(t => t.id !== id));
-                                            if (selectedTextId === id) setSelectedTextId(null);
-                                        }}
-                                        onSelectText={(id) => {
-                                            setSelectedTextId(id);
-                                            setSelection(null);
-                                        }}
-                                    />
-                                </div>
-                            )}
-
-
                             {activeTab === 'preview' && (
                                 <div className="space-y-4 animate-fade-in flex flex-col items-center justify-center h-full">
                                     <div>
@@ -411,7 +336,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             <PublishTemplateModal
                 isOpen={isPublishOpen}
                 onClose={() => setIsPublishOpen(false)}
-                config={{ ...selectedFrame, stickers, textLayers }}
+                config={selectedFrame}
                 previewDataUrl={previewDataUrl}
                 parentId={remixId}
                 editTarget={editTarget}

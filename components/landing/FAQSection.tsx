@@ -5,7 +5,6 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import { motion } from "framer-motion";
 
 const faqs = [
     {
@@ -34,13 +33,13 @@ export const FAQSection = () => {
     return (
         <section className="py-24 bg-paper2/50">
             <div className="container px-4 max-w-3xl mx-auto">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    className="text-center mb-12"
-                >
+                {/* Was a framer-motion whileInView fade. The library was 130KB of the
+                    homepage bundle to animate one heading, and the Tailwind keyframes
+                    below already existed. This plays on mount rather than on scroll,
+                    which is what it looked like anyway at this position in the page. */}
+                <div className="text-center mb-12 animate-slide-up">
                     <h2 className="font-display text-3xl md:text-4xl font-extrabold text-ink mb-4">Questions, answered</h2>
-                </motion.div>
+                </div>
 
                 <Accordion type="single" collapsible className="w-full space-y-4">
                     {faqs.map((faq, i) => (

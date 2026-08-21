@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect } from 'react';
-import { CANVAS_SIZE } from '@/lib/constants';
-import { FrameConfig, Position, StickerConfig, MotionEffect, TextConfig } from '@/lib/types';
+import { FrameConfig } from '@/lib/types';
 import { useEditorLogic } from './editor/useEditorLogic';
 import { CanvasArea } from './editor/CanvasArea';
 import { EditorToolbar } from './editor/EditorToolbar';
@@ -12,20 +11,6 @@ interface EditorProps {
   selectedFrame: FrameConfig;
   onReset: () => void;
   onPreviewUpdate: (dataUrl: string) => void;
-
-  // Lifted State Props
-  stickers: StickerConfig[];
-  onStickersChange: (stickers: StickerConfig[]) => void;
-  textLayers: TextConfig[];
-  onTextLayersChange: (layers: TextConfig[]) => void;
-  motionEffect: MotionEffect;
-  isPlaying: boolean;
-
-  // Interaction State (Shared)
-  selection: string | null;
-  onSelectSticker: (id: string | null) => void;
-  selectedTextId: string | null;
-  onSelectText: (id: string | null) => void;
 
   // Export Ref
   editorRef?: React.RefObject<{ getDominantColors: () => Promise<string[]> } | null>;
@@ -41,187 +26,33 @@ export const Editor: React.FC<EditorProps> = ({
   selectedFrame,
   onReset,
   onPreviewUpdate,
-  stickers,
-  onStickersChange,
-  textLayers,
-  onTextLayersChange,
-  motionEffect,
-  isPlaying,
-  selection,
-  onSelectSticker,
-  selectedTextId,
-  onSelectText,
   editorRef,
   onRemoveBackground,
   isRemovingBackground
 }) => {
-  const logic = useEditorLogic({
-    imageSrc,
-    stickers,
-    onStickersChange,
-    textLayers,
-    onTextLayersChange,
-    selectedFrame
-  });
+  const logic = useEditorLogic({ imageSrc, selectedFrame });
 
-  // Sync interaction state from props to logic if needed, or handle bi-directionally
-  // For now, key state is in logic, but selection prop comes from parent in original code?
-  // Actually, original code had `selection` prop but also local interaction state.
-  // The `useEditorLogic` manages `interactionMode` and `dragStart`.
-  // The `selection` state seems to be lifted in original code, so we should sync.
-
+  // Panning the photo is the whole interaction model now. This used to open with
+  // sticker rotate/scale handle hit tests, then a text hit test, then a sticker
+  // hit test, before falling through to here.
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    const { x, y } = logic.getMousePos(e);
-    const centerX = CANVAS_SIZE / 2;
-    const centerY = CANVAS_SIZE / 2;
-    const STICKER_BASE_SIZE = 48; // Match constant
-
-    // 1. Check Sticker Interactons (Rotate/Scale handles)
-    if (selection) {
-      const s = stickers.find(st => st.id === selection);
-      if (s) {
-        const sX = centerX + s.x;
-        const sY = centerY + s.y;
-        const sSize = STICKER_BASE_SIZE * s.scale;
-        const localM = logic.rotatePoint(x, y, sX, sY, -s.rotation);
-        const localX = localM.x - sX;
-        const localY = localM.y - sY;
-
-        // Rotate Handle (Top)
-        if (Math.abs(localX) <= 10 && Math.abs(localY - (-sSize / 2 - 20)) <= 10) {
-          logic.setInteractionMode('rotate');
-          logic.setInitialStickerState({ ...s });
-          return;
-        }
-        // Scale Handles (Corners)
-        const half = sSize / 2;
-        const corners = [{ x: -half, y: -half }, { x: half, y: -half }, { x: half, y: half }, { x: -half, y: half }];
-        for (let c of corners) {
-          if (Math.abs(localX - c.x) <= 10 && Math.abs(localY - c.y) <= 10) {
-            logic.setInteractionMode('scale');
-            logic.setDragStart({ x, y });
-            logic.setInitialStickerState({ ...s });
-            return;
-          }
-        }
-      }
-    }
-
-    // 2. Hit Testing
-    let hitStickerId: string | null = null;
-    let hitTextId: string | null = null;
-    const ctx = logic.canvasRef.current?.getContext('2d');
-
-    // Text Hit Test
-    for (let i = textLayers.length - 1; i >= 0; i--) {
-      const t = textLayers[i];
-      const tX = centerX + t.x;
-      const tY = centerY + t.y;
-      const localM = logic.rotatePoint(x, y, tX, tY, -t.rotation);
-      const localX = localM.x - tX;
-      const localY = localM.y - tY;
-      if (ctx) {
-        ctx.font = `${t.fontSize}px "${t.fontFamily}", sans-serif`;
-        const metrics = ctx.measureText(t.text);
-        const width = metrics.width;
-        const height = t.fontSize;
-        let xStart = 0;
-        if (t.align === 'center') xStart = -width / 2;
-        if (t.align === 'right') xStart = -width;
-        if (localX >= xStart && localX <= xStart + width && localY >= -height / 2 && localY <= height / 2) {
-          hitTextId = t.id;
-          break;
-        }
-      }
-    }
-
-    if (hitTextId) {
-      onSelectText(hitTextId);
-      onSelectSticker(null);
-      logic.setInteractionMode('drag');
-      const t = textLayers.find(tl => tl.id === hitTextId)!;
-      // For angular drag, we need the initial angle of the mouse relative to center
-      const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
-      logic.setDragStart({ x, y }); // Store raw mouse pos
-      logic.setInitialTextState({ ...t, rotation: t.rotation - angle }); // Store offset
+    if (!logic.imageObject) {
+      logic.setInteractionMode('none');
       return;
     }
-
-    // Sticker Hit Test
-    for (let i = stickers.length - 1; i >= 0; i--) {
-      const s = stickers[i];
-      const sX = centerX + s.x;
-      const sY = centerY + s.y;
-      const sSize = STICKER_BASE_SIZE * s.scale;
-      const localM = logic.rotatePoint(x, y, sX, sY, -s.rotation);
-      const localX = localM.x - sX;
-      const localY = localM.y - sY;
-      if (Math.abs(localX) <= sSize / 2 && Math.abs(localY) <= sSize / 2) {
-        hitStickerId = s.id;
-        break;
-      }
-    }
-
-    if (hitStickerId) {
-      onSelectSticker(hitStickerId);
-      onSelectText(null);
-      logic.setInteractionMode('drag');
-      const s = stickers.find(st => st.id === hitStickerId)!;
-      logic.setDragStart({ x: x - s.x, y: y - s.y });
-    } else {
-      onSelectSticker(null);
-      onSelectText(null);
-      if (logic.imageObject) {
-        logic.setInteractionMode('pan');
-        logic.setDragStart({ x: x - logic.position.x, y: y - logic.position.y });
-      } else {
-        logic.setInteractionMode('none');
-      }
-    }
+    const { x, y } = logic.getMousePos(e);
+    logic.setInteractionMode('pan');
+    logic.setDragStart({ x: x - logic.position.x, y: y - logic.position.y });
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    if (logic.interactionMode === 'none') return;
+    if (logic.interactionMode !== 'pan') return;
     if (e.cancelable) e.preventDefault();
     const { x, y } = logic.getMousePos(e);
-    const centerX = CANVAS_SIZE / 2;
-    const centerY = CANVAS_SIZE / 2;
-
-    if (logic.interactionMode === 'pan') {
-      logic.setPosition({ x: x - logic.dragStart.x, y: y - logic.dragStart.y });
-    } else if (logic.interactionMode === 'drag') {
-      if (selection) {
-        onStickersChange(stickers.map(s => s.id === selection ? { ...s, x: x - logic.dragStart.x, y: y - logic.dragStart.y } : s));
-      } else if (selectedTextId && logic.initialTextState) {
-        // Angular Drag for Text
-        const currentAngle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
-        const newRotation = currentAngle + logic.initialTextState.rotation;
-        onTextLayersChange(textLayers.map(t => t.id === selectedTextId ? { ...t, rotation: newRotation } : t));
-      }
-    } else if (logic.interactionMode === 'rotate' && selection) {
-      onStickersChange(stickers.map(s => {
-        if (s.id !== selection) return s;
-        const sX = centerX + s.x;
-        const sY = centerY + s.y;
-        const angle = Math.atan2(y - sY, x - sX) * (180 / Math.PI);
-        return { ...s, rotation: angle + 90 };
-      }));
-    } else if (logic.interactionMode === 'scale' && selection && logic.initialStickerState) {
-      const STICKER_BASE_SIZE = 48; // Match constant
-      onStickersChange(stickers.map(s => {
-        if (s.id !== selection) return s;
-        const sX = centerX + s.x;
-        const sY = centerY + s.y;
-        const dist = Math.sqrt(Math.pow(x - sX, 2) + Math.pow(y - sY, 2));
-        const baseRadius = (STICKER_BASE_SIZE / 2) * Math.sqrt(2);
-        let newScale = dist / baseRadius;
-        if (newScale < 0.2) newScale = 0.2;
-        return { ...s, scale: newScale };
-      }));
-    }
+    logic.setPosition({ x: x - logic.dragStart.x, y: y - logic.dragStart.y });
   };
 
-  const handleEnd = () => { logic.setInteractionMode('none'); logic.setInitialStickerState(null); logic.setInitialTextState(null); };
+  const handleEnd = () => { logic.setInteractionMode('none'); };
 
   React.useImperativeHandle(editorRef, () => ({
     getDominantColors: logic.getDominantColors
@@ -242,20 +73,17 @@ export const Editor: React.FC<EditorProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  // Static preview update
+  // Static preview update. This is what produces the campaign thumbnail, so the
+  // body stays exactly as it was; only the `isPlaying` guard around it is gone,
+  // along with the sticker and text-layer entries in the dependency list.
   useEffect(() => {
-    // We need to trigger this update. 
-    // Since `draw` is in `CanvasArea`, we can rely on it updating the canvas, 
-    // and we just Poll the canvas here?
-    if (!isPlaying) {
-      const timeout = setTimeout(() => {
-        if (logic.canvasRef.current) {
-          onPreviewUpdate(logic.canvasRef.current.toDataURL('image/png', 0.5));
-        }
-      }, 500);
-      return () => clearTimeout(timeout);
-    }
-  }, [logic.canvasRef, isPlaying, selection, stickers, textLayers, logic.position, logic.scale, logic.rotation]);
+    const timeout = setTimeout(() => {
+      if (logic.canvasRef.current) {
+        onPreviewUpdate(logic.canvasRef.current.toDataURL('image/png', 0.5));
+      }
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [logic.canvasRef, logic.position, logic.scale, logic.rotation]);
 
 
   return (
@@ -264,16 +92,9 @@ export const Editor: React.FC<EditorProps> = ({
         canvasRef={logic.canvasRef as React.RefObject<HTMLCanvasElement>}
         imageObject={logic.imageObject}
         selectedFrame={selectedFrame}
-        stickers={stickers}
-        textLayers={textLayers}
         position={logic.position}
         scale={logic.scale}
         rotation={logic.rotation}
-        motionEffect={motionEffect}
-        isPlaying={isPlaying}
-        isRecording={logic.isRecording}
-        selection={selection}
-        selectedTextId={selectedTextId}
         isDragOver={logic.isDragOver}
         interactionMode={logic.interactionMode}
         onMouseDown={handleMouseDown}
@@ -295,11 +116,7 @@ export const Editor: React.FC<EditorProps> = ({
       />
 
       <EditorToolbar
-        canvasRef={logic.canvasRef as React.RefObject<HTMLCanvasElement>}
         imageObject={logic.imageObject}
-        selection={selection}
-        stickers={stickers}
-        onStickersChange={onStickersChange}
         scale={logic.scale}
         setScale={logic.setScale}
         rotation={logic.rotation}
