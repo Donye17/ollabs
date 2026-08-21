@@ -48,3 +48,10 @@ __pycache__/
 
 # Stale git lock files, safe to delete
 /_to_delete/
+
+# Environment files. NOTHING here is safe to commit: .env.local holds
+# BETTER_AUTH_SECRET, ADMIN_CLAIM_SECRET and every OAuth client secret, and
+# .env holds the live DATABASE_URL. This repo is public.
+.env
+.env.*
+!.env.example
