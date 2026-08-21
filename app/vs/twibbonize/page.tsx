@@ -43,10 +43,13 @@ const rows: { label: string; ollabs: string; twibbonize: string; ollabsWins: boo
         ollabsWins: true,
     },
     {
+        // Was "None" with a win marked against it. Ollabs runs ads now, so that
+        // row had become a false claim sitting in a comparison table, which is
+        // the worst place to leave one. Honest and not scored as a win.
         label: 'Ads',
-        ollabs: 'None',
+        ollabs: 'On some pages, never on the photo',
         twibbonize: 'Yes',
-        ollabsWins: true,
+        ollabsWins: false,
     },
     {
         label: 'Account required to support',
@@ -201,8 +204,9 @@ export default function VsTwibbonizePage() {
                         familiarity is worth something.
                     </p>
                     <p className="text-lg text-ink/75 leading-relaxed">
-                        Ollabs is newer and smaller. What we will not do is put an ad or a watermark or a payment
-                        screen between your supporters and the thing you asked them to do.
+                        Ollabs is newer and smaller. There are ads on some pages and they are what keeps it
+                        free. What we will not do is put a watermark or a payment screen between your supporters
+                        and the thing you asked them to do, or run an ad on the photo itself.
                     </p>
                 </div>
             </section>
