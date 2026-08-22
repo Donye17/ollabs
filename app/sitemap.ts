@@ -38,6 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { url: `${baseUrl}/es`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
         { url: `${baseUrl}/pt/vs/twibbonize`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
         { url: `${baseUrl}/id/vs/twibbonize`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+        { url: `${baseUrl}/es/vs/twibbonize`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
         { url: `${baseUrl}/vs/linktree`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
         { url: `${baseUrl}/create`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
         { url: `${baseUrl}/explore`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },

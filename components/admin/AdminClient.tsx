@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { Loader2, EyeOff, Eye, ExternalLink, ShieldAlert, Images } from 'lucide-react';
+import { Loader2, EyeOff, Eye, ExternalLink, ShieldAlert, Images, Globe } from 'lucide-react';
+import { countryLabel } from '@/lib/geo';
 import { DayFramesPanel } from './DayFramesPanel';
 
 interface ReportRow {
@@ -12,6 +13,71 @@ interface ReportRow {
     report_count: number;
     last_reported: string;
     reasons: string[] | null;
+}
+
+type CountryRow = { country: string; n: number };
+
+type GeoPayload = {
+    published: CountryRow[];
+    firstSupporter: CountryRow[];
+    supporterUses: CountryRow[];
+};
+
+function CountryTable({ title, rows }: { title: string; rows: CountryRow[] }) {
+    if (rows.length === 0) {
+        return (
+            <div className="bg-cream border border-ink/10 rounded-2xl p-4">
+                <p className="text-sm font-bold mb-1">{title}</p>
+                <p className="text-xs text-muted">No data yet.</p>
+            </div>
+        );
+    }
+    return (
+        <div className="bg-cream border border-ink/10 rounded-2xl p-4">
+            <p className="text-sm font-bold mb-3">{title}</p>
+            <ul className="space-y-1.5">
+                {rows.map((row) => (
+                    <li key={row.country} className="flex items-center justify-between gap-3 text-sm">
+                        <span className="truncate">{countryLabel(row.country) || row.country}</span>
+                        <span className="font-semibold tabular-nums shrink-0">{row.n.toLocaleString()}</span>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+
+function GeoStatsPanel({ adminKey }: { adminKey: string }) {
+    const [data, setData] = useState<GeoPayload | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetch(`/api/admin/geo?key=${encodeURIComponent(adminKey)}`)
+            .then(async (r) => {
+                if (!r.ok) throw new Error('Could not load geo stats.');
+                return r.json();
+            })
+            .then((d: GeoPayload) => setData(d))
+            .catch((e: Error) => setError(e.message))
+            .finally(() => setLoading(false));
+    }, [adminKey]);
+
+    if (loading) {
+        return <div className="flex items-center gap-2 text-muted text-sm"><Loader2 size={16} className="animate-spin" /> Loading geo...</div>;
+    }
+    if (error) {
+        return <div className="text-sm text-coral">{error}</div>;
+    }
+    if (!data) return null;
+
+    return (
+        <div className="grid gap-3 sm:grid-cols-3">
+            <CountryTable title="Published from" rows={data.published} />
+            <CountryTable title="First supporter from" rows={data.firstSupporter} />
+            <CountryTable title="Supporter saves" rows={data.supporterUses} />
+        </div>
+    );
 }
 
 export const AdminClient: React.FC = () => {
@@ -70,13 +136,23 @@ export const AdminClient: React.FC = () => {
                 </div>
 
                 {key && (
-                    <section className="mb-12">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Images size={18} className="text-brand-deep" />
-                            <h2 className="font-display text-xl font-extrabold">Day frames</h2>
-                        </div>
-                        <DayFramesPanel adminKey={key} />
-                    </section>
+                    <>
+                        <section className="mb-12">
+                            <div className="flex items-center gap-2 mb-4">
+                                <Globe size={18} className="text-brand-deep" />
+                                <h2 className="font-display text-xl font-extrabold">Country breakdown</h2>
+                            </div>
+                            <GeoStatsPanel adminKey={key} />
+                        </section>
+
+                        <section className="mb-12">
+                            <div className="flex items-center gap-2 mb-4">
+                                <Images size={18} className="text-brand-deep" />
+                                <h2 className="font-display text-xl font-extrabold">Day frames</h2>
+                            </div>
+                            <DayFramesPanel adminKey={key} />
+                        </section>
+                    </>
                 )}
 
                 <h2 className="font-display text-xl font-extrabold mb-4">Reported campaigns</h2>

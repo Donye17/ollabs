@@ -236,3 +236,84 @@ export const VS_ID: VsCopy = {
                   : r.twibbonize,
     })),
 };
+
+export const VS_ES: VsCopy = {
+    metaTitle: 'Ollabs vs Twibbonize',
+    metaDescription:
+        'Comparación honesta entre Ollabs y Twibbonize. La diferencia clave: Twibbonize cobra a quien apoya para quitar la marca de agua. Ollabs nunca cobra a quien apoya.',
+    eyebrow: 'Comparación',
+    h1: 'Ollabs vs Twibbonize',
+    hero: 'Ambos sirven para campañas de marco de foto de perfil. La diferencia que importa: en Twibbonize, quien apoya paga para quitar la marca de agua. En Ollabs, quien apoya nunca paga.',
+    createCta: 'Crear una campaña gratis',
+    exploreCta: 'Ver campañas en vivo',
+    tableHeaderOllabs: 'Ollabs',
+    tableHeaderTwibbonize: 'Twibbonize',
+    disclaimer:
+        'Basado en la documentación pública de Twibbonize sobre marcas de agua, a agosto de 2026. Si algo quedó desactualizado, escríbenos a hello@ollabs.studio.',
+    honestTitle: 'Dónde Twibbonize sigue siendo fuerte',
+    honestP1:
+        'Mejor ser honestos. Twibbonize es enorme, lleva años y tiene apps nativas. Muy arraigado en Latinoamérica y el sudeste asiático. Si necesitas una app en la tienda o un mercado que ya conoce ese nombre, esa familiaridad cuenta.',
+    honestP2:
+        'Ollabs es más nuevo y pequeño. Hay anuncios discretos en algunas páginas, y eso mantiene el servicio gratis. Lo que no hacemos: marca de agua, pantallas de pago entre quien apoya y tu campaña, ni anuncios encima de la foto.',
+    faqTitle: 'Preguntas frecuentes',
+    faqs: [
+        {
+            q: '¿Cuál es la diferencia real?',
+            a: 'Quién paga. Twibbonize pone marca de agua y cobra por quitarla. Ollabs: foto limpia para quien apoya, siempre.',
+        },
+        {
+            q: '¿Por qué importa la marca de agua?',
+            a: 'Para ONGs, escuelas o empresas, el costo cae en quien te apoya, no en la plataforma. Eso rebota en tu organización.',
+        },
+        {
+            q: '¿Ollabs es realmente gratis?',
+            a: 'Sí, no es prueba. Campañas y apoyadores sin límite.',
+        },
+        {
+            q: '¿Twibbonize es mejor en algo?',
+            a: 'Sí. Escala, historial y app móvil. En mercados donde domina, es una opción razonable.',
+        },
+        {
+            q: '¿Puedo migrar una campaña?',
+            a: 'No hay importación, pero recrearla toma unos minutos. Sube tu PNG transparente.',
+        },
+    ],
+    tryTitle: 'Prueba una campaña',
+    tryBody: 'Un minuto aproximadamente y gratis.',
+    tryCta: 'Crear campaña',
+    rows: VS_EN.rows.map((r) => ({
+        ...r,
+        label:
+            r.label === 'Watermark on the supporter\'s photo'
+                ? 'Marca de agua en la foto de quien apoya'
+                : r.label === 'Who pays'
+                  ? 'Quién paga'
+                  : r.label === 'Ads'
+                    ? 'Anuncios'
+                    : r.label === 'Account required to support'
+                      ? 'Cuenta para apoyar'
+                      : r.label === 'Account required to create'
+                        ? 'Cuenta para crear'
+                        : r.label === 'Mobile app'
+                          ? 'App móvil'
+                          : 'Escala e historial',
+        ollabs:
+            r.label === 'Watermark on the supporter\'s photo'
+                ? 'Nunca'
+                : r.label === 'Who pays'
+                  ? 'Nadie'
+                  : r.label === 'Ads'
+                    ? 'En algunas páginas, nunca en la foto'
+                    : r.label === 'Account required to create'
+                      ? 'No'
+                      : r.label === 'Mobile app'
+                        ? 'No, vía navegador'
+                        : r.ollabs,
+        twibbonize:
+            r.label === 'Watermark on the supporter\'s photo'
+                ? 'Sí, salvo que paguen'
+                : r.label === 'Who pays'
+                  ? 'Quien apoya, para quitar la marca'
+                  : r.twibbonize,
+    })),
+};
