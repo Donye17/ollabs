@@ -13,12 +13,14 @@ link. Supporters open that link, drop in a photo, and download the framed result
 
 **On `main`:** Phases 1–7 plus calendar moments (Phase 8 content, no paid upgrade).
 Mobile shell, custom-frame create (Frame → Name → Send), organizer save + slug 301s, quiet ads, PT-BR,
-organizer hubs, Bahasa, Tagalog and Hindi landings at `/tl` and `/hi`, localized `/pt/for` and `/id/for`
-pages, `/pt/vs/twibbonize` and `/id/vs/twibbonize`, top-market `/day` pages (NG, MX, MY, PH, TH),
-publisher country on campaign create (`publisher_country`, migration 0014), and an expanded `/day`
-calendar (Sept–Oct awareness + BR/ID local moments). iPhone share-first save on `/c`. Hub public pages
-show a **Made with** + Ollabs logo footer. **My campaigns** stays visible in the top nav on every phone
-screen (pill on mobile) and in the `/create` sticky bar.
+organizer hubs, Bahasa, Tagalog/Hindi/Spanish landings (`/tl`, `/hi`, `/es`), localized `/pt/for`,
+`/id/for`, and `/es/for` pages, `/pt/vs/twibbonize` and `/id/vs/twibbonize`, top-market `/day` pages
+(NG, MX, MY, PH, TH), geo tracking (`publisher_country`, `first_supporter_country`, supporter rows),
+first-supporter organizer email (migration 0016), country breakdown on `/mine`, hub handle suggestion
+after publish and on `/hub`, Messenger share on publish for ID/TL locales, and language banner offers
+for `/tl`, `/hi`, `/es`. iPhone share-first save on `/c`. Hub public pages show a **Made with** +
+Ollabs logo footer. **My campaigns** stays visible in the top nav on every phone screen (pill on mobile)
+and in the `/create` sticky bar.
 
 **Copy:** no em dashes in user-facing hub, create, or mine strings. Hub Support CTA
 is two lines (`Support` / campaign title), not `Support — title`.
@@ -29,7 +31,7 @@ category, country, or politics. Never on the photo; never on `/create`.
 carry denser labelled inventory between content blocks.
 **Paid upgrade:** deferred until hubs show demand.
 
-Next: org pilots in BR/ID, Spanish `/for` pages, admin country dashboard, AdSense slot split when approved.
+Next: org pilots in BR/ID, admin country dashboard, AdSense slot split when approved, `/es/vs/twibbonize`.
 
 **Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
 “Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page

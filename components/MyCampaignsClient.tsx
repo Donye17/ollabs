@@ -1,7 +1,9 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Pencil, Trash2, Inbox, LogIn, LogOut, Loader2, Users } from 'lucide-react';
+import { ExternalLink, Globe, Pencil, Trash2, Inbox, LogIn, LogOut, Loader2, Users } from 'lucide-react';
+import { countryLabel } from '@/lib/geo';
+import { suggestHandleFromEmail } from '@/lib/hub';
 
 interface SavedCampaign {
     slug: string;
@@ -18,6 +20,8 @@ interface AccountCampaign {
     supporter_count: number | null;
     view_count: number | null;
     created_at: string;
+    publisher_country: string | null;
+    first_supporter_country: string | null;
 }
 
 interface Row {
@@ -26,16 +30,24 @@ interface Row {
     url: string;
     manageUrl: string | null;
     supporters: number | null;
+    publisherCountry: string | null;
+    firstSupporterCountry: string | null;
     /** Present only for rows that live in this browser but not on the account. */
     localCreatedAt?: number;
 }
 
 const LOCAL_KEY = 'ollabs_my_campaigns';
 
+function countryChip(code: string | null): string | null {
+    if (!code) return null;
+    return countryLabel(code) || code;
+}
+
 export const MyCampaignsClient: React.FC = () => {
     const [local, setLocal] = useState<SavedCampaign[]>([]);
     const [account, setAccount] = useState<AccountCampaign[] | null>(null);
     const [email, setEmail] = useState<string | null>(null);
+    const [hubHandle, setHubHandle] = useState<string | null>(null);
     const [loaded, setLoaded] = useState(false);
 
     const loadAccount = useCallback(async () => {
@@ -44,11 +56,13 @@ export const MyCampaignsClient: React.FC = () => {
             if (res.status === 401) {
                 setAccount(null);
                 setEmail(null);
+                setHubHandle(null);
                 return;
             }
             const data = await res.json().catch(() => ({}));
             setAccount(Array.isArray(data?.campaigns) ? data.campaigns : []);
             setEmail(typeof data?.email === 'string' ? data.email : null);
+            setHubHandle(typeof data?.hub_handle === 'string' ? data.hub_handle : null);
         } catch {
             setAccount(null);
         }
@@ -73,9 +87,38 @@ export const MyCampaignsClient: React.FC = () => {
                 url: `${origin}/c/${c.slug}`,
                 manageUrl: `${origin}/c/${c.slug}/manage?k=${c.owner_token}`,
                 supporters: c.supporter_count,
+                publisherCountry: c.publisher_country,
+                firstSupporterCountry: c.first_supporter_country,
             })),
         [account, origin]
     );
+
+    const countrySummary = useMemo(() => {
+        if (!accountRows.length) return null;
+        const published = new Map<string, number>();
+        const firstJoin = new Map<string, number>();
+        for (const row of accountRows) {
+            if (row.publisherCountry) {
+                published.set(row.publisherCountry, (published.get(row.publisherCountry) || 0) + 1);
+            }
+            if (row.firstSupporterCountry && (row.supporters ?? 0) > 0) {
+                firstJoin.set(row.firstSupporterCountry, (firstJoin.get(row.firstSupporterCountry) || 0) + 1);
+            }
+        }
+        if (published.size === 0 && firstJoin.size === 0) return null;
+        return { published, firstJoin };
+    }, [accountRows]);
+
+    const suggestedHandle = useMemo(() => {
+        if (!email || hubHandle) return '';
+        return suggestHandleFromEmail(email);
+    }, [email, hubHandle]);
+
+    const hubHref = hubHandle
+        ? `/u/${hubHandle}`
+        : suggestedHandle
+          ? `/hub?suggest=${encodeURIComponent(suggestedHandle)}`
+          : '/hub';
 
     // Campaigns this browser remembers that are not on the account. Older
     // campaigns, or ones made before signing in. There is no "add to account"
@@ -91,6 +134,8 @@ export const MyCampaignsClient: React.FC = () => {
                 url: c.url,
                 manageUrl: c.manageUrl,
                 supporters: null,
+                publisherCountry: null,
+                firstSupporterCountry: null,
                 localCreatedAt: c.createdAt,
             }));
     }, [local, accountRows]);
@@ -105,6 +150,7 @@ export const MyCampaignsClient: React.FC = () => {
         try { await fetch('/api/auth/logout', { method: 'POST' }); } catch { /* ignore */ }
         setAccount(null);
         setEmail(null);
+        setHubHandle(null);
     };
 
     if (!loaded) {
@@ -130,18 +176,54 @@ export const MyCampaignsClient: React.FC = () => {
                 </div>
             )}
 
+            {signedIn && countrySummary && (
+                <div className="mb-4 rounded-2xl border border-ink/10 bg-paper px-4 py-3">
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted mb-2">
+                        <Globe size={13} /> Where your campaigns travel
+                    </div>
+                    <div className="space-y-2 text-sm text-ink/80">
+                        {countrySummary.published.size > 0 && (
+                            <p>
+                                <span className="font-semibold text-ink">Published from:</span>{' '}
+                                {[...countrySummary.published.entries()]
+                                    .sort((a, b) => b[1] - a[1])
+                                    .map(([code, n]) => `${countryChip(code)} (${n})`)
+                                    .join(', ')}
+                            </p>
+                        )}
+                        {countrySummary.firstJoin.size > 0 && (
+                            <p>
+                                <span className="font-semibold text-ink">First supporters from:</span>{' '}
+                                {[...countrySummary.firstJoin.entries()]
+                                    .sort((a, b) => b[1] - a[1])
+                                    .map(([code, n]) => `${countryChip(code)} (${n})`)
+                                    .join(', ')}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {signedIn && (
                 <Link
-                    href="/hub"
+                    href={hubHref}
                     className="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-brand/25 bg-brand/10 px-4 py-4 min-h-[56px] hover:bg-brand/15 active:bg-brand/20 transition-colors"
                 >
                     <div className="min-w-0">
-                        <p className="font-display font-bold text-[15px]">Your campaign hub</p>
+                        <p className="font-display font-bold text-[15px]">
+                            {hubHandle ? 'Your campaign hub' : 'Claim your campaign hub'}
+                        </p>
                         <p className="text-xs text-ink/70 truncate">
-                            Claim /u/… with Support button, bio, and other links
+                            {hubHandle
+                                ? `ollabs.studio/u/${hubHandle}`
+                                : suggestedHandle
+                                  ? `Suggested: /u/${suggestedHandle} with Support button, bio, and links`
+                                  : 'Claim /u/… with Support button, bio, and other links'}
                         </p>
                     </div>
-                    <span className="text-xs font-bold text-brand-deep shrink-0">Edit</span>
+                    <span className="text-xs font-bold text-brand-deep shrink-0">
+                        {hubHandle ? 'View' : 'Edit'}
+                    </span>
                 </Link>
             )}
 
@@ -206,40 +288,52 @@ export const MyCampaignsClient: React.FC = () => {
     );
 };
 
-const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRemove }) => (
-    <div className="bg-cream border border-ink/10 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="min-w-0 flex-1">
-            <p className="font-display font-bold truncate text-[15px]">{row.title}</p>
-            <p className="text-xs text-muted truncate flex items-center gap-2 mt-0.5">
-                <span className="truncate">ollabs.studio/c/{row.slug}</span>
-                {row.supporters != null && (
-                    <span className="inline-flex items-center gap-1 shrink-0">
-                        <Users size={11} /> {row.supporters.toLocaleString()}
-                    </span>
+const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRemove }) => {
+    const pub = countryChip(row.publisherCountry);
+    const first = countryChip(row.firstSupporterCountry);
+
+    return (
+        <div className="bg-cream border border-ink/10 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="min-w-0 flex-1">
+                <p className="font-display font-bold truncate text-[15px]">{row.title}</p>
+                <p className="text-xs text-muted truncate flex items-center gap-2 mt-0.5 flex-wrap">
+                    <span className="truncate">ollabs.studio/c/{row.slug}</span>
+                    {row.supporters != null && (
+                        <span className="inline-flex items-center gap-1 shrink-0">
+                            <Users size={11} /> {row.supporters.toLocaleString()}
+                        </span>
+                    )}
+                </p>
+                {(pub || first) && (
+                    <p className="text-[11px] text-ink/60 mt-1 leading-snug">
+                        {pub && <span>Published {pub}</span>}
+                        {pub && first && <span> · </span>}
+                        {first && <span>First join {first}</span>}
+                    </p>
                 )}
-            </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
-            <a href={row.url} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-paper border border-ink/10 hover:bg-ink/5 transition-colors" title="Open campaign">
-                <ExternalLink size={16} className="text-ink" />
-            </a>
-            {row.manageUrl && (
-                <a href={row.manageUrl} className="min-h-11 px-4 rounded-lg bg-brand text-ink font-semibold text-sm flex items-center gap-1.5 hover:brightness-105 active:brightness-95 transition-all flex-1 sm:flex-none justify-center" title="Edit this campaign and see its stats">
-                    <Pencil size={15} /> Manage
+            </div>
+            <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
+                <a href={row.url} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-paper border border-ink/10 hover:bg-ink/5 transition-colors" title="Open campaign">
+                    <ExternalLink size={16} className="text-ink" />
                 </a>
-            )}
-            <a
-                href={`/create?remix=${encodeURIComponent(row.slug)}`}
-                className="min-h-11 px-3 rounded-lg bg-paper border border-ink/15 text-ink font-semibold text-sm flex items-center gap-1 hover:bg-ink/5 transition-colors justify-center"
-                title="Start a new campaign with this frame"
-            >
-                Reuse frame
-            </a>
-            {onRemove && (
-                <button onClick={onRemove} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-paper border border-ink/10 hover:text-coral transition-colors" title="Remove from this list">
-                    <Trash2 size={16} />
-                </button>
-            )}
+                {row.manageUrl && (
+                    <a href={row.manageUrl} className="min-h-11 px-4 rounded-lg bg-brand text-ink font-semibold text-sm flex items-center gap-1.5 hover:brightness-105 active:brightness-95 transition-all flex-1 sm:flex-none justify-center" title="Edit this campaign and see its stats">
+                        <Pencil size={15} /> Manage
+                    </a>
+                )}
+                <a
+                    href={`/create?remix=${encodeURIComponent(row.slug)}`}
+                    className="min-h-11 px-3 rounded-lg bg-paper border border-ink/15 text-ink font-semibold text-sm flex items-center gap-1 hover:bg-ink/5 transition-colors justify-center"
+                    title="Start a new campaign with this frame"
+                >
+                    Reuse frame
+                </a>
+                {onRemove && (
+                    <button onClick={onRemove} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-paper border border-ink/10 hover:text-coral transition-colors" title="Remove from this list">
+                        <Trash2 size={16} />
+                    </button>
+                )}
+            </div>
         </div>
-    </div>
-);
+    );
+};

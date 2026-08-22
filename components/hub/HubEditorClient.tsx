@@ -20,6 +20,7 @@ import {
     HUB_LINKS_MAX,
     handleError,
     normalizeHandle,
+    suggestHandleFromEmail,
 } from '@/lib/hub';
 
 type CampaignOpt = {
@@ -81,7 +82,15 @@ export const HubEditorClient: React.FC = () => {
             }
             const data = (await res.json()) as HubPayload;
             setSignedIn(true);
-            setHandle(data.handle || '');
+            let nextHandle = data.handle || '';
+            if (!nextHandle) {
+                try {
+                    const suggest = new URLSearchParams(window.location.search).get('suggest');
+                    if (suggest) nextHandle = normalizeHandle(suggest);
+                    else if (data.email) nextHandle = suggestHandleFromEmail(data.email);
+                } catch { /* ignore */ }
+            }
+            setHandle(nextHandle);
             setPublishedHandle(data.handle);
             setDisplayName(data.displayName || '');
             setBio(data.bio || '');

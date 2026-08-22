@@ -20,7 +20,8 @@ export async function GET(request: NextRequest) {
         }
 
         const result = await pool.query(
-            `SELECT slug, title, owner_token, supporter_count, view_count, created_at
+            `SELECT slug, title, owner_token, supporter_count, view_count, created_at,
+                    publisher_country, first_supporter_country
              FROM campaigns
              WHERE creator_id = $1 AND is_hidden IS NOT TRUE
              ORDER BY created_at DESC
@@ -28,7 +29,16 @@ export async function GET(request: NextRequest) {
             [organizer.id]
         );
 
-        return NextResponse.json({ email: organizer.email, campaigns: result.rows });
+        const hubRes = await pool.query(
+            `SELECT handle FROM organizers WHERE id = $1 LIMIT 1`,
+            [organizer.id]
+        );
+
+        return NextResponse.json({
+            email: organizer.email,
+            hub_handle: (hubRes.rows[0]?.handle as string | null) ?? null,
+            campaigns: result.rows,
+        });
     } catch (error) {
         console.error('Failed to list organizer campaigns:', error);
         return NextResponse.json({ error: 'Failed to load your campaigns' }, { status: 500 });

@@ -1,7 +1,7 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse, after } from 'next/server';
-import { milestoneEmail, sendEmail } from '@/lib/email';
-import { publisherCountry } from '@/lib/geo';
+import { firstSupporterEmail, milestoneEmail, sendEmail } from '@/lib/email';
+import { countryLabel, publisherCountry } from '@/lib/geo';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,6 +70,32 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                 `UPDATE campaigns SET first_supporter_country = $2 WHERE id = $1 AND first_supporter_country IS NULL`,
                 [campaignId, supporterCountry]
             );
+        }
+
+        // First supporter is the highest-leverage nudge: median first join is 4.5
+        // minutes after publish. Guard with first_supporter_emailed_at like milestones.
+        if (prevCount === 0 && count === 1 && campaign.organizer_email) {
+            after(async () => {
+                try {
+                    const claim = await pool.query(
+                        `UPDATE campaigns SET first_supporter_emailed_at = NOW()
+                         WHERE id = $1 AND first_supporter_emailed_at IS NULL
+                         RETURNING id`,
+                        [campaignId]
+                    );
+                    if (claim.rowCount === 0) return;
+                    const msg = firstSupporterEmail({
+                        title: campaign.title,
+                        slug,
+                        ownerToken: campaign.owner_token,
+                        country: supporterCountry,
+                        countryName: countryLabel(supporterCountry),
+                    });
+                    await sendEmail({ to: campaign.organizer_email, ...msg });
+                } catch (e) {
+                    console.error('[use] first supporter email failed', e);
+                }
+            });
         }
 
         // Milestone nudge. Guarded by milestone_notified so a burst of traffic

@@ -28,6 +28,9 @@ export const RESERVED_HANDLES = new Set([
     'ollabs',
     'privacy',
     'pt',
+    'tl',
+    'hi',
+    'es',
     'recover',
     'settings',
     'support',
@@ -100,6 +103,27 @@ export function isSafeHttpUrl(raw: string): boolean {
 }
 
 /** Whether crawlers should index this hub (has something useful to show). */
+/**
+ * Best-effort handle from an organizer email local part.
+ * Used after publish and on /hub so claiming /u/… is one tap, not a blank field.
+ */
+export function suggestHandleFromEmail(email: string): string {
+    const local = (email.split('@')[0] || '').trim();
+    if (!local) return '';
+
+    const candidates = [
+        normalizeHandle(local),
+        normalizeHandle(local.split('.')[0] || ''),
+        normalizeHandle(local.split('+')[0] || ''),
+        normalizeHandle(local.replace(/\d+$/g, '')),
+    ];
+
+    for (const c of candidates) {
+        if (isValidHandle(c)) return c;
+    }
+    return '';
+}
+
 export function hubIsIndexable(hub: {
     featured: unknown;
     campaigns: unknown[];

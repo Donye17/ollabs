@@ -8,7 +8,8 @@ import { FramePreview } from './FramePreview';
 import { QRCode } from './QRCode';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from './ShareGlyphs';
 import { track, withUtm } from '@/lib/analytics';
-import { organizerShareText, whatsappUrl } from '@/lib/share';
+import { organizerShareText, whatsappUrl, messengerShareUrl, prefersTagalog } from '@/lib/share';
+import { suggestHandleFromEmail } from '@/lib/hub';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 
 interface EditTarget {
@@ -49,6 +50,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     // When they are, the campaign attaches to their account server side and the
     // whole account panel disappears, because there is nothing left to ask.
     const [sessionEmail, setSessionEmail] = useState<string | null>(null);
+    const [hubHandle, setHubHandle] = useState<string | null>(null);
     useEffect(() => {
         if (!isOpen) return;
         let cancelled = false;
@@ -56,6 +58,10 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             .then((r) => (r.ok ? r.json() : null))
             .then((d) => { if (!cancelled && d?.email) setSessionEmail(d.email); })
             .catch(() => { /* signed out, which is the normal case */ });
+        fetch('/api/organizer/hub')
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d) => { if (!cancelled && d?.handle) setHubHandle(d.handle); })
+            .catch(() => { /* no hub yet */ });
         return () => { cancelled = true; };
     }, [isOpen]);
 
@@ -470,6 +476,22 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         }
     };
 
+    const showMessengerShare = locale === 'id' || prefersTagalog();
+
+    const shareMessenger = () => {
+        if (!campaignUrl) return;
+        window.location.href = messengerShareUrl(withUtm(campaignUrl, 'messenger'));
+        track('campaign_share', { campaign: campaignSlug, platform: 'messenger', from: 'publish' });
+    };
+
+    const publishEmail = sessionEmail || organizerEmail || accountEmail;
+    const suggestedHubHandle = !hubHandle && publishEmail ? suggestHandleFromEmail(publishEmail) : '';
+    const hubHref = hubHandle
+        ? `/u/${hubHandle}`
+        : suggestedHubHandle
+          ? `/hub?suggest=${encodeURIComponent(suggestedHubHandle)}`
+          : '/hub';
+
     const handleCopyManage = async () => {
         if (!manageUrl) return;
         try {
@@ -540,6 +562,15 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 <WhatsAppGlyph size={20} /> {tp.shareWhatsApp}
                             </button>
 
+                            {showMessengerShare && (
+                                <button
+                                    onClick={shareMessenger}
+                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-[#0084FF] text-white hover:brightness-105 active:brightness-95 transition-all"
+                                >
+                                    <Share2 size={18} /> {tp.shareMessenger}
+                                </button>
+                            )}
+
                             {canNativeShare && (
                                 <button
                                     onClick={shareNative}
@@ -581,13 +612,19 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             )}
 
                             <Link
-                                href="/hub"
+                                href={hubHref}
                                 onClick={() => track('hub_from_publish', { campaign: campaignSlug || '' })}
                                 className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-brand/30 text-brand-deep hover:bg-brand/10 active:bg-brand/15 transition-all"
                             >
-                                <LayoutGrid size={16} /> {tp.setupHub}
+                                <LayoutGrid size={16} /> {hubHandle ? 'Open your hub' : tp.setupHub}
                             </Link>
-                            <p className="text-xs text-muted text-center">{tp.setupHubBody}</p>
+                            <p className="text-xs text-muted text-center">
+                                {hubHandle
+                                    ? `Your hub is live at ollabs.studio/u/${hubHandle}`
+                                    : suggestedHubHandle
+                                      ? `Suggested handle: /u/${suggestedHubHandle}. ${tp.setupHubBody}`
+                                      : tp.setupHubBody}
+                            </p>
 
                             <div className="border-t border-ink/10 pt-4 space-y-3">
                                 <p className="text-sm font-bold text-ink">{tp.thenSaveAccess}</p>

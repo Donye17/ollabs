@@ -110,6 +110,42 @@ Keep this email. That dashboard link is the key to your campaign, and it is how 
     };
 }
 
+export function firstSupporterEmail(opts: {
+    title: string;
+    slug: string;
+    ownerToken: string;
+    country?: string | null;
+    countryName?: string | null;
+}) {
+    const manage = `${SITE}/c/${opts.slug}/manage?k=${opts.ownerToken}`;
+    const url = `${SITE}/c/${opts.slug}`;
+    const t = esc(opts.title);
+    const where = opts.countryName
+        ? ` from ${esc(opts.countryName)}`
+        : opts.country
+          ? ` (${esc(opts.country)})`
+          : '';
+    const headline = `Your first supporter just joined${where}`;
+    return {
+        subject: `First supporter on "${opts.title}"`,
+        text: [
+            headline,
+            ``,
+            `Someone added your frame. Momentum matters most in the first hour, so this is a good moment to share again.`,
+            ``,
+            `Campaign: ${url}`,
+            `Dashboard: ${manage}`,
+        ].join('\n'),
+        html: shell(`
+<tr><td style="font-size:22px;font-weight:800;padding-bottom:8px;">${headline}</td></tr>
+<tr><td style="font-size:15px;line-height:1.6;color:#374151;padding-bottom:22px;">
+<strong>${t}</strong> has its first supporter. Most campaigns get their first person in the first hour after publish, so a quick reshare now is worth it.
+</td></tr>
+<tr><td style="padding-bottom:20px;">${button(manage, 'See your numbers')}</td></tr>
+<tr><td style="font-size:13px;line-height:1.6;color:#6B7280;">Share again: <a href="${url}" style="color:#0369A1;">${url}</a></td></tr>`),
+    };
+}
+
 export function milestoneEmail(opts: {
     title: string; slug: string; ownerToken: string; count: number; goal?: number | null;
 }) {

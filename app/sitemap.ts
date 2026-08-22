@@ -3,6 +3,7 @@ import { pool } from '@/lib/neon';
 import { USE_CASES } from '@/lib/useCases';
 import { USE_CASES_PT } from '@/lib/useCasesPt';
 import { USE_CASES_ID } from '@/lib/useCasesId';
+import { USE_CASES_ES } from '@/lib/useCasesEs';
 import { DAYS } from '@/lib/days';
 
 export const revalidate = 3600; // Revalidate every hour
@@ -55,6 +56,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         })),
         ...USE_CASES_ID.map((u) => ({
             url: `${baseUrl}/id/for/${u.slug}`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly' as const,
+            priority: 0.82,
+        })),
+        ...USE_CASES_ES.map((u) => ({
+            url: `${baseUrl}/es/for/${u.slug}`,
             lastModified: new Date(),
             changeFrequency: 'monthly' as const,
             priority: 0.82,

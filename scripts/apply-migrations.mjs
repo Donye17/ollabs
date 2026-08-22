@@ -29,7 +29,7 @@ if (!url) {
 }
 
 const sql = neon(url);
-const files = ['0014_publisher_country.sql', '0015_supporter_country.sql'];
+const files = ['0014_publisher_country.sql', '0015_supporter_country.sql', '0016_first_supporter_emailed.sql'];
 
 for (const file of files) {
     const raw = readFileSync(join(root, 'drizzle', file), 'utf8');

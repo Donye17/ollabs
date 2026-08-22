@@ -13,52 +13,87 @@ import {
 
 const DISMISS_KEY = 'ollabs_locale_banner_dismissed';
 
+type MarketingLocale = Locale | 'tl' | 'hi' | 'es';
+
+function marketingLandingPath(locale: MarketingLocale): string | null {
+    if (locale === 'tl') return '/tl';
+    if (locale === 'hi') return '/hi';
+    if (locale === 'es') return '/es';
+    return localeLandingPath(locale);
+}
+
+/** Browser-first locale for soft banner offers (includes TL/HI/ES landings). */
+function resolveMarketingLocale(languages: readonly string[]): MarketingLocale {
+    for (const l of languages) {
+        if (typeof l !== 'string') continue;
+        const lower = l.toLowerCase();
+        if (lower.startsWith('pt')) return 'pt';
+        if (lower.startsWith('id')) return 'id';
+        if (lower.startsWith('fil') || lower.startsWith('tl')) return 'tl';
+        if (lower.startsWith('hi')) return 'hi';
+        if (lower.startsWith('es')) return 'es';
+    }
+    return 'en';
+}
+
+function onMarketingLanding(pathname: string): MarketingLocale | null {
+    if (pathname === '/pt' || pathname.startsWith('/pt/')) return 'pt';
+    if (pathname === '/id' || pathname.startsWith('/id/')) return 'id';
+    if (pathname === '/tl' || pathname.startsWith('/tl/')) return 'tl';
+    if (pathname === '/hi' || pathname.startsWith('/hi/')) return 'hi';
+    if (pathname === '/es' || pathname.startsWith('/es/')) return 'es';
+    return null;
+}
+
 /**
  * Soft language offer. Never hard-redirects on first paint — that fights
  * WhatsApp WebViews. Choosing PT/ID can navigate to /pt or /id for SEO entry.
  */
 export function LanguageBanner() {
     const pathname = usePathname() || '/';
-    const onPtSite = pathname === '/pt' || pathname.startsWith('/pt/');
-    const onIdSite = pathname === '/id' || pathname.startsWith('/id/');
-    const onLocaleLanding = onPtSite || onIdSite;
+    const landingLocale = onMarketingLanding(pathname);
+    const onLocaleLanding = landingLocale != null;
     const { locale, setLocale, messages } = useLocale();
     const [visible, setVisible] = useState(false);
-    const [suggested, setSuggested] = useState<Locale | null>(null);
+    const [suggested, setSuggested] = useState<MarketingLocale | null>(null);
 
     useEffect(() => {
         try {
             if (sessionStorage.getItem(DISMISS_KEY) === '1') return;
         } catch { /* ignore */ }
 
-        const nav = resolveLocale({
-            languages: typeof navigator !== 'undefined' ? navigator.languages : [],
-        });
+        const nav = resolveMarketingLocale(
+            typeof navigator !== 'undefined' ? navigator.languages : []
+        );
 
         const cookie = document.cookie.match(new RegExp(`(?:^|; )${LOCALE_COOKIE}=([^;]*)`));
         const cookieLocale = cookie?.[1];
 
-        // On the English site: offer PT or ID when the browser says so, unless
-        // they already chose English explicitly.
-        if (!onLocaleLanding && (nav === 'pt' || nav === 'id')) {
+        // On the English site: offer a locale landing when the browser says so,
+        // unless they already chose English explicitly.
+        if (!onLocaleLanding && nav !== 'en') {
             if (cookieLocale === 'en') return;
             setSuggested(nav);
             setVisible(true);
             return;
         }
 
-        // On a locale landing: offer English when the browser is English-first
-        // and they are viewing the translated page.
-        if (onPtSite && nav === 'en' && locale === 'pt') {
+        // On a locale landing: offer English when the browser is English-first.
+        if (landingLocale === 'pt' && nav === 'en' && locale === 'pt') {
             setSuggested('en');
             setVisible(true);
             return;
         }
-        if (onIdSite && nav === 'en' && locale === 'id') {
+        if (landingLocale === 'id' && nav === 'en' && locale === 'id') {
+            setSuggested('en');
+            setVisible(true);
+            return;
+        }
+        if ((landingLocale === 'tl' || landingLocale === 'hi' || landingLocale === 'es') && nav === 'en') {
             setSuggested('en');
             setVisible(true);
         }
-    }, [onLocaleLanding, onPtSite, onIdSite, locale]);
+    }, [onLocaleLanding, landingLocale, locale]);
 
     if (!visible || !suggested) return null;
 
@@ -68,9 +103,11 @@ export function LanguageBanner() {
     };
 
     const accept = () => {
-        setLocale(suggested);
+        if (suggested === 'pt' || suggested === 'id' || suggested === 'en') {
+            setLocale(suggested);
+        }
         dismiss();
-        const landing = localeLandingPath(suggested);
+        const landing = marketingLandingPath(suggested);
         if (landing && !onLocaleLanding) {
             window.location.href = landing;
             return;
@@ -93,7 +130,25 @@ export function LanguageBanner() {
                   switchTo: 'Pakai Bahasa',
                   dismiss: 'Tetap English',
               }
-              : messages.banner;
+              : suggested === 'tl'
+                ? {
+                    suggest: 'Mukhang Tagalog ang wika mo. Gusto mo bang makita ang Ollabs sa Filipino?',
+                    switchTo: 'Gamitin ang Filipino',
+                    dismiss: 'Keep English',
+                }
+                : suggested === 'hi'
+                  ? {
+                      suggest: 'लगता है आप हिंदी बोलते हैं। क्या Ollabs हिंदी में देखना चाहेंगे?',
+                      switchTo: 'हिंदी में देखें',
+                      dismiss: 'Keep English',
+                  }
+                  : suggested === 'es'
+                    ? {
+                        suggest: 'Parece que hablas español. ¿Quieres ver Ollabs en español?',
+                        switchTo: 'Usar español',
+                        dismiss: 'Keep English',
+                    }
+                    : messages.banner;
 
     return (
         <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] inset-x-0 z-50 px-3 pointer-events-none sm:bottom-4">
@@ -119,6 +174,9 @@ export function LanguageBanner() {
             <span className="sr-only">
                 <Link href="/pt">Português</Link>
                 <Link href="/id">Bahasa Indonesia</Link>
+                <Link href="/tl">Filipino</Link>
+                <Link href="/hi">Hindi</Link>
+                <Link href="/es">Español</Link>
             </span>
         </div>
     );
