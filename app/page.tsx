@@ -59,14 +59,34 @@ export default function Home() {
                     <p className="text-lg md:text-xl text-ink/70 mb-8 max-w-2xl mx-auto leading-relaxed">
                         Make a profile-picture frame for your cause, team, or event. Share one link and your people add it to their photo in seconds. Free, no signup, no watermark.
                     </p>
-                    <div className="flex flex-wrap items-center justify-center gap-3">
-                        <Link href="/create" className="group h-12 px-7 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all">
+                    <div className="flex flex-col items-center gap-3">
+                        <Link
+                            href="/create"
+                            className="group h-12 px-7 rounded-xl bg-brand text-ink font-bold inline-flex items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all"
+                        >
                             Create a campaign
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
-                        <Link href="/explore" className="h-12 px-7 rounded-xl bg-transparent border border-ink/15 text-ink font-bold flex items-center hover:bg-ink/5 transition-all">
-                            Explore campaigns
-                        </Link>
+                        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                            <Link
+                                href="/mine"
+                                className="min-h-[44px] px-4 rounded-xl border border-ink/15 bg-cream text-ink text-sm font-bold inline-flex items-center hover:bg-ink/5 transition-colors"
+                            >
+                                My campaigns
+                            </Link>
+                            <Link
+                                href="/updates"
+                                className="min-h-[44px] px-4 rounded-xl border border-ink/15 bg-cream text-ink text-sm font-bold inline-flex items-center hover:bg-ink/5 transition-colors"
+                            >
+                                What&apos;s new
+                            </Link>
+                            <Link
+                                href="/for"
+                                className="min-h-[44px] px-4 rounded-xl border border-ink/15 bg-cream text-ink text-sm font-bold inline-flex items-center hover:bg-ink/5 transition-colors"
+                            >
+                                Use cases
+                            </Link>
+                        </div>
                     </div>
                 </div>
 

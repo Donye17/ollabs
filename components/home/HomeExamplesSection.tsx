@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { pool } from '@/lib/neon';
 import { visibleFrameSql, HOME_TOP_CAMPAIGNS, MIN_SUPPORTERS_TO_DISPLAY } from '@/lib/frameValidity';
 import type { FrameConfig } from '@/lib/types';
@@ -51,14 +50,6 @@ export async function HomeExamplesSection() {
                 Real frames people are using right now, ranked by supporters.
             </p>
             <HomeTopCampaignsClient campaigns={campaigns} />
-            <div className="mt-8 text-center">
-                <Link
-                    href="/explore"
-                    className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-ink/15 bg-paper px-5 text-sm font-bold text-ink hover:bg-ink/5 transition-colors"
-                >
-                    Explore all campaigns
-                </Link>
-            </div>
         </div>
     );
 }
