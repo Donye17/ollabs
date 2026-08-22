@@ -360,7 +360,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     };
 
     return (
-        <div className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-6 ${hasImage ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]' : 'pb-6'}`}>
+        <div className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-6 ${hasImage ? 'pb-[calc(11rem+env(safe-area-inset-bottom,0px))]' : 'pb-6'}`}>
             <a href="/" className="mb-6">
                 <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-7 w-auto" />
             </a>
@@ -613,7 +613,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 browsers ignore <a download>); Download leads where the sheet
                 does not exist. Safe-area so the home indicator never covers it. */}
             {hasImage && (
-                <div className="fixed bottom-0 inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
+                <div className="fixed bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-3">
                     <div className="w-full max-w-sm mx-auto flex flex-col gap-2">
                         {saveError && (
                             <p role="alert" className="text-xs text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2 text-center">

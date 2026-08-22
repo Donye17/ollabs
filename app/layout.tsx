@@ -147,6 +147,12 @@ export default function RootLayout({
                 />
                 <LocaleProvider>
                     {children}
+                    {/* Reserve space for the fixed mobile tab bar on every page. */}
+                    <div
+                        className="lg:hidden shrink-0 pointer-events-none"
+                        style={{ height: 'calc(3.75rem + env(safe-area-inset-bottom, 0px))' }}
+                        aria-hidden
+                    />
                     <MobileOrganizerNav />
                     <LanguageBanner />
                 </LocaleProvider>

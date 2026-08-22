@@ -204,7 +204,7 @@ export const HubEditorClient: React.FC = () => {
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://ollabs.studio';
 
     return (
-        <div className="max-w-lg mx-auto space-y-6 pb-[max(6rem,env(safe-area-inset-bottom))]">
+        <div className="max-w-lg mx-auto space-y-6 pb-[max(10rem,calc(6rem+env(safe-area-inset-bottom)))]">
             {previewPath && (
                 <a
                     href={previewPath}
@@ -404,7 +404,7 @@ export const HubEditorClient: React.FC = () => {
 
             <HubMadeWithFooter className="pt-2" />
 
-            <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <div className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-5 pt-3 pb-3">
                 <div className="max-w-lg mx-auto flex items-center gap-3">
                     <button
                         type="button"

@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-22-mobile-tab-bar',
+        date: '2026-08-22',
+        title: 'Create, Mine, and Hub on every phone screen',
+        summary: 'A clearer bottom tab bar so you can move around without hunting for links.',
+        items: [
+            'Mine, Create, and Hub stay fixed at the bottom on every mobile page.',
+            'Create sits raised in the middle on a dark bar so it is easy to spot with your thumb.',
+            'Save and share bars on create and campaign pages sit above the tab bar.',
+        ],
+    },
+    {
         id: '2026-08-22-home-podium',
         date: '2026-08-22',
         title: 'Home shows the top three campaigns',

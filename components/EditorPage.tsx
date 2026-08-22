@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import Link from 'next/link';
 import { Editor } from './Editor';
 import { FrameSelector } from './FrameSelector';
 import { CustomFramePanel } from './CustomFramePanel';
@@ -220,7 +219,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const openPublish = () => setIsPublishOpen(true);
 
     return (
-        <div className="min-h-screen bg-paper text-ink font-sans pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+        <div className="min-h-screen bg-paper text-ink font-sans pb-[calc(9.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
             <NavBar />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(3.5rem+env(safe-area-inset-top,0px)+0.5rem)] pb-6 lg:py-24">
@@ -307,17 +306,11 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
             {/* Thumb-zone create. Header buttons are easy to miss once you are
                 deep in cutout controls on a small screen. */}
-            <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
-                <div className="max-w-lg mx-auto flex gap-2">
-                    <Link
-                        href="/mine"
-                        className="min-h-[52px] px-4 rounded-xl border border-brand/25 bg-brand/10 text-brand-deep font-bold text-[11px] uppercase tracking-wider inline-flex items-center justify-center shrink-0 hover:bg-brand/15 active:bg-brand/20 transition-colors"
-                    >
-                        My campaigns
-                    </Link>
+        <div className="fixed bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-3">
+                <div className="max-w-lg mx-auto">
                     <button
                         onClick={openPublish}
-                        className="flex-1 min-h-[52px] flex items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 active:brightness-95 transition-all"
+                        className="w-full min-h-[52px] flex items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 active:brightness-95 transition-all"
                     >
                     {editTarget
                         ? <><Save size={18} /> {t.saveChanges}</>

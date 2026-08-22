@@ -151,7 +151,7 @@ export function LanguageBanner() {
                     : messages.banner;
 
     return (
-        <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] inset-x-0 z-50 px-3 pointer-events-none sm:bottom-4">
+        <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] inset-x-0 z-50 px-3 pointer-events-none sm:bottom-4">
             <div className="pointer-events-auto max-w-lg mx-auto bg-ink text-paper rounded-2xl px-4 py-3 shadow-lg flex flex-col sm:flex-row sm:items-center gap-3">
                 <p className="text-sm flex-1 leading-snug">{copy.suggest}</p>
                 <div className="flex gap-2 shrink-0">

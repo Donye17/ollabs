@@ -19,8 +19,9 @@ organizer hubs, Bahasa, Tagalog/Hindi/Spanish landings (`/tl`, `/hi`, `/es`), lo
 first-supporter organizer email (migration 0016), country breakdown on `/mine`, hub handle suggestion
 after publish and on `/hub`, Messenger share on publish for ID/TL locales, and language banner offers
 for `/tl`, `/hi`, `/es`. iPhone share-first save on `/c`. Hub public pages show a **Made with** +
-Ollabs logo footer. **My campaigns** stays visible in the top nav on every phone screen (pill on mobile)
-and in the `/create` sticky bar.
+Ollabs logo footer. **My campaigns** stays visible in the top nav on every phone screen (pill on mobile).
+A fixed **Mine · Create · Hub** tab bar (ink plate, raised Create) sits on every mobile page except admin;
+page save bars stack above it.
 
 **Copy:** no em dashes in user-facing hub, create, or mine strings. Hub Support CTA
 is two lines (`Support` / campaign title), not `Support — title`.
