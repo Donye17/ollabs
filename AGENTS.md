@@ -11,14 +11,16 @@ link. Supporters open that link, drop in a photo, and download the framed result
 
 ## Where things stand (2026-08-21)
 
-**On `main`:** Phases 1–7. Mobile shell, custom-frame create, organizer save + slug
-301s, quiet ads, PT-BR, organizer hubs, and Bahasa (`/id` landing + locale chrome).
+**On `main`:** Phases 1–7 plus calendar moments (Phase 8 content, no paid upgrade).
+Mobile shell, custom-frame create, organizer save + slug 301s, quiet ads, PT-BR,
+organizer hubs, Bahasa, and an expanded `/day` calendar (Sept–Oct awareness +
+BR/ID local moments).
 
 Lawyer gate still applies before denser ads on Brazilian electoral campaign pages.
-**Paid upgrade:** deferred — do not build vanity/custom domain/CSV/invoice until hubs
-show demand.
+**Paid upgrade:** deferred until hubs show demand.
 
-Next: Phase 8 calendar moments (BR/ID local + awareness days), not monetization.
+Next: post-download “run your own campaign” prompt, more PT/ID `/for` pages, or
+artwork upgrades for the new day rings.
 
 **Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
 “Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page

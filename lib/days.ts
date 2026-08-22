@@ -9,6 +9,7 @@
 // real, specific editorial or it does not ship.
 
 import { FrameConfig, FrameType } from '@/lib/types';
+import { SEPT_OCT_DAYS } from '@/lib/daysSeptOct';
 
 export type DateRule =
     | { type: 'fixed'; month: number; day: number }
@@ -279,7 +280,7 @@ export const DAYS: AwarenessDay[] = [
             cutoutScale: 0,
         },
         relatedUseCases: ['nonprofits', 'fundraisers', 'companies'],
-        relatedDays: ['national-smores-day'],
+        relatedDays: ['national-smores-day', 'independencia-do-brasil'],
     },
     {
         slug: 'national-smores-day',
@@ -547,7 +548,7 @@ export const DAYS: AwarenessDay[] = [
             cutoutScale: 0,
         },
         relatedUseCases: ['companies', 'events', 'nonprofits'],
-        relatedDays: ['national-nonprofit-day', 'national-dog-day'],
+        relatedDays: ['national-nonprofit-day', 'independencia-do-brasil'],
     },
     {
         slug: 'national-coffee-day',
@@ -733,6 +734,7 @@ export const DAYS: AwarenessDay[] = [
         relatedUseCases: ['nonprofits', 'fundraisers', 'companies'],
         relatedDays: ['national-dog-day', 'national-nonprofit-day'],
     },
+    ...SEPT_OCT_DAYS,
 ];
 
 export function getDay(slug: string): AwarenessDay | undefined {
