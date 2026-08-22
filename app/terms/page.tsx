@@ -1,5 +1,12 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { NavBar } from '@/components/NavBar';
+
+export const metadata: Metadata = {
+    title: 'Terms of Service',
+    description: 'The terms that govern creating, publishing, and supporting profile-picture frame campaigns with Ollabs.',
+    alternates: { canonical: 'https://ollabs.studio/terms' },
+};
 
 export default function TermsOfService() {
     return (

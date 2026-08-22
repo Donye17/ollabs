@@ -8,7 +8,17 @@ import { AdSlot } from '@/components/AdSlot';
 export const metadata: Metadata = {
     title: 'Who uses Ollabs | Profile picture frame campaigns',
     description: 'Profile-picture frame campaigns for fundraisers, nonprofits, churches, schools, sports teams, events, and more. Free, no signup, no watermark.',
-    alternates: { canonical: 'https://ollabs.studio/for' },
+    alternates: {
+        canonical: 'https://ollabs.studio/for',
+        languages: {
+            en: 'https://ollabs.studio/for',
+            'pt-BR': 'https://ollabs.studio/pt/for',
+            id: 'https://ollabs.studio/id/for',
+            es: 'https://ollabs.studio/es/for',
+            tl: 'https://ollabs.studio/tl/for',
+            'x-default': 'https://ollabs.studio/for',
+        },
+    },
     openGraph: { type: 'website', url: 'https://ollabs.studio/for', title: 'Who uses Ollabs', description: 'Profile-picture frame campaigns for causes, teams, events, and more.', siteName: 'Ollabs', images: ['/og.png'] },
     twitter: { card: 'summary_large_image', images: ['/og.png'] },
 };

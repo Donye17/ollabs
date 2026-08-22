@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
+import { HomeCreateCta } from '@/components/home/HomeCreateCta';
 import type { LandingCopy } from '@/lib/i18n/messages';
 
 type Props = {
@@ -34,13 +35,13 @@ export function LocaleLandingPage({ t, htmlLang, extraFooterLinks }: Props) {
                     </h1>
                     <p className="text-base sm:text-lg text-ink/70 mb-7 max-w-2xl mx-auto leading-relaxed">{t.sub}</p>
                     <div className="flex flex-wrap items-center justify-center gap-3">
-                        <Link
-                            href="/create"
+                        <HomeCreateCta
+                            eventFrom={htmlLang}
                             className="group min-h-[48px] px-6 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 active:brightness-95 transition-all"
                         >
                             {t.cta}
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
+                        </HomeCreateCta>
                         <Link
                             href="/"
                             hrefLang="en"

@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { QRCode } from '@/components/QRCode';
 import { CATEGORIES } from '@/lib/categories';
 import { organizerShareText, whatsappUrl } from '@/lib/share';
+import { track, withUtm } from '@/lib/analytics';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck, Palette } from 'lucide-react';
 
@@ -221,9 +222,10 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                 <span className="text-sm text-ink truncate flex-1">{shareUrl}</span>
                             </div>
                             <a
-                                href={whatsappUrl(organizerShareText(title || data.title), shareUrl)}
+                                href={whatsappUrl(organizerShareText(title || data.title), withUtm(shareUrl, 'whatsapp'))}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                onClick={() => track('campaign_share', { campaign: currentSlug, method: 'whatsapp', from: 'manage' })}
                                 className="w-full min-h-[48px] py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white hover:brightness-105 transition-all"
                                 style={{ backgroundColor: WHATSAPP_GREEN }}
                             >

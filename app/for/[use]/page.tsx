@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { USE_CASES, getUseCase } from '@/lib/useCases';
+import { useCaseLanguageAlternates } from '@/lib/useCaseHreflang';
 import { AdSlot } from '@/components/AdSlot';
 
 export const revalidate = 86400;
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ use: stri
         title,
         description,
         keywords: [uc.keyword, 'profile picture frame', 'pfp frame', 'twibbon alternative', `${uc.audience.toLowerCase()} profile frame`],
-        alternates: { canonical: url },
+        alternates: { canonical: url, languages: useCaseLanguageAlternates(uc.slug) },
         openGraph: { type: 'website', url, title, description, siteName: 'Ollabs', images: ['/og.png'] },
         twitter: { card: 'summary_large_image', title, description, images: ['/og.png'] },
     };

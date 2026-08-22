@@ -17,14 +17,47 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-22-filipino-use-cases',
+        date: '2026-08-22',
+        title: 'More campaign guides in Filipino',
+        summary: 'Organizers in the Philippines can find a starting point that fits their community.',
+        items: [
+            'New Filipino guides cover churches, schools, events, communities, and awareness campaigns.',
+            'A Filipino Ollabs and Twibbonize comparison explains the differences honestly.',
+            'Portuguese, Bahasa, Spanish, and Filipino use cases now each have their own directory.',
+        ],
+    },
+    {
+        id: '2026-08-22-sharing-and-discovery',
+        date: '2026-08-22',
+        title: 'Sharing speaks more of your language',
+        summary: 'Campaign links are easier to send and useful pages are easier to find.',
+        items: [
+            'WhatsApp share messages now support Spanish and Tagalog, alongside English, Portuguese, and Bahasa.',
+            'The publish screen keeps WhatsApp in view and gives one calm reminder before an unshared campaign is closed.',
+            'Home now links directly to calendar moments, use cases, comparisons, and every language landing.',
+        ],
+    },
+    {
+        id: '2026-08-22-campaign-thumb-zone',
+        date: '2026-08-22',
+        title: 'Campaign pages keep the thumb zone clear',
+        summary: 'Supporters opening a link only see the frame job, not organizer navigation.',
+        items: [
+            'Mine, Create, and Hub stay on organizer screens (home, create, mine, hub).',
+            'Public campaign and hub pages no longer show the bottom tab bar, so Save or share sits flush at the bottom.',
+            'Language offers stay out of the way of save and publish buttons.',
+        ],
+    },
+    {
         id: '2026-08-22-mobile-tab-bar',
         date: '2026-08-22',
-        title: 'Create, Mine, and Hub on every phone screen',
+        title: 'Create, Mine, and Hub on organizer phone screens',
         summary: 'A clearer bottom tab bar so you can move around without hunting for links.',
         items: [
-            'Mine, Create, and Hub stay fixed at the bottom on every mobile page.',
+            'Mine, Create, and Hub stay fixed at the bottom on organizer mobile pages.',
             'Create sits raised in the middle on a dark bar so it is easy to spot with your thumb.',
-            'Save and share bars on create and campaign pages sit above the tab bar.',
+            'Save and share bars on create sit above the tab bar.',
         ],
     },
     {

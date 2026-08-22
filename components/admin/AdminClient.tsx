@@ -17,10 +17,19 @@ interface ReportRow {
 
 type CountryRow = { country: string; n: number };
 
+type DeadCampaignRow = {
+    slug: string;
+    title: string;
+    view_count: number;
+    supporter_count: number;
+    created_at: string;
+};
+
 type GeoPayload = {
     published: CountryRow[];
     firstSupporter: CountryRow[];
     supporterUses: CountryRow[];
+    deadCampaigns: DeadCampaignRow[];
 };
 
 function CountryTable({ title, rows }: { title: string; rows: CountryRow[] }) {
@@ -72,10 +81,61 @@ function GeoStatsPanel({ adminKey }: { adminKey: string }) {
     if (!data) return null;
 
     return (
-        <div className="grid gap-3 sm:grid-cols-3">
-            <CountryTable title="Published from" rows={data.published} />
-            <CountryTable title="First supporter from" rows={data.firstSupporter} />
-            <CountryTable title="Supporter saves" rows={data.supporterUses} />
+        <div className="space-y-8">
+            <div className="grid gap-3 sm:grid-cols-3">
+                <CountryTable title="Published from" rows={data.published} />
+                <CountryTable title="First supporter from" rows={data.firstSupporter} />
+                <CountryTable title="Supporter saves" rows={data.supporterUses} />
+            </div>
+
+            <div>
+                <div className="mb-3">
+                    <h3 className="font-display text-lg font-extrabold">Dead campaigns</h3>
+                    <p className="text-xs text-muted">At least 2 views, no supporters, and more than 24 hours old.</p>
+                </div>
+                {data.deadCampaigns.length === 0 ? (
+                    <div className="rounded-2xl border border-ink/10 bg-cream p-5 text-sm text-ink/70">
+                        No dead campaigns found.
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-cream">
+                        <table className="w-full min-w-[560px] text-left text-sm">
+                            <thead className="border-b border-ink/10 text-xs uppercase tracking-wide text-muted">
+                                <tr>
+                                    <th className="px-4 py-3 font-bold">Campaign</th>
+                                    <th className="px-4 py-3 font-bold">Views</th>
+                                    <th className="px-4 py-3 font-bold">Created</th>
+                                    <th className="px-4 py-3 font-bold">Open</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.deadCampaigns.map((campaign) => (
+                                    <tr key={campaign.slug} className="border-b border-ink/5 last:border-0">
+                                        <td className="max-w-[280px] px-4 py-3">
+                                            <p className="truncate font-semibold">{campaign.title}</p>
+                                            <p className="truncate text-xs text-muted">/{campaign.slug}</p>
+                                        </td>
+                                        <td className="px-4 py-3 tabular-nums">{campaign.view_count.toLocaleString()}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-ink/70">
+                                            {new Date(campaign.created_at).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <a
+                                                href={`/c/${campaign.slug}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 font-semibold text-brand-deep hover:underline"
+                                            >
+                                                <ExternalLink size={13} /> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
@@ -140,7 +200,7 @@ export const AdminClient: React.FC = () => {
                         <section className="mb-12">
                             <div className="flex items-center gap-2 mb-4">
                                 <Globe size={18} className="text-brand-deep" />
-                                <h2 className="font-display text-xl font-extrabold">Country breakdown</h2>
+                                <h2 className="font-display text-xl font-extrabold">Market and campaign health</h2>
                             </div>
                             <GeoStatsPanel adminKey={key} />
                         </section>

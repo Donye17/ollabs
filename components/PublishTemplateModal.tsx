@@ -39,10 +39,14 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     // Set when the builder was opened from a /day page, so the campaign can be
     // attributed to that day rather than guessed at by category.
     const [daySlug, setDaySlug] = useState<string | null>(null);
+    const [referrerSlug, setReferrerSlug] = useState<string | null>(null);
     useEffect(() => {
         try {
-            const d = new URLSearchParams(window.location.search).get('day');
+            const params = new URLSearchParams(window.location.search);
+            const d = params.get('day');
+            const from = params.get('from');
             if (d) setDaySlug(d);
+            if (from) setReferrerSlug(from);
         } catch { /* ignore */ }
     }, []);
 
@@ -97,6 +101,18 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     // manage link clears this; Skip is explicit, not accidental.
     const [linkSaved, setLinkSaved] = useState(false);
     const [closeBlocked, setCloseBlocked] = useState(false);
+    const [shareFired, setShareFired] = useState(false);
+    const [shareNudgeShown, setShareNudgeShown] = useState(false);
+    const [showShareNudge, setShowShareNudge] = useState(false);
+
+    useEffect(() => {
+        if (!campaignUrl || shareFired || shareNudgeShown) return;
+        const timer = window.setTimeout(() => {
+            setShareNudgeShown(true);
+            setShowShareNudge(true);
+        }, 30_000);
+        return () => window.clearTimeout(timer);
+    }, [campaignUrl, shareFired, shareNudgeShown]);
 
     // Editing an existing campaign's frame
     const [savingFrame, setSavingFrame] = useState(false);
@@ -161,9 +177,20 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         setFrameSaved(false);
         setLinkSaved(false);
         setCloseBlocked(false);
+        setShareFired(false);
+        setShareNudgeShown(false);
+        setShowShareNudge(false);
     }, []);
 
     const handleClose = useCallback(() => {
+        // A single soft interception catches the highest-risk exit: closing the
+        // success screen before sending the link anywhere. It never traps them;
+        // "Not now" below continues the normal close path.
+        if (campaignUrl && !shareFired && !shareNudgeShown) {
+            setShareNudgeShown(true);
+            setShowShareNudge(true);
+            return;
+        }
         // After a successful create, refuse a silent dismiss until they have a
         // way back in — account, or an acknowledged manage-link save.
         if (campaignUrl && !sessionEmail && !linkSaved) {
@@ -172,7 +199,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         }
         onClose();
         resetForm();
-    }, [onClose, resetForm, campaignUrl, sessionEmail, linkSaved]);
+    }, [onClose, resetForm, campaignUrl, sessionEmail, linkSaved, shareFired, shareNudgeShown]);
 
     /**
      * Escape closes the modal, and the page behind it stays where it was.
@@ -336,7 +363,14 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             const res = await fetch('/api/campaigns', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, frameConfig: config, previewUrl, organizerEmail: organizerEmail || null, daySlug })
+                body: JSON.stringify({
+                    title,
+                    frameConfig: config,
+                    previewUrl,
+                    organizerEmail: organizerEmail || null,
+                    daySlug,
+                    referrerSlug,
+                })
             });
 
             if (res.ok) {
@@ -360,6 +394,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                     day: daySlug || 'none',
                     country: campaign.publisher_country || 'unknown',
                 });
+                track('create_step', { step: 'send' });
 
                 // Remember this campaign on the device so the owner can find it again.
                 try {
@@ -460,16 +495,23 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
     const shareWhatsApp = () => {
         if (!campaignUrl) return;
-        const text = organizerShareText(title || 'Ollabs', locale);
+        // Spanish and Tagalog do not yet have full UI dictionaries. Passing no
+        // explicit locale lets share.ts detect those browser languages while an
+        // explicitly localized Portuguese or Bahasa UI still wins.
+        const text = organizerShareText(title || 'Ollabs', locale === 'en' ? undefined : locale);
+        setShareFired(true);
+        setShowShareNudge(false);
         window.open(whatsappUrl(text, withUtm(campaignUrl, 'whatsapp')), '_blank', 'noopener,noreferrer');
-        track('campaign_share', { campaign: campaignSlug, platform: 'whatsapp', from: 'publish' });
+        track('campaign_share', { campaign: campaignSlug, method: 'whatsapp', platform: 'whatsapp', from: 'publish' });
     };
 
     const shareNative = async () => {
         if (!campaignUrl) return;
-        const text = organizerShareText(title || 'Ollabs', locale);
+        const text = organizerShareText(title || 'Ollabs', locale === 'en' ? undefined : locale);
         try {
             await navigator.share({ title: title || 'Ollabs', text, url: withUtm(campaignUrl, 'native') });
+            setShareFired(true);
+            setShowShareNudge(false);
             track('campaign_share', { campaign: campaignSlug, platform: 'native', from: 'publish' });
         } catch {
             // Cancelled from the sheet, which is not an error worth surfacing.
@@ -480,6 +522,8 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
     const shareMessenger = () => {
         if (!campaignUrl) return;
+        setShareFired(true);
+        setShowShareNudge(false);
         window.location.href = messengerShareUrl(withUtm(campaignUrl, 'messenger'));
         track('campaign_share', { campaign: campaignSlug, platform: 'messenger', from: 'publish' });
     };
@@ -509,6 +553,16 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         setLinkSaved(true);
         setCloseBlocked(false);
         setAccountStep('offer');
+    };
+
+    const dismissShareNudge = () => {
+        setShowShareNudge(false);
+        if (campaignUrl && !sessionEmail && !linkSaved) {
+            setCloseBlocked(true);
+            return;
+        }
+        onClose();
+        resetForm();
     };
 
     // Already signed in when the campaign was created, or signed in just now via
@@ -543,9 +597,9 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 {/* Content */}
                 <div className="p-6 space-y-6">
                     {/* Preview */}
-                    <div className="flex justify-center py-2">
+                    {!campaignUrl && <div className="flex justify-center py-2">
                         <FramePreview frame={config} className="w-40 h-40 rounded-full border-4 border-cream bg-paper2 shadow-lg mx-auto" />
-                    </div>
+                    </div>}
 
                     {campaignUrl ? (
                         /* Success: share first, save access second — Frame → Name → Send */
@@ -561,6 +615,31 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             >
                                 <WhatsAppGlyph size={20} /> {tp.shareWhatsApp}
                             </button>
+
+                            {showShareNudge && (
+                                <div className="rounded-xl border border-brand/30 bg-brand/10 p-4 text-center space-y-3">
+                                    <p className="text-sm font-bold text-ink">Ready to send it?</p>
+                                    <p className="text-xs text-ink/70 leading-relaxed">
+                                        Campaigns get moving when the link reaches the first group. WhatsApp opens with your message ready.
+                                    </p>
+                                    <div className="flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={shareWhatsApp}
+                                            className="flex-1 min-h-[44px] rounded-lg bg-ink px-3 text-sm font-bold text-paper"
+                                        >
+                                            Open WhatsApp
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={dismissShareNudge}
+                                            className="min-h-[44px] rounded-lg border border-ink/15 bg-cream px-3 text-sm font-semibold text-ink"
+                                        >
+                                            Not now
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             {showMessengerShare && (
                                 <button

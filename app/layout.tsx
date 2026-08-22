@@ -5,6 +5,7 @@ import { Inter, Bricolage_Grotesque } from 'next/font/google';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 import { LanguageBanner } from '@/components/i18n/LanguageBanner';
 import { MobileOrganizerNav } from '@/components/MobileOrganizerNav';
+import { MobileNavSpacer } from '@/components/MobileNavSpacer';
 import { DeferredAnalytics } from '@/components/DeferredAnalytics';
 import './globals.css';
 
@@ -49,11 +50,13 @@ export const metadata: Metadata = {
         ],
     },
     alternates: {
-        canonical: 'https://ollabs.studio',
         languages: {
             en: 'https://ollabs.studio',
             'pt-BR': 'https://ollabs.studio/pt',
             id: 'https://ollabs.studio/id',
+            tl: 'https://ollabs.studio/tl',
+            hi: 'https://ollabs.studio/hi',
+            es: 'https://ollabs.studio/es',
             'x-default': 'https://ollabs.studio',
         },
     },
@@ -105,30 +108,52 @@ export const viewport: Viewport = {
 
 const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    'name': 'Ollabs',
-    'url': 'https://ollabs.studio',
-    'description': 'Create a profile-picture frame campaign for your cause, team, or event and share one link. Supporters add it to their photo in seconds. Free, no signup.',
-    'applicationCategory': 'DesignApplication',
-    'operatingSystem': 'Web',
-    'genre': 'Design',
-    'offers': {
-        '@type': 'Offer',
-        'price': '0',
-        'priceCurrency': 'USD'
-    },
-    'featureList': 'Profile Picture Frame Maker, Campaign Links, Supporter Counter, Custom Frame Upload, Flag Overlays',
-    'potentialAction': {
-        '@type': 'CreateAction',
-        'target': {
-            '@type': 'EntryPoint',
-            'urlTemplate': 'https://ollabs.studio/create'
+    '@graph': [
+        {
+            '@type': 'Organization',
+            '@id': 'https://ollabs.studio/#organization',
+            'name': 'Ollabs',
+            'url': 'https://ollabs.studio',
+            'logo': {
+                '@type': 'ImageObject',
+                'url': 'https://ollabs.studio/Ollabs%20Logo%20Black.png',
+            },
         },
-        'result': {
-            '@type': 'ImageObject',
-            'name': 'Custom Avatar Frame'
-        }
-    }
+        {
+            '@type': 'WebSite',
+            '@id': 'https://ollabs.studio/#website',
+            'name': 'Ollabs',
+            'url': 'https://ollabs.studio',
+            'publisher': { '@id': 'https://ollabs.studio/#organization' },
+        },
+        {
+            '@type': 'WebApplication',
+            '@id': 'https://ollabs.studio/#app',
+            'name': 'Ollabs',
+            'url': 'https://ollabs.studio',
+            'description': 'Create a profile-picture frame campaign for your cause, team, or event and share one link. Supporters add it to their photo in seconds. Free, no signup.',
+            'applicationCategory': 'DesignApplication',
+            'operatingSystem': 'Web',
+            'genre': 'Design',
+            'offers': {
+                '@type': 'Offer',
+                'price': '0',
+                'priceCurrency': 'USD',
+            },
+            'featureList': 'Profile Picture Frame Maker, Campaign Links, Supporter Counter, Custom Frame Upload, Flag Overlays',
+            'potentialAction': {
+                '@type': 'CreateAction',
+                'target': {
+                    '@type': 'EntryPoint',
+                    'urlTemplate': 'https://ollabs.studio/create',
+                },
+                'result': {
+                    '@type': 'ImageObject',
+                    'name': 'Custom Avatar Frame',
+                },
+            },
+        },
+    ],
 };
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-0E75K2XJ5Q';
@@ -147,12 +172,9 @@ export default function RootLayout({
                 />
                 <LocaleProvider>
                     {children}
-                    {/* Reserve space for the fixed mobile tab bar on every page. */}
-                    <div
-                        className="lg:hidden shrink-0 pointer-events-none"
-                        style={{ height: 'calc(3.75rem + env(safe-area-inset-bottom, 0px))' }}
-                        aria-hidden
-                    />
+                    {/* Spacer + nav share the same route gate so /c and SEO pages
+                        do not reserve empty thumb space under the fold. */}
+                    <MobileNavSpacer />
                     <MobileOrganizerNav />
                     <LanguageBanner />
                 </LocaleProvider>

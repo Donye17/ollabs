@@ -116,7 +116,9 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
 
     // A function rather than a value: it reads navigator.language, which differs
     // between the server render and the browser, so it must not touch render.
-    const shareText = () => supporterShareText(title, locale);
+    // Spanish and Tagalog share copy is browser-detected until those languages
+    // have full client UI dictionaries.
+    const shareText = () => supporterShareText(title, locale === 'en' ? undefined : locale);
 
     const openShare = (platform: 'x' | 'whatsapp' | 'facebook' | 'messenger') => {
         const url = withUtm(shareUrl(), platform === 'messenger' ? 'messenger' : platform);
@@ -360,7 +362,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     };
 
     return (
-        <div className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-6 ${hasImage ? 'pb-[calc(11rem+env(safe-area-inset-bottom,0px))]' : 'pb-6'}`}>
+        <div className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-6 ${hasImage ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]' : 'pb-6'}`}>
             <a href="/" className="mb-6">
                 <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-7 w-auto" />
             </a>
@@ -531,7 +533,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                                     </p>
                                 </div>
                                 <a
-                                    href={withUtm('/create', 'campaign_page')}
+                                    href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_page')}
                                     onClick={() => track('create_from_campaign', { campaign: slug })}
                                     className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 active:brightness-110 transition-all"
                                 >
@@ -582,7 +584,13 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     )}
                 </div>
 
-                <a href="/create" className="text-xs text-muted hover:text-brand-deep transition-colors mt-1">{t.makeOwnFooter}</a>
+                <a
+                    href={`/create?from=${encodeURIComponent(slug)}`}
+                    onClick={() => track('create_from_campaign', { campaign: slug, from: 'footer' })}
+                    className="text-xs text-muted hover:text-brand-deep transition-colors mt-1"
+                >
+                    {t.makeOwnFooter}
+                </a>
 
                 {/* Second unit for people who keep scrolling (count / report). Same
                     rules: post-download only, labelled, in-flow, never on the photo. */}
@@ -613,12 +621,22 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 browsers ignore <a download>); Download leads where the sheet
                 does not exist. Safe-area so the home indicator never covers it. */}
             {hasImage && (
-                <div className="fixed bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-3">
+                <div className="fixed bottom-0 inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
                     <div className="w-full max-w-sm mx-auto flex flex-col gap-2">
                         {saveError && (
-                            <p role="alert" className="text-xs text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2 text-center">
-                                {saveError}
-                            </p>
+                            <div role="alert" className="text-xs text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center space-y-2">
+                                <p>{saveError}</p>
+                                {isIOS() && (
+                                    <a
+                                        href={pageUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex min-h-[40px] items-center rounded-lg bg-ink px-4 font-bold text-paper"
+                                    >
+                                        Open in Safari
+                                    </a>
+                                )}
+                            </div>
                         )}
                         {canSharePhoto ? (
                             <>

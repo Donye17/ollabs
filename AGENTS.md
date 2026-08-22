@@ -20,8 +20,12 @@ first-supporter organizer email (migration 0016), country breakdown on `/mine`, 
 after publish and on `/hub`, Messenger share on publish for ID/TL locales, and language banner offers
 for `/tl`, `/hi`, `/es`. iPhone share-first save on `/c`. Hub public pages show a **Made with** +
 Ollabs logo footer. **My campaigns** stays visible in the top nav on every phone screen (pill on mobile).
-A fixed **Mine · Create · Hub** tab bar (ink plate, raised Create) sits on every mobile page except admin;
-page save bars stack above it.
+A fixed **Mine · Create · Hub** tab bar (ink plate, raised Create) sits on organizer
+mobile surfaces (home, create, mine, hub, explore, manage). It is **hidden** on
+supporter and visitor journeys (`/c` public, `/u` hubs, `/for`, `/day`, locale
+landings, `/vs`) so Save/Share keeps the thumb zone. Page save bars stack above
+the tab bar when it is present; on `/c` and `/day` tools they sit flush to the
+safe area. Language banner never covers a save/publish bar.
 
 **Copy:** no em dashes in user-facing hub, create, or mine strings. Hub Support CTA
 is two lines (`Support` / campaign title), not `Support — title`.
@@ -32,7 +36,11 @@ category, country, or politics. Never on the photo; never on `/create`.
 carry denser labelled inventory between content blocks.
 **Paid upgrade:** deferred until hubs show demand.
 
-Next: org pilots in BR/ID, AdSense slot split when approved.
+Next: org pilots in BR/ID. AdSense: create two display units in the dashboard
+(Campaign inline + SEO inline), set `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` and
+`NEXT_PUBLIC_ADSENSE_SLOT_SEO` on Vercel, keep Auto ads / anchors / vignettes OFF.
+Code already branches in `AdSlot.tsx`; both env vars still fall back to the same
+slot until you set them.
 
 **Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
 “Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page

@@ -124,7 +124,7 @@ export const USE_CASES_ES: UseCase[] = [
     },
 ];
 
-const EN_SLUG: Record<string, string> = {
+export const EN_SLUG: Record<string, string> = {
     iglesias: 'churches',
     escuelas: 'schools',
     equipos: 'sports-teams',

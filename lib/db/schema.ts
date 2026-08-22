@@ -20,6 +20,7 @@ export const campaigns = pgTable("campaigns", {
 	viewCount: integer("view_count").default(0),
 	goal: integer("goal"),
 	category: text("category"),
+	referrerSlug: text("referrer_slug"),
 	ownerToken: text("owner_token"),
 	previewUrl: text("preview_url"),
 	isPublic: boolean("is_public").default(true),
@@ -29,12 +30,18 @@ export const campaigns = pgTable("campaigns", {
 	organizerEmail: text("organizer_email"),
 	emailSentAt: timestamp("email_sent_at", { withTimezone: true, mode: 'string' }),
 	milestoneNotified: integer("milestone_notified").default(0),
+	publisherCountry: text("publisher_country"),
+	firstSupporterCountry: text("first_supporter_country"),
+	firstSupporterEmailedAt: timestamp("first_supporter_emailed_at", { withTimezone: true, mode: 'string' }),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
 	index("idx_campaigns_slug").using("btree", table.slug.asc().nullsLast()),
 	index("idx_campaigns_created_at").using("btree", table.createdAt.desc().nullsLast()),
 	index("idx_campaigns_category").using("btree", table.category.asc().nullsLast()),
+	index("idx_campaigns_referrer_slug").using("btree", table.referrerSlug.asc().nullsLast()),
 	index("idx_campaigns_organizer_email").using("btree", table.organizerEmail.asc().nullsLast()),
+	index("idx_campaigns_publisher_country").using("btree", table.publisherCountry.asc().nullsLast()),
+	index("idx_campaigns_first_supporter_country").using("btree", table.firstSupporterCountry.asc().nullsLast()),
 	unique("campaigns_slug_key").on(table.slug),
 ]);
 
@@ -44,6 +51,7 @@ export const campaignUses = pgTable("campaign_uses", {
 	userId: text("user_id"),
 	// Set only when a supporter opts in to the supporter wall.
 	imageUrl: text("image_url"),
+	supporterCountry: text("supporter_country"),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
 	index("idx_campaign_uses_campaign_id").using("btree", table.campaignId.asc().nullsLast()),

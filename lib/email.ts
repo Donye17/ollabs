@@ -8,6 +8,8 @@
 // We only ever email ORGANIZERS. Supporters never give us an address and must
 // never receive anything.
 
+import { organizerShareText, whatsappUrl } from '@/lib/share';
+
 const FROM = process.env.EMAIL_FROM || 'Ollabs <hello@ollabs.studio>';
 const KEY = process.env.RESEND_API_KEY;
 
@@ -119,6 +121,7 @@ export function firstSupporterEmail(opts: {
 }) {
     const manage = `${SITE}/c/${opts.slug}/manage?k=${opts.ownerToken}`;
     const url = `${SITE}/c/${opts.slug}`;
+    const whatsapp = whatsappUrl(organizerShareText(opts.title, 'en'), url);
     const t = esc(opts.title);
     const where = opts.countryName
         ? ` from ${esc(opts.countryName)}`
@@ -133,6 +136,8 @@ export function firstSupporterEmail(opts: {
             ``,
             `Someone added your frame. Momentum matters most in the first hour, so this is a good moment to share again.`,
             ``,
+            `Share again on WhatsApp: ${whatsapp}`,
+            ``,
             `Campaign: ${url}`,
             `Dashboard: ${manage}`,
         ].join('\n'),
@@ -141,6 +146,7 @@ export function firstSupporterEmail(opts: {
 <tr><td style="font-size:15px;line-height:1.6;color:#374151;padding-bottom:22px;">
 <strong>${t}</strong> has its first supporter. Most campaigns get their first person in the first hour after publish, so a quick reshare now is worth it.
 </td></tr>
+<tr><td style="padding-bottom:12px;">${button(whatsapp, 'Share again on WhatsApp')}</td></tr>
 <tr><td style="padding-bottom:20px;">${button(manage, 'See your numbers')}</td></tr>
 <tr><td style="font-size:13px;line-height:1.6;color:#6B7280;">Share again: <a href="${url}" style="color:#0369A1;">${url}</a></td></tr>`),
     };

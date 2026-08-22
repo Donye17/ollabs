@@ -225,7 +225,7 @@ export const DayFrameTool: React.FC<{
     const end = () => { drag.current.active = false; };
 
     return (
-        <div className={`max-w-md mx-auto ${hasImage ? 'pb-[calc(11rem+env(safe-area-inset-bottom,0px))]' : ''}`}>
+        <div className={`max-w-md mx-auto ${hasImage ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]' : ''}`}>
             <div
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
@@ -303,7 +303,7 @@ export const DayFrameTool: React.FC<{
             )}
 
             {hasImage && (
-                <div className="fixed bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-3">
+                <div className="fixed bottom-0 inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
                     <div className="w-full max-w-md mx-auto flex flex-col gap-2">
                         {canSharePhoto ? (
                             <>

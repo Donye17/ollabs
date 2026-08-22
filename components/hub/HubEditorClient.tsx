@@ -22,6 +22,8 @@ import {
     normalizeHandle,
     suggestHandleFromEmail,
 } from '@/lib/hub';
+import { ABOVE_MOBILE_NAV } from '@/lib/mobileNav';
+import { track } from '@/lib/analytics';
 
 type CampaignOpt = {
     id: string;
@@ -162,9 +164,17 @@ export const HubEditorClient: React.FC = () => {
                 setError(body.error || 'Could not save.');
                 return;
             }
+            const firstClaim = !publishedHandle && Boolean(body.handle || normalized);
             setPublishedHandle(body.handle);
             setHandle(body.handle || normalized);
+            track('hub_saved', {
+                has_avatar: Boolean(avatarUrl),
+                has_bio: Boolean(bio.trim()),
+                link_count: links.length,
+                has_featured_campaign: Boolean(featuredId),
+            });
             setSaveMsg('Saved');
+            if (firstClaim) track('hub_claimed', { handle: body.handle || normalized });
             setTimeout(() => setSaveMsg(null), 2000);
         } catch {
             setError('Could not reach the server.');
@@ -404,7 +414,10 @@ export const HubEditorClient: React.FC = () => {
 
             <HubMadeWithFooter className="pt-2" />
 
-            <div className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-5 pt-3 pb-3">
+            <div
+                className="fixed inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-5 pt-3 pb-3"
+                style={{ bottom: ABOVE_MOBILE_NAV }}
+            >
                 <div className="max-w-lg mx-auto flex items-center gap-3">
                     <button
                         type="button"

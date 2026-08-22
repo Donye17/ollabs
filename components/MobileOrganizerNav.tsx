@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FolderOpen, LayoutGrid, Plus } from 'lucide-react';
-import { MOBILE_NAV_H } from '@/lib/mobileNav';
+import { MOBILE_NAV_H, shouldShowMobileOrganizerNav } from '@/lib/mobileNav';
 
 const ITEMS = [
     { href: '/mine', label: 'Mine', Icon: FolderOpen },
@@ -12,22 +12,23 @@ const ITEMS = [
 ] as const;
 
 /**
- * Always-on thumb-zone nav on phones. Create sits raised in the middle so the
- * bar reads as a real app shell, not a quiet footer strip.
+ * Organizer thumb-zone nav on phones. Create sits raised in the middle so the
+ * bar reads as a real app shell. Hidden on /c, /u, and SEO landings so
+ * supporters only see the frame job.
  */
 export function MobileOrganizerNav() {
     const pathname = usePathname() || '/';
-    if (pathname.startsWith('/admin')) return null;
+    if (!shouldShowMobileOrganizerNav(pathname)) return null;
 
     return (
         <nav
-            className="lg:hidden fixed inset-x-0 bottom-0 z-40 pb-[env(safe-area-inset-bottom,0px)]"
-            style={{ paddingTop: 0 }}
+            className="lg:hidden fixed inset-x-0 bottom-0 z-40"
             aria-label="Main"
         >
-            {/* Lifted plate so it does not blend into page cream */}
+            {/* Safe-area pad lives on the ink plate so the bar is flush to the
+                screen edge; padding on the outer nav left a cream strip under it. */}
             <div
-                className="border-t-2 border-brand/40 bg-ink text-paper shadow-[0_-8px_24px_rgba(6,20,31,0.18)]"
+                className="border-t-2 border-brand/40 bg-ink text-paper shadow-[0_-8px_24px_rgba(6,20,31,0.18)] pb-[env(safe-area-inset-bottom,0px)]"
                 style={{ minHeight: MOBILE_NAV_H }}
             >
                 <div className="max-w-lg mx-auto grid grid-cols-3 items-end px-1">

@@ -317,3 +317,58 @@ export const VS_ES: VsCopy = {
                   : r.twibbonize,
     })),
 };
+
+export const VS_TL: VsCopy = {
+    metaTitle: 'Ollabs vs Twibbonize',
+    metaDescription:
+        'Tapat na paghahambing ng Ollabs at Twibbonize para sa profile picture frame campaign. Sa Twibbonize, kailangang magbayad para alisin ang watermark. Sa Ollabs, malinis ang larawan ng supporter.',
+    eyebrow: 'Paghahambing',
+    h1: 'Ollabs vs Twibbonize',
+    hero: 'Pareho silang ginagamit para sa profile picture frame campaign. Ang pinakamahalagang kaibahan: sa Twibbonize, kailangang magbayad para alisin ang watermark sa larawan. Sa Ollabs, walang sinisingil sa supporter.',
+    createCta: 'Gumawa ng libreng campaign',
+    exploreCta: 'Tingnan ang mga live campaign',
+    tableHeaderOllabs: 'Ollabs',
+    tableHeaderTwibbonize: 'Twibbonize',
+    disclaimer:
+        'Batay sa pampublikong help documentation ng Twibbonize tungkol sa watermark at Remove Watermark plan, na sinuri noong Agosto 2026. Maaaring magbago ang mga produkto. Kung may luma nang impormasyon, sumulat sa hello@ollabs.studio.',
+    honestTitle: 'Kung saan mas angkop ang Twibbonize',
+    honestP1:
+        'Mas mabuting maging tapat. Malaki na ang Twibbonize, matagal nang ginagamit, at may native mobile apps. Kilala rin ito sa Pilipinas at Indonesia. Kung kailangan ninyo ng app mula sa App Store o Google Play, o pamilyar na ang audience ninyo sa Twibbonize, may halaga ang pagiging pamilyar na iyon.',
+    honestP2:
+        'Mas bago at mas maliit ang Ollabs. May mga ad sa ilang page at tumutulong ang mga iyon para manatiling libre ang serbisyo. Hindi kami naglalagay ng ad sa mismong larawan, at hindi namin inilalagay ang payment screen sa pagitan ng supporter at ng campaign ninyo.',
+    faqTitle: 'Mga karaniwang tanong',
+    faqs: [
+        {
+            q: 'Ano ang pangunahing kaibahan ng Ollabs at Twibbonize?',
+            a: 'Kung sino ang kailangang magbayad. Sa Twibbonize, may watermark ang downloaded na larawan at kailangang magbayad para alisin ito. Sa Ollabs, malinis ang larawan at walang sinisingil sa supporter.',
+        },
+        {
+            q: 'Bakit mahalaga ang watermark?',
+            a: 'Para sa nonprofit, paaralan, simbahan, o kumpanya, ang watermark at alok na magbayad ay nakikita ng inyong supporter. Bahagi iyon ng karanasan nila sa campaign ng inyong organisasyon.',
+        },
+        {
+            q: 'Libre ba talaga ang Ollabs?',
+            a: 'Oo. Hindi ito trial. Walang limitasyon sa dami ng campaign o supporter.',
+        },
+        {
+            q: 'May mga bagay bang mas mahusay ang Twibbonize?',
+            a: 'Oo. Mas malaki ito, mas mahaba ang track record, at may native iOS at Android apps. Makatuwiran itong piliin kung mahalaga sa inyo ang mobile app o pamilyar na rito ang audience ninyo.',
+        },
+        {
+            q: 'Puwede bang ilipat sa Ollabs ang dati nang campaign?',
+            a: 'Walang automatic import. Gayunman, maaari ninyong i-upload ang kasalukuyang transparent PNG frame at gumawa ng bagong campaign link sa loob ng ilang minuto.',
+        },
+    ],
+    tryTitle: 'Subukan sa isang campaign',
+    tryBody: 'Humigit-kumulang isang minuto lang ang kailangan at libre itong gawin.',
+    tryCta: 'Gumawa ng campaign',
+    rows: [
+        { label: 'Watermark sa larawan ng supporter', ollabs: 'Wala', twibbonize: 'Mayroon, maliban kung magbayad para alisin', ollabsWins: true },
+        { label: 'Sino ang nagbabayad', ollabs: 'Walang sinisingil sa supporter', twibbonize: 'Supporter, para alisin ang watermark', ollabsWins: true },
+        { label: 'Mga ad', ollabs: 'Sa ilang page, hindi sa larawan', twibbonize: 'Mayroon', ollabsWins: false },
+        { label: 'Kailangang account para sumuporta', ollabs: 'Hindi', twibbonize: 'Hindi', ollabsWins: false },
+        { label: 'Kailangang account para gumawa', ollabs: 'Hindi', twibbonize: 'Oo', ollabsWins: true },
+        { label: 'Mobile app', ollabs: 'Wala, gumagana sa browser', twibbonize: 'May iOS at Android app', ollabsWins: false },
+        { label: 'Laki at track record', ollabs: 'Bago, maliit, at lumalago', twibbonize: 'Napakalaki at matagal nang ginagamit', ollabsWins: false },
+    ],
+};

@@ -118,6 +118,7 @@ export const USE_CASES_ID: UseCase[] = [
             { title: 'Tanpa watermark', body: 'Foto bersih, tidak ada upsell ke pendukung.' },
         ],
         faqs: [
+            { q: 'Bagaimana cara buat twibbon gratis?', a: 'Upload desain bingkai, beri nama kampanye, lalu bagikan link-nya. Pendukung dapat memasang foto tanpa daftar.' },
             { q: 'Apakah ini alternatif Twibbonize?', a: 'Ya. Tanpa watermark dan tanpa biaya untuk yang mendukung.' },
             { q: 'Apakah hitungan asli?', a: 'Ya. Hanya yang benar-benar pasang bingkai yang dihitung.' },
         ],

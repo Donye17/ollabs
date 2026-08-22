@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { UseCasePageShell } from '@/components/seo/UseCasePageShell';
 import { USE_CASES_ID, getUseCaseId } from '@/lib/useCasesId';
+import { englishSlugFromId, useCaseLanguageAlternates } from '@/lib/useCaseHreflang';
 
 export const revalidate = 86400;
 
@@ -33,11 +34,12 @@ export async function generateMetadata({ params }: { params: Promise<{ use: stri
     const title = uc.h1;
     const description = `${uc.subtitle} Gratis, tanpa daftar, tanpa watermark.`;
     const url = `https://ollabs.studio/id/for/${uc.slug}`;
+    const enSlug = englishSlugFromId(uc.slug);
     return {
         title,
         description,
         keywords: [uc.keyword, 'bingkai foto profil', 'twibbon gratis', 'alternatif twibbonize'],
-        alternates: { canonical: url, languages: { id: url, en: 'https://ollabs.studio/for/nonprofits' } },
+        alternates: { canonical: url, languages: useCaseLanguageAlternates(enSlug) },
         openGraph: { type: 'website', url, title, description, siteName: 'Ollabs', locale: 'id_ID', images: ['/og.png'] },
     };
 }

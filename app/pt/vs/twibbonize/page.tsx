@@ -8,7 +8,17 @@ export const metadata: Metadata = {
     title: VS_PT.metaTitle,
     description: VS_PT.metaDescription,
     keywords: ['alternativa twibbonize', 'twibbon sem marca d\'água', 'moldura foto perfil grátis', 'ollabs vs twibbonize'],
-    alternates: { canonical: URL, languages: { 'pt-BR': URL, en: 'https://ollabs.studio/vs/twibbonize' } },
+    alternates: {
+        canonical: URL,
+        languages: {
+            en: 'https://ollabs.studio/vs/twibbonize',
+            'pt-BR': URL,
+            id: 'https://ollabs.studio/id/vs/twibbonize',
+            es: 'https://ollabs.studio/es/vs/twibbonize',
+            tl: 'https://ollabs.studio/tl/vs/twibbonize',
+            'x-default': 'https://ollabs.studio/vs/twibbonize',
+        },
+    },
     openGraph: { type: 'website', url: URL, siteName: 'Ollabs', title: VS_PT.metaTitle, description: VS_PT.metaDescription, locale: 'pt_BR', images: ['/og.png'] },
 };
 

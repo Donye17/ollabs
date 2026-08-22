@@ -42,7 +42,7 @@ export async function HomeExamplesSection() {
     if (campaigns.length === 0) return null;
 
     return (
-        <div className="mt-16 sm:mt-20 relative z-10">
+        <div className="relative z-10">
             <p className="text-center text-xs uppercase tracking-[0.2em] text-muted font-bold mb-2">
                 Top campaigns
             </p>

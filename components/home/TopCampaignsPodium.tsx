@@ -97,11 +97,13 @@ export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) 
                     return (
                         <li
                             key={campaign.slug}
-                            className={`flex-1 max-w-[140px] sm:max-w-[160px] ${first ? 'z-10 -mt-4 sm:-mt-6' : 'opacity-95'}`}
+                            className={`flex-1 min-w-0 max-w-[140px] sm:max-w-[160px] ${first ? 'z-10' : ''}`}
                         >
                             <Link
                                 href={`/c/${campaign.slug}`}
-                                className="group flex flex-col items-center text-center outline-none"
+                                className={`group flex flex-col items-center text-center outline-none ${
+                                    first ? 'pt-0' : 'pt-6'
+                                }`}
                             >
                                 <span
                                     className={`mb-2 inline-flex items-center justify-center rounded-full font-display font-extrabold tabular-nums ${

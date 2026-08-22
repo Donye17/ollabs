@@ -11,6 +11,8 @@ import { getFlag, resolveFlagFrame } from '@/lib/flags';
 import { AlertCircle, ChevronDown, Loader2, Save, Upload } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
 import { useLocale } from '@/components/i18n/LocaleProvider';
+import { ABOVE_MOBILE_NAV } from '@/lib/mobileNav';
+import { track } from '@/lib/analytics';
 // Loaded on demand (see handleRemoveBackground). This library is ~5.5MB of WASM;
 // importing it statically made every visitor to /create download it whether or
 // not they ever removed a background.
@@ -39,6 +41,15 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
     // Refs
     const editorRef = useRef<{ getDominantColors: () => Promise<string[]> }>(null);
+    const startedTrackedRef = useRef(false);
+    const nameStepTrackedRef = useRef(false);
+
+    useEffect(() => {
+        if (startedTrackedRef.current) return;
+        startedTrackedRef.current = true;
+        track('create_started');
+        track('create_step', { step: 'frame' });
+    }, []);
 
     // Things that went wrong surface under the canvas rather than through
     // alert(). On a phone an alert covers the whole page, and inside an in-app
@@ -216,7 +227,13 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
         );
     }
 
-    const openPublish = () => setIsPublishOpen(true);
+    const openPublish = () => {
+        if (!editTarget && !nameStepTrackedRef.current) {
+            nameStepTrackedRef.current = true;
+            track('create_step', { step: 'name' });
+        }
+        setIsPublishOpen(true);
+    };
 
     return (
         <div className="min-h-screen bg-paper text-ink font-sans pb-[calc(9.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
@@ -306,7 +323,10 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
             {/* Thumb-zone create. Header buttons are easy to miss once you are
                 deep in cutout controls on a small screen. */}
-        <div className="fixed bottom-[calc(3.75rem+env(safe-area-inset-bottom,0px))] inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-3">
+        <div
+            className="fixed inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-3"
+            style={{ bottom: ABOVE_MOBILE_NAV }}
+        >
                 <div className="max-w-lg mx-auto">
                     <button
                         onClick={openPublish}

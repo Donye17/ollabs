@@ -8,7 +8,17 @@ export const metadata: Metadata = {
     title: VS_ID.metaTitle,
     description: VS_ID.metaDescription,
     keywords: ['alternatif twibbonize', 'twibbon tanpa watermark', 'bingkai foto profil gratis', 'ollabs vs twibbonize'],
-    alternates: { canonical: URL, languages: { id: URL, en: 'https://ollabs.studio/vs/twibbonize' } },
+    alternates: {
+        canonical: URL,
+        languages: {
+            en: 'https://ollabs.studio/vs/twibbonize',
+            'pt-BR': 'https://ollabs.studio/pt/vs/twibbonize',
+            id: URL,
+            es: 'https://ollabs.studio/es/vs/twibbonize',
+            tl: 'https://ollabs.studio/tl/vs/twibbonize',
+            'x-default': 'https://ollabs.studio/vs/twibbonize',
+        },
+    },
     openGraph: { type: 'website', url: URL, siteName: 'Ollabs', title: VS_ID.metaTitle, description: VS_ID.metaDescription, locale: 'id_ID', images: ['/og.png'] },
 };
 

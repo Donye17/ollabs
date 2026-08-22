@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
     title: 'Create a campaign',
     description: 'Design a profile-picture frame for your cause, team, or event and share one link. No login required.',
+    alternates: { canonical: 'https://ollabs.studio/create' },
 };
 
 const jsonLd = {

@@ -16,7 +16,17 @@ export const metadata: Metadata = {
         'free twibbon alternative',
         'profile picture frame no watermark',
     ],
-    alternates: { canonical: URL },
+    alternates: {
+        canonical: URL,
+        languages: {
+            en: URL,
+            'pt-BR': 'https://ollabs.studio/pt/vs/twibbonize',
+            id: 'https://ollabs.studio/id/vs/twibbonize',
+            es: 'https://ollabs.studio/es/vs/twibbonize',
+            tl: 'https://ollabs.studio/tl/vs/twibbonize',
+            'x-default': URL,
+        },
+    },
     openGraph: {
         type: 'website',
         url: URL,

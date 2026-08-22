@@ -7,9 +7,9 @@ import { useLocale } from '@/components/i18n/LocaleProvider';
 import {
     LOCALE_COOKIE,
     localeLandingPath,
-    resolveLocale,
     type Locale,
 } from '@/lib/i18n/locale';
+import { shouldHideLanguageBanner, shouldShowMobileOrganizerNav } from '@/lib/mobileNav';
 
 const DISMISS_KEY = 'ollabs_locale_banner_dismissed';
 
@@ -96,6 +96,10 @@ export function LanguageBanner() {
     }, [onLocaleLanding, landingLocale, locale]);
 
     if (!visible || !suggested) return null;
+    // Never cover Save / Share / Create / Publish thumb bars.
+    if (shouldHideLanguageBanner(pathname)) return null;
+
+    const aboveOrganizerNav = shouldShowMobileOrganizerNav(pathname);
 
     const dismiss = () => {
         try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch { /* ignore */ }
@@ -151,8 +155,14 @@ export function LanguageBanner() {
                     : messages.banner;
 
     return (
-        <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] inset-x-0 z-50 px-3 pointer-events-none sm:bottom-4">
-            <div className="pointer-events-auto max-w-lg mx-auto bg-ink text-paper rounded-2xl px-4 py-3 shadow-lg flex flex-col sm:flex-row sm:items-center gap-3">
+        <div
+            className={`fixed inset-x-0 z-30 px-3 pointer-events-none sm:bottom-4 ${
+                aboveOrganizerNav
+                    ? 'bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))]'
+                    : 'bottom-[calc(1rem+env(safe-area-inset-bottom,0px))]'
+            }`}
+        >
+            <div className="pointer-events-auto max-w-lg mx-auto bg-ink text-paper rounded-2xl px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
                 <p className="text-sm flex-1 leading-snug">{copy.suggest}</p>
                 <div className="flex gap-2 shrink-0">
                     <button

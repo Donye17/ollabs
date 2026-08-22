@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { UseCasePageShell } from '@/components/seo/UseCasePageShell';
-import { USE_CASES_ES, englishUseCaseSlug, getUseCaseEs } from '@/lib/useCasesEs';
+import { USE_CASES_ES, getUseCaseEs } from '@/lib/useCasesEs';
+import { englishSlugFromEs, useCaseLanguageAlternates } from '@/lib/useCaseHreflang';
 
 export const revalidate = 86400;
 
@@ -33,14 +34,14 @@ export async function generateMetadata({ params }: { params: Promise<{ use: stri
     const title = uc.h1;
     const description = `${uc.subtitle} Gratis, sin registro, sin marca de agua.`;
     const url = `https://ollabs.studio/es/for/${uc.slug}`;
-    const enSlug = englishUseCaseSlug(uc.slug);
+    const enSlug = englishSlugFromEs(uc.slug);
     return {
         title,
         description,
         keywords: [uc.keyword, 'marco foto perfil', 'twibbon gratis', 'alternativa twibbonize'],
         alternates: {
             canonical: url,
-            languages: { es: url, en: `https://ollabs.studio/for/${enSlug}` },
+            languages: useCaseLanguageAlternates(enSlug),
         },
         openGraph: { type: 'website', url, title, description, siteName: 'Ollabs', locale: 'es_ES', images: ['/og.png'] },
     };

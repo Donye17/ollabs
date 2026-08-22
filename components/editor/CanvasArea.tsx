@@ -122,7 +122,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
             onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave}
             onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchCancel}
             onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
-            title={imageObject ? "Drag to move, Scroll/Pinch to zoom" : "Drop an image here"}
+            title={imageObject ? "Drag to move, Scroll/Pinch to zoom" : "Tap to add a photo"}
         >
             <canvas ref={canvasRef} width={CANVAS_SIZE} height={CANVAS_SIZE} className="w-full h-full object-contain pointer-events-none drop-shadow-2xl" />
             {!imageObject && !isDragOver && (
@@ -131,7 +131,8 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
                         <Upload className="w-8 h-8 text-muted group-hover:text-brand transition-colors" />
                     </div>
                     <span className="text-base font-bold text-ink/80 tracking-wide mb-1">Start creating</span>
-                    <span className="text-xs text-muted">Drag and drop an image here</span>
+                    <span className="text-xs text-muted md:hidden">Tap to add a photo</span>
+                    <span className="text-xs text-muted hidden md:inline">Click or drag a photo here</span>
                 </div>
             )}
             {isDragOver && (

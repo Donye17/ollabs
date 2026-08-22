@@ -1,5 +1,12 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { NavBar } from '@/components/NavBar';
+
+export const metadata: Metadata = {
+    title: 'Privacy Policy',
+    description: 'How Ollabs handles campaign information, analytics, advertising, and the photos you process in your browser.',
+    alternates: { canonical: 'https://ollabs.studio/privacy' },
+};
 
 export default function PrivacyPage() {
     return (
@@ -7,7 +14,7 @@ export default function PrivacyPage() {
             <NavBar />
             <main className="max-w-3xl mx-auto px-6 py-28">
                 <h1 className="font-display text-4xl font-extrabold mb-2">Privacy Policy</h1>
-                <p className="text-sm text-muted mb-10">Last updated: {new Date().toLocaleDateString()}</p>
+                <p className="text-sm text-muted mb-10">Last updated: August 22, 2026</p>
 
                 <div className="space-y-8 text-ink/75 leading-relaxed">
                     <section>
@@ -29,7 +36,7 @@ export default function PrivacyPage() {
 
                     <section>
                         <h2 className="font-display text-xl font-bold text-ink mb-2">4. Analytics</h2>
-                        <p>We use privacy-conscious analytics to understand how the site is used, such as page views and general device information. This helps us improve the product.</p>
+                        <p>We use Google Analytics 4 (GA4) and Vercel Analytics to understand how the site is used, such as page views and general device information. This helps us improve the product.</p>
                     </section>
 
                     {/* Required before AdSense can serve here: Google's publisher
@@ -38,7 +45,7 @@ export default function PrivacyPage() {
                     <section>
                         <h2 className="font-display text-xl font-bold text-ink mb-2">5. Advertising</h2>
                         <p>Ollabs is free to use and free to share, and we run ads on some pages to cover what it costs to keep it that way. Supporters are never charged, and the photo you download never carries a watermark or any Ollabs branding.</p>
-                        <p className="mt-3">Ads are served by Google, which as a third-party vendor uses cookies to serve them. Google&apos;s use of advertising cookies lets it and its partners serve ads based on your visit to this site and other sites on the internet. You can opt out of personalized advertising at <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-brand-deep font-semibold hover:underline">Google Ads Settings</a>, or opt out of a third-party vendor&apos;s use of cookies for personalized advertising at <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" className="text-brand-deep font-semibold hover:underline">aboutads.info</a>.</p>
+                        <p className="mt-3">Ads are served by Google AdSense. Google, as a third-party vendor, uses cookies to serve them. Google&apos;s use of advertising cookies lets it and its partners serve ads based on your visit to this site and other sites on the internet. You can opt out of personalized advertising at <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-brand-deep font-semibold hover:underline">Google Ads Settings</a>, or opt out of a third-party vendor&apos;s use of cookies for personalized advertising at <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" className="text-brand-deep font-semibold hover:underline">aboutads.info</a>.</p>
                         <p className="mt-3">We never place ads on the photo itself, and we do not sell advertising against any individual campaign or its cause.</p>
                     </section>
 

@@ -36,32 +36,46 @@ export function prefersIndonesian(): boolean {
     return langs.some((l) => typeof l === 'string' && l.toLowerCase().startsWith('id'));
 }
 
+export function prefersSpanish(): boolean {
+    if (typeof navigator === 'undefined') return false;
+    const langs = [navigator.language, ...(navigator.languages || [])];
+    return langs.some((l) => typeof l === 'string' && l.toLowerCase().startsWith('es'));
+}
+
+export type ShareLocale = 'en' | 'pt' | 'id' | 'es' | 'tl';
+
 /** Resolve which language the WhatsApp paste should use. */
-export function shareLocale(locale?: Locale | null): 'en' | 'pt' | 'id' {
-    if (locale === 'pt' || locale === 'id' || locale === 'en') return locale;
+export function shareLocale(locale?: Locale | 'es' | 'tl' | null): ShareLocale {
+    if (locale === 'pt' || locale === 'id' || locale === 'es' || locale === 'tl' || locale === 'en') return locale;
     if (prefersPortuguese()) return 'pt';
     if (prefersIndonesian()) return 'id';
+    if (prefersSpanish()) return 'es';
+    if (prefersTagalog()) return 'tl';
     return 'en';
 }
 
 /** @deprecated Prefer shareLocale. Kept for call sites that only care about PT. */
-export function shareInPortuguese(locale?: Locale | null): boolean {
+export function shareInPortuguese(locale?: Locale | 'es' | 'tl' | null): boolean {
     return shareLocale(locale) === 'pt';
 }
 
 /** What an organizer sends when they have just published their campaign. */
-export function organizerShareText(title: string, locale?: Locale | null): string {
+export function organizerShareText(title: string, locale?: Locale | 'es' | 'tl' | null): string {
     const lang = shareLocale(locale);
     if (lang === 'pt') return `Coloque a moldura "${title}" na sua foto de perfil:`;
     if (lang === 'id') return `Pasang bingkai "${title}" di foto profil kamu:`;
+    if (lang === 'es') return `Añade el marco "${title}" a tu foto de perfil:`;
+    if (lang === 'tl') return `Ilagay ang frame na "${title}" sa profile picture mo:`;
     return `Add the "${title}" frame to your profile picture:`;
 }
 
 /** What a supporter sends after adding the frame to their own photo. */
-export function supporterShareText(title: string, locale?: Locale | null): string {
+export function supporterShareText(title: string, locale?: Locale | 'es' | 'tl' | null): string {
     const lang = shareLocale(locale);
     if (lang === 'pt') return `Adicionei a moldura "${title}" na minha foto. Adicione a sua:`;
     if (lang === 'id') return `Aku sudah pasang bingkai "${title}" di fotoku. Pasang juga:`;
+    if (lang === 'es') return `Añadí el marco "${title}" a mi foto. Añade el tuyo:`;
+    if (lang === 'tl') return `Nilagyan ko ng frame na "${title}" ang photo ko. Lagyan din ang iyo:`;
     return `I just added the "${title}" frame to my photo on Ollabs. Add yours:`;
 }
 
