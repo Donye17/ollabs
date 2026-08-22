@@ -7,16 +7,22 @@ import { HomeTopCampaignsClient } from '@/components/home/HomeTopCampaignsClient
 
 async function getTopCampaigns(): Promise<TopCampaign[]> {
     try {
-        // Rank by real traction, not recency. The home podium should only show
-        // campaigns people actually joined, so brand-new empties never fill a slot.
+        // Rank by real campaign_uses rows, not the denormalized counter. Seeded
+        // demo frames used to inflate supporter_count without matching uses.
         const res = await pool.query(
-            `SELECT c.slug, c.title, c.frame_config, c.supporter_count
+            `SELECT c.slug, c.title, c.frame_config,
+                    COALESCE(u.real_uses, 0)::int AS supporter_count
              FROM campaigns c
+             LEFT JOIN (
+                 SELECT campaign_id, COUNT(*)::int AS real_uses
+                 FROM campaign_uses
+                 GROUP BY campaign_id
+             ) u ON u.campaign_id = c.id
              WHERE c.is_public = true
                AND c.is_hidden IS NOT TRUE
-               AND COALESCE(c.supporter_count, 0) >= $1
+               AND COALESCE(u.real_uses, 0) >= $1
                AND ${visibleFrameSql('c')}
-             ORDER BY c.supporter_count DESC NULLS LAST, c.created_at DESC
+             ORDER BY COALESCE(u.real_uses, 0) DESC, c.created_at DESC
              LIMIT $2`,
             [MIN_SUPPORTERS_TO_DISPLAY, HOME_TOP_CAMPAIGNS]
         );

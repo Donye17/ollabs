@@ -42,7 +42,19 @@ async function getCampaigns(sort: Sort, category: string | null): Promise<Explor
             ORDER BY COALESCE(r.recent, 0) DESC, c.supporter_count DESC NULLS LAST, c.created_at DESC
             LIMIT 60`;
     } else {
-        query = `${base} ${where} ORDER BY c.supporter_count DESC NULLS LAST, c.created_at DESC LIMIT 60`;
+        // Popular = real downloads recorded in campaign_uses, not a denormalized
+        // counter that can be seeded ahead of real traffic.
+        query = `SELECT c.slug, c.title, c.frame_config,
+                        COALESCE(u.real_uses, 0)::int AS supporter_count
+                 FROM campaigns c
+                 LEFT JOIN (
+                     SELECT campaign_id, COUNT(*)::int AS real_uses
+                     FROM campaign_uses
+                     GROUP BY campaign_id
+                 ) u ON u.campaign_id = c.id
+                 ${where}
+                 ORDER BY COALESCE(u.real_uses, 0) DESC, c.created_at DESC
+                 LIMIT 60`;
     }
     try {
         const res = await pool.query(query);
