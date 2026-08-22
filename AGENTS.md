@@ -98,6 +98,9 @@ prefixes. Recent examples:
 - `Delete the dead weight: framer-motion, the onboarding overlay, and the unreachable editor features`
 - `Fix the shared renderer bug that stalled mobile, and cap canvas work`
 
+When something user-visible ships, add a bullet to `lib/announcements.ts` (newest first) and link
+from the home footer at `/updates`.
+
 Colors come from the Tailwind theme (`brand`, `ink`, `paper`, `cream`, `coral`, `muted`) — no
 hardcoded hex in components.
 

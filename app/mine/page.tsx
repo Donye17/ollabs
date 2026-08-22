@@ -28,6 +28,10 @@ export default function MinePage() {
             <section className="px-4 sm:px-6 pb-[max(6rem,env(safe-area-inset-bottom))]">
                 <MyCampaignsClient />
                 <p className="text-center text-sm text-muted mt-6 max-w-2xl mx-auto">
+                    <Link href="/updates" className="text-brand-deep font-semibold hover:underline">
+                        What&apos;s new
+                    </Link>
+                    {' · '}
                     Made a campaign on another device?{' '}
                     <Link href="/login" className="text-brand-deep font-semibold hover:underline">
                         Sign in with a code

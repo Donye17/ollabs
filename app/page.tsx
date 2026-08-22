@@ -232,6 +232,7 @@ export default async function Home() {
                                     <li><Link href="/explore" className="hover:text-brand-deep transition-colors">Explore campaigns</Link></li>
                                     <li><Link href="/mine" className="hover:text-brand-deep transition-colors">My campaigns</Link></li>
                                     <li><Link href="/for" className="hover:text-brand-deep transition-colors">Use cases</Link></li>
+                                    <li><Link href="/updates" className="hover:text-brand-deep transition-colors">What&apos;s new</Link></li>
                                 </ul>
                             </div>
                             <div>

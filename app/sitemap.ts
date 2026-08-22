@@ -41,6 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { url: `${baseUrl}/es/vs/twibbonize`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
         { url: `${baseUrl}/vs/linktree`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
         { url: `${baseUrl}/create`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
+        { url: `${baseUrl}/updates`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.75 },
         { url: `${baseUrl}/explore`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
         { url: `${baseUrl}/for`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
         ...USE_CASES.map((u) => ({
