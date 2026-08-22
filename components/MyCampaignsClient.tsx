@@ -130,6 +130,21 @@ export const MyCampaignsClient: React.FC = () => {
                 </div>
             )}
 
+            {signedIn && (
+                <Link
+                    href="/hub"
+                    className="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-brand/25 bg-brand/10 px-4 py-3.5 hover:bg-brand/15 transition-colors"
+                >
+                    <div className="min-w-0">
+                        <p className="font-display font-bold text-[15px]">Your campaign hub</p>
+                        <p className="text-xs text-ink/70 truncate">
+                            Claim /u/… — Support button, bio, and other links
+                        </p>
+                    </div>
+                    <span className="text-xs font-bold text-brand-deep shrink-0">Edit</span>
+                </Link>
+            )}
+
             {nothingAnywhere ? (
                 <div className="bg-cream border border-ink/10 rounded-2xl p-10 text-center">
                     <Inbox className="w-8 h-8 text-muted mx-auto mb-3" />

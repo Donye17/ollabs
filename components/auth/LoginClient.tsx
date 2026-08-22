@@ -1,12 +1,20 @@
 "use client";
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, KeyRound, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 type Step = 'email' | 'code' | 'done';
 
+function safeNext(raw: string | null): string {
+    // Only same-origin relative paths. Avoid open redirects.
+    if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/mine';
+    return raw;
+}
+
 export const LoginClient: React.FC = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const nextPath = safeNext(searchParams.get('next'));
     const [step, setStep] = useState<Step>('email');
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
@@ -57,9 +65,9 @@ export const LoginClient: React.FC = () => {
             }
             setClaimed(typeof data?.claimed === 'number' ? data.claimed : 0);
             setStep('done');
-            // Let them read the confirmation for a beat before the list loads.
+            // Let them read the confirmation for a beat before the next page loads.
             setTimeout(() => {
-                router.push('/mine');
+                router.push(nextPath);
                 router.refresh();
             }, 1400);
         } catch {

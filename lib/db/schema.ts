@@ -96,8 +96,32 @@ export const organizers = pgTable("organizers", {
 	email: text().notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 	lastLoginAt: timestamp("last_login_at", { withTimezone: true, mode: 'string' }),
+	// Optional public hub at /u/[handle]. Null until they claim one after login.
+	handle: text(),
+	displayName: text("display_name"),
+	bio: text(),
+	avatarUrl: text("avatar_url"),
+	featuredCampaignId: uuid("featured_campaign_id"),
+	hubUpdatedAt: timestamp("hub_updated_at", { withTimezone: true, mode: 'string' }),
 }, (table) => [
 	unique("idx_organizers_email").on(table.email),
+]);
+
+// Extra buttons on the organizer hub (Instagram, donate, press kit, …).
+export const organizerHubLinks = pgTable("organizer_hub_links", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	organizerId: uuid("organizer_id").notNull(),
+	title: text().notNull(),
+	url: text().notNull(),
+	sortOrder: integer("sort_order").default(0).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("idx_hub_links_organizer").using("btree", table.organizerId.asc().nullsLast(), table.sortOrder.asc().nullsLast()),
+	foreignKey({
+		columns: [table.organizerId],
+		foreignColumns: [organizers.id],
+		name: "organizer_hub_links_organizer_id_fkey"
+	}).onDelete("cascade"),
 ]);
 
 // Six digit sign-in codes, stored hashed. Codes rather than magic links because

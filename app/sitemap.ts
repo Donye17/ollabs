@@ -55,7 +55,46 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: 'weekly',
             priority: 0.7,
         }));
-        return [...routes, ...campaignRoutes];
+
+        // Hubs with something to show (bio, link, or a public campaign). Empty
+        // handle claims stay noindex via the page metadata and are omitted here.
+        let hubRoutes: MetadataRoute.Sitemap = [];
+        try {
+            const hubs = await pool.query(
+                `SELECT o.handle, o.hub_updated_at, o.created_at
+                 FROM organizers o
+                 WHERE o.handle IS NOT NULL
+                   AND (
+                     (o.bio IS NOT NULL AND length(trim(o.bio)) > 0)
+                     OR EXISTS (
+                       SELECT 1 FROM organizer_hub_links l WHERE l.organizer_id = o.id
+                     )
+                     OR EXISTS (
+                       SELECT 1 FROM campaigns c
+                       WHERE c.creator_id = o.id::text
+                         AND c.is_public = true
+                         AND c.is_hidden IS NOT TRUE
+                     )
+                   )
+                 ORDER BY o.hub_updated_at DESC NULLS LAST
+                 LIMIT 2000`
+            );
+            hubRoutes = hubs.rows.map((row) => ({
+                url: `${baseUrl}/u/${row.handle}`,
+                lastModified: row.hub_updated_at
+                    ? new Date(row.hub_updated_at)
+                    : row.created_at
+                      ? new Date(row.created_at)
+                      : new Date(),
+                changeFrequency: 'weekly' as const,
+                priority: 0.65,
+            }));
+        } catch (hubErr) {
+            // Table may not exist until migration 0013 is applied.
+            console.error('Failed to list hubs for sitemap', hubErr);
+        }
+
+        return [...routes, ...campaignRoutes, ...hubRoutes];
     } catch (e) {
         console.error('Failed to generate sitemap', e);
         return routes;

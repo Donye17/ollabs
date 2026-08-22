@@ -151,7 +151,20 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
 
                 {!loading && data && (
                     <>
-                        <h1 className="font-display text-3xl font-extrabold mt-1 mb-6">{data.title}</h1>
+                        <h1 className="font-display text-3xl font-extrabold mt-1 mb-4">{data.title}</h1>
+
+                        <a
+                            href="/hub"
+                            className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-brand/25 bg-brand/10 px-4 py-3.5 hover:bg-brand/15 transition-colors"
+                        >
+                            <div className="min-w-0">
+                                <p className="font-display font-bold text-[15px]">Campaign hub</p>
+                                <p className="text-xs text-ink/70">
+                                    Bio, Support button, and other links at /u/…
+                                </p>
+                            </div>
+                            <span className="text-xs font-bold text-brand-deep shrink-0">Set up</span>
+                        </a>
 
                         {/* Real stats */}
                         <div className="grid grid-cols-3 gap-3 mb-6">

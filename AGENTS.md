@@ -11,11 +11,11 @@ link. Supporters open that link, drop in a photo, and download the framed result
 
 ## Where things stand (2026-08-21)
 
-**On `main`:** Phases 1–5. Mobile shell, custom-frame create, organizer save + slug
-301s, quiet ads, and PT-BR (`/pt` landing + locale cookie + campaign/create chrome).
+**On `main`:** Phases 1–6. Mobile shell, custom-frame create, organizer save + slug
+301s, quiet ads, PT-BR, and organizer hubs (`/u/[handle]` + `/hub` editor).
 
 Lawyer gate still applies before denser ads on Brazilian electoral campaign pages.
-Next: Phase 6 organizer hubs, or Phase 7 Bahasa after more PT `/for` pages.
+Next: Phase 7 Bahasa after more PT `/for` pages, or calendar moments.
 
 **Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
 “Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page

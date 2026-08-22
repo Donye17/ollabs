@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { LoginClient } from '@/components/auth/LoginClient';
 
@@ -23,7 +24,9 @@ export default function LoginPage() {
                 </div>
             </section>
             <section className="px-6 pb-24">
-                <LoginClient />
+                <Suspense fallback={<div className="max-w-md mx-auto h-48 rounded-2xl bg-cream border border-ink/10 animate-pulse" />}>
+                    <LoginClient />
+                </Suspense>
                 <p className="text-center text-sm text-muted mt-6 max-w-md mx-auto">
                     Never made a campaign?{' '}
                     <Link href="/create" className="text-brand-deep font-semibold hover:underline">
