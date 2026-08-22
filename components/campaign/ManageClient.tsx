@@ -2,6 +2,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { QRCode } from '@/components/QRCode';
 import { CATEGORIES } from '@/lib/categories';
+import { organizerShareText, whatsappUrl } from '@/lib/share';
+import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck, Palette } from 'lucide-react';
 
 interface ManageData {
@@ -198,20 +200,30 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                             )}
                         </div>
 
-                        {/* Share */}
+                        {/* Share — WhatsApp leads for the same reason as publish:
+                            organizers on a phone are usually already in WhatsApp. */}
                         <div className="bg-cream border border-ink/10 rounded-2xl p-4 mb-6 space-y-3">
                             <p className="text-xs font-bold text-muted uppercase tracking-wider">Share link</p>
                             <div className="bg-paper border border-ink/10 rounded-xl px-3 py-2.5 flex items-center gap-2">
                                 <span className="text-sm text-ink truncate flex-1">{shareUrl}</span>
                             </div>
+                            <a
+                                href={whatsappUrl(organizerShareText(title || data.title), shareUrl)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full min-h-[48px] py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white hover:brightness-105 transition-all"
+                                style={{ backgroundColor: WHATSAPP_GREEN }}
+                            >
+                                <WhatsAppGlyph size={16} /> Share on WhatsApp
+                            </a>
                             <div className="flex gap-2">
-                                <button onClick={copyLink} className="flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-brand text-ink hover:brightness-105 transition-all">
+                                <button onClick={copyLink} className="flex-1 min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                     {copied ? <><Check size={15} /> Copied</> : <><Copy size={15} /> Copy</>}
                                 </button>
-                                <a href={shareUrl} target="_blank" rel="noopener noreferrer" className="py-2.5 px-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                <a href={shareUrl} target="_blank" rel="noopener noreferrer" className="min-h-[44px] py-2.5 px-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                     <ExternalLink size={15} /> Open
                                 </a>
-                                <button onClick={() => setShowQR((v) => !v)} className="py-2.5 px-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                <button onClick={() => setShowQR((v) => !v)} className="min-h-[44px] py-2.5 px-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                     <QrCode size={15} /> QR
                                 </button>
                             </div>

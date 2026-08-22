@@ -8,6 +8,7 @@ import { addPngMetadata } from '@/lib/pngMeta';
 import { track, withUtm } from '@/lib/analytics';
 import { XGlyph, WhatsAppGlyph, FacebookGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { supporterShareText, whatsappUrl, canShareFiles } from '@/lib/share';
+import { downloadBlob } from '@/lib/download';
 import { AdSlot } from '@/components/AdSlot';
 import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles, ArrowRight } from 'lucide-react';
 
@@ -279,21 +280,8 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         try {
             const blob = await taggedBlob();
             if (blob) {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `ollabs-${slug}.png`;
-                // In the document and removed after, rather than a detached click.
-                // Some mobile browsers ignore a click on an element that was never
-                // in the tree, and this is the one action the whole page exists for.
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                // Revoking straight away used to race the download on mobile: the
-                // browser had not finished reading the blob when the URL went away,
-                // so the file silently never arrived. Outlive the read instead.
-                setTimeout(() => URL.revokeObjectURL(url), 60_000);
+                // Same mobile-safe path as /day and /create — see lib/download.ts.
+                downloadBlob(blob, `ollabs-${slug}.png`);
                 bumpCount();
                 setJustDownloaded(true);
                 track('frame_download', { campaign: slug });
@@ -350,7 +338,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     };
 
     return (
-        <div className="min-h-screen bg-paper text-ink flex flex-col items-center px-4 py-6">
+        <div className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-6 ${hasImage ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]' : 'pb-6'}`}>
             <a href="/" className="mb-6">
                 <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-7 w-auto" />
             </a>
@@ -426,27 +414,9 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     </>
                 ) : (
                     <>
-                        {/* On a phone the share sheet is the reliable way to keep the
-                            picture, so it leads. iOS in-app browsers ignore <a download>
-                            entirely, and that is where a lot of these visitors are. On
-                            desktop, where the sheet does not exist, Download leads. */}
-                        {canSharePhoto ? (
-                            <>
-                                <button onClick={handleSharePhoto} disabled={sharingPhoto}
-                                    className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all disabled:opacity-50">
-                                    {sharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> Save or share photo</>}
-                                </button>
-                                <button onClick={handleDownload} disabled={downloading}
-                                    className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors disabled:opacity-50">
-                                    {downloading ? <Loader2 size={16} className="animate-spin" /> : <><Download size={16} /> Download</>}
-                                </button>
-                            </>
-                        ) : (
-                            <button onClick={handleDownload} disabled={downloading}
-                                className="w-full min-h-[56px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50">
-                                {downloading ? <Loader2 size={18} className="animate-spin" /> : <>{justDownloaded ? <><Check size={18} /> Downloaded, download again</> : <><Download size={18} /> Download</>}</>}
-                            </button>
-                        )}
+                        {/* Primary save actions live in the sticky thumb bar below.
+                            Keeping a desktop-only duplicate here would fight the bar
+                            on phones; the bar is always the one path. */}
 
                         {canCopyImage && (
                             <button onClick={handleCopyImage}
@@ -600,6 +570,33 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     <button onClick={() => setReportOpen(true)} className="text-[11px] text-muted/70 hover:text-coral transition-colors">Report this campaign</button>
                 )}
             </div>
+
+            {/* Thumb-zone save bar. Share sheet leads on phones (iOS in-app
+                browsers ignore <a download>); Download leads where the sheet
+                does not exist. Safe-area so the home indicator never covers it. */}
+            {hasImage && (
+                <div className="fixed bottom-0 inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
+                    <div className="w-full max-w-sm mx-auto flex flex-col gap-2">
+                        {canSharePhoto ? (
+                            <>
+                                <button onClick={handleSharePhoto} disabled={sharingPhoto}
+                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all disabled:opacity-50">
+                                    {sharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> Save or share photo</>}
+                                </button>
+                                <button onClick={handleDownload} disabled={downloading}
+                                    className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors disabled:opacity-50">
+                                    {downloading ? <Loader2 size={16} className="animate-spin" /> : <><Download size={16} /> Download</>}
+                                </button>
+                            </>
+                        ) : (
+                            <button onClick={handleDownload} disabled={downloading}
+                                className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50">
+                                {downloading ? <Loader2 size={18} className="animate-spin" /> : <>{justDownloaded ? <><Check size={18} /> Downloaded, download again</> : <><Download size={18} /> Download</>}</>}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -83,6 +83,9 @@ export const viewport: Viewport = {
     // userScalable false: pinch zoom stays available, which people rely on.
     width: 'device-width',
     initialScale: 1,
+    // Without cover, env(safe-area-inset-*) stays 0 on notched iPhones and the
+    // sticky thumb bars sit under the home indicator.
+    viewportFit: 'cover',
 };
 
 const jsonLd = {

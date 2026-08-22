@@ -209,7 +209,7 @@ export const DayFrameTool: React.FC<{
     const end = () => { drag.current.active = false; };
 
     return (
-        <div className="max-w-md mx-auto">
+        <div className={`max-w-md mx-auto ${hasImage ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]' : ''}`}>
             <div
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
@@ -249,36 +249,16 @@ export const DayFrameTool: React.FC<{
                         <input
                             type="range" min={1} max={3} step={0.01} value={zoom}
                             onChange={(e) => setZoom(parseFloat(e.target.value))}
-                            className="w-full accent-brand-deep"
+                            aria-label="Photo zoom"
+                            className="w-full h-8 accent-brand-deep"
                         />
                     </div>
-                    {/* On a phone the share sheet is the reliable way to keep the
-                        picture, so it leads. On desktop, where the sheet does not
-                        exist, Download leads. */}
-                    {canSharePhoto && (
-                        <button
-                            onClick={sharePhoto} disabled={sharingPhoto}
-                            className="w-full h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 transition-all disabled:opacity-60"
-                        >
-                            {sharingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageDown size={18} />}
-                            Save or share photo
-                        </button>
-                    )}
-                    <div className="flex gap-2">
-                        <button
-                            onClick={download} disabled={downloading}
-                            className={`flex-1 h-12 rounded-xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-60 ${canSharePhoto ? 'bg-cream border border-ink/10 text-ink hover:bg-ink/5' : 'bg-brand text-ink hover:brightness-105'}`}
-                        >
-                            {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={18} />}
-                            Download
-                        </button>
-                        <button
-                            onClick={() => fileRef.current?.click()}
-                            className="h-12 px-5 rounded-xl border border-ink/15 font-bold hover:bg-ink/5 transition-colors"
-                        >
-                            Change
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => fileRef.current?.click()}
+                        className="w-full h-12 rounded-xl border border-ink/15 font-bold hover:bg-ink/5 transition-colors"
+                    >
+                        Change photo
+                    </button>
                 </div>
             )}
 
@@ -303,6 +283,31 @@ export const DayFrameTool: React.FC<{
                     >
                         Create a campaign <ArrowRight size={16} />
                     </Link>
+                </div>
+            )}
+
+            {hasImage && (
+                <div className="fixed bottom-0 inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
+                    <div className="w-full max-w-md mx-auto flex flex-col gap-2">
+                        {canSharePhoto && (
+                            <button
+                                onClick={sharePhoto} disabled={sharingPhoto}
+                                className="w-full h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 transition-all disabled:opacity-60"
+                            >
+                                {sharingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageDown size={18} />}
+                                Save or share photo
+                            </button>
+                        )}
+                        <div className="flex gap-2">
+                            <button
+                                onClick={download} disabled={downloading}
+                                className={`flex-1 h-12 rounded-xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-60 ${canSharePhoto ? 'bg-cream border border-ink/10 text-ink hover:bg-ink/5' : 'bg-brand text-ink hover:brightness-105'}`}
+                            >
+                                {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={18} />}
+                                Download
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
