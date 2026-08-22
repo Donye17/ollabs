@@ -86,6 +86,11 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     const [accountEmail, setAccountEmail] = useState('');
     const [accountCode, setAccountCode] = useState('');
     const [accountError, setAccountError] = useState<string | null>(null);
+    // Closing after publish without saving access is how organizers lose
+    // campaigns inside WhatsApp's in-app browser. Account login or copying the
+    // manage link clears this; Skip is explicit, not accidental.
+    const [linkSaved, setLinkSaved] = useState(false);
+    const [closeBlocked, setCloseBlocked] = useState(false);
 
     // Editing an existing campaign's frame
     const [savingFrame, setSavingFrame] = useState(false);
@@ -133,8 +138,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         }
     };
 
-    const handleClose = useCallback(() => {
-        onClose();
+    const resetForm = useCallback(() => {
         setTitle('');
         setDescription('');
         setGoal('');
@@ -152,7 +156,20 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         setCreateError(null);
         setFrameError(null);
         setFrameSaved(false);
-    }, [onClose]);
+        setLinkSaved(false);
+        setCloseBlocked(false);
+    }, []);
+
+    const handleClose = useCallback(() => {
+        // After a successful create, refuse a silent dismiss until they have a
+        // way back in — account, or an acknowledged manage-link save.
+        if (campaignUrl && !sessionEmail && !linkSaved) {
+            setCloseBlocked(true);
+            return;
+        }
+        onClose();
+        resetForm();
+    }, [onClose, resetForm, campaignUrl, sessionEmail, linkSaved]);
 
     /**
      * Escape closes the modal, and the page behind it stays where it was.
@@ -330,6 +347,11 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 // Carry whatever they typed into the account panel so they do not
                 // have to enter the same address twice.
                 setAccountEmail(organizerEmail || '');
+                // Welcome email includes the manage link, so they already have a
+                // way back — do not block Done on that path.
+                if (organizerEmail.trim() || sessionEmail) {
+                    setLinkSaved(true);
+                }
                 track('campaign_created', { campaign: campaign.slug, category: category || 'none', day: daySlug || 'none' });
 
                 // Remember this campaign on the device so the owner can find it again.
@@ -407,6 +429,8 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
             setSessionEmail(accountEmail);
             setAccountStep('saved');
+            setLinkSaved(true);
+            setCloseBlocked(false);
         } catch {
             setAccountError('Could not reach the server. Try again.');
             setAccountStep('code');
@@ -450,10 +474,18 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         try {
             await navigator.clipboard.writeText(manageUrl);
             setManageCopied(true);
+            setLinkSaved(true);
+            setCloseBlocked(false);
             setTimeout(() => setManageCopied(false), 1500);
         } catch {
             // clipboard unavailable
         }
+    };
+
+    const skipAccountForNow = () => {
+        setLinkSaved(true);
+        setCloseBlocked(false);
+        setAccountStep('offer');
     };
 
     // Already signed in when the campaign was created, or signed in just now via
@@ -553,21 +585,31 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 </div>
                             )}
 
-                            {/* Account. Skipped entirely for someone already signed in. */}
+                            {/* Account. Skipped entirely for someone already signed in.
+                                Placed right after WhatsApp: share first (the campaign
+                                dies without it), then save access before they leave. */}
                             {onAccount ? (
                                 <div className="bg-brand/10 border border-brand/30 rounded-xl p-4 flex items-start gap-2.5">
                                     <Check size={16} className="text-brand-deep mt-0.5 shrink-0" />
                                     <p className="text-xs text-ink/80">
                                         Saved to your account, <span className="font-semibold">{sessionEmail}</span>. Open it from
-                                        any device by signing in with a code.
+                                        any device by signing in with a code at{' '}
+                                        <a href="/login" className="underline font-semibold">/login</a>.
                                     </p>
                                 </div>
                             ) : (
-                                <div className="bg-cream border border-ink/10 rounded-xl p-4 space-y-3">
+                                <div className={`rounded-xl p-4 space-y-3 ${closeBlocked ? 'bg-coral/10 border border-coral/30' : 'bg-cream border border-ink/10'}`}>
                                     <div className="flex items-center gap-2 text-ink">
                                         <UserPlus size={16} className="text-brand-deep" />
-                                        <span className="text-sm font-bold">Keep this campaign</span>
+                                        <span className="text-sm font-bold">Save your campaigns</span>
                                     </div>
+
+                                    {closeBlocked && (
+                                        <p role="alert" className="text-xs text-coral">
+                                            Create a free login, or copy your manage link below, before you leave —
+                                            otherwise this campaign can disappear when you leave WhatsApp.
+                                        </p>
+                                    )}
 
                                     {accountStep === 'code' || accountStep === 'verifying' ? (
                                         <>
@@ -588,11 +630,11 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                                     className="w-full bg-paper border border-ink/10 rounded-xl pl-10 pr-4 py-3 text-ink tracking-[0.35em] font-semibold placeholder:tracking-normal placeholder:font-normal placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
                                                 />
                                             </div>
-                                            {accountError && <p className="text-xs text-red-600">{accountError}</p>}
+                                            {accountError && <p className="text-xs text-coral">{accountError}</p>}
                                             <button
                                                 onClick={verifyAccountCode}
                                                 disabled={accountStep === 'verifying' || accountCode.length !== 6}
-                                                className="w-full py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
+                                                className="w-full min-h-[44px] py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
                                             >
                                                 {accountStep === 'verifying' ? <><Loader2 size={15} className="animate-spin" /> Checking</> : 'Save my campaign'}
                                             </button>
@@ -606,24 +648,32 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     ) : (
                                         <>
                                             <p className="text-xs text-ink/70">
-                                                Get a 6 digit code by email and this campaign is yours on any device, even if
-                                                you lose the link below. No password. Supporters still never sign in.
+                                                Optional, but this is how you manage the campaign from another phone.
+                                                Get a 6 digit code by email — no password. Supporters still never sign in.
                                             </p>
                                             <input
                                                 type="email"
                                                 autoComplete="email"
+                                                autoFocus={!organizerEmail}
                                                 value={accountEmail}
                                                 onChange={(e) => setAccountEmail(e.target.value)}
                                                 placeholder="you@organization.org"
                                                 className="w-full bg-paper border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
                                             />
-                                            {accountError && <p className="text-xs text-red-600">{accountError}</p>}
+                                            {accountError && <p className="text-xs text-coral">{accountError}</p>}
                                             <button
                                                 onClick={sendAccountCode}
                                                 disabled={accountStep === 'sending' || !accountEmail}
-                                                className="w-full py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
+                                                className="w-full min-h-[44px] py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
                                             >
                                                 {accountStep === 'sending' ? <><Loader2 size={15} className="animate-spin" /> Sending</> : 'Email me a code'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={skipAccountForNow}
+                                                className="w-full text-[11px] text-muted hover:text-ink transition-colors py-1"
+                                            >
+                                                Skip for now — I&apos;ll copy the manage link
                                             </button>
                                         </>
                                     )}
@@ -636,25 +686,22 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                         <Pencil size={16} className="text-brand-deep" />
                                         <span className="text-sm font-bold">Manage campaign</span>
                                     </div>
-                                    {/* Leads with editing on purpose. Organizers were publishing a
-                                        campaign, spotting a typo, and building a whole second campaign
-                                        because nothing here told them the first one could be changed. */}
                                     <p className="text-xs text-ink/70">
-                                        Spotted a typo? Change the title, description, goal, category, and even the
-                                        link from here. Your supporters keep working links, so nothing breaks. Your
-                                        stats live here too.
+                                        Change the title, description, goal, category, custom link, and frame.
+                                        Old share links keep working when you rename the URL. Stats live here too.
                                     </p>
                                     <div className="flex gap-2">
                                         <a
                                             href={manageUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex-1 py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all"
+                                            onClick={() => { setLinkSaved(true); setCloseBlocked(false); }}
+                                            className="flex-1 min-h-[44px] py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all"
                                         >
                                             <ExternalLink size={15} /> Open
                                         </a>
                                         <button onClick={handleCopyManage}
-                                            className="py-2.5 px-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
+                                            className="min-h-[44px] py-2.5 px-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
                                             {manageCopied ? <><Check size={15} className="text-brand-deep" /> Copied</> : <><Copy size={15} /> Copy link</>}
                                         </button>
                                     </div>
@@ -665,7 +712,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                                 ? 'This link is a private key to your campaign. Keep it to yourself.'
                                                 : organizerEmail
                                                     ? `Private key to your campaign. Also emailed to ${organizerEmail}. Keep it to yourself.`
-                                                    : 'Private key to your campaign. Without an account it is the only way back in, so save it somewhere.'}
+                                                    : 'Private key to your campaign. Without an account it is the only way back in, so copy it somewhere safe.'}
                                         </span>
                                     </p>
                                 </div>
@@ -734,19 +781,21 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 </div>
                             ) : (
                                 <div className="space-y-2 pt-1">
-                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Your email (optional)</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">
+                                        Email to get back in <span className="normal-case font-medium">(recommended)</span>
+                                    </label>
                                     <input
                                         type="email"
                                         autoComplete="email"
+                                        autoFocus
                                         value={organizerEmail}
                                         onChange={(e) => setOrganizerEmail(e.target.value)}
                                         placeholder="you@organization.org"
                                         className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
                                     />
                                     <p className="text-[11px] text-muted">
-                                        Publishing never requires an account. Leave an address and you can save the campaign
-                                        to one on the next screen, which is how you get back to it from another device.
-                                        Supporters are never emailed.
+                                        Creating never requires an account. An email is the reliable way back in after
+                                        you leave WhatsApp&apos;s browser. Supporters are never emailed.
                                     </p>
                                 </div>
                             )}
@@ -761,7 +810,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             onClick={handleClose}
                             className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper transition-all"
                         >
-                            <Check size={20} /> Done
+                            <Check size={20} /> {linkSaved || onAccount ? 'Done' : 'Save access, then Done'}
                         </button>
                     ) : (
                         <>

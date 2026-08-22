@@ -306,7 +306,10 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                     <input value={slugInput} onChange={(e) => setSlugInput(e.target.value)}
                                         className="flex-1 bg-transparent py-2.5 text-ink outline-none min-w-0" />
                                 </div>
-                                <p className="text-[11px] text-muted">Letters and numbers become dashes. Changing this updates your share link.</p>
+                                <p className="text-[11px] text-muted">
+                                    Letters and numbers become dashes. Changing this updates your share link;
+                                    older links redirect automatically so WhatsApp shares keep working.
+                                </p>
                             </div>
 
                             <div className="flex items-center gap-3">

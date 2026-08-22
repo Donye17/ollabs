@@ -68,13 +68,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
         // Confirm ownership first.
         const owned = await pool.query(
-            `SELECT id FROM campaigns WHERE slug = $1 AND owner_token = $2 LIMIT 1`,
+            `SELECT id, slug FROM campaigns WHERE slug = $1 AND owner_token = $2 LIMIT 1`,
             [slug, token]
         );
         if (owned.rows.length === 0) {
             return NextResponse.json({ error: 'Not found or wrong key' }, { status: 404 });
         }
-        const id = owned.rows[0].id;
+        const id = owned.rows[0].id as string;
+        const currentSlug = owned.rows[0].slug as string;
 
         const sets: string[] = [];
         const values: unknown[] = [];
@@ -140,8 +141,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             if (!newSlug) {
                 return NextResponse.json({ error: 'That link name is not valid. Use letters and numbers.' }, { status: 400 });
             }
-            sets.push(`slug = $${i++}`);
-            values.push(newSlug);
+            if (newSlug !== currentSlug) {
+                sets.push(`slug = $${i++}`);
+                values.push(newSlug);
+            } else {
+                newSlug = null;
+            }
         }
 
         if (sets.length === 0) {
@@ -154,6 +159,30 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
                 `UPDATE campaigns SET ${sets.join(', ')} WHERE id = $${i} RETURNING slug, title, description, frame_config, preview_url`,
                 values
             );
+
+            // Keep every previously shared /c/[old] working. Resolve redirects by
+            // campaign id so a second rename (a→b→c) still sends a→c.
+            if (newSlug) {
+                try {
+                    // If this slug was someone else's old name, the new owner wins.
+                    await pool.query(
+                        `DELETE FROM campaign_slug_redirects WHERE old_slug = $1`,
+                        [newSlug]
+                    );
+                    await pool.query(
+                        `INSERT INTO campaign_slug_redirects (old_slug, campaign_id)
+                         VALUES ($1, $2)
+                         ON CONFLICT (old_slug) DO UPDATE SET campaign_id = EXCLUDED.campaign_id`,
+                        [currentSlug, id]
+                    );
+                } catch (redirErr) {
+                    // Table may not exist yet on a deploy that raced the migration.
+                    // The slug update already succeeded; failing closed on redirects
+                    // is worse than logging and shipping the rename.
+                    console.error('slug redirect write failed', redirErr);
+                }
+            }
+
             return NextResponse.json(result.rows[0]);
         } catch (e: any) {
             if (e?.code === '23505') {

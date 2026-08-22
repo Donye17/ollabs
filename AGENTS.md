@@ -11,16 +11,12 @@ link. Supporters open that link, drop in a photo, and download the framed result
 
 ## Where things stand (2026-08-21)
 
-**Mobile Step 3 is on `main`** (`ffc8d64`): shared `lib/download.ts`, share sheet, `touch-action`,
-`dvh` modals, no `alert()`.
+**On `main`:** mobile Step 3 (`ffc8d64`), phone shell + custom-frame-first create
+(Phases 1–2).
 
-**In progress — Phase 1–2 of the execution plan** (phone shell + custom-frame-first create):
-
-- Sticky thumb-zone Save/Share on `/c` and `/day` with safe-area insets
-- `CampaignClient` uses `downloadBlob` (no hand-rolled anchor)
-- Manage: WhatsApp share leads
-- `/create`: custom upload is the default path; premades demoted to “Simple styles”;
-  canvas pinned while editing; sticky Create campaign bar on mobile
+**Phase 3 (this pass):** post-publish save nudge (Done blocked until login or manage
+link acknowledged); `campaign_slug_redirects` + 301 from old `/c/[slug]` after rename.
+Migration `0012` applied to Neon.
 
 **Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
 “Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page

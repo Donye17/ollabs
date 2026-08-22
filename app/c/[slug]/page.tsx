@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { pool } from '@/lib/neon';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { CampaignClient } from '@/components/campaign/CampaignClient';
 import { FrameConfig } from '@/lib/types';
@@ -27,9 +27,34 @@ const getCampaign = cache(async (slug: string) => {
     }
 });
 
+/** Follow a renamed custom URL to the campaign's current slug. */
+const resolveRedirectSlug = cache(async (slug: string): Promise<string | null> => {
+    try {
+        const res = await pool.query(
+            `SELECT c.slug
+             FROM campaign_slug_redirects r
+             JOIN campaigns c ON c.id = r.campaign_id
+             WHERE r.old_slug = $1
+               AND c.is_public = true
+               AND c.is_hidden IS NOT TRUE
+             LIMIT 1`,
+            [slug]
+        );
+        return res.rows[0]?.slug ?? null;
+    } catch (e) {
+        // Missing table before migration 0012 is applied — treat as no redirect.
+        console.error('slug redirect lookup failed', e);
+        return null;
+    }
+});
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
-    const c = await getCampaign(slug);
+    let c = await getCampaign(slug);
+    if (!c) {
+        const dest = await resolveRedirectSlug(slug);
+        if (dest) c = await getCampaign(dest);
+    }
     if (!c) return { title: 'Campaign not found' };
     const description = c.description || `Add the ${c.title} frame to your profile picture and show your support.`;
 
@@ -67,13 +92,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             images: [{ url: shareImage, width: 1024, height: 1024, alt: c.title }],
         },
         twitter: { card: 'summary_large_image', title: c.title, description, images: [shareImage] },
+        alternates: { canonical: `https://ollabs.studio/c/${c.slug}` },
     };
 }
 
 export default async function CampaignPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
     const campaign = await getCampaign(slug);
-    if (!campaign) notFound();
+    if (!campaign) {
+        const dest = await resolveRedirectSlug(slug);
+        // Permanent: WhatsApp and search should retire the old slug.
+        if (dest && dest !== slug) redirect(`/c/${dest}`);
+        notFound();
+    }
 
     const frame: FrameConfig = typeof campaign.frame_config === 'string'
         ? JSON.parse(campaign.frame_config)
