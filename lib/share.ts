@@ -34,16 +34,27 @@ export function prefersPortuguese(): boolean {
     return langs.some((l) => typeof l === 'string' && l.toLowerCase().startsWith('pt'));
 }
 
+/**
+ * Share copy language. Prefer an explicit UI locale (cookie / /pt) so a
+ * Brazilian organizer on the Portuguese landing gets PT WhatsApp text even if
+ * their browser language list is messy.
+ */
+export function shareInPortuguese(locale?: 'en' | 'pt' | null): boolean {
+    if (locale === 'pt') return true;
+    if (locale === 'en') return false;
+    return prefersPortuguese();
+}
+
 /** What an organizer sends when they have just published their campaign. */
-export function organizerShareText(title: string): string {
-    return prefersPortuguese()
+export function organizerShareText(title: string, locale?: 'en' | 'pt' | null): string {
+    return shareInPortuguese(locale)
         ? `Coloque a moldura "${title}" na sua foto de perfil:`
         : `Add the "${title}" frame to your profile picture:`;
 }
 
 /** What a supporter sends after adding the frame to their own photo. */
-export function supporterShareText(title: string): string {
-    return prefersPortuguese()
+export function supporterShareText(title: string, locale?: 'en' | 'pt' | null): string {
+    return shareInPortuguese(locale)
         ? `Adicionei a moldura "${title}" na minha foto. Adicione a sua:`
         : `I just added the "${title}" frame to my photo on Ollabs. Add yours:`;
 }

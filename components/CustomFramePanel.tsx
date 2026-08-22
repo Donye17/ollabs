@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { FrameConfig, FrameType } from '@/lib/types';
 import { Upload, AlertCircle, Loader2 } from 'lucide-react';
 import { upload } from '@vercel/blob/client';
+import { useLocale } from '@/components/i18n/LocaleProvider';
 
 interface CustomFramePanelProps {
     frame: FrameConfig;
@@ -10,6 +11,8 @@ interface CustomFramePanelProps {
 }
 
 export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onChange }) => {
+    const { messages } = useLocale();
+    const t = messages.create;
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -47,9 +50,9 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
     return (
         <div className="space-y-5 animate-fade-in">
             <div>
-                <h2 className="font-display text-lg font-bold text-ink mb-1">Your frame</h2>
+                <h2 className="font-display text-lg font-bold text-ink mb-1">{t.yourFrame}</h2>
                 <p className="text-muted text-xs">
-                    Upload your logo, badge, or designed frame. Watch the live preview above while you open a window for the photo.
+                    {t.yourFrameHint}
                 </p>
             </div>
 
@@ -66,7 +69,7 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
                 <div className="flex flex-col items-center justify-center gap-3 px-4 py-8 text-center">
                     {isCustom ? (
                         <div className="w-24 h-24 rounded-full bg-paper overflow-hidden border border-ink/10 flex items-center justify-center">
-                            <img src={frame.imageUrl} alt="Your frame" className="w-full h-full object-contain" />
+                            <img src={frame.imageUrl} alt="" className="w-full h-full object-contain" />
                         </div>
                     ) : (
                         <div className="w-16 h-16 rounded-2xl bg-brand/20 flex items-center justify-center">
@@ -75,9 +78,9 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
                     )}
                     <div>
                         <p className="font-bold text-ink text-sm">
-                            {uploading ? 'Uploading…' : (isCustom ? 'Change frame image' : 'Upload logo or frame')}
+                            {uploading ? t.uploading : (isCustom ? t.changeFrame : t.uploadFrame)}
                         </p>
-                        <p className="text-[11px] text-muted mt-1">PNG with transparency works best</p>
+                        <p className="text-[11px] text-muted mt-1">{t.pngTip}</p>
                     </div>
                 </div>
             </label>
@@ -91,7 +94,7 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
             {isCustom && (
                 <div className="p-4 bg-cream border border-ink/10 rounded-2xl space-y-3">
                     <div className="flex items-center justify-between">
-                        <label className="text-sm font-medium text-ink">Photo window</label>
+                        <label className="text-sm font-medium text-ink">{t.photoWindow}</label>
                         <span className="text-xs text-muted">{Math.round(cutout * 100)}%</span>
                     </div>
                     <input
@@ -101,11 +104,11 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
                         step={0.01}
                         value={cutout}
                         onChange={(e) => setCutout(parseFloat(e.target.value))}
-                        aria-label="Photo window size"
+                        aria-label={t.photoWindow}
                         className="w-full h-8 accent-brand"
                     />
                     <p className="text-xs text-muted">
-                        Cut a circle so the photo shows through. Left = more frame, right = more photo. Set to 0 if your PNG already has a transparent center.
+                        {t.photoWindowHint}
                     </p>
                 </div>
             )}
@@ -114,7 +117,7 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
                 <div className="p-3 bg-brand/10 rounded-xl border border-brand/20 flex gap-3 items-start">
                     <AlertCircle className="text-brand-deep shrink-0 mt-0.5" size={16} />
                     <p className="text-xs text-brand-deep">
-                        A square logo or round badge works great. Ollabs keeps the outer design and opens a window in the center for each supporter&apos;s photo.
+                        {t.tipLogo}
                     </p>
                 </div>
             )}

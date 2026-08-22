@@ -9,7 +9,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = 'https://ollabs.studio';
 
     const routes: MetadataRoute.Sitemap = [
-        { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
+        {
+            url: baseUrl,
+            lastModified: new Date(),
+            changeFrequency: 'daily',
+            priority: 1,
+            alternates: { languages: { en: baseUrl, 'pt-BR': `${baseUrl}/pt` } },
+        },
+        {
+            url: `${baseUrl}/pt`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.95,
+            alternates: { languages: { en: baseUrl, 'pt-BR': `${baseUrl}/pt` } },
+        },
         { url: `${baseUrl}/create`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
         { url: `${baseUrl}/explore`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
         { url: `${baseUrl}/for`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },

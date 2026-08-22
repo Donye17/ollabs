@@ -9,6 +9,7 @@ import { WhatsAppGlyph, WHATSAPP_GREEN } from './ShareGlyphs';
 import { CATEGORIES } from '@/lib/categories';
 import { track, withUtm } from '@/lib/analytics';
 import { organizerShareText, whatsappUrl } from '@/lib/share';
+import { useLocale } from '@/components/i18n/LocaleProvider';
 
 interface EditTarget {
     slug: string;
@@ -32,6 +33,8 @@ interface PublishTemplateModalProps {
 type AccountStep = 'offer' | 'sending' | 'code' | 'verifying' | 'saved';
 
 export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl, editTarget }) => {
+    const { messages, locale } = useLocale();
+    const tp = messages.publish;
     // Set when the builder was opened from a /day page, so the campaign can be
     // attributed to that day rather than guessed at by category.
     const [daySlug, setDaySlug] = useState<string | null>(null);
@@ -453,14 +456,14 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
     const shareWhatsApp = () => {
         if (!campaignUrl) return;
-        const text = organizerShareText(title || 'Ollabs');
+        const text = organizerShareText(title || 'Ollabs', locale);
         window.open(whatsappUrl(text, withUtm(campaignUrl, 'whatsapp')), '_blank', 'noopener,noreferrer');
         track('campaign_share', { campaign: campaignSlug, platform: 'whatsapp', from: 'publish' });
     };
 
     const shareNative = async () => {
         if (!campaignUrl) return;
-        const text = organizerShareText(title || 'Ollabs');
+        const text = organizerShareText(title || 'Ollabs', locale);
         try {
             await navigator.share({ title: title || 'Ollabs', text, url: withUtm(campaignUrl, 'native') });
             track('campaign_share', { campaign: campaignSlug, platform: 'native', from: 'publish' });
@@ -511,7 +514,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-ink/10 flex items-center justify-between sticky top-0 bg-paper z-10">
-                    <h2 className="font-display text-lg font-extrabold text-ink">{campaignUrl ? 'Campaign is live' : 'Create a campaign'}</h2>
+                    <h2 className="font-display text-lg font-extrabold text-ink">{campaignUrl ? tp.liveTitle : tp.createTitle}</h2>
                     <button onClick={handleClose} aria-label="Close" className="p-2 hover:bg-ink/10 rounded-full transition-colors">
                         <X size={18} className="text-muted" />
                     </button>
@@ -528,10 +531,9 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                         /* Success: shareable link */
                         <div className="space-y-4">
                             <div className="text-center">
-                                <p className="font-display text-lg font-extrabold leading-tight">Send it now.</p>
+                                <p className="font-display text-lg font-extrabold leading-tight">{tp.sendNow}</p>
                                 <p className="text-sm text-ink/70 mt-1">
-                                    Campaigns that get shared in the first few minutes are the ones that fill up.
-                                    Anyone who opens your link can add the frame to their photo.
+                                    {tp.sendNowBody}
                                 </p>
                             </div>
 
@@ -542,7 +544,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all shadow-sm"
                                 style={{ backgroundColor: WHATSAPP_GREEN }}
                             >
-                                <WhatsAppGlyph size={20} /> Share on WhatsApp
+                                <WhatsAppGlyph size={20} /> {tp.shareWhatsApp}
                             </button>
 
                             {canNativeShare && (
@@ -550,7 +552,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     onClick={shareNative}
                                     className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 active:brightness-110 transition-all"
                                 >
-                                    <Share2 size={18} /> Share another way
+                                    <Share2 size={18} /> {tp.shareAnother}
                                 </button>
                             )}
 
@@ -568,7 +570,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     rel="noopener noreferrer"
                                     className="flex-1 min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
                                 >
-                                    <ExternalLink size={18} /> Open
+                                    <ExternalLink size={18} /> {tp.open}
                                 </a>
                                 <button
                                     onClick={() => setShowQR((v) => !v)}
@@ -601,20 +603,19 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 <div className={`rounded-xl p-4 space-y-3 ${closeBlocked ? 'bg-coral/10 border border-coral/30' : 'bg-cream border border-ink/10'}`}>
                                     <div className="flex items-center gap-2 text-ink">
                                         <UserPlus size={16} className="text-brand-deep" />
-                                        <span className="text-sm font-bold">Save your campaigns</span>
+                                        <span className="text-sm font-bold">{tp.saveCampaigns}</span>
                                     </div>
 
                                     {closeBlocked && (
                                         <p role="alert" className="text-xs text-coral">
-                                            Create a free login, or copy your manage link below, before you leave —
-                                            otherwise this campaign can disappear when you leave WhatsApp.
+                                            {tp.closeBlocked}
                                         </p>
                                     )}
 
                                     {accountStep === 'code' || accountStep === 'verifying' ? (
                                         <>
                                             <p className="text-xs text-ink/70">
-                                                Enter the 6 digit code sent to <span className="font-semibold">{accountEmail}</span>.
+                                                {tp.enterCode(accountEmail)}
                                             </p>
                                             <div className="relative">
                                                 <KeyRound className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -636,20 +637,19 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                                 disabled={accountStep === 'verifying' || accountCode.length !== 6}
                                                 className="w-full min-h-[44px] py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
                                             >
-                                                {accountStep === 'verifying' ? <><Loader2 size={15} className="animate-spin" /> Checking</> : 'Save my campaign'}
+                                                {accountStep === 'verifying' ? <><Loader2 size={15} className="animate-spin" /> …</> : tp.saveMyCampaign}
                                             </button>
                                             <button
                                                 onClick={sendAccountCode}
                                                 className="w-full text-[11px] text-muted hover:text-brand-deep transition-colors"
                                             >
-                                                Send a new code
+                                                {tp.sendNewCode}
                                             </button>
                                         </>
                                     ) : (
                                         <>
                                             <p className="text-xs text-ink/70">
-                                                Optional, but this is how you manage the campaign from another phone.
-                                                Get a 6 digit code by email — no password. Supporters still never sign in.
+                                                {tp.saveCampaignsBody}
                                             </p>
                                             <input
                                                 type="email"
@@ -666,14 +666,14 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                                 disabled={accountStep === 'sending' || !accountEmail}
                                                 className="w-full min-h-[44px] py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
                                             >
-                                                {accountStep === 'sending' ? <><Loader2 size={15} className="animate-spin" /> Sending</> : 'Email me a code'}
+                                                {accountStep === 'sending' ? <><Loader2 size={15} className="animate-spin" /> …</> : tp.emailCode}
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={skipAccountForNow}
                                                 className="w-full text-[11px] text-muted hover:text-ink transition-colors py-1"
                                             >
-                                                Skip for now — I&apos;ll copy the manage link
+                                                {tp.skipForNow}
                                             </button>
                                         </>
                                     )}
@@ -684,11 +684,10 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 <div className="bg-brand/10 border border-brand/30 rounded-xl p-4 space-y-2.5">
                                     <div className="flex items-center gap-2 text-ink">
                                         <Pencil size={16} className="text-brand-deep" />
-                                        <span className="text-sm font-bold">Manage campaign</span>
+                                        <span className="text-sm font-bold">{tp.manage}</span>
                                     </div>
                                     <p className="text-xs text-ink/70">
-                                        Change the title, description, goal, category, custom link, and frame.
-                                        Old share links keep working when you rename the URL. Stats live here too.
+                                        {tp.manageBody}
                                     </p>
                                     <div className="flex gap-2">
                                         <a
@@ -698,21 +697,21 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                             onClick={() => { setLinkSaved(true); setCloseBlocked(false); }}
                                             className="flex-1 min-h-[44px] py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all"
                                         >
-                                            <ExternalLink size={15} /> Open
+                                            <ExternalLink size={15} /> {tp.open}
                                         </a>
                                         <button onClick={handleCopyManage}
                                             className="min-h-[44px] py-2.5 px-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
-                                            {manageCopied ? <><Check size={15} className="text-brand-deep" /> Copied</> : <><Copy size={15} /> Copy link</>}
+                                            {manageCopied ? <><Check size={15} className="text-brand-deep" /> ✓</> : <><Copy size={15} /> {messages.campaign.copyLink}</>}
                                         </button>
                                     </div>
                                     <p className="text-[11px] text-muted flex items-start gap-1.5">
                                         <ShieldCheck size={13} className="mt-0.5 shrink-0" />
                                         <span>
                                             {onAccount
-                                                ? 'This link is a private key to your campaign. Keep it to yourself.'
+                                                ? tp.privateKey
                                                 : organizerEmail
-                                                    ? `Private key to your campaign. Also emailed to ${organizerEmail}. Keep it to yourself.`
-                                                    : 'Private key to your campaign. Without an account it is the only way back in, so copy it somewhere safe.'}
+                                                    ? tp.privateKeyEmail(organizerEmail)
+                                                    : tp.privateKeyOnly}
                                         </span>
                                     </p>
                                 </div>
@@ -722,7 +721,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                         /* Form */
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Campaign title</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">{tp.campaignTitle}</label>
                                 <input
                                     type="text"
                                     value={title}
@@ -733,7 +732,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Description (optional)</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">{tp.description}</label>
                                 <textarea
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
@@ -744,7 +743,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Goal (optional)</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">{tp.goal}</label>
                                     <input
                                         type="number"
                                         min={1}
@@ -756,7 +755,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Category</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">{tp.category}</label>
                                     <select
                                         value={category}
                                         onChange={(e) => setCategory(e.target.value)}
@@ -782,7 +781,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             ) : (
                                 <div className="space-y-2 pt-1">
                                     <label className="text-xs font-bold text-muted uppercase tracking-wider">
-                                        Email to get back in <span className="normal-case font-medium">(recommended)</span>
+                                        {tp.emailBack}
                                     </label>
                                     <input
                                         type="email"
@@ -794,8 +793,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                         className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
                                     />
                                     <p className="text-[11px] text-muted">
-                                        Creating never requires an account. An email is the reliable way back in after
-                                        you leave WhatsApp&apos;s browser. Supporters are never emailed.
+                                        {tp.emailBackHint}
                                     </p>
                                 </div>
                             )}
@@ -810,7 +808,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             onClick={handleClose}
                             className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper transition-all"
                         >
-                            <Check size={20} /> {linkSaved || onAccount ? 'Done' : 'Save access, then Done'}
+                            <Check size={20} /> {linkSaved || onAccount ? tp.done : tp.saveThenDone}
                         </button>
                     ) : (
                         <>
@@ -824,7 +822,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             disabled={!title || isSubmitting}
                             className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isSubmitting ? <Loader2 className="animate-spin" /> : <><Rocket size={20} /> Create campaign</>}
+                            {isSubmitting ? <Loader2 className="animate-spin" /> : <><Rocket size={20} /> {tp.createButton}</>}
                         </button>
                         </>
                     )}

@@ -3,6 +3,8 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Bricolage_Grotesque } from 'next/font/google';
+import { LocaleProvider } from '@/components/i18n/LocaleProvider';
+import { LanguageBanner } from '@/components/i18n/LanguageBanner';
 import './globals.css';
 
 const inter = Inter({
@@ -41,6 +43,14 @@ export const metadata: Metadata = {
                 alt: 'Ollabs, bring your people together with a profile-picture frame',
             },
         ],
+    },
+    alternates: {
+        canonical: 'https://ollabs.studio',
+        languages: {
+            en: 'https://ollabs.studio',
+            'pt-BR': 'https://ollabs.studio/pt',
+            'x-default': 'https://ollabs.studio',
+        },
     },
     twitter: {
         card: 'summary_large_image',
@@ -130,7 +140,10 @@ export default function RootLayout({
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
                 />
-                {children}
+                <LocaleProvider>
+                    {children}
+                    <LanguageBanner />
+                </LocaleProvider>
                 {GA_ID && (
                     <>
                         <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />

@@ -8,6 +8,7 @@ import { addPngMetadata } from '@/lib/pngMeta';
 import { track } from '@/lib/analytics';
 import { canShareFiles } from '@/lib/share';
 import { downloadBlob } from '@/lib/download';
+import { useLocale } from '@/components/i18n/LocaleProvider';
 import { Upload, Download, Loader2, ArrowRight, ImageDown, AlertCircle } from 'lucide-react';
 
 const CANVAS = 1024;
@@ -31,6 +32,8 @@ export const DayFrameTool: React.FC<{
      */
     section?: 'day' | 'flags';
 }> = ({ frame, dayName, daySlug, section = 'day' }) => {
+    const { messages } = useLocale();
+    const t = messages.day;
     const isFlag = section === 'flags';
     // Keep the day dimension clean: flag downloads report under their own key
     // rather than masquerading as an awareness day in GA.
@@ -232,7 +235,7 @@ export const DayFrameTool: React.FC<{
                 {!hasImage && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                         <Upload className="w-7 h-7 text-ink/40 mb-2" />
-                        <p className="text-sm font-semibold text-ink/60">Tap to add your photo</p>
+                        <p className="text-sm font-semibold text-ink/60">{t.tapAdd}</p>
                     </div>
                 )}
             </div>
@@ -245,7 +248,7 @@ export const DayFrameTool: React.FC<{
             {hasImage && (
                 <div className="mt-5 space-y-4">
                     <div>
-                        <label className="text-xs font-bold uppercase tracking-wider text-muted">Zoom</label>
+                        <label className="text-xs font-bold uppercase tracking-wider text-muted">{t.zoom}</label>
                         <input
                             type="range" min={1} max={3} step={0.01} value={zoom}
                             onChange={(e) => setZoom(parseFloat(e.target.value))}
@@ -257,7 +260,7 @@ export const DayFrameTool: React.FC<{
                         onClick={() => fileRef.current?.click()}
                         className="w-full h-12 rounded-xl border border-ink/15 font-bold hover:bg-ink/5 transition-colors"
                     >
-                        Change photo
+                        {t.changePhoto}
                     </button>
                 </div>
             )}
@@ -270,7 +273,7 @@ export const DayFrameTool: React.FC<{
 
             {done && (
                 <div className="mt-5 bg-cream border border-ink/10 rounded-2xl p-5 text-center">
-                    <p className="font-display font-bold mb-1">Saved. Go set it as your profile picture.</p>
+                    <p className="font-display font-bold mb-1">{t.saved}</p>
                     <p className="text-sm text-ink/70 mb-4">
                         {isFlag
                             ? `Want everyone in your group behind the same ${dayName} frame? Make a campaign and share one link, so you can see how many joined.`
@@ -281,7 +284,7 @@ export const DayFrameTool: React.FC<{
                         onClick={() => track(isFlag ? 'flag_to_create' : 'day_to_create', dimension)}
                         className="inline-flex h-11 px-6 rounded-xl bg-ink text-paper font-bold items-center gap-2 hover:opacity-90 transition-opacity"
                     >
-                        Create a campaign <ArrowRight size={16} />
+                        {t.createCampaign} <ArrowRight size={16} />
                     </Link>
                 </div>
             )}
@@ -295,7 +298,7 @@ export const DayFrameTool: React.FC<{
                                 className="w-full h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 transition-all disabled:opacity-60"
                             >
                                 {sharingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageDown size={18} />}
-                                Save or share photo
+                                {t.saveOrShare}
                             </button>
                         )}
                         <div className="flex gap-2">
@@ -304,7 +307,7 @@ export const DayFrameTool: React.FC<{
                                 className={`flex-1 h-12 rounded-xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-60 ${canSharePhoto ? 'bg-cream border border-ink/10 text-ink hover:bg-ink/5' : 'bg-brand text-ink hover:brightness-105'}`}
                             >
                                 {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={18} />}
-                                Download
+                                {t.download}
                             </button>
                         </div>
                     </div>

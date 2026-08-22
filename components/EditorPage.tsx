@@ -13,6 +13,7 @@ import { FrameConfig } from '@/lib/types';
 import { getFlag, resolveFlagFrame } from '@/lib/flags';
 import { AlertCircle, ChevronDown, Loader2, Save, Upload } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
+import { useLocale } from '@/components/i18n/LocaleProvider';
 // Loaded on demand (see handleRemoveBackground). This library is ~5.5MB of WASM;
 // importing it statically made every visitor to /create download it whether or
 // not they ever removed a background.
@@ -25,6 +26,8 @@ export interface EditTarget {
 }
 
 export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
+    const { messages } = useLocale();
+    const t = messages.create;
     // History State (Frame Config)
     const [history, setHistory] = useState<FrameConfig[]>([DEFAULT_FRAME]);
     const [historyIndex, setHistoryIndex] = useState<number>(0);
@@ -247,7 +250,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         )}
 
                         <p className="mt-3 text-xs text-muted text-center max-w-md hidden lg:block">
-                            Drag a photo onto the circle to preview how supporters will look. Pinch or pan to fit.
+                            {t.dragTip}
                         </p>
                     </div>
 
@@ -255,12 +258,12 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                     <div className="lg:col-span-5 space-y-4 relative z-10">
                         <div className="px-1">
                             <h1 className="font-display text-2xl font-extrabold text-ink tracking-tight">
-                                {editTarget ? 'Edit your frame' : 'Campaign builder'}
+                                {editTarget ? t.editTitle : t.title}
                             </h1>
                             <p className="text-xs text-muted font-medium">
                                 {editTarget
-                                    ? `Saves to "${editTarget.title}". Your link and supporters stay put.`
-                                    : 'Upload your frame, then share one link. No account needed to create.'}
+                                    ? t.editSubtitle(editTarget.title)
+                                    : t.subtitle}
                             </p>
                         </div>
 
@@ -280,18 +283,18 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             sticker picker instead of a campaign tool. */}
                         <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
                             <summary className="flex items-center justify-between cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
-                                <span>Simple styles</span>
+                                <span>{t.simpleStyles}</span>
                                 <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180" />
                             </summary>
                             <div className="px-5 pb-5 space-y-3 border-t border-ink/10 pt-4">
-                                <p className="text-xs text-muted">No artwork yet? Pick a colour ring to start.</p>
+                                <p className="text-xs text-muted">{t.simpleStylesHint}</p>
                                 <FrameSelector selectedFrameId={selectedFrame.id} onSelect={handlePresetSelect} />
                             </div>
                         </details>
 
                         <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
                             <summary className="flex items-center justify-between cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
-                                <span>Fine tune colours</span>
+                                <span>{t.fineTune}</span>
                                 <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180" />
                             </summary>
                             <div className="px-5 pb-5 border-t border-ink/10 pt-4">
@@ -309,7 +312,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
                         <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
                             <summary className="flex items-center justify-between cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
-                                <span>Preview in contacts</span>
+                                <span>{t.previewContacts}</span>
                                 <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180" />
                             </summary>
                             <div className="px-5 pb-5 border-t border-ink/10 pt-4 flex flex-col items-center">
@@ -323,8 +326,8 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             className="hidden lg:flex w-full min-h-[52px] items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 transition-all"
                         >
                             {editTarget
-                                ? <><Save size={18} /> Save changes</>
-                                : <><Upload size={18} /> Create campaign</>}
+                                ? <><Save size={18} /> {t.saveChanges}</>
+                                : <><Upload size={18} /> {t.createCampaign}</>}
                         </button>
                     </div>
                 </div>
@@ -338,8 +341,8 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                     className="w-full max-w-lg mx-auto min-h-[52px] flex items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 active:brightness-95 transition-all"
                 >
                     {editTarget
-                        ? <><Save size={18} /> Save changes</>
-                        : <><Upload size={18} /> Create campaign</>}
+                        ? <><Save size={18} /> {t.saveChanges}</>
+                        : <><Upload size={18} /> {t.createCampaign}</>}
                 </button>
             </div>
 
