@@ -10,9 +10,10 @@ const ITEMS = [
     { href: '/hub', label: 'Hub', Icon: LayoutGrid },
 ] as const;
 
-/** Thumb-zone nav for organizers. Hidden on /create (that page has its own bar). */
+/** Thumb-zone nav for organizers. Hidden on marketing home, create, hub, and campaigns. */
 export function MobileOrganizerNav() {
     const pathname = usePathname() || '/';
+    if (pathname === '/' || pathname === '') return null;
     if (pathname === '/create' || pathname.startsWith('/create/')) return null;
     if (pathname === '/hub' || pathname.startsWith('/hub/')) return null;
     if (pathname.startsWith('/c/')) return null;

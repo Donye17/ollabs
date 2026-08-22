@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import type { HomeCampaign } from '@/components/HomeExamples';
 import { ExamplesSkeleton } from '@/components/home/ExamplesSkeleton';
+import { DeferUntilIdle } from '@/components/home/DeferUntilIdle';
 
 const HomeExamples = dynamic(
     () => import('@/components/HomeExamples').then((m) => ({ default: m.HomeExamples })),
@@ -10,5 +11,9 @@ const HomeExamples = dynamic(
 );
 
 export function HomeExamplesClient({ campaigns }: { campaigns: HomeCampaign[] }) {
-    return <HomeExamples campaigns={campaigns} />;
+    return (
+        <DeferUntilIdle fallback={<ExamplesSkeleton />}>
+            <HomeExamples campaigns={campaigns} />
+        </DeferUntilIdle>
+    );
 }

@@ -1,11 +1,11 @@
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import Script from 'next/script';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Bricolage_Grotesque } from 'next/font/google';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 import { LanguageBanner } from '@/components/i18n/LanguageBanner';
 import { MobileOrganizerNav } from '@/components/MobileOrganizerNav';
+import { DeferredAnalytics } from '@/components/DeferredAnalytics';
 import './globals.css';
 
 const inter = Inter({
@@ -150,17 +150,7 @@ export default function RootLayout({
                     <MobileOrganizerNav />
                     <LanguageBanner />
                 </LocaleProvider>
-                {GA_ID && (
-                    <>
-                        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="lazyOnload" />
-                        <Script id="google-analytics" strategy="lazyOnload">
-                            {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GA_ID}');`}
-                        </Script>
-                    </>
-                )}
+                {GA_ID ? <DeferredAnalytics gaId={GA_ID} /> : null}
                 {/* AdSense script is loaded by AdSlot on first mount, not here.
                     Create and other ad-free screens should not pay for it.
                     Dashboard: keep Auto ads, anchor, and vignette OFF. */}
