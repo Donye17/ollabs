@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { FrameConfig, FrameType } from '@/lib/types';
-import { Upload, Image as ImageIcon, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, AlertCircle, Loader2 } from 'lucide-react';
 import { upload } from '@vercel/blob/client';
 
 interface CustomFramePanelProps {
@@ -45,40 +45,51 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
     const setCutout = (value: number) => onChange({ ...frame, cutoutScale: value });
 
     return (
-        <div className="space-y-6 animate-fade-in">
+        <div className="space-y-5 animate-fade-in">
             <div>
-                <h2 className="text-lg font-bold text-ink mb-1">Upload your own frame</h2>
-                <p className="text-muted text-xs">Use your brand or cause design, a logo, badge, or frame. It wraps the photo, and you open a window in the middle for the picture.</p>
+                <h2 className="font-display text-lg font-bold text-ink mb-1">Your frame</h2>
+                <p className="text-muted text-xs">
+                    Upload your logo, badge, or designed frame. Watch the live preview above while you open a window for the photo.
+                </p>
             </div>
 
-            <div className="p-6 bg-cream border border-ink/10 rounded-2xl flex flex-col items-center gap-4 text-center">
-                <div className="w-20 h-20 rounded-full bg-paper2 flex items-center justify-center mb-1 overflow-hidden">
+            {/* Large drop zone — the old 80px circle made the upload feel like a
+                side option. This is the product. */}
+            <label className={`block cursor-pointer rounded-2xl border-2 border-dashed transition-colors ${isCustom ? 'border-ink/15 bg-cream' : 'border-brand/50 bg-brand/5 hover:bg-brand/10'} ${uploading ? 'opacity-70 pointer-events-none' : ''}`}>
+                <input
+                    type="file"
+                    accept="image/png,image/webp,image/gif,image/jpeg"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                />
+                <div className="flex flex-col items-center justify-center gap-3 px-4 py-8 text-center">
                     {isCustom ? (
-                        <img src={frame.imageUrl} alt="Your frame" className="w-full h-full object-contain" />
+                        <div className="w-24 h-24 rounded-full bg-paper overflow-hidden border border-ink/10 flex items-center justify-center">
+                            <img src={frame.imageUrl} alt="Your frame" className="w-full h-full object-contain" />
+                        </div>
                     ) : (
-                        <ImageIcon className="text-muted" size={32} />
+                        <div className="w-16 h-16 rounded-2xl bg-brand/20 flex items-center justify-center">
+                            {uploading ? <Loader2 className="animate-spin text-brand-deep" size={28} /> : <Upload className="text-brand-deep" size={28} />}
+                        </div>
                     )}
-                </div>
-
-                <label className="cursor-pointer group relative">
-                    <input
-                        type="file"
-                        accept="image/png,image/webp,image/gif,image/jpeg"
-                        className="hidden"
-                        onChange={handleImageUpload}
-                        disabled={uploading}
-                    />
-                    <div className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-colors shadow-lg shadow-blue-900/20 ${uploading ? 'bg-brand/60 text-ink/80 cursor-wait' : 'bg-brand hover:brightness-105 text-ink'}`}>
-                        {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                        <span>{uploading ? 'Uploading…' : (isCustom ? 'Change frame' : 'Upload logo or frame')}</span>
+                    <div>
+                        <p className="font-bold text-ink text-sm">
+                            {uploading ? 'Uploading…' : (isCustom ? 'Change frame image' : 'Upload logo or frame')}
+                        </p>
+                        <p className="text-[11px] text-muted mt-1">PNG with transparency works best</p>
                     </div>
-                </label>
+                </div>
+            </label>
 
-                {error && <p className="text-xs text-red-400">{error}</p>}
-            </div>
+            {error && (
+                <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5">
+                    {error}
+                </p>
+            )}
 
             {isCustom && (
-                <div className="p-5 bg-cream border border-ink/10 rounded-2xl space-y-3">
+                <div className="p-4 bg-cream border border-ink/10 rounded-2xl space-y-3">
                     <div className="flex items-center justify-between">
                         <label className="text-sm font-medium text-ink">Photo window</label>
                         <span className="text-xs text-muted">{Math.round(cutout * 100)}%</span>
@@ -90,18 +101,23 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
                         step={0.01}
                         value={cutout}
                         onChange={(e) => setCutout(parseFloat(e.target.value))}
-                        className="w-full accent-blue-500"
+                        aria-label="Photo window size"
+                        className="w-full h-8 accent-brand"
                     />
-                    <p className="text-xs text-muted">Cut a circle out of the middle so the photo shows through. Drag left for a bigger frame, right for a bigger photo. Set to 0 if your PNG already has a transparent center.</p>
+                    <p className="text-xs text-muted">
+                        Cut a circle so the photo shows through. Left = more frame, right = more photo. Set to 0 if your PNG already has a transparent center.
+                    </p>
                 </div>
             )}
 
-            <div className="p-4 bg-brand/10 rounded-xl border border-brand/20 flex gap-3 items-start">
-                <AlertCircle className="text-brand-deep shrink-0 mt-0.5" size={16} />
-                <p className="text-xs text-brand-deep">
-                    <strong>Tip:</strong> A square logo or round badge works great, Ollabs keeps the outer design and opens a window in the center for each supporter's photo.
-                </p>
-            </div>
+            {!isCustom && (
+                <div className="p-3 bg-brand/10 rounded-xl border border-brand/20 flex gap-3 items-start">
+                    <AlertCircle className="text-brand-deep shrink-0 mt-0.5" size={16} />
+                    <p className="text-xs text-brand-deep">
+                        A square logo or round badge works great. Ollabs keeps the outer design and opens a window in the center for each supporter&apos;s photo.
+                    </p>
+                </div>
+            )}
         </div>
     );
 };

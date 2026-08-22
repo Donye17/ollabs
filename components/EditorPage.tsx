@@ -11,7 +11,7 @@ import { DEFAULT_FRAME } from '@/lib/constants';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { FrameConfig } from '@/lib/types';
 import { getFlag, resolveFlagFrame } from '@/lib/flags';
-import { AlertCircle, Sparkles, Sliders, Eye, Image as ImageIcon, Upload, Loader2, Save } from 'lucide-react';
+import { AlertCircle, ChevronDown, Loader2, Save, Upload } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
 // Loaded on demand (see handleRemoveBackground). This library is ~5.5MB of WASM;
 // importing it statically made every visitor to /create download it whether or
@@ -63,8 +63,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
         }
     };
 
-
-    const [activeTab, setActiveTab] = useState<'design' | 'custom' | 'customize' | 'preview'>('design');
     const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(!!remixId);
 
@@ -184,8 +182,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const handleFrameUpdate = (updatedFrame: FrameConfig) => addToHistory(updatedFrame);
     const handlePreviewUpdate = useCallback((dataUrl: string) => setPreviewDataUrl(dataUrl), []);
 
-
-
     if (isLoading || editLoading) {
         return (
             <div className="min-h-screen bg-paper flex flex-col items-center justify-center text-ink font-sans">
@@ -213,15 +209,18 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
         );
     }
 
+    const openPublish = () => setIsPublishOpen(true);
+
     return (
-        <div className="min-h-screen bg-paper text-ink font-sans">
+        <div className="min-h-screen bg-paper text-ink font-sans pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
             <NavBar />
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 lg:py-24">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(5rem+env(safe-area-inset-top,0px))] pb-8 lg:py-24">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
 
-                    {/* Left Column: Canvas */}
-                    <div className="lg:col-span-7 flex flex-col items-center sticky top-24 z-0 h-fit lg:h-auto">
+                    {/* Canvas stays pinned on phones so cutout/caption edits never
+                        scroll the only preview that matters off-screen. */}
+                    <div className="lg:col-span-7 flex flex-col items-center sticky top-[calc(4.5rem+env(safe-area-inset-top,0px))] z-0 bg-paper/95 backdrop-blur-sm py-2 lg:py-0 lg:bg-transparent lg:backdrop-blur-none h-fit">
                         <Editor
                             imageSrc={imageSrc}
                             onImageSelect={handleImageSelect}
@@ -234,7 +233,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         />
 
                         {notice && (
-                            <div role="alert" className="mt-6 p-4 bg-coral/10 rounded-2xl border border-coral/30 text-sm text-ink/80 max-w-md w-full flex gap-3 items-start animate-fade-in">
+                            <div role="alert" className="mt-4 p-4 bg-coral/10 rounded-2xl border border-coral/30 text-sm text-ink/80 max-w-md w-full flex gap-3 items-start animate-fade-in">
                                 <AlertCircle className="shrink-0 text-coral mt-0.5" size={18} />
                                 <p className="flex-1">{notice}</p>
                                 <button
@@ -247,114 +246,102 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             </div>
                         )}
 
-                        {/* Tip Box */}
-                        <div className="mt-8 p-4 bg-brand/10 rounded-2xl border border-brand/30 text-sm text-ink/70 max-w-md flex gap-3 items-start animate-fade-in">
-                            <AlertCircle className="shrink-0 text-brand-deep mt-0.5" size={18} />
-                            <p><strong className="text-ink">Tip:</strong> Drag and drop a photo to start. Pinch to zoom or pan.</p>
-                        </div>
+                        <p className="mt-3 text-xs text-muted text-center max-w-md hidden lg:block">
+                            Drag a photo onto the circle to preview how supporters will look. Pinch or pan to fit.
+                        </p>
                     </div>
 
-                    {/* Right Column: Key Controls */}
-                    <div className="lg:col-span-5 space-y-6 relative z-10 bg-paper/95 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none p-4 -mx-4 rounded-t-3xl border-t border-ink/10 lg:border-none lg:p-0 lg:m-0 lg:rounded-none shadow-[0_-10px_40px_rgba(0,0,0,0.12)] lg:shadow-none">
-
-                        {/* Creator Header */}
-                        <div className="flex items-center justify-between px-2">
-                            <div className="min-w-0">
-                                <h1 className="font-display text-2xl font-extrabold text-ink tracking-tight">
-                                    {editTarget ? 'Edit your frame' : 'Campaign builder'}
-                                </h1>
-                                <p className="text-xs text-muted font-medium truncate">
-                                    {editTarget
-                                        ? `Saves to "${editTarget.title}". Your link and supporters stay put.`
-                                        : 'Make your frame, then share one link.'}
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setIsPublishOpen(true)}
-                                className="bg-brand text-ink px-3 py-2 sm:px-4 rounded-xl text-sm font-bold flex items-center gap-2 hover:brightness-105 transition-all shrink-0"
-                            >
+                    {/* Controls — custom frame first; premades demoted */}
+                    <div className="lg:col-span-5 space-y-4 relative z-10">
+                        <div className="px-1">
+                            <h1 className="font-display text-2xl font-extrabold text-ink tracking-tight">
+                                {editTarget ? 'Edit your frame' : 'Campaign builder'}
+                            </h1>
+                            <p className="text-xs text-muted font-medium">
                                 {editTarget
-                                    ? <><Save size={16} /> <span className="hidden sm:inline">Save changes</span></>
-                                    : <><Upload size={16} /> <span className="hidden sm:inline">Create campaign</span></>}
-                            </button>
+                                    ? `Saves to "${editTarget.title}". Your link and supporters stay put.`
+                                    : 'Upload your frame, then share one link. No account needed to create.'}
+                            </p>
                         </div>
 
-                        {/* Tab Switcher - Scrollable on mobile */}
-                        <div className="flex p-1 bg-cream border border-ink/10 rounded-2xl overflow-x-auto scrollbar-hide">
-                            {[
-                                { id: 'design', icon: Sparkles, label: 'Design' },
-                                { id: 'custom', icon: ImageIcon, label: 'Custom' },
-                                { id: 'customize', icon: Sliders, label: 'Edit' },
-                                { id: 'preview', icon: Eye, label: 'Preview' },
-                            ].map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id as any)}
-                                    className={`flex-1 min-w-[60px] flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl text-[10px] uppercase font-bold tracking-wide transition-all ${activeTab === tab.id ? 'bg-ink text-paper shadow-sm' : 'text-muted hover:text-ink'}`}
-                                >
-                                    <tab.icon size={18} />
-                                    <span>{tab.label}</span>
-                                </button>
-                            ))}
+                        <div className="bg-cream border border-ink/10 p-5 sm:p-6 rounded-3xl space-y-6">
+                            <CustomFramePanel
+                                frame={selectedFrame}
+                                onChange={handleFrameUpdate}
+                            />
+
+                            <div className="pt-2 border-t border-ink/10">
+                                <CaptionControls frame={selectedFrame} onChange={handleFrameUpdate} />
+                            </div>
                         </div>
 
-                        {/* Tab Content Panels */}
-                        <div className="bg-cream border border-ink/10 p-6 rounded-3xl min-h-[400px]">
+                        {/* Premades are a fallback. Real organizers upload brand art;
+                            leading with eight swatches made the product feel like a
+                            sticker picker instead of a campaign tool. */}
+                        <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
+                            <summary className="flex items-center justify-between cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
+                                <span>Simple styles</span>
+                                <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180" />
+                            </summary>
+                            <div className="px-5 pb-5 space-y-3 border-t border-ink/10 pt-4">
+                                <p className="text-xs text-muted">No artwork yet? Pick a colour ring to start.</p>
+                                <FrameSelector selectedFrameId={selectedFrame.id} onSelect={handlePresetSelect} />
+                            </div>
+                        </details>
 
-                            {activeTab === 'design' && (
-                                <div className="space-y-5 animate-fade-in">
-                                    <div>
-                                        <h2 className="font-display text-lg font-bold text-ink mb-1">Choose a style</h2>
-                                        <p className="text-muted text-xs">Select a base frame to start with.</p>
-                                    </div>
-                                    <FrameSelector selectedFrameId={selectedFrame.id} onSelect={handlePresetSelect} />
-                                    <div className="pt-4 border-t border-ink/10">
-                                        <CaptionControls frame={selectedFrame} onChange={handleFrameUpdate} />
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === 'custom' && (
-                                <CustomFramePanel
+                        <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
+                            <summary className="flex items-center justify-between cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
+                                <span>Fine tune colours</span>
+                                <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180" />
+                            </summary>
+                            <div className="px-5 pb-5 border-t border-ink/10 pt-4">
+                                <FrameCustomizer
                                     frame={selectedFrame}
                                     onChange={handleFrameUpdate}
+                                    onUndo={handleUndo}
+                                    onRedo={handleRedo}
+                                    canUndo={historyIndex > 0}
+                                    canRedo={historyIndex < history.length - 1}
+                                    onAutoMatch={handleAutoMatch}
                                 />
-                            )}
+                            </div>
+                        </details>
 
-                            {activeTab === 'customize' && (
-                                <div className="space-y-4 animate-fade-in">
-                                    <div>
-                                        <h2 className="font-display text-lg font-bold text-ink mb-1">Fine tune</h2>
-                                        <p className="text-muted text-xs">Adjust colors, borders, and effects.</p>
-                                    </div>
-                                    <FrameCustomizer
-                                        frame={selectedFrame}
-                                        onChange={handleFrameUpdate}
-                                        onUndo={handleUndo}
-                                        onRedo={handleRedo}
-                                        canUndo={historyIndex > 0}
-                                        canRedo={historyIndex < history.length - 1}
-                                        onAutoMatch={handleAutoMatch}
-                                    />
-                                </div>
-                            )}
+                        <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
+                            <summary className="flex items-center justify-between cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
+                                <span>Preview in contacts</span>
+                                <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180" />
+                            </summary>
+                            <div className="px-5 pb-5 border-t border-ink/10 pt-4 flex flex-col items-center">
+                                <ContactPreview previewSrc={previewDataUrl} />
+                            </div>
+                        </details>
 
-                            {activeTab === 'preview' && (
-                                <div className="space-y-4 animate-fade-in flex flex-col items-center justify-center h-full">
-                                    <div>
-                                        <h2 className="font-display text-lg font-bold text-ink mb-1 text-center">Live preview</h2>
-                                        <p className="text-muted text-xs text-center mb-6">See how it looks in a contact list.</p>
-                                    </div>
-                                    <ContactPreview previewSrc={previewDataUrl} />
-                                </div>
-                            )}
-
-                        </div>
-
+                        {/* Desktop publish — phones use the sticky bar */}
+                        <button
+                            onClick={openPublish}
+                            className="hidden lg:flex w-full min-h-[52px] items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 transition-all"
+                        >
+                            {editTarget
+                                ? <><Save size={18} /> Save changes</>
+                                : <><Upload size={18} /> Create campaign</>}
+                        </button>
                     </div>
-
                 </div>
             </main>
+
+            {/* Thumb-zone create. Header buttons are easy to miss once you are
+                deep in cutout controls on a small screen. */}
+            <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
+                <button
+                    onClick={openPublish}
+                    className="w-full max-w-lg mx-auto min-h-[52px] flex items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 active:brightness-95 transition-all"
+                >
+                    {editTarget
+                        ? <><Save size={18} /> Save changes</>
+                        : <><Upload size={18} /> Create campaign</>}
+                </button>
+            </div>
 
             <PublishTemplateModal
                 isOpen={isPublishOpen}
@@ -365,7 +352,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                 editTarget={editTarget}
             />
 
-            <footer className="py-12 text-center text-muted text-sm border-t border-ink/10 bg-paper">
+            <footer className="hidden lg:block py-12 text-center text-muted text-sm border-t border-ink/10 bg-paper">
                 <p>&copy; {new Date().getFullYear()} Ollabs. Bring your people together.</p>
             </footer>
         </div>
