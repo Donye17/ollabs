@@ -19,6 +19,9 @@ interface EditorProps {
   // Background Removal
   onRemoveBackground?: () => void;
   isRemovingBackground?: boolean;
+
+  /** Campaign builder: preview the frame; photo upload is optional and secondary. */
+  frameFirst?: boolean;
 }
 
 export const Editor: React.FC<EditorProps> = ({
@@ -29,7 +32,8 @@ export const Editor: React.FC<EditorProps> = ({
   onPreviewUpdate,
   editorRef,
   onRemoveBackground,
-  isRemovingBackground
+  isRemovingBackground,
+  frameFirst = false,
 }) => {
   const logic = useEditorLogic({ imageSrc, selectedFrame });
 
@@ -127,6 +131,7 @@ export const Editor: React.FC<EditorProps> = ({
         rotation={logic.rotation}
         isDragOver={logic.isDragOver}
         interactionMode={logic.interactionMode}
+        frameFirst={frameFirst}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleEnd}
@@ -135,11 +140,16 @@ export const Editor: React.FC<EditorProps> = ({
         onTouchMove={handleMouseMove}
         onTouchEnd={handleEnd}
         onTouchCancel={handleEnd}
-        onDragOver={(e) => { e.preventDefault(); logic.setIsDragOver(true); }}
+        onDragOver={(e) => {
+          if (frameFirst && !logic.imageObject) return;
+          e.preventDefault();
+          logic.setIsDragOver(true);
+        }}
         onDragLeave={() => logic.setIsDragOver(false)}
         onDrop={(e) => {
           e.preventDefault();
           logic.setIsDragOver(false);
+          if (frameFirst && !logic.imageObject) return;
           const file = e.dataTransfer.files?.[0];
           if (file && file.type.startsWith('image/')) onImageSelect(file);
         }}
@@ -164,6 +174,7 @@ export const Editor: React.FC<EditorProps> = ({
         onDownload={handleDownload}
         onSharePhoto={canSharePhoto ? handleSharePhoto : undefined}
         isSharingPhoto={sharingPhoto}
+        frameFirst={frameFirst}
       />
     </div>
   );

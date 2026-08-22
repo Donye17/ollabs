@@ -44,9 +44,12 @@ export function MobileOrganizerNav() {
                                     href={href}
                                     className="relative flex flex-col items-center justify-end pb-2 pt-1 min-h-[60px]"
                                 >
+                                    {/* Hollow brand ring + plus, like the Ollabs mark.
+                                        Keeps Create distinct from the solid "Create
+                                        campaign" publish bar stacked above this nav. */}
                                     <span
-                                        className={`-mt-5 mb-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand text-ink shadow-lg shadow-brand/40 ring-4 ring-ink transition-transform active:scale-95 ${
-                                            active ? 'brightness-105' : 'hover:brightness-105'
+                                        className={`-mt-5 mb-1 flex h-14 w-14 items-center justify-center rounded-full border-[3px] border-brand bg-ink text-brand shadow-lg shadow-brand/25 ring-4 ring-ink transition-transform active:scale-95 ${
+                                            active ? 'bg-brand/15' : 'hover:bg-brand/10'
                                         }`}
                                     >
                                         <Icon size={26} strokeWidth={2.75} />

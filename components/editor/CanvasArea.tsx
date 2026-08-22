@@ -13,6 +13,8 @@ interface CanvasAreaProps {
     rotation: number;
     isDragOver: boolean;
     interactionMode: 'none' | 'pan';
+    /** Hide photo-first empty state; campaign create is about the frame. */
+    frameFirst?: boolean;
 
     // Event Handlers
     onMouseDown: (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => void;
@@ -37,6 +39,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
     rotation,
     isDragOver,
     interactionMode,
+    frameFirst = false,
     onMouseDown, onMouseMove, onMouseUp, onMouseLeave,
     onTouchStart, onTouchMove, onTouchEnd, onTouchCancel,
     onDragOver, onDragLeave, onDrop
@@ -122,17 +125,26 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
             onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave}
             onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchCancel}
             onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
-            title={imageObject ? "Drag to move, Scroll/Pinch to zoom" : "Tap to add a photo"}
+            title={imageObject ? "Drag to move, Scroll/Pinch to zoom" : (frameFirst ? "Upload your frame below" : "Tap to add a photo")}
         >
             <canvas ref={canvasRef} width={CANVAS_SIZE} height={CANVAS_SIZE} className="w-full h-full object-contain pointer-events-none drop-shadow-2xl" />
             {!imageObject && !isDragOver && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-muted pointer-events-none p-4 text-center">
-                    <div className="w-20 h-20 rounded-2xl bg-cream border-2 border-dashed border-ink/10 flex items-center justify-center mb-4 group-hover:border-brand/50 group-hover:bg-brand/10 transition-all duration-300">
-                        <Upload className="w-8 h-8 text-muted group-hover:text-brand transition-colors" />
-                    </div>
-                    <span className="text-base font-bold text-ink/80 tracking-wide mb-1">Start creating</span>
-                    <span className="text-xs text-muted md:hidden">Tap to add a photo</span>
-                    <span className="text-xs text-muted hidden md:inline">Click or drag a photo here</span>
+                    {frameFirst ? (
+                        <>
+                            <span className="text-base font-bold text-ink/80 tracking-wide mb-1">Frame preview</span>
+                            <span className="text-xs text-muted max-w-[14rem]">Upload your artwork below. Try a photo after if you want.</span>
+                        </>
+                    ) : (
+                        <>
+                            <div className="w-20 h-20 rounded-2xl bg-cream border-2 border-dashed border-ink/10 flex items-center justify-center mb-4 group-hover:border-brand/50 group-hover:bg-brand/10 transition-all duration-300">
+                                <Upload className="w-8 h-8 text-muted group-hover:text-brand transition-colors" />
+                            </div>
+                            <span className="text-base font-bold text-ink/80 tracking-wide mb-1">Start creating</span>
+                            <span className="text-xs text-muted md:hidden">Tap to add a photo</span>
+                            <span className="text-xs text-muted hidden md:inline">Click or drag a photo here</span>
+                        </>
+                    )}
                 </div>
             )}
             {isDragOver && (

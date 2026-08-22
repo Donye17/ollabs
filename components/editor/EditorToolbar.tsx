@@ -21,6 +21,8 @@ interface EditorToolbarProps {
      */
     onSharePhoto?: () => void;
     isSharingPhoto?: boolean;
+    /** Campaign builder: photo upload is secondary to the frame. */
+    frameFirst?: boolean;
 }
 
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
@@ -36,7 +38,8 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     isRemovingBackground,
     onDownload,
     onSharePhoto,
-    isSharingPhoto
+    isSharingPhoto,
+    frameFirst = false,
 }) => {
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -45,15 +48,26 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
     return (
         <div className="w-full max-w-lg mx-auto space-y-6">
-            {/* Controls Bar: Upload, Set Profile, Download */}
-            <div className="flex items-center gap-4 w-full px-4">
-                <label className="flex-1">
-                    <input type="file" accept="image/*" className="hidden" onChange={handleFileInput} />
-                    <div className="flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-4 px-6 rounded-xl cursor-pointer transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 font-bold font-heading select-none hover:-translate-y-0.5">
-                        <Upload size={20} /> <span>{imageObject ? 'Change photo' : 'Upload photo'}</span>
-                    </div>
-                </label>
-            </div>
+            {/* Photo upload. On campaign create this stays secondary - frame first. */}
+            {frameFirst ? (
+                <div className="w-full px-4">
+                    <label className="block">
+                        <input type="file" accept="image/*" className="hidden" onChange={handleFileInput} />
+                        <div className="flex items-center justify-center gap-2 bg-cream hover:bg-ink/5 text-ink py-3 px-4 rounded-xl cursor-pointer transition-all border border-ink/10 font-semibold text-sm select-none">
+                            <Upload size={18} /> <span>{imageObject ? 'Change preview photo' : 'Try with a photo (optional)'}</span>
+                        </div>
+                    </label>
+                </div>
+            ) : (
+                <div className="flex items-center gap-4 w-full px-4">
+                    <label className="flex-1">
+                        <input type="file" accept="image/*" className="hidden" onChange={handleFileInput} />
+                        <div className="flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-4 px-6 rounded-xl cursor-pointer transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 font-bold font-heading select-none hover:-translate-y-0.5">
+                            <Upload size={20} /> <span>{imageObject ? 'Change photo' : 'Upload photo'}</span>
+                        </div>
+                    </label>
+                </div>
+            )}
 
             {imageObject && (
                 <div className="flex flex-col gap-3 w-full px-4">

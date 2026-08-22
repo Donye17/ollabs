@@ -366,7 +366,7 @@ const en: Messages = {
         previewContacts: 'Preview in contacts',
         createCampaign: 'Create campaign',
         saveChanges: 'Save changes',
-        dragTip: 'Drag a photo onto the circle to preview how supporters will look. Pinch or pan to fit.',
+        dragTip: 'Upload your frame first. Optionally drop a photo on the circle to preview how supporters will look.',
     },
     publish: {
         createTitle: 'Name it',

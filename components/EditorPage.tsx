@@ -242,9 +242,10 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(3.5rem+env(safe-area-inset-top,0px)+0.5rem)] pb-6 lg:py-24">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
 
-                    {/* Canvas stays pinned on phones so cutout/caption edits never
-                        scroll the only preview that matters off-screen. */}
-                    <div className="lg:col-span-7 flex flex-col items-center sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-0 bg-paper/95 backdrop-blur-sm py-2 lg:py-0 lg:bg-transparent lg:backdrop-blur-none h-fit">
+                    {/* Preview + title stick together on phones with solid paper
+                        so the subtitle never scrolls up through a transparent
+                        canvas plate into "1. Your artwork". */}
+                    <div className="lg:col-span-7 flex flex-col items-center sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-0 bg-paper py-2 lg:py-0 lg:bg-transparent h-fit">
                         <Editor
                             imageSrc={imageSrc}
                             onImageSelect={handleImageSelect}
@@ -254,7 +255,19 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             editorRef={editorRef}
                             onRemoveBackground={handleRemoveBackground}
                             isRemovingBackground={isRemovingBg}
+                            frameFirst
                         />
+
+                        <div className="mt-3 w-full max-w-lg px-1 text-center lg:text-left">
+                            <h1 className="font-display text-xl sm:text-2xl font-extrabold text-ink tracking-tight">
+                                {editTarget ? t.editTitle : t.title}
+                            </h1>
+                            <p className="text-xs text-muted font-medium">
+                                {editTarget
+                                    ? t.editSubtitle(editTarget.title)
+                                    : t.subtitle}
+                            </p>
+                        </div>
 
                         {notice && (
                             <div role="alert" className="mt-4 p-4 bg-coral/10 rounded-2xl border border-coral/30 text-sm text-ink/80 max-w-md w-full flex gap-3 items-start animate-fade-in">
@@ -277,17 +290,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
                     {/* Controls — custom frame first; premades demoted */}
                     <div className="lg:col-span-5 space-y-4 relative z-10">
-                        <div className="px-1">
-                            <h1 className="font-display text-xl sm:text-2xl font-extrabold text-ink tracking-tight">
-                                {editTarget ? t.editTitle : t.title}
-                            </h1>
-                            <p className="text-xs text-muted font-medium">
-                                {editTarget
-                                    ? t.editSubtitle(editTarget.title)
-                                    : t.subtitle}
-                            </p>
-                        </div>
-
                         <CustomFramePanel
                             frame={selectedFrame}
                             onChange={handleFrameUpdate}
@@ -324,7 +326,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             {/* Thumb-zone create. Header buttons are easy to miss once you are
                 deep in cutout controls on a small screen. */}
         <div
-            className="fixed inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-3"
+            className="fixed inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper px-4 pt-3 pb-3"
             style={{ bottom: ABOVE_MOBILE_NAV }}
         >
                 <div className="max-w-lg mx-auto">
