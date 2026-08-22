@@ -2,13 +2,11 @@ import Link from 'next/link';
 import { ExternalLink, Users } from 'lucide-react';
 import type { PublicHub } from '@/lib/hub';
 import { AdSlot } from '@/components/AdSlot';
+import { HubMadeWithFooter } from '@/components/hub/HubMadeWithFooter';
 
 /** Mobile-first Linktree column. Primary job: push people into /c for the frame. */
 export function HubPublicView({ hub }: { hub: PublicHub }) {
     const ctaHref = hub.featured ? `/c/${hub.featured.slug}` : null;
-    const ctaLabel = hub.featured
-        ? `Support — ${hub.featured.title}`
-        : null;
 
     return (
         <div className="min-h-screen bg-paper text-ink">
@@ -47,12 +45,15 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                 </header>
 
                 <div className="space-y-3">
-                    {ctaHref && ctaLabel && (
+                    {ctaHref && hub.featured && (
                         <Link
                             href={ctaHref}
-                            className="flex w-full min-h-14 items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-4 text-center text-base font-bold text-ink shadow-sm transition-all hover:brightness-105 active:scale-[0.99]"
+                            className="flex w-full min-h-14 flex-col items-center justify-center gap-0.5 rounded-2xl bg-brand px-5 py-4 text-center shadow-sm transition-all hover:brightness-105 active:scale-[0.99]"
                         >
-                            {ctaLabel}
+                            <span className="text-base font-bold text-ink">Support</span>
+                            <span className="text-sm font-semibold text-ink/85 truncate max-w-[92%]">
+                                {hub.featured.title}
+                            </span>
                         </Link>
                     )}
 
@@ -122,16 +123,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                     <AdSlot surface="seo" />
                 </div>
 
-                <footer className="mt-12 pb-4 text-center">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted hover:text-brand-deep transition-colors"
-                    >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/Ollabs Logo Black.png" alt="" className="h-4 w-auto opacity-70" />
-                        Made with Ollabs
-                    </Link>
-                </footer>
+                <HubMadeWithFooter className="mt-12 pb-[max(1rem,env(safe-area-inset-bottom))]" />
             </div>
         </div>
     );

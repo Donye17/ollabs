@@ -7,7 +7,7 @@ import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { addPngMetadata } from '@/lib/pngMeta';
 import { track, withUtm } from '@/lib/analytics';
 import { XGlyph, WhatsAppGlyph, FacebookGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
-import { supporterShareText, whatsappUrl } from '@/lib/share';
+import { supporterShareText, whatsappUrl, messengerShareUrl, prefersTagalog } from '@/lib/share';
 import { saveFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome } from '@/lib/savePhoto';
 import { AdSlot } from '@/components/AdSlot';
 import { useLocale } from '@/components/i18n/LocaleProvider';
@@ -118,15 +118,20 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     // between the server render and the browser, so it must not touch render.
     const shareText = () => supporterShareText(title, locale);
 
-    const openShare = (platform: 'x' | 'whatsapp' | 'facebook') => {
-        const url = withUtm(shareUrl(), platform);
+    const openShare = (platform: 'x' | 'whatsapp' | 'facebook' | 'messenger') => {
+        const url = withUtm(shareUrl(), platform === 'messenger' ? 'messenger' : platform);
         const text = shareText();
         const map: Record<string, string> = {
             x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
             whatsapp: whatsappUrl(text, url),
             facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+            messenger: messengerShareUrl(url),
         };
-        window.open(map[platform], '_blank', 'noopener,noreferrer');
+        if (platform === 'messenger') {
+            window.location.href = map.messenger;
+        } else {
+            window.open(map[platform], '_blank', 'noopener,noreferrer');
+        }
         track('frame_share', { campaign: slug, platform });
     };
 
@@ -462,6 +467,16 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                                     <WhatsAppGlyph size={18} /> {t.shareWhatsApp}
                                 </button>
 
+                                {(prefersTagalog() || locale === 'id') && (
+                                    <button
+                                        onClick={() => openShare('messenger')}
+                                        className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white hover:brightness-105 active:brightness-95 transition-all"
+                                        style={{ backgroundColor: '#0084FF' }}
+                                    >
+                                        {t.shareMessenger}
+                                    </button>
+                                )}
+
                                 {canNativeShare && (
                                     <button onClick={handleShare}
                                         className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 transition-all">
@@ -521,6 +536,13 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                                     className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 active:brightness-110 transition-all"
                                 >
                                     {t.makeOwn} <ArrowRight size={17} />
+                                </a>
+                                <a
+                                    href={withUtm('/hub', 'campaign_post_save')}
+                                    onClick={() => track('hub_from_campaign', { campaign: slug })}
+                                    className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-brand/30 text-brand-deep hover:bg-brand/10 transition-all"
+                                >
+                                    {t.setupHub}
                                 </a>
                             </div>
                         )}

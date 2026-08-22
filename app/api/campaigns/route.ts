@@ -6,6 +6,7 @@ import { hasVisibleFrame, visibleFrameSql } from '@/lib/frameValidity';
 import { campaignLiveEmail, isValidEmail, normalizeEmail, sendEmail } from '@/lib/email';
 import { getDay } from '@/lib/days';
 import { getSessionOrganizer } from '@/lib/auth';
+import { publisherCountry } from '@/lib/geo';
 
 export const dynamic = 'force-dynamic';
 
@@ -116,6 +117,7 @@ export async function POST(request: NextRequest) {
         // is set only when the creator already had a session open.
         const creatorId = organizer?.id ?? null;
         const creatorName = 'Anonymous';
+        const country = publisherCountry(request);
 
         const baseSlug = slugify(title);
         const token = ownerToken();
@@ -125,10 +127,10 @@ export async function POST(request: NextRequest) {
             const slug = `${baseSlug}-${randomSuffix()}`;
             try {
                 const result = await pool.query(
-                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, goal, category, organizer_email, day_slug, created_at)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW())
-                     RETURNING id, slug, title, supporter_count, owner_token, created_at`,
-                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, goalValue, categoryValue, emailValue, dayValue]
+                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, goal, category, organizer_email, day_slug, publisher_country, created_at)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())
+                     RETURNING id, slug, title, supporter_count, owner_token, created_at, publisher_country`,
+                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, goalValue, categoryValue, emailValue, dayValue, country]
                 );
                 campaign = result.rows[0];
                 break;

@@ -76,6 +76,21 @@ export function whatsappUrl(text: string, url: string): string {
     return `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`;
 }
 
+/** Opens Messenger share on phones that have the app installed. */
+export function messengerShareUrl(url: string): string {
+    return `fb-messenger://share/?link=${encodeURIComponent(url)}`;
+}
+
+export function prefersTagalog(): boolean {
+    if (typeof navigator === 'undefined') return false;
+    const langs = [navigator.language, ...(navigator.languages || [])];
+    return langs.some((l) => {
+        if (typeof l !== 'string') return false;
+        const lower = l.toLowerCase();
+        return lower.startsWith('fil') || lower.startsWith('tl');
+    });
+}
+
 /**
  * Whether this browser can hand a PNG to the OS share sheet.
  *

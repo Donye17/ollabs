@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const description =
         hub.bio?.trim() ||
         (hub.featured
-            ? `Support ${hub.featured.title} — add the frame to your profile picture.`
+            ? `Support ${hub.featured.title}. Add the frame to your profile picture.`
             : `Campaigns and links from ${hub.displayName}.`);
 
     const index = hubIsIndexable(hub);

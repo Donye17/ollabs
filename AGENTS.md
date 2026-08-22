@@ -9,12 +9,19 @@ link. Supporters open that link, drop in a photo, and download the framed result
 
 ---
 
-## Where things stand (2026-08-21)
+## Where things stand (2026-08-22)
 
 **On `main`:** Phases 1–7 plus calendar moments (Phase 8 content, no paid upgrade).
-Mobile shell, custom-frame create, organizer save + slug 301s, quiet ads, PT-BR,
-organizer hubs, Bahasa, and an expanded `/day` calendar (Sept–Oct awareness +
-BR/ID local moments).
+Mobile shell, custom-frame create (Frame → Name → Send), organizer save + slug 301s, quiet ads, PT-BR,
+organizer hubs, Bahasa, Tagalog and Hindi landings at `/tl` and `/hi`, localized `/pt/for` and `/id/for`
+pages, `/pt/vs/twibbonize` and `/id/vs/twibbonize`, top-market `/day` pages (NG, MX, MY, PH, TH),
+publisher country on campaign create (`publisher_country`, migration 0014), and an expanded `/day`
+calendar (Sept–Oct awareness + BR/ID local moments). iPhone share-first save on `/c`. Hub public pages
+show a **Made with** + Ollabs logo footer. **My campaigns** stays visible in the top nav on every phone
+screen (pill on mobile) and in the `/create` sticky bar.
+
+**Copy:** no em dashes in user-facing hub, create, or mine strings. Hub Support CTA
+is two lines (`Support` / campaign title), not `Support — title`.
 
 **Ads:** same quiet in-flow units on every campaign — no special rules by
 category, country, or politics. Never on the photo; never on `/create`.

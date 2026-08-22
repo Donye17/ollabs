@@ -133,12 +133,12 @@ export const MyCampaignsClient: React.FC = () => {
             {signedIn && (
                 <Link
                     href="/hub"
-                    className="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-brand/25 bg-brand/10 px-4 py-3.5 hover:bg-brand/15 transition-colors"
+                    className="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-brand/25 bg-brand/10 px-4 py-4 min-h-[56px] hover:bg-brand/15 active:bg-brand/20 transition-colors"
                 >
                     <div className="min-w-0">
                         <p className="font-display font-bold text-[15px]">Your campaign hub</p>
                         <p className="text-xs text-ink/70 truncate">
-                            Claim /u/… — Support button, bio, and other links
+                            Claim /u/… with Support button, bio, and other links
                         </p>
                     </div>
                     <span className="text-xs font-bold text-brand-deep shrink-0">Edit</span>
@@ -207,10 +207,10 @@ export const MyCampaignsClient: React.FC = () => {
 };
 
 const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRemove }) => (
-    <div className="bg-cream border border-ink/10 rounded-2xl p-4 flex items-center gap-3">
+    <div className="bg-cream border border-ink/10 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="min-w-0 flex-1">
-            <p className="font-display font-bold truncate">{row.title}</p>
-            <p className="text-xs text-muted truncate flex items-center gap-2">
+            <p className="font-display font-bold truncate text-[15px]">{row.title}</p>
+            <p className="text-xs text-muted truncate flex items-center gap-2 mt-0.5">
                 <span className="truncate">ollabs.studio/c/{row.slug}</span>
                 {row.supporters != null && (
                     <span className="inline-flex items-center gap-1 shrink-0">
@@ -219,17 +219,24 @@ const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRem
                 )}
             </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-            <a href={row.url} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-paper border border-ink/10 hover:bg-ink/5 transition-colors" title="Open campaign">
+        <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
+            <a href={row.url} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-paper border border-ink/10 hover:bg-ink/5 transition-colors" title="Open campaign">
                 <ExternalLink size={16} className="text-ink" />
             </a>
             {row.manageUrl && (
-                <a href={row.manageUrl} className="px-3 py-2 rounded-lg bg-brand text-ink font-semibold text-sm flex items-center gap-1.5 hover:brightness-105 transition-all" title="Edit this campaign and see its stats">
+                <a href={row.manageUrl} className="min-h-11 px-4 rounded-lg bg-brand text-ink font-semibold text-sm flex items-center gap-1.5 hover:brightness-105 active:brightness-95 transition-all flex-1 sm:flex-none justify-center" title="Edit this campaign and see its stats">
                     <Pencil size={15} /> Manage
                 </a>
             )}
+            <a
+                href={`/create?remix=${encodeURIComponent(row.slug)}`}
+                className="min-h-11 px-3 rounded-lg bg-paper border border-ink/15 text-ink font-semibold text-sm flex items-center gap-1 hover:bg-ink/5 transition-colors justify-center"
+                title="Start a new campaign with this frame"
+            >
+                Reuse frame
+            </a>
             {onRemove && (
-                <button onClick={onRemove} className="p-2 rounded-lg bg-paper border border-ink/10 hover:text-coral transition-colors" title="Remove from this list">
+                <button onClick={onRemove} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-paper border border-ink/10 hover:text-coral transition-colors" title="Remove from this list">
                     <Trash2 size={16} />
                 </button>
             )}

@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState } from 'react';
-import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode, UserPlus, KeyRound, Pencil, Save, Share2 } from 'lucide-react';
+import Link from 'next/link';
+import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode, UserPlus, KeyRound, Pencil, Save, Share2, LayoutGrid } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { upload } from '@vercel/blob/client';
 import { FramePreview } from './FramePreview';
@@ -348,7 +349,11 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 if (organizerEmail.trim() || sessionEmail) {
                     setLinkSaved(true);
                 }
-                track('campaign_created', { campaign: campaign.slug, day: daySlug || 'none' });
+                track('campaign_created', {
+                    campaign: campaign.slug,
+                    day: daySlug || 'none',
+                    country: campaign.publisher_country || 'unknown',
+                });
 
                 // Remember this campaign on the device so the owner can find it again.
                 try {
@@ -359,7 +364,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 } catch { /* ignore */ }
             } else {
                 const err = await res.json().catch(() => ({}));
-                setCreateError(err.error || 'Could not create your campaign. Nothing was lost — try again.');
+                setCreateError(err.error || 'Could not create your campaign. Nothing was lost. Try again.');
             }
         } catch (error) {
             console.error(error);
@@ -574,6 +579,15 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     <p className="text-[11px] text-muted">Scan or download to print for events</p>
                                 </div>
                             )}
+
+                            <Link
+                                href="/hub"
+                                onClick={() => track('hub_from_publish', { campaign: campaignSlug || '' })}
+                                className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-brand/30 text-brand-deep hover:bg-brand/10 active:bg-brand/15 transition-all"
+                            >
+                                <LayoutGrid size={16} /> {tp.setupHub}
+                            </Link>
+                            <p className="text-xs text-muted text-center">{tp.setupHubBody}</p>
 
                             <div className="border-t border-ink/10 pt-4 space-y-3">
                                 <p className="text-sm font-bold text-ink">{tp.thenSaveAccess}</p>

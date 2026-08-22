@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { HubMadeWithFooter } from '@/components/hub/HubMadeWithFooter';
 import { upload } from '@vercel/blob/client';
 import {
     ExternalLink,
@@ -177,7 +178,7 @@ export const HubEditorClient: React.FC = () => {
                 <LogIn className="w-8 h-8 text-brand-deep mx-auto mb-3" />
                 <p className="font-display font-bold text-lg mb-2">Sign in to claim your hub</p>
                 <p className="text-sm text-ink/70 mb-6">
-                    Creating a campaign never needs an account. A hub does — so your
+                    Creating a campaign never needs an account. A hub does, so your
                     page has a stable owner and survives device switches.
                 </p>
                 <Link
@@ -224,7 +225,7 @@ export const HubEditorClient: React.FC = () => {
                         />
                     </div>
                     <p className="text-xs text-muted mt-2 leading-relaxed">
-                        Letters, numbers, hyphens. This is your public home base — the Support
+                        Letters, numbers, hyphens. This is your public home base. The Support
                         button on it opens your frame page.
                     </p>
                 </div>
@@ -334,7 +335,7 @@ export const HubEditorClient: React.FC = () => {
                     </button>
                 </div>
                 <p className="text-sm text-ink/70">
-                    Instagram, donate, press kit — anything else in the campaign.
+                    Instagram, donate, press kit, or anything else in the campaign.
                 </p>
 
                 {links.length === 0 && (
@@ -391,6 +392,8 @@ export const HubEditorClient: React.FC = () => {
                     {error}
                 </p>
             )}
+
+            <HubMadeWithFooter className="pt-2" />
 
             <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
                 <div className="max-w-lg mx-auto flex items-center gap-3">

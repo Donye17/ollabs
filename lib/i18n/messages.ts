@@ -32,6 +32,7 @@ export type Messages = {
         youreIn: string;
         bringPeople: string;
         shareWhatsApp: string;
+        shareMessenger: string;
         shareAnother: string;
         copyLink: string;
         scanCampaign: string;
@@ -39,6 +40,7 @@ export type Messages = {
         wantOwnBody: string;
         makeOwn: string;
         makeOwnFooter: string;
+        setupHub: string;
         report: string;
         reportTitle: string;
         reportPlaceholder: string;
@@ -83,6 +85,7 @@ export type Messages = {
         sendNow: string;
         sendNowBody: string;
         shareWhatsApp: string;
+        shareMessenger: string;
         shareAnother: string;
         open: string;
         saveCampaigns: string;
@@ -109,6 +112,8 @@ export type Messages = {
         createButton: string;
         signedInAs: (email: string) => string;
         savedToAccount: (email: string) => string;
+        setupHub: string;
+        setupHubBody: string;
     };
     day: {
         tapAdd: string;
@@ -123,6 +128,9 @@ export type Messages = {
     };
     landingPt: LandingCopy;
     landingId: LandingCopy;
+    landingTl: LandingCopy;
+    landingHi: LandingCopy;
+    landingEs: LandingCopy;
 };
 
 export type LandingCopy = {
@@ -176,6 +184,84 @@ const landingPt: LandingCopy = {
     stepLabel: (n) => `Passo ${n}`,
 };
 
+const landingTl: LandingCopy = {
+    title: 'Ollabs: libreng twibbon at profile frame para sa kampanya',
+    description:
+        'Gumawa ng profile picture frame para sa inyong cause, team, o event. I-share ang isang link at idadagdag ng supporters sa photo nila. Libre, walang signup, walang watermark.',
+    eyebrow: 'Mula sa collabs, para tipunin ang tao',
+    headline: 'Tipunin ang',
+    headlineAccent: 'inyong grupo.',
+    sub: 'Gumawa ng profile frame para sa kampanya o event. Isang link lang at lahat makakasali sa ilang segundo. Libre, walang signup, walang watermark.',
+    cta: 'Gumawa ng kampanya',
+    ctaSecondary: 'English version',
+    howTitle: 'Paano gumagana',
+    step1Title: 'Gumawa ng frame',
+    step1Body: 'Pumili ng kulay o mag-upload ng sariling design.',
+    step2Title: 'I-share ang link',
+    step2Body: 'I-post sa Messenger, Viber, o group chat. Parehong link para sa lahat.',
+    step3Title: 'Sila ang magdadagdag',
+    step3Body: 'Mag-upload ng photo, i-download na may frame, tumaas ang counter.',
+    whyTitle: 'Bakit Ollabs',
+    why1: 'Walang watermark sa supporters',
+    why2: 'Walang account para sumali',
+    why3: 'Gumagana sa phone browser',
+    why4: 'Libre para sa organizers at supporters',
+    englishSite: 'English site',
+    stepLabel: (n) => `Hakbang ${n}`,
+};
+
+const landingHi: LandingCopy = {
+    title: 'Ollabs: मुफ़्त twibbon और profile frame',
+    description:
+        'अपने cause, team या event के लिए profile picture frame बनाएं। एक link शेयर करें, supporters सेकंडों में photo पर frame लगाएं। मुफ़्त, बिना signup, बिना watermark।',
+    eyebrow: 'Collabs से, लोगों को जोड़ने के लिए',
+    headline: 'अपने लोगों को',
+    headlineAccent: 'एक जगह लाएं।',
+    sub: 'कैंपेन या event के लिए profile frame बनाएं। एक link, सब कुछ सेकंडों में। मुफ़्त, बिना signup, बिना watermark।',
+    cta: 'कैंपेन बनाएं',
+    ctaSecondary: 'English version',
+    howTitle: 'कैसे काम करता है',
+    step1Title: 'Frame बनाएं',
+    step1Body: 'रंग चुनें या अपना design upload करें।',
+    step2Title: 'Link शेयर करें',
+    step2Body: 'WhatsApp, email या social पर भेजें।',
+    step3Title: 'Supporters जुड़ें',
+    step3Body: 'Photo upload, framed download, counter बढ़ता है।',
+    whyTitle: 'Ollabs क्यों',
+    why1: 'Supporters पर कोई watermark नहीं',
+    why2: 'जुड़ने के लिए account नहीं',
+    why3: 'Phone browser पर चलता है',
+    why4: 'Organizers और supporters के लिए मुफ़्त',
+    englishSite: 'English site',
+    stepLabel: (n) => `चरण ${n}`,
+};
+
+const landingEs: LandingCopy = {
+    title: 'Ollabs: marco de foto de perfil gratis para campañas',
+    description:
+        'Crea un marco de foto de perfil para tu causa, equipo o evento. Comparte un enlace y todos lo agregan en segundos. Gratis, sin registro, sin marca de agua.',
+    eyebrow: 'De collabs, para reunir gente',
+    headline: 'Reúne a tu',
+    headlineAccent: 'gente.',
+    sub: 'Haz un marco de foto de perfil para tu campaña o evento. Un enlace y todos participan en segundos. Gratis, sin registro, sin marca de agua.',
+    cta: 'Crear una campaña',
+    ctaSecondary: 'English version',
+    howTitle: 'Cómo funciona',
+    step1Title: 'Crea el marco',
+    step1Body: 'Elige un color o sube tu diseño.',
+    step2Title: 'Comparte un enlace',
+    step2Body: 'Publícalo en WhatsApp, email y redes.',
+    step3Title: 'Ellos lo agregan',
+    step3Body: 'Suben su foto, descargan con marco, sube el contador.',
+    whyTitle: 'Por qué Ollabs',
+    why1: 'Sin marca de agua para quien apoya',
+    why2: 'Sin cuenta para participar',
+    why3: 'Funciona en el navegador del celular',
+    why4: 'Gratis para organizadores y apoyos',
+    englishSite: 'English site',
+    stepLabel: (n) => `Paso ${n}`,
+};
+
 const landingId: LandingCopy = {
     title: 'Ollabs: twibbon gratis & bingkai foto profil untuk kampanye',
     description:
@@ -183,7 +269,7 @@ const landingId: LandingCopy = {
     eyebrow: 'Dari collabs, untuk kumpulkan orang',
     headline: 'Kumpulkan',
     headlineAccent: 'barengannya.',
-    sub: 'Buat bingkai foto profil untuk kampanye, komunitas, atau event. Kirim satu link — semua orang pasang di foto dalam hitungan detik. Gratis, tanpa daftar, tanpa watermark.',
+    sub: 'Buat bingkai foto profil untuk kampanye, komunitas, atau event. Kirim satu link, semua orang pasang di foto dalam hitungan detik. Gratis, tanpa daftar, tanpa watermark.',
     cta: 'Buat kampanye',
     ctaSecondary: 'English version',
     howTitle: 'Cara kerjanya',
@@ -233,6 +319,7 @@ const en: Messages = {
         youreIn: "You're in. Now bring your people.",
         bringPeople: 'Post your framed photo, and share the link so others can add it too.',
         shareWhatsApp: 'Share on WhatsApp',
+        shareMessenger: 'Share on Messenger',
         shareAnother: 'Share another way',
         copyLink: 'Copy link',
         scanCampaign: 'Scan to open this campaign',
@@ -241,6 +328,7 @@ const en: Messages = {
             'Make a frame for your team, your school, your campaign. It is free, and you get a link just like this one to send out.',
         makeOwn: 'Make your own frame',
         makeOwnFooter: 'Make your own with Ollabs',
+        setupHub: 'Set up your campaign hub',
         report: 'Report this campaign',
         reportTitle: 'Report this campaign',
         reportPlaceholder: "What's wrong with it? (optional)",
@@ -289,18 +377,19 @@ const en: Messages = {
         sendNowBody:
             'Campaigns that get shared in the first few minutes are the ones that fill up. Anyone who opens your link can add the frame to their photo.',
         shareWhatsApp: 'Share on WhatsApp',
+        shareMessenger: 'Share on Messenger',
         shareAnother: 'Share another way',
         open: 'Open',
         saveCampaigns: 'Save your campaigns',
         saveCampaignsBody:
-            'Optional, but this is how you manage the campaign from another phone. Get a 6 digit code by email — no password. Supporters still never sign in.',
+            'Optional, but this is how you manage the campaign from another phone. Get a 6 digit code by email. No password. Supporters still never sign in.',
         emailCode: 'Email me a code',
         enterCode: (email) => `Enter the 6 digit code sent to ${email}.`,
         saveMyCampaign: 'Save my campaign',
         sendNewCode: 'Send a new code',
-        skipForNow: "Skip for now — I'll copy the manage link",
+        skipForNow: "Skip for now. I'll copy the manage link",
         closeBlocked:
-            'Create a free login, or copy your manage link below, before you leave — otherwise this campaign can disappear when you leave WhatsApp.',
+            'Create a free login, or copy your manage link below, before you leave. Otherwise this campaign can disappear when you leave WhatsApp.',
         manage: 'Manage campaign',
         manageBody:
             'Change the title, description, goal, category, custom link, and frame. Old share links keep working when you rename the URL. Stats live here too.',
@@ -322,6 +411,8 @@ const en: Messages = {
         signedInAs: (email) => `Signed in as ${email}. This campaign goes straight onto your account.`,
         savedToAccount: (email) =>
             `Saved to your account, ${email}. Open it from any device by signing in with a code at /login.`,
+        setupHub: 'Set up your campaign hub',
+        setupHubBody: 'One link for your bio, Support button, and every campaign you run.',
     },
     day: {
         tapAdd: 'Tap to add your photo',
@@ -336,6 +427,9 @@ const en: Messages = {
     },
     landingPt,
     landingId,
+    landingTl,
+    landingHi,
+    landingEs,
 };
 
 const pt: Messages = {
@@ -370,6 +464,7 @@ const pt: Messages = {
         bringPeople:
             'Poste a foto com a moldura e compartilhe o link para outras pessoas também colocarem.',
         shareWhatsApp: 'Compartilhar no WhatsApp',
+        shareMessenger: 'Compartilhar no Messenger',
         shareAnother: 'Compartilhar de outro jeito',
         copyLink: 'Copiar link',
         scanCampaign: 'Escaneie para abrir esta campanha',
@@ -378,6 +473,7 @@ const pt: Messages = {
             'Faça uma moldura para o seu time, escola ou campanha. É grátis, e você ganha um link igual a este para enviar.',
         makeOwn: 'Criar minha moldura',
         makeOwnFooter: 'Crie a sua no Ollabs',
+        setupHub: 'Configure seu hub de campanhas',
         report: 'Denunciar esta campanha',
         reportTitle: 'Denunciar esta campanha',
         reportPlaceholder: 'O que está errado? (opcional)',
@@ -426,18 +522,19 @@ const pt: Messages = {
         sendNowBody:
             'Campanhas compartilhadas nos primeiros minutos são as que enchem. Quem abrir o link coloca a moldura na foto.',
         shareWhatsApp: 'Compartilhar no WhatsApp',
+        shareMessenger: 'Compartilhar no Messenger',
         shareAnother: 'Compartilhar de outro jeito',
         open: 'Abrir',
         saveCampaigns: 'Salvar suas campanhas',
         saveCampaignsBody:
-            'Opcional, mas é assim que você gerencia a campanha em outro celular. Receba um código de 6 dígitos por e-mail — sem senha. Quem apoia nunca faz login.',
+            'Opcional, mas é assim que você gerencia a campanha em outro celular. Receba um código de 6 dígitos por e-mail. Sem senha. Quem apoia nunca faz login.',
         emailCode: 'Me envie um código',
         enterCode: (email) => `Digite o código de 6 dígitos enviado para ${email}.`,
         saveMyCampaign: 'Salvar minha campanha',
         sendNewCode: 'Enviar outro código',
-        skipForNow: 'Pular por agora — vou copiar o link de gerenciar',
+        skipForNow: 'Pular por agora. Vou copiar o link de gerenciar',
         closeBlocked:
-            'Crie um login grátis, ou copie o link de gerenciar abaixo, antes de sair — senão esta campanha pode sumir quando você sair do WhatsApp.',
+            'Crie um login grátis, ou copie o link de gerenciar abaixo, antes de sair. Senão esta campanha pode sumir quando você sair do WhatsApp.',
         manage: 'Gerenciar campanha',
         manageBody:
             'Mude o título, descrição, meta, categoria, link personalizado e moldura. Links antigos continuam funcionando se você renomear a URL. As estatísticas ficam aqui.',
@@ -445,7 +542,7 @@ const pt: Messages = {
         privateKeyEmail: (email) =>
             `Chave privada da campanha. Também enviada para ${email}. Guarde só para você.`,
         privateKeyOnly:
-            'Chave privada da campanha. Sem conta, é o único jeito de voltar — copie em algum lugar seguro.',
+            'Chave privada da campanha. Sem conta, é o único jeito de voltar. Copie em algum lugar seguro.',
         done: 'Pronto',
         saveThenDone: 'Salve o acesso e depois Pronto',
         campaignTitle: 'Título da campanha',
@@ -460,6 +557,8 @@ const pt: Messages = {
             `Conectado como ${email}. Esta campanha vai direto para a sua conta.`,
         savedToAccount: (email) =>
             `Salva na sua conta, ${email}. Abra em qualquer dispositivo entrando com um código em /login.`,
+        setupHub: 'Configure seu hub de campanhas',
+        setupHubBody: 'Um link para bio, botão Apoiar e todas as suas campanhas.',
     },
     day: {
         tapAdd: 'Toque para adicionar sua foto',
@@ -474,6 +573,9 @@ const pt: Messages = {
     },
     landingPt,
     landingId,
+    landingTl,
+    landingHi,
+    landingEs,
 };
 
 const id: Messages = {
@@ -508,6 +610,7 @@ const id: Messages = {
         bringPeople:
             'Posting fotomu yang sudah dibingkai, dan bagikan linknya supaya orang lain juga bisa pasang.',
         shareWhatsApp: 'Bagikan di WhatsApp',
+        shareMessenger: 'Bagikan di Messenger',
         shareAnother: 'Bagikan cara lain',
         copyLink: 'Salin link',
         scanCampaign: 'Pindai untuk buka kampanye ini',
@@ -516,6 +619,7 @@ const id: Messages = {
             'Buat bingkai untuk tim, sekolah, atau kampanyemu. Gratis, dan kamu dapat link seperti ini untuk dibagikan.',
         makeOwn: 'Buat bingkai sendiri',
         makeOwnFooter: 'Buat sendiri di Ollabs',
+        setupHub: 'Atur hub kampanyemu',
         report: 'Laporkan kampanye ini',
         reportTitle: 'Laporkan kampanye ini',
         reportPlaceholder: 'Ada apa yang salah? (opsional)',
@@ -565,18 +669,19 @@ const id: Messages = {
         sendNowBody:
             'Kampanye yang dibagikan di menit-menit pertama yang paling cepat penuh. Siapa pun yang buka linkmu bisa pasang bingkai di fotonya.',
         shareWhatsApp: 'Bagikan di WhatsApp',
+        shareMessenger: 'Bagikan di Messenger',
         shareAnother: 'Bagikan cara lain',
         open: 'Buka',
         saveCampaigns: 'Simpan kampanyemu',
         saveCampaignsBody:
-            'Opsional, tapi begini kamu bisa kelola kampanye dari HP lain. Dapat kode 6 digit lewat email — tanpa kata sandi. Pendukung tetap tidak perlu masuk.',
+            'Opsional, tapi begini kamu bisa kelola kampanye dari HP lain. Dapat kode 6 digit lewat email. Tanpa kata sandi. Pendukung tetap tidak perlu masuk.',
         emailCode: 'Kirimi aku kode',
         enterCode: (email) => `Masukkan kode 6 digit yang dikirim ke ${email}.`,
         saveMyCampaign: 'Simpan kampanyeku',
         sendNewCode: 'Kirim kode baru',
-        skipForNow: 'Lewati dulu — aku akan salin link kelola',
+        skipForNow: 'Lewati dulu. Aku akan salin link kelola',
         closeBlocked:
-            'Buat login gratis, atau salin link kelola di bawah, sebelum keluar — kalau tidak kampanye ini bisa hilang saat kamu keluar dari WhatsApp.',
+            'Buat login gratis, atau salin link kelola di bawah, sebelum keluar. Kalau tidak kampanye ini bisa hilang saat kamu keluar dari WhatsApp.',
         manage: 'Kelola kampanye',
         manageBody:
             'Ubah judul, deskripsi, target, kategori, link kustom, dan bingkai. Link lama tetap jalan saat kamu mengganti URL. Statistik juga di sini.',
@@ -584,7 +689,7 @@ const id: Messages = {
         privateKeyEmail: (email) =>
             `Kunci pribadi kampanyemu. Juga dikirim ke ${email}. Simpan untuk dirimu sendiri.`,
         privateKeyOnly:
-            'Kunci pribadi kampanyemu. Tanpa akun, ini satu-satunya cara kembali — salin ke tempat aman.',
+            'Kunci pribadi kampanyemu. Tanpa akun, ini satu-satunya cara kembali. Salin ke tempat aman.',
         done: 'Selesai',
         saveThenDone: 'Simpan akses, lalu Selesai',
         campaignTitle: 'Judul kampanye',
@@ -599,6 +704,8 @@ const id: Messages = {
             `Masuk sebagai ${email}. Kampanye ini langsung masuk ke akunmu.`,
         savedToAccount: (email) =>
             `Disimpan ke akunmu, ${email}. Buka dari perangkat mana saja dengan masuk pakai kode di /login.`,
+        setupHub: 'Atur hub kampanyemu',
+        setupHubBody: 'Satu link untuk bio, tombol Dukung, dan semua kampanyemu.',
     },
     day: {
         tapAdd: 'Ketuk untuk menambah fotomu',
@@ -613,6 +720,9 @@ const id: Messages = {
     },
     landingPt,
     landingId,
+    landingTl,
+    landingHi,
+    landingEs,
 };
 
 export const dictionaries: Record<Locale, Messages> = { en, pt, id };

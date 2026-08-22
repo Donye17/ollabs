@@ -5,6 +5,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Bricolage_Grotesque } from 'next/font/google';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 import { LanguageBanner } from '@/components/i18n/LanguageBanner';
+import { MobileOrganizerNav } from '@/components/MobileOrganizerNav';
 import './globals.css';
 
 const inter = Inter({
@@ -143,6 +144,7 @@ export default function RootLayout({
                 />
                 <LocaleProvider>
                     {children}
+                    <MobileOrganizerNav />
                     <LanguageBanner />
                 </LocaleProvider>
                 {GA_ID && (

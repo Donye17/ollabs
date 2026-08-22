@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { pool } from '@/lib/neon';
 import { USE_CASES } from '@/lib/useCases';
+import { USE_CASES_PT } from '@/lib/useCasesPt';
+import { USE_CASES_ID } from '@/lib/useCasesId';
 import { DAYS } from '@/lib/days';
 
 export const revalidate = 3600; // Revalidate every hour
@@ -30,6 +32,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.95,
             alternates: { languages: { en: baseUrl, 'pt-BR': `${baseUrl}/pt`, id: `${baseUrl}/id` } },
         },
+        { url: `${baseUrl}/tl`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+        { url: `${baseUrl}/hi`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+        { url: `${baseUrl}/es`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+        { url: `${baseUrl}/pt/vs/twibbonize`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+        { url: `${baseUrl}/id/vs/twibbonize`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+        { url: `${baseUrl}/vs/linktree`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
         { url: `${baseUrl}/create`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
         { url: `${baseUrl}/explore`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
         { url: `${baseUrl}/for`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
@@ -38,6 +46,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             lastModified: new Date(),
             changeFrequency: 'monthly' as const,
             priority: 0.8,
+        })),
+        ...USE_CASES_PT.map((u) => ({
+            url: `${baseUrl}/pt/for/${u.slug}`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly' as const,
+            priority: 0.82,
+        })),
+        ...USE_CASES_ID.map((u) => ({
+            url: `${baseUrl}/id/for/${u.slug}`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly' as const,
+            priority: 0.82,
         })),
         { url: `${baseUrl}/day`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
         ...DAYS.map((d) => ({

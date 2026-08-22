@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { Editor } from './Editor';
 import { FrameSelector } from './FrameSelector';
 import { CustomFramePanel } from './CustomFramePanel';
-import { CaptionControls } from './CaptionControls';
 import { NavBar } from '@/components/NavBar';
 import { DEFAULT_FRAME } from '@/lib/constants';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
@@ -47,7 +47,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const [notice, setNotice] = useState<string | null>(null);
 
     const [isPublishOpen, setIsPublishOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(!!remixId);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [imageSrc, setImageSrc] = useState<string | null>(null);
 
@@ -93,6 +93,33 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
         } catch { /* ignore */ }
     }, []);
 
+    // Reuse another campaign's frame: /create?remix=<slug>
+    useEffect(() => {
+        let remix: string | null = null;
+        try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('edit')) return;
+            remix = params.get('remix');
+        } catch { /* ignore */ }
+        if (!remix) return;
+
+        setIsLoading(true);
+        fetch(`/api/campaigns/${encodeURIComponent(remix)}`)
+            .then(async (r) => {
+                if (!r.ok) throw new Error('Could not load that frame');
+                return r.json();
+            })
+            .then((d) => {
+                const raw = d.frame_config;
+                const config = typeof raw === 'string' ? JSON.parse(raw) : raw;
+                if (!config) throw new Error('This campaign has no frame saved on it.');
+                setHistory([config]);
+                setHistoryIndex(0);
+            })
+            .catch((e) => setNotice(e.message || 'Could not load that frame'))
+            .finally(() => setIsLoading(false));
+    }, []);
+
     // Initial load: restore an in-progress frame from local storage. Skipped when
     // editing or when a flag was requested, so neither can be overwritten by a
     // half-finished draft.
@@ -128,7 +155,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             setImageSrc(url);
         } catch (error) {
             console.error("BG Removal failed", error);
-            setNotice("Could not remove the background. Your photo is unchanged — try again, or use it as it is.");
+            setNotice("Could not remove the background. Your photo is unchanged. Try again, or use it as it is.");
         } finally {
             setIsRemovingBg(false);
         }
@@ -196,12 +223,12 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
         <div className="min-h-screen bg-paper text-ink font-sans pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
             <NavBar />
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(5rem+env(safe-area-inset-top,0px))] pb-8 lg:py-24">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(3.5rem+env(safe-area-inset-top,0px)+0.5rem)] pb-6 lg:py-24">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
 
                     {/* Canvas stays pinned on phones so cutout/caption edits never
                         scroll the only preview that matters off-screen. */}
-                    <div className="lg:col-span-7 flex flex-col items-center sticky top-[calc(4.5rem+env(safe-area-inset-top,0px))] z-0 bg-paper/95 backdrop-blur-sm py-2 lg:py-0 lg:bg-transparent lg:backdrop-blur-none h-fit">
+                    <div className="lg:col-span-7 flex flex-col items-center sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-0 bg-paper/95 backdrop-blur-sm py-2 lg:py-0 lg:bg-transparent lg:backdrop-blur-none h-fit">
                         <Editor
                             imageSrc={imageSrc}
                             onImageSelect={handleImageSelect}
@@ -235,7 +262,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                     {/* Controls — custom frame first; premades demoted */}
                     <div className="lg:col-span-5 space-y-4 relative z-10">
                         <div className="px-1">
-                            <h1 className="font-display text-2xl font-extrabold text-ink tracking-tight">
+                            <h1 className="font-display text-xl sm:text-2xl font-extrabold text-ink tracking-tight">
                                 {editTarget ? t.editTitle : t.title}
                             </h1>
                             <p className="text-xs text-muted font-medium">
@@ -249,17 +276,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             frame={selectedFrame}
                             onChange={handleFrameUpdate}
                         />
-
-                        <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
-                            <summary className="flex items-center cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
-                                <span className="flex-1">{t.addText}</span>
-                                <span className="text-[11px] font-semibold text-muted normal-case tracking-normal mr-2">{t.optional}</span>
-                                <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180 shrink-0" />
-                            </summary>
-                            <div className="px-5 pb-5 border-t border-ink/10 pt-4">
-                                <CaptionControls frame={selectedFrame} onChange={handleFrameUpdate} />
-                            </div>
-                        </details>
 
                         {/* Premades are a fallback. Real organizers upload brand art;
                             leading with eight swatches made the product feel like a
@@ -292,14 +308,22 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             {/* Thumb-zone create. Header buttons are easy to miss once you are
                 deep in cutout controls on a small screen. */}
             <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
-                <button
-                    onClick={openPublish}
-                    className="w-full max-w-lg mx-auto min-h-[52px] flex items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 active:brightness-95 transition-all"
-                >
+                <div className="max-w-lg mx-auto flex gap-2">
+                    <Link
+                        href="/mine"
+                        className="min-h-[52px] px-4 rounded-xl border border-brand/25 bg-brand/10 text-brand-deep font-bold text-[11px] uppercase tracking-wider inline-flex items-center justify-center shrink-0 hover:bg-brand/15 active:bg-brand/20 transition-colors"
+                    >
+                        My campaigns
+                    </Link>
+                    <button
+                        onClick={openPublish}
+                        className="flex-1 min-h-[52px] flex items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 active:brightness-95 transition-all"
+                    >
                     {editTarget
                         ? <><Save size={18} /> {t.saveChanges}</>
                         : <><Upload size={18} /> {t.createCampaign}</>}
-                </button>
+                    </button>
+                </div>
             </div>
 
             <PublishTemplateModal

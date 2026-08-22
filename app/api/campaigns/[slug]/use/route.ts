@@ -1,6 +1,7 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse, after } from 'next/server';
 import { milestoneEmail, sendEmail } from '@/lib/email';
+import { publisherCountry } from '@/lib/geo';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         }
         const campaign = campaignRes.rows[0];
         const campaignId = campaign.id;
+        const supporterCountry = publisherCountry(request);
 
         let imageUrl: string | null = null;
         try {
@@ -42,18 +44,33 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             // no body is fine
         }
 
+        const prevCountRes = await pool.query(
+            `SELECT supporter_count FROM campaigns WHERE id = $1`,
+            [campaignId]
+        );
+        const prevCount: number = prevCountRes.rows[0]?.supporter_count ?? 0;
+
         await pool.query(
-            `INSERT INTO campaign_uses (campaign_id, user_id, image_url, created_at)
-             VALUES ($1, $2, $3, NOW())`,
-            [campaignId, null, imageUrl]
+            `INSERT INTO campaign_uses (campaign_id, user_id, image_url, supporter_country, created_at)
+             VALUES ($1, $2, $3, $4, NOW())`,
+            [campaignId, null, imageUrl, supporterCountry]
         );
 
         const updated = await pool.query(
-            `UPDATE campaigns SET supporter_count = supporter_count + 1 WHERE id = $1 RETURNING supporter_count`,
+            `UPDATE campaigns SET supporter_count = supporter_count + 1
+             WHERE id = $1
+             RETURNING supporter_count`,
             [campaignId]
         );
 
         const count: number = updated.rows[0].supporter_count;
+
+        if (prevCount === 0 && supporterCountry) {
+            await pool.query(
+                `UPDATE campaigns SET first_supporter_country = $2 WHERE id = $1 AND first_supporter_country IS NULL`,
+                [campaignId, supporterCountry]
+            );
+        }
 
         // Milestone nudge. Guarded by milestone_notified so a burst of traffic
         // cannot send the same email twice, and never blocks the response.
