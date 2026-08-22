@@ -9,6 +9,7 @@ export const metadata: Metadata = {
         canonical: 'https://ollabs.studio/pt',
         languages: {
             'pt-BR': 'https://ollabs.studio/pt',
+            id: 'https://ollabs.studio/id',
             en: 'https://ollabs.studio',
             'x-default': 'https://ollabs.studio',
         },

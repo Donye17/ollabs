@@ -3,8 +3,8 @@ import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { getMessages } from '@/lib/i18n/messages';
 
-export default function PortugueseLandingPage() {
-    const t = getMessages('pt').landingPt;
+export default function IndonesianLandingPage() {
+    const t = getMessages('id').landingId;
 
     const steps = [
         { title: t.step1Title, body: t.step1Body },
@@ -87,8 +87,8 @@ export default function PortugueseLandingPage() {
                     {t.englishSite}
                 </Link>
                 {' · '}
-                <Link href="/id" hrefLang="id" className="font-semibold text-brand-deep hover:underline">
-                    Bahasa Indonesia
+                <Link href="/pt" hrefLang="pt-BR" className="font-semibold text-brand-deep hover:underline">
+                    Português
                 </Link>
             </footer>
         </main>

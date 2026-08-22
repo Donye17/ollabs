@@ -24,6 +24,7 @@ export type Messages = {
         share: string;
         copied: string;
         peopleSupporting: string;
+        of: string;
         ofSupporters: string;
         goalReached: string;
         youreIn: string;
@@ -107,29 +108,85 @@ export type Messages = {
         saved: string;
         createCampaign: string;
     };
-    landingPt: {
-        title: string;
-        description: string;
-        eyebrow: string;
-        headline: string;
-        headlineAccent: string;
-        sub: string;
-        cta: string;
-        ctaSecondary: string;
-        howTitle: string;
-        step1Title: string;
-        step1Body: string;
-        step2Title: string;
-        step2Body: string;
-        step3Title: string;
-        step3Body: string;
-        whyTitle: string;
-        why1: string;
-        why2: string;
-        why3: string;
-        why4: string;
-        englishSite: string;
-    };
+    landingPt: LandingCopy;
+    landingId: LandingCopy;
+};
+
+export type LandingCopy = {
+    title: string;
+    description: string;
+    eyebrow: string;
+    headline: string;
+    headlineAccent: string;
+    sub: string;
+    cta: string;
+    ctaSecondary: string;
+    howTitle: string;
+    step1Title: string;
+    step1Body: string;
+    step2Title: string;
+    step2Body: string;
+    step3Title: string;
+    step3Body: string;
+    whyTitle: string;
+    why1: string;
+    why2: string;
+    why3: string;
+    why4: string;
+    englishSite: string;
+    stepLabel: (n: number) => string;
+};
+
+const landingPt: LandingCopy = {
+    title: 'Ollabs: moldura grátis para foto de perfil e campanhas',
+    description:
+        'Crie uma moldura de foto de perfil para a sua causa, time ou evento. Compartilhe um link e as pessoas adicionam na foto em segundos. Grátis, sem cadastro, sem marca d\'água.',
+    eyebrow: 'De collabs, para reunir pessoas',
+    headline: 'Reúna a sua',
+    headlineAccent: 'galera.',
+    sub: 'Faça uma moldura de foto de perfil para a sua causa, campanha ou evento. Mande um link e todo mundo coloca na foto em segundos. Grátis, sem cadastro, sem marca d\'água.',
+    cta: 'Criar uma campanha',
+    ctaSecondary: 'Versão em inglês',
+    howTitle: 'Como funciona',
+    step1Title: 'Faça a moldura',
+    step1Body: 'Envie o seu design, logo ou cores.',
+    step2Title: 'Compartilhe um link',
+    step2Body: 'Mande no WhatsApp, Instagram ou onde a sua galera estiver.',
+    step3Title: 'Elas adicionam',
+    step3Body: 'Abrem o link, colocam a foto e salvam a moldura.',
+    whyTitle: 'Por que o Ollabs',
+    why1: 'Sem marca d\'água na foto',
+    why2: 'Quem apoia nunca paga',
+    why3: 'Funciona no celular, inclusive no WhatsApp',
+    why4: 'Sem precisar instalar app',
+    englishSite: 'English site',
+    stepLabel: (n) => `Passo ${n}`,
+};
+
+const landingId: LandingCopy = {
+    title: 'Ollabs: twibbon gratis & bingkai foto profil untuk kampanye',
+    description:
+        'Buat bingkai foto profil (twibbon) untuk kampanye, komunitas, atau event. Bagikan satu link, orang pasang di foto dalam hitungan detik. Gratis, tanpa daftar, tanpa watermark.',
+    eyebrow: 'Dari collabs, untuk kumpulkan orang',
+    headline: 'Kumpulkan',
+    headlineAccent: 'barengannya.',
+    sub: 'Buat bingkai foto profil untuk kampanye, komunitas, atau event. Kirim satu link — semua orang pasang di foto dalam hitungan detik. Gratis, tanpa daftar, tanpa watermark.',
+    cta: 'Buat kampanye',
+    ctaSecondary: 'English version',
+    howTitle: 'Cara kerjanya',
+    step1Title: 'Buat bingkainya',
+    step1Body: 'Unggah desain, logo, atau warna kamu.',
+    step2Title: 'Bagikan satu link',
+    step2Body: 'Kirim ke WhatsApp, Instagram, atau di mana barenganmu berada.',
+    step3Title: 'Mereka pasang',
+    step3Body: 'Buka link, masukkan foto, simpan bingkainya.',
+    whyTitle: 'Kenapa Ollabs',
+    why1: 'Tanpa watermark di foto',
+    why2: 'Pendukung tidak pernah bayar',
+    why3: 'Jalan di HP, termasuk di WhatsApp',
+    why4: 'Tanpa harus install aplikasi',
+    englishSite: 'English site',
+    stepLabel: (n) => `Langkah ${n}`,
 };
 
 const en: Messages = {
@@ -155,6 +212,7 @@ const en: Messages = {
         share: 'Share',
         copied: 'Copied',
         peopleSupporting: 'people supporting',
+        of: 'of',
         ofSupporters: 'supporters',
         goalReached: 'goal reached',
         youreIn: "You're in. Now bring your people.",
@@ -164,7 +222,8 @@ const en: Messages = {
         copyLink: 'Copy link',
         scanCampaign: 'Scan to open this campaign',
         wantOwn: 'Want one of your own?',
-        wantOwnBody: 'Make a frame for your team, your school, your campaign. It is free, and you get a link just like this one to send out.',
+        wantOwnBody:
+            'Make a frame for your team, your school, your campaign. It is free, and you get a link just like this one to send out.',
         makeOwn: 'Make your own frame',
         makeOwnFooter: 'Make your own with Ollabs',
         report: 'Report this campaign',
@@ -180,14 +239,17 @@ const en: Messages = {
         subtitle: 'Upload your frame, then share one link. No account needed to create.',
         editSubtitle: (name) => `Saves to "${name}". Your link and supporters stay put.`,
         yourFrame: 'Your frame',
-        yourFrameHint: 'Upload your logo, badge, or designed frame. Watch the live preview above while you open a window for the photo.',
+        yourFrameHint:
+            'Upload your logo, badge, or designed frame. Watch the live preview above while you open a window for the photo.',
         uploadFrame: 'Upload logo or frame',
         changeFrame: 'Change frame image',
         uploading: 'Uploading…',
         pngTip: 'PNG with transparency works best',
         photoWindow: 'Photo window',
-        photoWindowHint: 'Cut a circle so the photo shows through. Left = more frame, right = more photo. Set to 0 if your PNG already has a transparent center.',
-        tipLogo: 'A square logo or round badge works great. Ollabs keeps the outer design and opens a window in the center for each supporter\'s photo.',
+        photoWindowHint:
+            'Cut a circle so the photo shows through. Left = more frame, right = more photo. Set to 0 if your PNG already has a transparent center.',
+        tipLogo:
+            "A square logo or round badge works great. Ollabs keeps the outer design and opens a window in the center for each supporter's photo.",
         simpleStyles: 'Simple styles',
         simpleStylesHint: 'No artwork yet? Pick a colour ring to start.',
         fineTune: 'Fine tune colours',
@@ -200,23 +262,29 @@ const en: Messages = {
         createTitle: 'Create a campaign',
         liveTitle: 'Campaign is live',
         sendNow: 'Send it now.',
-        sendNowBody: 'Campaigns that get shared in the first few minutes are the ones that fill up. Anyone who opens your link can add the frame to their photo.',
+        sendNowBody:
+            'Campaigns that get shared in the first few minutes are the ones that fill up. Anyone who opens your link can add the frame to their photo.',
         shareWhatsApp: 'Share on WhatsApp',
         shareAnother: 'Share another way',
         open: 'Open',
         saveCampaigns: 'Save your campaigns',
-        saveCampaignsBody: 'Optional, but this is how you manage the campaign from another phone. Get a 6 digit code by email — no password. Supporters still never sign in.',
+        saveCampaignsBody:
+            'Optional, but this is how you manage the campaign from another phone. Get a 6 digit code by email — no password. Supporters still never sign in.',
         emailCode: 'Email me a code',
         enterCode: (email) => `Enter the 6 digit code sent to ${email}.`,
         saveMyCampaign: 'Save my campaign',
         sendNewCode: 'Send a new code',
         skipForNow: "Skip for now — I'll copy the manage link",
-        closeBlocked: 'Create a free login, or copy your manage link below, before you leave — otherwise this campaign can disappear when you leave WhatsApp.',
+        closeBlocked:
+            'Create a free login, or copy your manage link below, before you leave — otherwise this campaign can disappear when you leave WhatsApp.',
         manage: 'Manage campaign',
-        manageBody: 'Change the title, description, goal, category, custom link, and frame. Old share links keep working when you rename the URL. Stats live here too.',
+        manageBody:
+            'Change the title, description, goal, category, custom link, and frame. Old share links keep working when you rename the URL. Stats live here too.',
         privateKey: 'This link is a private key to your campaign. Keep it to yourself.',
-        privateKeyEmail: (email) => `Private key to your campaign. Also emailed to ${email}. Keep it to yourself.`,
-        privateKeyOnly: 'Private key to your campaign. Without an account it is the only way back in, so copy it somewhere safe.',
+        privateKeyEmail: (email) =>
+            `Private key to your campaign. Also emailed to ${email}. Keep it to yourself.`,
+        privateKeyOnly:
+            'Private key to your campaign. Without an account it is the only way back in, so copy it somewhere safe.',
         done: 'Done',
         saveThenDone: 'Save access, then Done',
         campaignTitle: 'Campaign title',
@@ -224,10 +292,12 @@ const en: Messages = {
         goal: 'Goal (optional)',
         category: 'Category',
         emailBack: 'Email to get back in (recommended)',
-        emailBackHint: "Creating never requires an account. An email is the reliable way back in after you leave WhatsApp's browser. Supporters are never emailed.",
+        emailBackHint:
+            "Creating never requires an account. An email is the reliable way back in after you leave WhatsApp's browser. Supporters are never emailed.",
         createButton: 'Create campaign',
         signedInAs: (email) => `Signed in as ${email}. This campaign goes straight onto your account.`,
-        savedToAccount: (email) => `Saved to your account, ${email}. Open it from any device by signing in with a code at /login.`,
+        savedToAccount: (email) =>
+            `Saved to your account, ${email}. Open it from any device by signing in with a code at /login.`,
     },
     day: {
         tapAdd: 'Tap to add your photo',
@@ -238,29 +308,8 @@ const en: Messages = {
         saved: 'Saved. Go set it as your profile picture.',
         createCampaign: 'Create a campaign',
     },
-    landingPt: {
-        title: 'Ollabs: moldura grátis para foto de perfil e campanhas',
-        description: 'Crie uma moldura de foto de perfil para a sua causa, time ou evento. Compartilhe um link e as pessoas adicionam na foto em segundos. Grátis, sem cadastro, sem marca d\'água.',
-        eyebrow: 'De collabs, para reunir pessoas',
-        headline: 'Reúna a sua',
-        headlineAccent: 'galera.',
-        sub: 'Faça uma moldura de foto de perfil para a sua causa, campanha ou evento. Mande um link e todo mundo coloca na foto em segundos. Grátis, sem cadastro, sem marca d\'água.',
-        cta: 'Criar uma campanha',
-        ctaSecondary: 'Versão em inglês',
-        howTitle: 'Como funciona',
-        step1Title: 'Faça a moldura',
-        step1Body: 'Envie o seu design, logo ou cores.',
-        step2Title: 'Compartilhe um link',
-        step2Body: 'Mande no WhatsApp, Instagram ou onde a sua galera estiver.',
-        step3Title: 'Elas adicionam',
-        step3Body: 'Abrem o link, colocam a foto e salvam a moldura.',
-        whyTitle: 'Por que o Ollabs',
-        why1: 'Sem marca d\'água na foto',
-        why2: 'Quem apoia nunca paga',
-        why3: 'Funciona no celular, inclusive no WhatsApp',
-        why4: 'Sem precisar instalar app',
-        englishSite: 'English site',
-    },
+    landingPt,
+    landingId,
 };
 
 const pt: Messages = {
@@ -286,16 +335,19 @@ const pt: Messages = {
         share: 'Compartilhar',
         copied: 'Copiado',
         peopleSupporting: 'pessoas apoiando',
+        of: 'de',
         ofSupporters: 'apoiadores',
         goalReached: 'meta atingida',
         youreIn: 'Pronto. Agora chame a sua galera.',
-        bringPeople: 'Poste a foto com a moldura e compartilhe o link para outras pessoas também colocarem.',
+        bringPeople:
+            'Poste a foto com a moldura e compartilhe o link para outras pessoas também colocarem.',
         shareWhatsApp: 'Compartilhar no WhatsApp',
         shareAnother: 'Compartilhar de outro jeito',
         copyLink: 'Copiar link',
         scanCampaign: 'Escaneie para abrir esta campanha',
         wantOwn: 'Quer uma moldura sua?',
-        wantOwnBody: 'Faça uma moldura para o seu time, escola ou campanha. É grátis, e você ganha um link igual a este para enviar.',
+        wantOwnBody:
+            'Faça uma moldura para o seu time, escola ou campanha. É grátis, e você ganha um link igual a este para enviar.',
         makeOwn: 'Criar minha moldura',
         makeOwnFooter: 'Crie a sua no Ollabs',
         report: 'Denunciar esta campanha',
@@ -311,14 +363,17 @@ const pt: Messages = {
         subtitle: 'Envie sua moldura e compartilhe um link. Não precisa de conta para criar.',
         editSubtitle: (name) => `Salva em "${name}". Seu link e seus apoiadores continuam iguais.`,
         yourFrame: 'Sua moldura',
-        yourFrameHint: 'Envie o logo, emblema ou moldura. Veja a prévia ao vivo enquanto abre a janela da foto.',
+        yourFrameHint:
+            'Envie o logo, emblema ou moldura. Veja a prévia ao vivo enquanto abre a janela da foto.',
         uploadFrame: 'Enviar logo ou moldura',
         changeFrame: 'Trocar imagem da moldura',
         uploading: 'Enviando…',
         pngTip: 'PNG com transparência funciona melhor',
         photoWindow: 'Janela da foto',
-        photoWindowHint: 'Abra um círculo para a foto aparecer. Esquerda = mais moldura, direita = mais foto. Use 0 se o PNG já tiver o centro transparente.',
-        tipLogo: 'Um logo quadrado ou emblema redondo funciona bem. O Ollabs mantém o desenho de fora e abre uma janela no centro para a foto de cada pessoa.',
+        photoWindowHint:
+            'Abra um círculo para a foto aparecer. Esquerda = mais moldura, direita = mais foto. Use 0 se o PNG já tiver o centro transparente.',
+        tipLogo:
+            'Um logo quadrado ou emblema redondo funciona bem. O Ollabs mantém o desenho de fora e abre uma janela no centro para a foto de cada pessoa.',
         simpleStyles: 'Estilos simples',
         simpleStylesHint: 'Ainda sem arte? Escolha um anel de cor para começar.',
         fineTune: 'Ajustar cores',
@@ -331,23 +386,29 @@ const pt: Messages = {
         createTitle: 'Criar uma campanha',
         liveTitle: 'Campanha no ar',
         sendNow: 'Envie agora.',
-        sendNowBody: 'Campanhas compartilhadas nos primeiros minutos são as que enchem. Quem abrir o link coloca a moldura na foto.',
+        sendNowBody:
+            'Campanhas compartilhadas nos primeiros minutos são as que enchem. Quem abrir o link coloca a moldura na foto.',
         shareWhatsApp: 'Compartilhar no WhatsApp',
         shareAnother: 'Compartilhar de outro jeito',
         open: 'Abrir',
         saveCampaigns: 'Salvar suas campanhas',
-        saveCampaignsBody: 'Opcional, mas é assim que você gerencia a campanha em outro celular. Receba um código de 6 dígitos por e-mail — sem senha. Quem apoia nunca faz login.',
+        saveCampaignsBody:
+            'Opcional, mas é assim que você gerencia a campanha em outro celular. Receba um código de 6 dígitos por e-mail — sem senha. Quem apoia nunca faz login.',
         emailCode: 'Me envie um código',
         enterCode: (email) => `Digite o código de 6 dígitos enviado para ${email}.`,
         saveMyCampaign: 'Salvar minha campanha',
         sendNewCode: 'Enviar outro código',
         skipForNow: 'Pular por agora — vou copiar o link de gerenciar',
-        closeBlocked: 'Crie um login grátis, ou copie o link de gerenciar abaixo, antes de sair — senão esta campanha pode sumir quando você sair do WhatsApp.',
+        closeBlocked:
+            'Crie um login grátis, ou copie o link de gerenciar abaixo, antes de sair — senão esta campanha pode sumir quando você sair do WhatsApp.',
         manage: 'Gerenciar campanha',
-        manageBody: 'Mude o título, descrição, meta, categoria, link personalizado e moldura. Links antigos continuam funcionando se você renomear a URL. As estatísticas ficam aqui.',
+        manageBody:
+            'Mude o título, descrição, meta, categoria, link personalizado e moldura. Links antigos continuam funcionando se você renomear a URL. As estatísticas ficam aqui.',
         privateKey: 'Este link é a chave privada da campanha. Guarde só para você.',
-        privateKeyEmail: (email) => `Chave privada da campanha. Também enviada para ${email}. Guarde só para você.`,
-        privateKeyOnly: 'Chave privada da campanha. Sem conta, é o único jeito de voltar — copie em algum lugar seguro.',
+        privateKeyEmail: (email) =>
+            `Chave privada da campanha. Também enviada para ${email}. Guarde só para você.`,
+        privateKeyOnly:
+            'Chave privada da campanha. Sem conta, é o único jeito de voltar — copie em algum lugar seguro.',
         done: 'Pronto',
         saveThenDone: 'Salve o acesso e depois Pronto',
         campaignTitle: 'Título da campanha',
@@ -355,10 +416,13 @@ const pt: Messages = {
         goal: 'Meta (opcional)',
         category: 'Categoria',
         emailBack: 'E-mail para voltar depois (recomendado)',
-        emailBackHint: 'Criar nunca exige conta. O e-mail é o jeito seguro de voltar depois de sair do navegador do WhatsApp. Quem apoia nunca recebe e-mail.',
+        emailBackHint:
+            'Criar nunca exige conta. O e-mail é o jeito seguro de voltar depois de sair do navegador do WhatsApp. Quem apoia nunca recebe e-mail.',
         createButton: 'Criar campanha',
-        signedInAs: (email) => `Conectado como ${email}. Esta campanha vai direto para a sua conta.`,
-        savedToAccount: (email) => `Salva na sua conta, ${email}. Abra em qualquer dispositivo entrando com um código em /login.`,
+        signedInAs: (email) =>
+            `Conectado como ${email}. Esta campanha vai direto para a sua conta.`,
+        savedToAccount: (email) =>
+            `Salva na sua conta, ${email}. Abra em qualquer dispositivo entrando com um código em /login.`,
     },
     day: {
         tapAdd: 'Toque para adicionar sua foto',
@@ -369,12 +433,137 @@ const pt: Messages = {
         saved: 'Salvo. Agora use como foto de perfil.',
         createCampaign: 'Criar uma campanha',
     },
-    landingPt: en.landingPt,
+    landingPt,
+    landingId,
 };
 
-pt.landingPt = en.landingPt;
+const id: Messages = {
+    banner: {
+        suggest: 'Looking for English? Switch language anytime.',
+        switchTo: 'Use English',
+        dismiss: 'Keep Indonesian',
+    },
+    campaign: {
+        eyebrow: 'Kampanye Ollabs',
+        tapHint: 'Ketuk lingkaran atau seret foto ke situ.',
+        uploadPhoto: 'Unggah fotomu',
+        stepAdd: 'Tambahkan fotomu',
+        stepFit: 'Sesuaikan posisi',
+        stepShare: 'Unduh & bagikan',
+        size: 'Ukuran',
+        saveOrShare: 'Simpan atau bagikan foto',
+        download: 'Unduh',
+        downloadedAgain: 'Sudah diunduh, unduh lagi',
+        copyImage: 'Salin gambar',
+        imageCopied: 'Gambar disalin',
+        newPhoto: 'Foto baru',
+        share: 'Bagikan',
+        copied: 'Disalin',
+        peopleSupporting: 'orang mendukung',
+        of: 'dari',
+        ofSupporters: 'pendukung',
+        goalReached: 'target tercapai',
+        youreIn: 'Sudah masuk. Sekarang ajak barenganmu.',
+        bringPeople:
+            'Posting fotomu yang sudah dibingkai, dan bagikan linknya supaya orang lain juga bisa pasang.',
+        shareWhatsApp: 'Bagikan di WhatsApp',
+        shareAnother: 'Bagikan cara lain',
+        copyLink: 'Salin link',
+        scanCampaign: 'Pindai untuk buka kampanye ini',
+        wantOwn: 'Mau buat sendiri?',
+        wantOwnBody:
+            'Buat bingkai untuk tim, sekolah, atau kampanyemu. Gratis, dan kamu dapat link seperti ini untuk dibagikan.',
+        makeOwn: 'Buat bingkai sendiri',
+        makeOwnFooter: 'Buat sendiri di Ollabs',
+        report: 'Laporkan kampanye ini',
+        reportTitle: 'Laporkan kampanye ini',
+        reportPlaceholder: 'Ada apa yang salah? (opsional)',
+        submitReport: 'Kirim laporan',
+        cancel: 'Batal',
+        reportThanks: 'Terima kasih, kami akan meninjau kampanye ini.',
+    },
+    create: {
+        title: 'Pembuat kampanye',
+        editTitle: 'Edit bingkaimu',
+        subtitle: 'Unggah bingkai, lalu bagikan satu link. Tidak perlu akun untuk membuat.',
+        editSubtitle: (name) => `Disimpan ke "${name}". Link dan pendukungmu tetap sama.`,
+        yourFrame: 'Bingkaimu',
+        yourFrameHint:
+            'Unggah logo, lencana, atau desain bingkai. Lihat pratinjau langsung sambil membuka jendela untuk foto.',
+        uploadFrame: 'Unggah logo atau bingkai',
+        changeFrame: 'Ganti gambar bingkai',
+        uploading: 'Mengunggah…',
+        pngTip: 'PNG dengan transparansi paling bagus',
+        photoWindow: 'Jendela foto',
+        photoWindowHint:
+            'Potong lingkaran supaya fotonya terlihat. Kiri = lebih banyak bingkai, kanan = lebih banyak foto. Setel 0 jika PNG-mu sudah transparan di tengah.',
+        tipLogo:
+            'Logo persegi atau lencana bulat cocok. Ollabs menjaga desain luar dan membuka jendela di tengah untuk foto setiap pendukung.',
+        simpleStyles: 'Gaya sederhana',
+        simpleStylesHint: 'Belum ada desain? Pilih cincin warna untuk mulai.',
+        fineTune: 'Sesuaikan warna',
+        previewContacts: 'Pratinjau di kontak',
+        createCampaign: 'Buat kampanye',
+        saveChanges: 'Simpan perubahan',
+        dragTip:
+            'Seret foto ke lingkaran untuk melihat hasilnya. Cubit atau geser untuk menyesuaikan.',
+    },
+    publish: {
+        createTitle: 'Buat kampanye',
+        liveTitle: 'Kampanye sudah live',
+        sendNow: 'Kirim sekarang.',
+        sendNowBody:
+            'Kampanye yang dibagikan di menit-menit pertama yang paling cepat penuh. Siapa pun yang buka linkmu bisa pasang bingkai di fotonya.',
+        shareWhatsApp: 'Bagikan di WhatsApp',
+        shareAnother: 'Bagikan cara lain',
+        open: 'Buka',
+        saveCampaigns: 'Simpan kampanyemu',
+        saveCampaignsBody:
+            'Opsional, tapi begini kamu bisa kelola kampanye dari HP lain. Dapat kode 6 digit lewat email — tanpa kata sandi. Pendukung tetap tidak perlu masuk.',
+        emailCode: 'Kirimi aku kode',
+        enterCode: (email) => `Masukkan kode 6 digit yang dikirim ke ${email}.`,
+        saveMyCampaign: 'Simpan kampanyeku',
+        sendNewCode: 'Kirim kode baru',
+        skipForNow: 'Lewati dulu — aku akan salin link kelola',
+        closeBlocked:
+            'Buat login gratis, atau salin link kelola di bawah, sebelum keluar — kalau tidak kampanye ini bisa hilang saat kamu keluar dari WhatsApp.',
+        manage: 'Kelola kampanye',
+        manageBody:
+            'Ubah judul, deskripsi, target, kategori, link kustom, dan bingkai. Link lama tetap jalan saat kamu mengganti URL. Statistik juga di sini.',
+        privateKey: 'Link ini adalah kunci pribadi kampanyemu. Simpan untuk dirimu sendiri.',
+        privateKeyEmail: (email) =>
+            `Kunci pribadi kampanyemu. Juga dikirim ke ${email}. Simpan untuk dirimu sendiri.`,
+        privateKeyOnly:
+            'Kunci pribadi kampanyemu. Tanpa akun, ini satu-satunya cara kembali — salin ke tempat aman.',
+        done: 'Selesai',
+        saveThenDone: 'Simpan akses, lalu Selesai',
+        campaignTitle: 'Judul kampanye',
+        description: 'Deskripsi (opsional)',
+        goal: 'Target (opsional)',
+        category: 'Kategori',
+        emailBack: 'Email untuk kembali lagi (disarankan)',
+        emailBackHint:
+            'Membuat tidak pernah butuh akun. Email adalah cara andal untuk kembali setelah keluar dari browser WhatsApp. Pendukung tidak pernah diemail.',
+        createButton: 'Buat kampanye',
+        signedInAs: (email) =>
+            `Masuk sebagai ${email}. Kampanye ini langsung masuk ke akunmu.`,
+        savedToAccount: (email) =>
+            `Disimpan ke akunmu, ${email}. Buka dari perangkat mana saja dengan masuk pakai kode di /login.`,
+    },
+    day: {
+        tapAdd: 'Ketuk untuk menambah fotomu',
+        zoom: 'Zoom',
+        changePhoto: 'Ganti foto',
+        saveOrShare: 'Simpan atau bagikan foto',
+        download: 'Unduh',
+        saved: 'Tersimpan. Pasang sebagai foto profilmu.',
+        createCampaign: 'Buat kampanye',
+    },
+    landingPt,
+    landingId,
+};
 
-export const dictionaries: Record<Locale, Messages> = { en, pt };
+export const dictionaries: Record<Locale, Messages> = { en, pt, id };
 
 export function getMessages(locale: Locale): Messages {
     return dictionaries[locale] || dictionaries.en;

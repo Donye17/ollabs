@@ -528,7 +528,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                                 />
                             </div>
                             <p className="text-xs text-muted mt-1.5">
-                                {count.toLocaleString()} {locale === 'pt' ? 'de' : 'of'} {goal.toLocaleString()} {t.ofSupporters}
+                                {count.toLocaleString()} {t.of} {goal.toLocaleString()} {t.ofSupporters}
                                 {count >= goal ? ` · ${t.goalReached}` : ''}
                             </p>
                         </>

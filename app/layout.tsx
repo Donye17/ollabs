@@ -49,6 +49,7 @@ export const metadata: Metadata = {
         languages: {
             en: 'https://ollabs.studio',
             'pt-BR': 'https://ollabs.studio/pt',
+            id: 'https://ollabs.studio/id',
             'x-default': 'https://ollabs.studio',
         },
     },

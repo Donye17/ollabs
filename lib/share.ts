@@ -16,17 +16,13 @@
 // leave the app, find the right group, long press and paste. Every step there
 // is somewhere to lose them, at the one moment that decides the outcome.
 
+import type { Locale } from '@/lib/i18n/locale';
+
 /**
  * Whether to write share copy in Portuguese.
  *
- * The interface is English, but the people sharing are overwhelmingly
- * Brazilian: every one of the twelve largest campaigns is a Brazilian
- * candidate. The share text is the one string that does not stay on our site,
- * it gets pasted into a WhatsApp group full of Brazilians, so it is worth
- * matching the reader rather than the interface.
- *
- * Deliberately narrow. This switches a couple of sentences of share copy, it
- * does not attempt to localize the product.
+ * Deliberately narrow: this switches a couple of sentences of WhatsApp paste
+ * text. Prefer an explicit UI locale when one is set.
  */
 export function prefersPortuguese(): boolean {
     if (typeof navigator === 'undefined') return false;
@@ -34,29 +30,39 @@ export function prefersPortuguese(): boolean {
     return langs.some((l) => typeof l === 'string' && l.toLowerCase().startsWith('pt'));
 }
 
-/**
- * Share copy language. Prefer an explicit UI locale (cookie / /pt) so a
- * Brazilian organizer on the Portuguese landing gets PT WhatsApp text even if
- * their browser language list is messy.
- */
-export function shareInPortuguese(locale?: 'en' | 'pt' | null): boolean {
-    if (locale === 'pt') return true;
-    if (locale === 'en') return false;
-    return prefersPortuguese();
+export function prefersIndonesian(): boolean {
+    if (typeof navigator === 'undefined') return false;
+    const langs = [navigator.language, ...(navigator.languages || [])];
+    return langs.some((l) => typeof l === 'string' && l.toLowerCase().startsWith('id'));
+}
+
+/** Resolve which language the WhatsApp paste should use. */
+export function shareLocale(locale?: Locale | null): 'en' | 'pt' | 'id' {
+    if (locale === 'pt' || locale === 'id' || locale === 'en') return locale;
+    if (prefersPortuguese()) return 'pt';
+    if (prefersIndonesian()) return 'id';
+    return 'en';
+}
+
+/** @deprecated Prefer shareLocale. Kept for call sites that only care about PT. */
+export function shareInPortuguese(locale?: Locale | null): boolean {
+    return shareLocale(locale) === 'pt';
 }
 
 /** What an organizer sends when they have just published their campaign. */
-export function organizerShareText(title: string, locale?: 'en' | 'pt' | null): string {
-    return shareInPortuguese(locale)
-        ? `Coloque a moldura "${title}" na sua foto de perfil:`
-        : `Add the "${title}" frame to your profile picture:`;
+export function organizerShareText(title: string, locale?: Locale | null): string {
+    const lang = shareLocale(locale);
+    if (lang === 'pt') return `Coloque a moldura "${title}" na sua foto de perfil:`;
+    if (lang === 'id') return `Pasang bingkai "${title}" di foto profil kamu:`;
+    return `Add the "${title}" frame to your profile picture:`;
 }
 
 /** What a supporter sends after adding the frame to their own photo. */
-export function supporterShareText(title: string, locale?: 'en' | 'pt' | null): string {
-    return shareInPortuguese(locale)
-        ? `Adicionei a moldura "${title}" na minha foto. Adicione a sua:`
-        : `I just added the "${title}" frame to my photo on Ollabs. Add yours:`;
+export function supporterShareText(title: string, locale?: Locale | null): string {
+    const lang = shareLocale(locale);
+    if (lang === 'pt') return `Adicionei a moldura "${title}" na minha foto. Adicione a sua:`;
+    if (lang === 'id') return `Aku sudah pasang bingkai "${title}" di fotoku. Pasang juga:`;
+    return `I just added the "${title}" frame to my photo on Ollabs. Add yours:`;
 }
 
 /**
