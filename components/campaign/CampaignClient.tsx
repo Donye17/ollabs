@@ -548,7 +548,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     the fit, or reaching for Download. Rendering it conditionally
                     rather than hiding it with CSS means there is no ad request at
                     all during the part of the flow that converts. */}
-                {justDownloaded && <AdSlot className="mt-4" />}
+                {justDownloaded && <AdSlot surface="campaign" className="mt-4" />}
 
                 {reportDone ? (
                     <p className="text-[11px] text-muted/70">Thanks, we will review this campaign.</p>

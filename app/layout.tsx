@@ -118,16 +118,6 @@ const jsonLd = {
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-0E75K2XJ5Q';
 
-// The AdSense loader, only when a publisher ID is actually configured. Until
-// then not a single byte of it is requested, so the site is unchanged.
-//
-// Note for the AdSense dashboard rather than for this file: Auto ads must stay
-// OFF, along with the anchor and vignette formats. Those are the ones that
-// float over the page and interrupt it between screens, and they are switched
-// on by default. The placement in this codebase is deliberate and in-flow, and
-// none of that survives Auto ads being enabled behind it.
-const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || 'ca-pub-5665798404376894';
-
 export default function RootLayout({
     children,
 }: {
@@ -152,14 +142,9 @@ gtag('config', '${GA_ID}');`}
                         </Script>
                     </>
                 )}
-                {ADSENSE_CLIENT && (
-                    <Script
-                        id="adsbygoogle"
-                        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-                        strategy="afterInteractive"
-                        crossOrigin="anonymous"
-                    />
-                )}
+                {/* AdSense script is loaded by AdSlot on first mount, not here.
+                    Create and other ad-free screens should not pay for it.
+                    Dashboard: keep Auto ads, anchor, and vignette OFF. */}
                 <Analytics />
                 <SpeedInsights />
             </body>

@@ -11,12 +11,13 @@ link. Supporters open that link, drop in a photo, and download the framed result
 
 ## Where things stand (2026-08-21)
 
-**On `main`:** mobile Step 3 (`ffc8d64`), phone shell + custom-frame-first create
-(Phases 1–2).
+**On `main`:** mobile Step 3, phone shell, custom-frame-first create (Phases 1–2),
+organizer save nudge + slug 301s (Phase 3, migration `0012`).
 
-**Phase 3 (this pass):** post-publish save nudge (Done blocked until login or manage
-link acknowledged); `campaign_slug_redirects` + 301 from old `/c/[slug]` after rename.
-Migration `0012` applied to Neon.
+**Phase 4 (this pass):** AdSense loads only when an AdSlot mounts; campaign vs SEO
+slot IDs; second quiet unit on long `/for` and `/day` pages; homepage/FAQ copy
+matches reality (never pay / never watermark / never ad on the photo). Lawyer gate
+still applies before denser ads on Brazilian electoral campaign pages.
 
 **Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
 “Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page

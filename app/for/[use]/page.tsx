@@ -118,7 +118,7 @@ export default async function UseCasePage({ params }: { params: Promise<{ use: s
 
             <section className="px-6 pt-8">
                 <div className="max-w-3xl mx-auto">
-                    <AdSlot />
+                    <AdSlot surface="seo" />
                 </div>
             </section>
 
@@ -134,6 +134,12 @@ export default async function UseCasePage({ params }: { params: Promise<{ use: s
                             </div>
                         ))}
                     </div>
+                </div>
+            </section>
+
+            <section className="px-6 pb-12">
+                <div className="max-w-3xl mx-auto">
+                    <AdSlot surface="seo" />
                 </div>
             </section>
 

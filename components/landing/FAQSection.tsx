@@ -9,11 +9,15 @@ import {
 const faqs = [
     {
         question: "Is Ollabs free?",
-        answer: "Yes, completely free. Create a campaign, share the link, and let supporters add your frame. No cost, and no watermark on the photo anyone downloads."
+        answer: "Yes for your supporters: they never pay, and the photo they download never has a watermark. Quiet ads on some pages help keep it that way. Creating a campaign is free."
+    },
+    {
+        question: "Do supporters see ads?",
+        answer: "Never on the photo, and never covering Save or Share. On a campaign page a single labelled ad can appear after they have already saved their framed picture. Auto ads and pop-ups stay off."
     },
     {
         question: "Do I need an account?",
-        answer: "No. You can create a campaign and supporters can use it without signing up for anything."
+        answer: "No. You can create a campaign without signing up. An optional login helps you manage campaigns from another phone."
     },
     {
         question: "Can I use my own design?",

@@ -57,7 +57,7 @@ const audiences = [
 const reasons = [
     "No signup required",
     "No watermark, ever",
-    "Completely free",
+    "Supporters never pay",
     "Upload your own design",
     "Live supporter counter",
     "Works on any phone",
