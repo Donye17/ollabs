@@ -15,7 +15,10 @@ link. Supporters open that link, drop in a photo, and download the framed result
 301s, quiet ads, PT-BR, organizer hubs, and Bahasa (`/id` landing + locale chrome).
 
 Lawyer gate still applies before denser ads on Brazilian electoral campaign pages.
-Next: Phase 8 calendar moments, or more PT/ID `/for` pages.
+**Paid upgrade:** deferred — do not build vanity/custom domain/CSV/invoice until hubs
+show demand.
+
+Next: Phase 8 calendar moments (BR/ID local + awareness days), not monetization.
 
 **Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
 “Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page
