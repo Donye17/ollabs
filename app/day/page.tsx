@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { daysByUpcoming, formatOccurrence, countdownLabel } from '@/lib/days';
+import { AdSlot } from '@/components/AdSlot';
 import { ArrowRight, CalendarDays } from 'lucide-react';
 
 const URL = 'https://ollabs.studio/day';
@@ -66,6 +67,9 @@ export default function DayIndexPage() {
                             <ArrowRight size={18} className="text-muted group-hover:text-brand-deep transition-colors shrink-0" />
                         </Link>
                     ))}
+                </div>
+                <div className="max-w-3xl mx-auto mt-10">
+                    <AdSlot surface="seo" />
                 </div>
             </section>
         </main>

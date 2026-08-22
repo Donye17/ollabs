@@ -18,6 +18,8 @@ BR/ID local moments).
 
 **Ads:** same quiet in-flow units on every campaign — no special rules by
 category, country, or politics. Never on the photo; never on `/create`.
+`/c` stays lean (1 before save, 2 after). SEO pages (`/for`, `/day`, hubs)
+carry denser labelled inventory between content blocks.
 **Paid upgrade:** deferred until hubs show demand.
 
 Next: post-download “run your own campaign” prompt, more PT/ID `/for` pages, or

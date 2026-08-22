@@ -153,6 +153,14 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                 </div>
             </section>
 
+            {/* Below the tool, never beside it. SEO pages carry denser inventory than
+                /c; still labelled, in-flow, collapses when unfilled. */}
+            <section className="px-6 pb-8">
+                <div className="max-w-3xl mx-auto">
+                    <AdSlot surface="seo" />
+                </div>
+            </section>
+
             {/* Intro + background */}
             <section className="px-6 pb-4">
                 <div className="max-w-3xl mx-auto space-y-4">
@@ -201,6 +209,12 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                             </div>
                         ))}
                     </div>
+                </div>
+            </section>
+
+            <section className="px-6 pb-8">
+                <div className="max-w-3xl mx-auto">
+                    <AdSlot surface="seo" />
                 </div>
             </section>
 
@@ -256,8 +270,6 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                 </div>
             </section>
 
-            {/* One unit, below the tool and above the FAQ, in the normal flow of
-                the page. Never beside the frame tool itself. */}
             <section className="px-6 pb-8">
                 <div className="max-w-3xl mx-auto">
                     <AdSlot surface="seo" />

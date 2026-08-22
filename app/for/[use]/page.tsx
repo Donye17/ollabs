@@ -85,6 +85,14 @@ export default async function UseCasePage({ params }: { params: Promise<{ use: s
                 </div>
             </section>
 
+            {/* SEO inventory: long scroll, labelled, in-flow only. Four units spaced
+                between content blocks — denser than /c, never in the hero or on a CTA. */}
+            <section className="px-6 pt-4 pb-2">
+                <div className="max-w-3xl mx-auto">
+                    <AdSlot surface="seo" />
+                </div>
+            </section>
+
             {/* Benefits */}
             <section className="px-6 py-16">
                 <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -155,6 +163,12 @@ export default async function UseCasePage({ params }: { params: Promise<{ use: s
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </div>
+                </div>
+            </section>
+
+            <section className="px-6 pb-10">
+                <div className="max-w-3xl mx-auto">
+                    <AdSlot surface="seo" />
                 </div>
             </section>
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ExternalLink, Users } from 'lucide-react';
 import type { PublicHub } from '@/lib/hub';
+import { AdSlot } from '@/components/AdSlot';
 
 /** Mobile-first Linktree column. Primary job: push people into /c for the frame. */
 export function HubPublicView({ hub }: { hub: PublicHub }) {
@@ -113,6 +114,12 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                             This hub is not ready yet.
                         </p>
                     )}
+                </div>
+
+                {/* One quiet unit below the links / campaigns — after the job of the
+                    page (get people into /c), never above the featured support CTA. */}
+                <div className="mt-8">
+                    <AdSlot surface="seo" />
                 </div>
 
                 <footer className="mt-12 pb-4 text-center">

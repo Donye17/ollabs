@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { USE_CASES } from '@/lib/useCases';
+import { AdSlot } from '@/components/AdSlot';
 
 export const metadata: Metadata = {
     title: 'Who uses Ollabs | Profile picture frame campaigns',
@@ -34,6 +35,9 @@ export default function ForHub() {
                             </span>
                         </Link>
                     ))}
+                </div>
+                <div className="max-w-3xl mx-auto mt-10">
+                    <AdSlot surface="seo" />
                 </div>
             </section>
 
