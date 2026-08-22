@@ -16,7 +16,8 @@ Mobile shell, custom-frame create, organizer save + slug 301s, quiet ads, PT-BR,
 organizer hubs, Bahasa, and an expanded `/day` calendar (Sept–Oct awareness +
 BR/ID local moments).
 
-Lawyer gate still applies before denser ads on Brazilian electoral campaign pages.
+**Ads:** same quiet in-flow units on every campaign — no special rules by
+category, country, or politics. Never on the photo; never on `/create`.
 **Paid upgrade:** deferred until hubs show demand.
 
 Next: post-download “run your own campaign” prompt, more PT/ID `/for` pages, or
