@@ -51,6 +51,13 @@ export type Messages = {
         editSubtitle: (name: string) => string;
         yourFrame: string;
         yourFrameHint: string;
+        artworkStep: string;
+        artworkStepHint: string;
+        photoWindowStep: string;
+        photoWindowStepHint: string;
+        addText: string;
+        optional: string;
+        fallback: string;
         uploadFrame: string;
         changeFrame: string;
         uploading: string;
@@ -69,6 +76,8 @@ export type Messages = {
     publish: {
         createTitle: string;
         liveTitle: string;
+        nameItHint: string;
+        thenSaveAccess: string;
         sendNow: string;
         sendNowBody: string;
         shareWhatsApp: string;
@@ -236,11 +245,18 @@ const en: Messages = {
     create: {
         title: 'Campaign builder',
         editTitle: 'Edit your frame',
-        subtitle: 'Upload your frame, then share one link. No account needed to create.',
+        subtitle: 'Upload your frame, name it, send one link. No account needed.',
         editSubtitle: (name) => `Saves to "${name}". Your link and supporters stay put.`,
         yourFrame: 'Your frame',
         yourFrameHint:
             'Upload your logo, badge, or designed frame. Watch the live preview above while you open a window for the photo.',
+        artworkStep: '1. Your artwork',
+        artworkStepHint: 'Logo, badge, or designed PNG.',
+        photoWindowStep: '2. Photo window',
+        photoWindowStepHint: 'Left = more frame. Right = more photo.',
+        addText: 'Add text',
+        optional: 'optional',
+        fallback: 'fallback',
         uploadFrame: 'Upload logo or frame',
         changeFrame: 'Change frame image',
         uploading: 'Uploading…',
@@ -259,8 +275,10 @@ const en: Messages = {
         dragTip: 'Drag a photo onto the circle to preview how supporters will look. Pinch or pan to fit.',
     },
     publish: {
-        createTitle: 'Create a campaign',
-        liveTitle: 'Campaign is live',
+        createTitle: 'Name it',
+        liveTitle: 'Send it',
+        nameItHint: 'Description, goal, and category live on Manage after you publish.',
+        thenSaveAccess: 'Then save access',
         sendNow: 'Send it now.',
         sendNowBody:
             'Campaigns that get shared in the first few minutes are the ones that fill up. Anyone who opens your link can add the frame to their photo.',
@@ -360,11 +378,18 @@ const pt: Messages = {
     create: {
         title: 'Criar campanha',
         editTitle: 'Editar sua moldura',
-        subtitle: 'Envie sua moldura e compartilhe um link. Não precisa de conta para criar.',
+        subtitle: 'Envie sua moldura, dê um nome e compartilhe um link. Não precisa de conta.',
         editSubtitle: (name) => `Salva em "${name}". Seu link e seus apoiadores continuam iguais.`,
         yourFrame: 'Sua moldura',
         yourFrameHint:
             'Envie o logo, emblema ou moldura. Veja a prévia ao vivo enquanto abre a janela da foto.',
+        artworkStep: '1. Sua arte',
+        artworkStepHint: 'Logo, emblema ou PNG desenhado.',
+        photoWindowStep: '2. Janela da foto',
+        photoWindowStepHint: 'Esquerda = mais moldura. Direita = mais foto.',
+        addText: 'Adicionar texto',
+        optional: 'opcional',
+        fallback: 'alternativa',
         uploadFrame: 'Enviar logo ou moldura',
         changeFrame: 'Trocar imagem da moldura',
         uploading: 'Enviando…',
@@ -383,8 +408,10 @@ const pt: Messages = {
         dragTip: 'Arraste uma foto para o círculo e veja como fica. Aperte ou arraste para encaixar.',
     },
     publish: {
-        createTitle: 'Criar uma campanha',
-        liveTitle: 'Campanha no ar',
+        createTitle: 'Dê um nome',
+        liveTitle: 'Envie',
+        nameItHint: 'Descrição, meta e categoria ficam em Gerenciar depois de publicar.',
+        thenSaveAccess: 'Depois salve o acesso',
         sendNow: 'Envie agora.',
         sendNowBody:
             'Campanhas compartilhadas nos primeiros minutos são as que enchem. Quem abrir o link coloca a moldura na foto.',
@@ -485,11 +512,18 @@ const id: Messages = {
     create: {
         title: 'Pembuat kampanye',
         editTitle: 'Edit bingkaimu',
-        subtitle: 'Unggah bingkai, lalu bagikan satu link. Tidak perlu akun untuk membuat.',
+        subtitle: 'Unggah bingkai, beri nama, bagikan satu link. Tidak perlu akun.',
         editSubtitle: (name) => `Disimpan ke "${name}". Link dan pendukungmu tetap sama.`,
         yourFrame: 'Bingkaimu',
         yourFrameHint:
             'Unggah logo, lencana, atau desain bingkai. Lihat pratinjau langsung sambil membuka jendela untuk foto.',
+        artworkStep: '1. Desainmu',
+        artworkStepHint: 'Logo, lencana, atau PNG desain.',
+        photoWindowStep: '2. Jendela foto',
+        photoWindowStepHint: 'Kiri = lebih banyak bingkai. Kanan = lebih banyak foto.',
+        addText: 'Tambah teks',
+        optional: 'opsional',
+        fallback: 'cadangan',
         uploadFrame: 'Unggah logo atau bingkai',
         changeFrame: 'Ganti gambar bingkai',
         uploading: 'Mengunggah…',
@@ -509,8 +543,10 @@ const id: Messages = {
             'Seret foto ke lingkaran untuk melihat hasilnya. Cubit atau geser untuk menyesuaikan.',
     },
     publish: {
-        createTitle: 'Buat kampanye',
-        liveTitle: 'Kampanye sudah live',
+        createTitle: 'Beri nama',
+        liveTitle: 'Kirim',
+        nameItHint: 'Deskripsi, target, dan kategori ada di Kelola setelah kamu publikasikan.',
+        thenSaveAccess: 'Lalu simpan akses',
         sendNow: 'Kirim sekarang.',
         sendNowBody:
             'Kampanye yang dibagikan di menit-menit pertama yang paling cepat penuh. Siapa pun yang buka linkmu bisa pasang bingkai di fotonya.',

@@ -48,17 +48,18 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
     const setCutout = (value: number) => onChange({ ...frame, cutoutScale: value });
 
     return (
-        <div className="space-y-5 animate-fade-in">
-            <div>
-                <h2 className="font-display text-lg font-bold text-ink mb-1">{t.yourFrame}</h2>
-                <p className="text-muted text-xs">
-                    {t.yourFrameHint}
-                </p>
-            </div>
+        <div className="space-y-4 animate-fade-in">
+            {/* Step 1 — artwork. Kept separate from the photo window so the
+                builder reads Frame → Name → Send instead of one dense panel. */}
+            <div className="bg-cream border border-ink/10 rounded-3xl p-5 sm:p-6 space-y-4">
+                <div>
+                    <h2 className="font-display text-lg font-bold text-ink mb-1">{t.artworkStep}</h2>
+                    <p className="text-muted text-xs">{t.artworkStepHint}</p>
+                </div>
 
             {/* Large drop zone — the old 80px circle made the upload feel like a
                 side option. This is the product. */}
-            <label className={`block cursor-pointer rounded-2xl border-2 border-dashed transition-colors ${isCustom ? 'border-ink/15 bg-cream' : 'border-brand/50 bg-brand/5 hover:bg-brand/10'} ${uploading ? 'opacity-70 pointer-events-none' : ''}`}>
+            <label className={`block cursor-pointer rounded-2xl border-2 border-dashed transition-colors ${isCustom ? 'border-ink/15 bg-paper' : 'border-brand/50 bg-brand/5 hover:bg-brand/10'} ${uploading ? 'opacity-70 pointer-events-none' : ''}`}>
                 <input
                     type="file"
                     accept="image/png,image/webp,image/gif,image/jpeg"
@@ -91,8 +92,22 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
                 </p>
             )}
 
+            {!isCustom && (
+                <div className="p-3 bg-brand/10 rounded-xl border border-brand/20 flex gap-3 items-start">
+                    <AlertCircle className="text-brand-deep shrink-0 mt-0.5" size={16} />
+                    <p className="text-xs text-brand-deep">
+                        {t.tipLogo}
+                    </p>
+                </div>
+            )}
+            </div>
+
             {isCustom && (
-                <div className="p-4 bg-cream border border-ink/10 rounded-2xl space-y-3">
+                <div className="bg-cream border border-ink/10 rounded-3xl p-5 sm:p-6 space-y-3">
+                    <div>
+                        <h2 className="font-display text-lg font-bold text-ink mb-1">{t.photoWindowStep}</h2>
+                        <p className="text-muted text-xs">{t.photoWindowStepHint}</p>
+                    </div>
                     <div className="flex items-center justify-between">
                         <label className="text-sm font-medium text-ink">{t.photoWindow}</label>
                         <span className="text-xs text-muted">{Math.round(cutout * 100)}%</span>
@@ -107,18 +122,6 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
                         aria-label={t.photoWindow}
                         className="w-full h-8 accent-brand"
                     />
-                    <p className="text-xs text-muted">
-                        {t.photoWindowHint}
-                    </p>
-                </div>
-            )}
-
-            {!isCustom && (
-                <div className="p-3 bg-brand/10 rounded-xl border border-brand/20 flex gap-3 items-start">
-                    <AlertCircle className="text-brand-deep shrink-0 mt-0.5" size={16} />
-                    <p className="text-xs text-brand-deep">
-                        {t.tipLogo}
-                    </p>
                 </div>
             )}
         </div>

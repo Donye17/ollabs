@@ -2,10 +2,8 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Editor } from './Editor';
 import { FrameSelector } from './FrameSelector';
-import { FrameCustomizer } from './FrameCustomizer';
 import { CustomFramePanel } from './CustomFramePanel';
 import { CaptionControls } from './CaptionControls';
-import { ContactPreview } from './ContactPreview';
 import { NavBar } from '@/components/NavBar';
 import { DEFAULT_FRAME } from '@/lib/constants';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
@@ -47,24 +45,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     // alert(). On a phone an alert covers the whole page, and inside an in-app
     // browser it can be dismissed by a stray tap before it is read.
     const [notice, setNotice] = useState<string | null>(null);
-
-    const handleAutoMatch = async () => {
-        setNotice(null);
-        if (!editorRef.current) return;
-        try {
-            const colors = await editorRef.current.getDominantColors();
-            if (colors && colors.length >= 2) {
-                const newFrame = { ...selectedFrame, color1: colors[0], color2: colors[1] };
-                handleFrameUpdate(newFrame);
-            } else if (colors && colors.length === 1) {
-                const newFrame = { ...selectedFrame, color1: colors[0] };
-                handleFrameUpdate(newFrame);
-            }
-        } catch (e) {
-            console.error("Auto match failed", e);
-            setNotice("Could not read the colours in that photo. Pick a colour by hand instead.");
-        }
-    };
 
     const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(!!remixId);
@@ -179,8 +159,6 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
         setHistoryIndex(newHistory.length - 1);
     };
 
-    const handleUndo = () => historyIndex > 0 && setHistoryIndex(historyIndex - 1);
-    const handleRedo = () => historyIndex < history.length - 1 && setHistoryIndex(historyIndex + 1);
     const handlePresetSelect = (frame: FrameConfig) => addToHistory(frame);
     const handleFrameUpdate = (updatedFrame: FrameConfig) => addToHistory(updatedFrame);
     const handlePreviewUpdate = useCallback((dataUrl: string) => setPreviewDataUrl(dataUrl), []);
@@ -267,56 +245,34 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             </p>
                         </div>
 
-                        <div className="bg-cream border border-ink/10 p-5 sm:p-6 rounded-3xl space-y-6">
-                            <CustomFramePanel
-                                frame={selectedFrame}
-                                onChange={handleFrameUpdate}
-                            />
+                        <CustomFramePanel
+                            frame={selectedFrame}
+                            onChange={handleFrameUpdate}
+                        />
 
-                            <div className="pt-2 border-t border-ink/10">
+                        <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
+                            <summary className="flex items-center cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
+                                <span className="flex-1">{t.addText}</span>
+                                <span className="text-[11px] font-semibold text-muted normal-case tracking-normal mr-2">{t.optional}</span>
+                                <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180 shrink-0" />
+                            </summary>
+                            <div className="px-5 pb-5 border-t border-ink/10 pt-4">
                                 <CaptionControls frame={selectedFrame} onChange={handleFrameUpdate} />
                             </div>
-                        </div>
+                        </details>
 
                         {/* Premades are a fallback. Real organizers upload brand art;
                             leading with eight swatches made the product feel like a
                             sticker picker instead of a campaign tool. */}
                         <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
-                            <summary className="flex items-center justify-between cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
-                                <span>{t.simpleStyles}</span>
-                                <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180" />
+                            <summary className="flex items-center cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
+                                <span className="flex-1">{t.simpleStyles}</span>
+                                <span className="text-[11px] font-semibold text-muted normal-case tracking-normal mr-2">{t.fallback}</span>
+                                <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180 shrink-0" />
                             </summary>
                             <div className="px-5 pb-5 space-y-3 border-t border-ink/10 pt-4">
                                 <p className="text-xs text-muted">{t.simpleStylesHint}</p>
                                 <FrameSelector selectedFrameId={selectedFrame.id} onSelect={handlePresetSelect} />
-                            </div>
-                        </details>
-
-                        <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
-                            <summary className="flex items-center justify-between cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
-                                <span>{t.fineTune}</span>
-                                <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180" />
-                            </summary>
-                            <div className="px-5 pb-5 border-t border-ink/10 pt-4">
-                                <FrameCustomizer
-                                    frame={selectedFrame}
-                                    onChange={handleFrameUpdate}
-                                    onUndo={handleUndo}
-                                    onRedo={handleRedo}
-                                    canUndo={historyIndex > 0}
-                                    canRedo={historyIndex < history.length - 1}
-                                    onAutoMatch={handleAutoMatch}
-                                />
-                            </div>
-                        </details>
-
-                        <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
-                            <summary className="flex items-center justify-between cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
-                                <span>{t.previewContacts}</span>
-                                <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180" />
-                            </summary>
-                            <div className="px-5 pb-5 border-t border-ink/10 pt-4 flex flex-col items-center">
-                                <ContactPreview previewSrc={previewDataUrl} />
                             </div>
                         </details>
 

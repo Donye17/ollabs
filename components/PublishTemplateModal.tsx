@@ -6,7 +6,6 @@ import { upload } from '@vercel/blob/client';
 import { FramePreview } from './FramePreview';
 import { QRCode } from './QRCode';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from './ShareGlyphs';
-import { CATEGORIES } from '@/lib/categories';
 import { track, withUtm } from '@/lib/analytics';
 import { organizerShareText, whatsappUrl } from '@/lib/share';
 import { useLocale } from '@/components/i18n/LocaleProvider';
@@ -60,9 +59,6 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     }, [isOpen]);
 
     const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [goal, setGoal] = useState('');
-    const [category, setCategory] = useState('');
     const [organizerEmail, setOrganizerEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     // Shown above the button that failed. An alert() here was particularly bad:
@@ -143,9 +139,6 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
     const resetForm = useCallback(() => {
         setTitle('');
-        setDescription('');
-        setGoal('');
-        setCategory('');
         setOrganizerEmail('');
         setCampaignUrl(null);
         setManageUrl(null);
@@ -336,7 +329,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             const res = await fetch('/api/campaigns', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description, frameConfig: config, previewUrl, goal: goal || null, category: category || null, organizerEmail: organizerEmail || null, daySlug })
+                body: JSON.stringify({ title, frameConfig: config, previewUrl, organizerEmail: organizerEmail || null, daySlug })
             });
 
             if (res.ok) {
@@ -355,7 +348,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 if (organizerEmail.trim() || sessionEmail) {
                     setLinkSaved(true);
                 }
-                track('campaign_created', { campaign: campaign.slug, category: category || 'none', day: daySlug || 'none' });
+                track('campaign_created', { campaign: campaign.slug, day: daySlug || 'none' });
 
                 // Remember this campaign on the device so the owner can find it again.
                 try {
@@ -508,7 +501,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             <div
                 role="dialog"
                 aria-modal="true"
-                aria-label={campaignUrl ? 'Campaign is live' : 'Create a campaign'}
+                aria-label={campaignUrl ? tp.liveTitle : tp.createTitle}
                 className="bg-paper border border-ink/10 rounded-3xl w-full max-w-md max-h-[92dvh] overflow-y-auto overscroll-contain shadow-2xl scale-100 animate-in zoom-in-95 duration-200"
             >
 
@@ -528,17 +521,12 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                     </div>
 
                     {campaignUrl ? (
-                        /* Success: shareable link */
+                        /* Success: share first, save access second — Frame → Name → Send */
                         <div className="space-y-4">
-                            <div className="text-center">
-                                <p className="font-display text-lg font-extrabold leading-tight">{tp.sendNow}</p>
-                                <p className="text-sm text-ink/70 mt-1">
-                                    {tp.sendNowBody}
-                                </p>
-                            </div>
+                            <p className="text-sm text-ink/70 text-center">
+                                {tp.sendNowBody}
+                            </p>
 
-                            {/* Primary action. One tap into WhatsApp with the message already
-                                written, because that is where these links actually get sent. */}
                             <button
                                 onClick={shareWhatsApp}
                                 className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all shadow-sm"
@@ -550,7 +538,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             {canNativeShare && (
                                 <button
                                     onClick={shareNative}
-                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 active:brightness-110 transition-all"
+                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
                                 >
                                     <Share2 size={18} /> {tp.shareAnother}
                                 </button>
@@ -568,15 +556,15 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     href={campaignUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex-1 min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
+                                    className="flex-1 min-h-[44px] py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
                                 >
-                                    <ExternalLink size={18} /> {tp.open}
+                                    <ExternalLink size={15} /> {tp.open}
                                 </a>
                                 <button
                                     onClick={() => setShowQR((v) => !v)}
-                                    className="min-h-[48px] py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
+                                    className="min-h-[44px] py-2.5 px-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
                                 >
-                                    <QrCode size={18} /> QR
+                                    <QrCode size={15} /> QR
                                 </button>
                             </div>
 
@@ -587,9 +575,9 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 </div>
                             )}
 
-                            {/* Account. Skipped entirely for someone already signed in.
-                                Placed right after WhatsApp: share first (the campaign
-                                dies without it), then save access before they leave. */}
+                            <div className="border-t border-ink/10 pt-4 space-y-3">
+                                <p className="text-sm font-bold text-ink">{tp.thenSaveAccess}</p>
+
                             {onAccount ? (
                                 <div className="bg-brand/10 border border-brand/30 rounded-xl p-4 flex items-start gap-2.5">
                                     <Check size={16} className="text-brand-deep mt-0.5 shrink-0" />
@@ -668,13 +656,24 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                             >
                                                 {accountStep === 'sending' ? <><Loader2 size={15} className="animate-spin" /> …</> : tp.emailCode}
                                             </button>
-                                            <button
-                                                type="button"
-                                                onClick={skipAccountForNow}
-                                                className="w-full text-[11px] text-muted hover:text-ink transition-colors py-1"
-                                            >
-                                                {tp.skipForNow}
-                                            </button>
+                                            {manageUrl && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleCopyManage}
+                                                    className="w-full min-h-[44px] py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
+                                                >
+                                                    {manageCopied ? <><Check size={15} className="text-brand-deep" /> Copied</> : <><Copy size={15} /> {tp.skipForNow}</>}
+                                                </button>
+                                            )}
+                                            {!manageUrl && (
+                                                <button
+                                                    type="button"
+                                                    onClick={skipAccountForNow}
+                                                    className="w-full text-[11px] text-muted hover:text-ink transition-colors py-1"
+                                                >
+                                                    {tp.skipForNow}
+                                                </button>
+                                            )}
                                         </>
                                     )}
                                 </div>
@@ -716,14 +715,16 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     </p>
                                 </div>
                             )}
+                            </div>
                         </div>
                     ) : (
-                        /* Form */
+                        /* Name it — title + email only; the rest waits on Manage */
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">{tp.campaignTitle}</label>
+                                <label className="text-xs font-bold text-muted uppercase tracking-wider">{tp.campaignTitle}</label>
                                 <input
                                     type="text"
+                                    autoFocus
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
                                     placeholder="Support Team USA"
@@ -731,72 +732,32 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">{tp.description}</label>
-                                <textarea
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    placeholder="What's this campaign for?"
-                                    className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all min-h-[80px] resize-none"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">{tp.goal}</label>
-                                    <input
-                                        type="number"
-                                        min={1}
-                                        inputMode="numeric"
-                                        value={goal}
-                                        onChange={(e) => setGoal(e.target.value)}
-                                        placeholder="e.g. 1000"
-                                        className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">{tp.category}</label>
-                                    <select
-                                        value={category}
-                                        onChange={(e) => setCategory(e.target.value)}
-                                        className="w-full bg-cream border border-ink/10 rounded-xl px-3 py-3 text-ink focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
-                                    >
-                                        <option value="">None</option>
-                                        {CATEGORIES.map((c) => (
-                                            <option key={c.key} value={c.key}>{c.label}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <p className="text-[11px] text-muted">A goal shows a progress bar; a category helps people find you on Explore.</p>
-
                             {onAccount ? (
                                 <div className="bg-brand/10 border border-brand/30 rounded-xl p-3 flex items-start gap-2.5">
                                     <Check size={15} className="text-brand-deep mt-0.5 shrink-0" />
                                     <p className="text-[11px] text-ink/80">
-                                        Signed in as <span className="font-semibold">{sessionEmail}</span>. This campaign goes
-                                        straight onto your account.
+                                        {tp.signedInAs(sessionEmail!)}
                                     </p>
                                 </div>
                             ) : (
-                                <div className="space-y-2 pt-1">
+                                <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted uppercase tracking-wider">
                                         {tp.emailBack}
                                     </label>
                                     <input
                                         type="email"
                                         autoComplete="email"
-                                        autoFocus
                                         value={organizerEmail}
                                         onChange={(e) => setOrganizerEmail(e.target.value)}
                                         placeholder="you@organization.org"
                                         className="w-full bg-cream border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
                                     />
-                                    <p className="text-[11px] text-muted">
-                                        {tp.emailBackHint}
-                                    </p>
                                 </div>
                             )}
+
+                            <p className="text-[11px] text-muted leading-relaxed">
+                                {tp.nameItHint}
+                            </p>
                         </div>
                     )}
                 </div>
