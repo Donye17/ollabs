@@ -12,13 +12,16 @@ const inter = Inter({
     subsets: ['latin'],
     variable: '--font-inter',
     display: 'swap',
+    adjustFontFallback: true,
+    preload: true,
 });
 
 const bricolage = Bricolage_Grotesque({
     subsets: ['latin'],
-    weight: ['400', '600', '700', '800'],
+    weight: ['700', '800'],
     variable: '--font-display',
     display: 'swap',
+    adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -149,8 +152,8 @@ export default function RootLayout({
                 </LocaleProvider>
                 {GA_ID && (
                     <>
-                        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
-                        <Script id="google-analytics" strategy="afterInteractive">
+                        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="lazyOnload" />
+                        <Script id="google-analytics" strategy="lazyOnload">
                             {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());

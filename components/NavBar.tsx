@@ -11,6 +11,8 @@ export const NavBar: React.FC = () => {
                     <img
                         src="/Ollabs Logo Black.png"
                         alt="Ollabs"
+                        width={105}
+                        height={28}
                         className="h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                     />
                 </Link>

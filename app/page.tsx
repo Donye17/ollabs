@@ -1,43 +1,18 @@
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { ArrowRight, Palette, Link2, Users, Check } from "lucide-react";
 import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
-import { FAQSection } from "@/components/landing/FAQSection";
-import { HomeExamples, HomeCampaign } from "@/components/HomeExamples";
-import { CalendarStrip, StripItem } from "@/components/home/CalendarStrip";
-import { calendarWindow, formatOccurrence, countdownLabel, calendarDateParts, resolveFrame } from "@/lib/days";
-import { getFrameOverrides } from "@/lib/dayFrames";
-import { FrameConfig } from "@/lib/types";
-import { pool } from "@/lib/neon";
-import { visibleFrameSql, HOME_SHOWCASE_LIMIT } from "@/lib/frameValidity";
+import { ExamplesSkeleton } from "@/components/home/ExamplesSkeleton";
+import { HomeExamplesSection } from "@/components/home/HomeExamplesSection";
+import { HomeCalendarSection } from "@/components/home/HomeCalendarSection";
 
 export const revalidate = 600;
 
-async function getExampleCampaigns(): Promise<HomeCampaign[]> {
-    try {
-        // Feeds the spotlight carousel, newest first, so the row always opens on the most
-        // recent campaign and the page looks alive. The frame has to actually render
-        // something, which is what keeps half-finished campaigns out of the showcase.
-        const res = await pool.query(
-            `SELECT c.slug, c.title, c.frame_config, c.supporter_count
-             FROM campaigns c
-             WHERE c.is_public = true
-               AND c.is_hidden IS NOT TRUE
-               AND ${visibleFrameSql('c')}
-             ORDER BY c.created_at DESC
-             LIMIT $1`,
-            [HOME_SHOWCASE_LIMIT]
-        );
-        return res.rows.map((r) => ({
-            slug: r.slug,
-            title: r.title,
-            supporterCount: r.supporter_count ?? 0,
-            frame: (typeof r.frame_config === 'string' ? JSON.parse(r.frame_config) : r.frame_config) as FrameConfig,
-        }));
-    } catch (e) {
-        console.error('Failed to load example campaigns', e);
-        return [];
-    }
-}
+const FAQSection = dynamic(
+    () => import("@/components/landing/FAQSection").then((m) => ({ default: m.FAQSection })),
+    { loading: () => <div className="h-80 bg-paper2/50" aria-hidden /> }
+);
 
 const steps = [
     { icon: Palette, title: "Make a frame", body: "Pick a clean style or upload your own design: a logo, colors, a slogan." },
@@ -63,33 +38,14 @@ const reasons = [
     "Works on any phone",
 ];
 
-export default async function Home() {
-    const [examples, frameOverrides] = await Promise.all([
-        getExampleCampaigns(),
-        getFrameOverrides(),
-    ]);
-
-    // Timeline of awareness days around today.
-    const calendarItems: StripItem[] = calendarWindow().map(({ day, occ, past }) => {
-        const parts = calendarDateParts(day, occ);
-        return {
-            slug: day.slug,
-            name: day.name,
-            dateTop: parts.top,
-            dateMain: parts.main,
-            countdown: past ? formatOccurrence(day, occ) : countdownLabel(occ),
-            past,
-            frame: resolveFrame(day, frameOverrides.get(day.slug)),
-        };
-    });
-
+export default function Home() {
     return (
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
 
-            {/* Hero */}
+            {/* Hero streams immediately. DB-backed sections sit in Suspense so Neon
+                latency does not block LCP on the headline and subcopy. */}
             <section className="relative pt-32 pb-16 px-6 overflow-hidden">
-                {/* Decorative rings, brand motif */}
                 <div className="absolute -top-24 -right-24 w-[380px] h-[380px] rounded-full border-[42px] border-brand/15 pointer-events-none" />
                 <div className="absolute top-28 right-24 w-16 h-16 rounded-full bg-coral/80 pointer-events-none hidden sm:block" />
 
@@ -108,43 +64,26 @@ export default async function Home() {
                             Create a campaign
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
-                        {examples.length > 0 && (
-                            <a href="#examples" className="h-12 px-7 rounded-xl bg-transparent border border-ink/15 text-ink font-bold flex items-center hover:bg-ink/5 transition-all">
-                                See examples
-                            </a>
-                        )}
+                        <a href="#examples" className="h-12 px-7 rounded-xl bg-transparent border border-ink/15 text-ink font-bold flex items-center hover:bg-ink/5 transition-all">
+                            See examples
+                        </a>
                     </div>
                 </div>
 
-                {examples.length > 0 && (
+                <Suspense fallback={
                     <div id="examples" className="mt-20 relative z-10 scroll-mt-24">
                         <p className="text-center text-xs uppercase tracking-[0.2em] text-muted font-bold mb-4">Live campaigns</p>
-                        {/* -mx-6 cancels the section's px-6 so the track runs edge to edge and
-                            the cards carry off both sides of the screen. */}
-                        <div className="-mx-6">
-                            <HomeExamples campaigns={examples} />
-                        </div>
+                        <ExamplesSkeleton />
                     </div>
-                )}
+                }>
+                    <HomeExamplesSection />
+                </Suspense>
             </section>
 
-            {/* Calendar */}
-            {calendarItems.length > 0 && (
-                <section className="py-16 overflow-hidden">
-                    <div className="max-w-4xl mx-auto px-6 text-center mb-10">
-                        <h2 className="font-display text-3xl md:text-4xl font-extrabold mb-3">What is coming up</h2>
-                        <p className="text-ink/70">
-                            Days worth marking, with a frame ready for each one. Pick a day, use the frame, or run it as
-                            your own campaign.
-                        </p>
-                    </div>
-                    <div className="max-w-6xl mx-auto">
-                        <CalendarStrip items={calendarItems} />
-                    </div>
-                </section>
-            )}
+            <Suspense fallback={<div className="h-[360px]" aria-hidden />}>
+                <HomeCalendarSection />
+            </Suspense>
 
-            {/* How it works */}
             <section className="px-6 py-20">
                 <div className="max-w-5xl mx-auto">
                     <h2 className="font-display text-3xl md:text-4xl font-extrabold text-center mb-14">How it works</h2>
@@ -163,7 +102,6 @@ export default async function Home() {
                 </div>
             </section>
 
-            {/* Made for */}
             <section className="px-6 py-14">
                 <div className="max-w-4xl mx-auto text-center">
                     <p className="text-xs uppercase tracking-[0.2em] text-muted font-bold mb-6">Made for</p>
@@ -178,7 +116,6 @@ export default async function Home() {
                 </div>
             </section>
 
-            {/* Why Ollabs */}
             <section className="px-6 py-20">
                 <div className="max-w-3xl mx-auto">
                     <h2 className="font-display text-3xl md:text-4xl font-extrabold text-center mb-4">Why Ollabs</h2>
@@ -196,10 +133,8 @@ export default async function Home() {
                 </div>
             </section>
 
-            {/* FAQ */}
             <FAQSection />
 
-            {/* Final CTA */}
             <section className="px-6 py-24">
                 <div className="max-w-3xl mx-auto text-center relative">
                     <div className="relative bg-ink text-paper rounded-3xl px-8 py-16 overflow-hidden">
@@ -214,12 +149,11 @@ export default async function Home() {
                 </div>
             </section>
 
-            {/* Footer */}
             <footer className="border-t border-ink/10 py-16 bg-paper">
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col md:flex-row items-start justify-between gap-12 mb-12">
                         <div className="max-w-xs">
-                            <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-7 w-auto mb-4" />
+                            <img src="/Ollabs Logo Black.png" alt="Ollabs" width={105} height={28} className="h-7 w-auto mb-4" />
                             <p className="text-muted text-sm leading-relaxed">
                                 The fast way to run a profile-picture campaign. Ollabs is a play on collabs, because coming together is the whole point.
                             </p>

@@ -66,6 +66,7 @@ export const CalendarStrip: React.FC<{ items: StripItem[] }> = ({ items }) => {
             <div className="p-4">
                 <FramePreview
                     frame={i.frame}
+                    size={272}
                     className="w-[136px] h-[136px] rounded-full mx-auto mb-3"
                 />
                 <p className="font-display font-bold text-sm leading-snug text-center line-clamp-2 mb-1">
