@@ -11,13 +11,11 @@ link. Supporters open that link, drop in a photo, and download the framed result
 
 ## Where things stand (2026-08-21)
 
-**On `main`:** mobile Step 3, phone shell, custom-frame-first create (Phases 1–2),
-organizer save nudge + slug 301s (Phase 3, migration `0012`).
+**On `main`:** Phases 1–5. Mobile shell, custom-frame create, organizer save + slug
+301s, quiet ads, and PT-BR (`/pt` landing + locale cookie + campaign/create chrome).
 
-**Phase 4 (this pass):** AdSense loads only when an AdSlot mounts; campaign vs SEO
-slot IDs; second quiet unit on long `/for` and `/day` pages; homepage/FAQ copy
-matches reality (never pay / never watermark / never ad on the photo). Lawyer gate
-still applies before denser ads on Brazilian electoral campaign pages.
+Lawyer gate still applies before denser ads on Brazilian electoral campaign pages.
+Next: Phase 6 organizer hubs, or Phase 7 Bahasa after more PT `/for` pages.
 
 **Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
 “Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page
