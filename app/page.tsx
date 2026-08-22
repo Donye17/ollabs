@@ -64,15 +64,15 @@ export default function Home() {
                             Create a campaign
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
-                        <a href="#examples" className="h-12 px-7 rounded-xl bg-transparent border border-ink/15 text-ink font-bold flex items-center hover:bg-ink/5 transition-all">
-                            See examples
-                        </a>
+                        <Link href="/explore" className="h-12 px-7 rounded-xl bg-transparent border border-ink/15 text-ink font-bold flex items-center hover:bg-ink/5 transition-all">
+                            Explore campaigns
+                        </Link>
                     </div>
                 </div>
 
                 <Suspense fallback={
-                    <div id="examples" className="mt-20 relative z-10 scroll-mt-24">
-                        <p className="text-center text-xs uppercase tracking-[0.2em] text-muted font-bold mb-4">Live campaigns</p>
+                    <div className="mt-16 sm:mt-20 relative z-10">
+                        <p className="text-center text-xs uppercase tracking-[0.2em] text-muted font-bold mb-8">Top campaigns</p>
                         <ExamplesSkeleton />
                     </div>
                 }>

@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-22-home-podium',
+        date: '2026-08-22',
+        title: 'Home shows the top three campaigns',
+        summary: 'Real traction up front, not a scrolling reel of everything new.',
+        items: [
+            'Hero Explore campaigns opens the full explore page.',
+            'Home podium ranks the top three live campaigns by supporters, with first place in the middle.',
+            'Explore all campaigns sits under the podium when you want more.',
+        ],
+    },
+    {
         id: '2026-08-22-organizer-growth',
         date: '2026-08-22',
         title: 'Organizer tools and more languages',

@@ -61,15 +61,18 @@ export function visibleFrameSql(alias = 'c'): string {
 }
 
 /**
- * How many campaigns feed the home showcase carousel. A spotlight row needs enough
- * cards to actually run off both edges of the screen, so this is deliberately well
- * above the number of campaigns with real traction.
+ * How many campaigns sit on the home podium. Fixed at three so the layout
+ * reads as 2nd / 1st / 3rd without a sliding carousel.
  */
-export const HOME_SHOWCASE_LIMIT = 16;
+export const HOME_TOP_CAMPAIGNS = 3;
+
+/** @deprecated Prefer HOME_TOP_CAMPAIGNS. Kept briefly for any stray imports. */
+export const HOME_SHOWCASE_LIMIT = HOME_TOP_CAMPAIGNS;
 
 /**
  * Supporter count is only worth showing once it means something. Below this we render
  * no count at all rather than "0 supporting", which reads as dead on a brand new
- * campaign and makes the whole row look abandoned.
+ * campaign and makes the whole row look abandoned. Home podium also uses this as
+ * the floor so empty campaigns never take a place.
  */
 export const MIN_SUPPORTERS_TO_DISPLAY = 5;

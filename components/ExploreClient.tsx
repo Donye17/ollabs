@@ -13,8 +13,8 @@ export interface ExploreCampaign {
 }
 
 // Explore loads up to 60 campaigns and used to mount a live canvas for every
-// one of them on first paint. HomeExamples already caps its drawing surfaces
-// with RENDER_WINDOW for exactly this reason; this is the grid equivalent.
+// one of them on first paint. Cap drawing surfaces for the same reason the
+// home podium only mounts three frames:
 //
 // Two caps, because a grid has no spotlight to measure distance from:
 //   1. Only the first screenful draws immediately. Everything else waits until
