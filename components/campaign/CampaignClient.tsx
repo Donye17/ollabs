@@ -393,6 +393,11 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     </p>
                 )}
 
+                {/* Before save: one unit under the canvas / fit controls, above the
+                    sticky Download bar. Never on the photo itself. Hidden once they
+                    save so the post-download pair does not stack three deep. */}
+                {!justDownloaded && <AdSlot surface="campaign" className="w-full mt-1" />}
+
                 <input ref={fileRef} type="file" accept="image/*" className="hidden"
                     onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
 
@@ -482,6 +487,10 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                             </div>
                         )}
 
+                        {/* Mid-stack after Share: the before-save unit unmounts here, so
+                            this is the first post-download impression in view. */}
+                        {justDownloaded && <AdSlot surface="campaign" className="mt-1" />}
+
                         {justDownloaded && (
                             <div className="w-full bg-brand/10 border border-brand/40 rounded-2xl p-4 text-center space-y-3 animate-fade-in">
                                 <div>
@@ -539,11 +548,8 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
 
                 <a href="/create" className="text-xs text-muted hover:text-brand-deep transition-colors mt-1">{t.makeOwnFooter}</a>
 
-                {/* The only ad on this page, and it does not exist until the job is
-                    done. Nobody sees it while they are uploading a photo, adjusting
-                    the fit, or reaching for Download. Rendering it conditionally
-                    rather than hiding it with CSS means there is no ad request at
-                    all during the part of the flow that converts. */}
+                {/* Second unit for people who keep scrolling (count / report). Same
+                    rules: post-download only, labelled, in-flow, never on the photo. */}
                 {justDownloaded && <AdSlot surface="campaign" className="mt-4" />}
 
                 {reportDone ? (

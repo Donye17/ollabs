@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ollabs — Campaign builder + live ads review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#01BEF6; --blue-deep:#0288B8; --blue-wash:#E4F7FE;
+    --ink:#06141F; --paper:#F4F1EA; --paper2:#EAE6DC; --cream:#FDFCF9;
+    --coral:#FF5C39; --amber:#FFC24B; --muted:#726C5F; --line:rgba(6,20,31,.12);
+    --wa:#25D366;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:32px 20px 100px}
+  .kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(26px,4vw,40px);line-height:1.05;letter-spacing:-.03em;margin:.3em 0 .35em}
+  .lede{max-width:70ch;color:#3a382f;font-size:15px;line-height:1.55;margin:0 0 18px}
+
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:20px;
+    padding:12px;background:var(--cream);border:1px solid var(--line);border-radius:16px;
+  }
+  .toolbar .hint{flex:1;min-width:200px;font-size:13px;color:var(--muted);line-height:1.4}
+  .toolbar button,.panel-actions button{
+    border:1px solid var(--line);background:var(--paper);border-radius:10px;
+    padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer;color:var(--ink);
+  }
+  .toolbar button.primary,.panel-actions button.primary{background:var(--blue);border-color:transparent}
+  .toolbar button.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .toolbar button.danger{color:var(--coral)}
+
+  .steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .step{
+    border:1px solid var(--line);background:var(--cream);border-radius:999px;
+    padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);
+  }
+  .step[aria-pressed="true"]{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .step.live{border-color:rgba(1,190,246,.45)}
+
+  .layout{display:grid;grid-template-columns:1fr 1fr minmax(280px,340px);gap:22px;align-items:start}
+  @media(max-width:1100px){.layout{grid-template-columns:1fr 1fr}}
+  @media(max-width:860px){.layout{grid-template-columns:1fr}}
+
+  .col h2{font-family:"Bricolage Grotesque",sans-serif;font-size:18px;margin:0 0 4px}
+  .col .sub{font-size:13px;color:var(--muted);margin:0 0 14px;min-height:2.6em}
+
+  .phone-wrap{position:relative;width:min(100%,340px);margin:0 auto}
+  .phone{background:#1a1a1a;border-radius:36px;padding:10px;border:1px solid #000}
+  .screen{
+    background:var(--paper);border-radius:28px;overflow:hidden;height:700px;
+    display:flex;flex-direction:column;position:relative;
+  }
+  .phone-wrap.comment-mode .screen{cursor:crosshair;outline:2px dashed var(--coral);outline-offset:2px}
+  .phone-wrap.comment-mode .screen::after{
+    content:"Click to pin a comment";position:absolute;top:8px;left:50%;transform:translateX(-50%);
+    z-index:40;background:var(--ink);color:var(--cream);font-size:10px;font-weight:700;
+    padding:4px 8px;border-radius:999px;pointer-events:none;
+  }
+
+  .pin{
+    position:absolute;z-index:30;width:26px;height:26px;border-radius:50%;
+    background:var(--coral);color:#fff;border:2px solid #fff;
+    font-size:11px;font-weight:800;display:grid;place-items:center;
+    transform:translate(-50%,-50%);cursor:pointer;
+  }
+  .pin:hover,.pin.sel{background:var(--ink)}
+
+  .nav{
+    height:44px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 14px;border-bottom:1px solid var(--line);background:rgba(244,241,234,.92);
+    font-size:11px;font-weight:800;letter-spacing:.04em;flex-shrink:0;
+  }
+  .nav .logo{display:flex;align-items:center;gap:6px}
+  .nav .o{width:12px;height:12px;border:3px solid var(--blue);border-radius:50%}
+  .create-btn{background:var(--blue);border:0;border-radius:10px;padding:6px 10px;font-weight:800;font-size:11px}
+
+  .scroll{flex:1;overflow-y:auto;padding:12px 12px 88px;display:flex;flex-direction:column;gap:10px}
+  .body{flex:1;overflow:hidden;padding:12px 12px 72px;display:flex;flex-direction:column;gap:10px}
+
+  .canvas{
+    align-self:center;width:152px;height:152px;border-radius:50%;
+    background:var(--paper2);border:16px solid var(--blue);flex-shrink:0;position:relative;
+  }
+  .canvas.empty{border-width:2px;border-style:dashed;border-color:rgba(1,190,246,.55);background:var(--blue-wash)}
+  .canvas .hint{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-size:10px;font-weight:700;color:var(--blue-deep);padding:16px}
+  .canvas .face{position:absolute;inset:18px;border-radius:50%;background:linear-gradient(160deg,#d4c4b0,#b89a7a)}
+
+  .card{background:var(--cream);border:1px solid var(--line);border-radius:16px;padding:12px}
+  .card h3{margin:0 0 4px;font-size:13px;font-family:"Bricolage Grotesque",sans-serif}
+  .muted{font-size:11px;color:var(--muted);line-height:1.4}
+  .drop{
+    border:2px dashed rgba(1,190,246,.55);background:var(--blue-wash);border-radius:14px;
+    padding:16px 8px;text-align:center;font-size:12px;font-weight:800;margin-top:8px;
+  }
+  .drop.done{border-style:solid;border-color:var(--line);background:var(--paper)}
+  .slider{height:6px;background:var(--paper2);border-radius:99px;margin-top:10px;position:relative}
+  .slider i{position:absolute;left:58%;top:-5px;width:16px;height:16px;border-radius:50%;background:var(--blue);border:2px solid var(--ink)}
+  .details{border:1px solid var(--line);background:var(--cream);border-radius:14px;padding:10px 12px;font-size:12px;font-weight:800;display:flex;justify-content:space-between}
+  .details span{color:var(--muted);font-weight:600}
+  .toolbar-row{display:flex;gap:6px}
+  .toolbar-row b{flex:1;background:var(--blue);border-radius:10px;padding:8px;font-size:10px;text-align:center;font-weight:800}
+  .toolbar-row i{flex:1;background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:8px;font-size:10px;text-align:center;font-style:normal;font-weight:700}
+  .bar{position:absolute;left:0;right:0;bottom:0;padding:10px 12px 14px;background:rgba(244,241,234,.95);border-top:1px solid var(--line);z-index:5}
+  .bar button,.cta{width:100%;border:0;border-radius:12px;background:var(--blue);color:var(--ink);font-weight:800;padding:13px;font-size:14px;cursor:pointer}
+  .bar .pair{display:flex;gap:8px}
+  .bar .pair button{flex:1}
+  .cta.wa{background:var(--wa);color:#fff}
+  .cta.ghost{background:var(--cream);border:1px solid var(--line)}
+  .cta.ink{background:var(--ink);color:var(--cream)}
+  .modal{position:absolute;inset:0;background:rgba(6,20,31,.55);display:flex;align-items:flex-end}
+  .sheet{width:100%;background:var(--paper);border-radius:22px 22px 0 0;padding:16px 16px 22px;max-height:92%;overflow:auto}
+  .sheet h3{font-family:"Bricolage Grotesque",sans-serif;margin:0 0 12px;font-size:18px}
+  label{display:block;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 0 5px}
+  input,select,textarea{width:100%;border:1px solid var(--line);background:var(--cream);border-radius:10px;padding:10px 12px;font:inherit;font-size:13px}
+  .preview-mini{width:72px;height:72px;border-radius:50%;border:10px solid var(--blue);background:var(--paper2);margin:0 auto 12px}
+
+  /* Matches components/AdSlot.tsx */
+  .ad-slot{width:100%;margin-top:4px}
+  .ad-slot .ad-label{
+    font-size:10px;text-transform:uppercase;letter-spacing:.15em;
+    color:rgba(114,108,95,.6);text-align:center;margin:0 0 6px;font-weight:600;
+  }
+  .ad-slot .ad-box{
+    min-height:100px;border-radius:12px;overflow:hidden;
+    background:var(--cream);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;
+  }
+  .ad-slot .ad-box .sq{width:56px;height:56px;border-radius:10px;background:var(--paper2);flex-shrink:0}
+  .ad-slot .ad-box .lines{flex:1;min-width:0}
+  .ad-slot .ad-box .lines b{display:block;height:10px;background:var(--paper2);border-radius:4px;margin-bottom:6px;width:78%}
+  .ad-slot .ad-box .lines b:nth-child(2){width:55%}
+  .ad-slot .ad-box .lines b:nth-child(3){width:40%;margin-bottom:0;background:rgba(1,190,246,.35)}
+  .ad-note{font-size:10px;color:var(--muted);text-align:center;margin-top:4px;line-height:1.35}
+
+  .camp-title{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:18px;text-align:center;margin:4px 0 0;line-height:1.15}
+  .camp-eye{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:center}
+  .count-card{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .count-card .n{font-family:"Bricolage Grotesque",sans-serif;font-size:22px;font-weight:800}
+  .own{background:rgba(1,190,246,.1);border:1px solid rgba(1,190,246,.4);border-radius:16px;padding:12px;text-align:center}
+  .own p{margin:0 0 8px;font-size:11px;color:rgba(6,20,31,.7);line-height:1.4}
+  .own .t{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:15px;color:var(--ink);margin-bottom:4px}
+  .row2{display:flex;gap:8px}
+  .row2 button{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--cream);font-weight:700;font-size:12px;cursor:pointer}
+
+  .panel{
+    background:var(--cream);border:1px solid var(--line);border-radius:18px;padding:14px;
+    position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;
+  }
+  @media(max-width:1100px){.panel{position:static;max-height:none}}
+  .panel h2{font-family:"Bricolage Grotesque",sans-serif;font-size:16px;margin:0 0 4px}
+  .panel .count{font-size:12px;color:var(--muted);margin-bottom:12px}
+  .panel-actions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .clist{display:flex;flex-direction:column;gap:8px}
+  .citem{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:10px;cursor:pointer}
+  .citem.sel{border-color:var(--coral);background:#fff6f3}
+  .citem .meta{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .citem .body{font-size:13px;line-height:1.4;white-space:pre-wrap}
+  .citem .row{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+  .citem .row button{font-size:11px;font-weight:700;border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 4px}
+  .empty{font-size:13px;color:var(--muted);line-height:1.45;padding:8px 2px}
+
+  .composer{position:fixed;inset:0;background:rgba(6,20,31,.45);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+  .composer.hidden{display:none}
+  .composer-card{width:min(100%,420px);background:var(--paper);border-radius:18px;border:1px solid var(--line);padding:16px}
+  .composer-card h3{font-family:"Bricolage Grotesque",sans-serif;margin:0 0 6px;font-size:18px}
+  .composer-card .meta{font-size:12px;color:var(--muted);margin-bottom:10px}
+  .composer-card textarea{min-height:110px;resize:vertical}
+  .composer-actions{display:flex;gap:8px;margin-top:12px}
+  .composer-actions button{flex:1;border-radius:12px;padding:12px;font-weight:800;font-size:13px;cursor:pointer;border:1px solid var(--line);background:var(--cream)}
+  .composer-actions .save{background:var(--blue);border-color:transparent}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:120;background:var(--ink);color:var(--cream);padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">Interactive review · pin comments · ads match live AdSlot</p>
+  <h1>Builder + live campaign ads</h1>
+  <p class="lede">
+    Steps 1–3 compare today vs proposed create flow. Step 4 is the supporter page when a campaign is live —
+    quiet ads on every <code>/c</code> campaign: one before Save (under the canvas), two after Save — labelled, in-flow, never on the photo.
+  </p>
+
+  <div class="toolbar">
+    <button type="button" id="btn-comment" class="primary">Pin comment</button>
+    <button type="button" id="btn-copy">Copy for Cursor</button>
+    <button type="button" id="btn-download">Download feedback.md</button>
+    <button type="button" id="btn-clear" class="danger">Clear all</button>
+    <p class="hint" id="mode-hint">Browse mode — use the step pills. Open <b>4. Live /c</b> for ad placement.</p>
+  </div>
+
+  <div class="steps" role="tablist">
+    <button class="step" data-step="frame" aria-pressed="true">1. Frame</button>
+    <button class="step" data-step="name" aria-pressed="false">2. Name</button>
+    <button class="step" data-step="send" aria-pressed="false">3. Send</button>
+    <button class="step live" data-step="live" aria-pressed="false">4. Live /c · ads</button>
+  </div>
+
+  <div class="layout">
+    <div class="col">
+      <h2 id="left-title">Today</h2>
+      <p class="sub" id="today-sub"></p>
+      <div class="phone-wrap" data-side="today" id="wrap-today">
+        <div class="phone"><div class="screen" id="today"></div></div>
+      </div>
+    </div>
+    <div class="col">
+      <h2 id="right-title">Proposed</h2>
+      <p class="sub" id="prop-sub"></p>
+      <div class="phone-wrap" data-side="proposed" id="wrap-proposed">
+        <div class="phone"><div class="screen" id="proposed"></div></div>
+      </div>
+    </div>
+    <aside class="panel">
+      <h2>Comments</h2>
+      <p class="count" id="comment-count">0 notes</p>
+      <div class="panel-actions">
+        <button type="button" id="btn-copy-2" class="primary">Copy for Cursor</button>
+      </div>
+      <div class="clist" id="clist"></div>
+    </aside>
+  </div>
+</div>
+
+<div class="composer hidden" id="composer" role="dialog" aria-modal="true">
+  <div class="composer-card">
+    <h3 id="composer-title">Add comment</h3>
+    <p class="meta" id="composer-meta"></p>
+    <textarea id="composer-text" placeholder="What should change?"></textarea>
+    <div class="composer-actions">
+      <button type="button" id="composer-cancel">Cancel</button>
+      <button type="button" class="save" id="composer-save">Save</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = "ollabs_builder_review_v1";
+const nav = `<div class="nav"><span class="logo"><span class="o"></span> Ollabs</span><span class="create-btn">Create</span></div>`;
+
+/** Same chrome as components/AdSlot.tsx — label + reserved block. Fake creative = filled state. */
+const AD_FILLED = `
+  <div class="ad-slot" data-ad-mock="filled">
+    <p class="ad-label">Advertisement</p>
+    <div class="ad-box" aria-hidden="true">
+      <div class="sq"></div>
+      <div class="lines"><b></b><b></b><b></b></div>
+    </div>
+    <p class="ad-note">Same unit on every campaign · collapses if AdSense unfilled</p>
+  </div>
+`;
+
+const today = {
+  frame: `
+    ${nav}
+    <div class="body">
+      <div class="canvas"></div>
+      <div class="toolbar-row"><b>Change photo</b><i>Save / share</i><i>Download</i></div>
+      <div class="card">
+        <h3>Your frame</h3>
+        <p class="muted">Upload logo, badge, or designed frame.</p>
+        <div class="drop done">Change frame image</div>
+        <p class="muted" style="margin-top:8px">Photo window · 62%</p>
+        <div class="slider"><i></i></div>
+        <p class="muted" style="margin-top:10px"><b style="color:var(--ink);font-weight:800">Slogan around the ring</b></p>
+        <input placeholder="e.g. SUPPORT TEAM USA" value="">
+      </div>
+      <div class="details">Simple styles <span>▾</span></div>
+      <div class="details">Fine tune colours <span>▾</span></div>
+      <div class="details">Preview in contacts <span>▾</span></div>
+    </div>
+    <div class="bar"><button data-go="name">Create campaign</button></div>
+  `,
+  name: `
+    ${nav}
+    <div class="body" style="filter:blur(2px);opacity:.5"><div class="canvas"></div></div>
+    <div class="modal"><div class="sheet">
+      <h3>Create a campaign</h3>
+      <div class="preview-mini"></div>
+      <label>Campaign title</label><input value="Support our team">
+      <label>Description (optional)</label><textarea rows="2"></textarea>
+      <label>Goal (optional)</label><input placeholder="100">
+      <label>Category</label><select><option>Causes</option></select>
+      <label>Email to get back in</label><input placeholder="you@org.org">
+      <button class="cta" style="margin-top:14px" data-go="send">Create campaign</button>
+    </div></div>
+  `,
+  send: `
+    ${nav}
+    <div class="modal"><div class="sheet">
+      <h3>Campaign is live</h3>
+      <div class="preview-mini"></div>
+      <p style="font-family:'Bricolage Grotesque';font-weight:800;margin:0 0 6px">Send it now.</p>
+      <p class="muted" style="margin:0 0 12px">No ads on this screen — organizer publish only.</p>
+      <button class="cta wa">Share on WhatsApp</button>
+      <div style="height:8px"></div>
+      <button class="cta ghost">Share another way</button>
+      <div style="height:14px"></div>
+      <p style="font-weight:800;font-size:13px;margin:0 0 6px">Save your campaigns</p>
+      <input placeholder="you@org.org" style="margin:8px 0">
+      <button class="cta ghost">Email me a code</button>
+      <div style="height:8px"></div>
+      <button class="cta ink" data-go="live">Done → see /c ads</button>
+    </div></div>
+  `,
+  live: `
+    ${nav}
+    <div class="scroll">
+      <p class="camp-eye">Ollabs campaign</p>
+      <h2 class="camp-title">Support our team</h2>
+      <div class="canvas" style="margin-top:8px"><div class="face"></div></div>
+      <p class="muted" style="text-align:center">Adjust the fit · Size</p>
+      <div class="slider"><i></i></div>
+      ${AD_FILLED}
+      <div class="count-card"><div class="n">128</div><p class="muted" style="margin:4px 0 0">people supporting</p></div>
+      <p class="muted" style="text-align:center">Make your own with Ollabs</p>
+      <p class="muted" style="text-align:center;opacity:.7">Report this campaign</p>
+    </div>
+    <div class="bar">
+      <div class="pair">
+        <button type="button" data-go="live">Save or share</button>
+        <button type="button" class="cta ghost" style="padding:13px">Download</button>
+      </div>
+    </div>
+  `
+};
+
+const proposed = {
+  frame: `
+    ${nav}
+    <div class="body">
+      <div class="canvas empty"><span class="hint">Upload your frame to begin</span></div>
+      <div class="card">
+        <h3>1. Your artwork</h3>
+        <p class="muted">Logo, badge, or designed PNG.</p>
+        <div class="drop">Upload logo or frame</div>
+      </div>
+      <div class="card">
+        <h3>2. Photo window</h3>
+        <p class="muted">Left = more frame. Right = more photo.</p>
+        <div class="slider"><i></i></div>
+      </div>
+      <div class="details">Add text <span>optional</span></div>
+      <div class="details">Simple styles <span>fallback</span></div>
+    </div>
+    <div class="bar"><button data-go="name">Create campaign</button></div>
+  `,
+  name: `
+    ${nav}
+    <div class="body" style="filter:blur(1px)"><div class="canvas"></div></div>
+    <div class="modal"><div class="sheet">
+      <h3>Name it</h3>
+      <div class="preview-mini"></div>
+      <label>Campaign title</label><input value="Support our team">
+      <label>Email to get back in (recommended)</label>
+      <input placeholder="you@org.org">
+      <p class="muted" style="margin:8px 0 14px">No ads here. Description / goal / category wait on Manage.</p>
+      <button class="cta" data-go="send">Create campaign</button>
+    </div></div>
+  `,
+  send: `
+    ${nav}
+    <div class="modal"><div class="sheet">
+      <h3>Send it</h3>
+      <div class="preview-mini"></div>
+      <p class="muted" style="margin:0 0 14px">Organizer screen — still no ads.</p>
+      <button class="cta wa">Share on WhatsApp</button>
+      <div style="height:8px"></div>
+      <button class="cta ghost">Share another way</button>
+      <div style="height:18px;border-bottom:1px solid var(--line);margin-bottom:14px"></div>
+      <p style="font-weight:800;font-size:13px;margin:0 0 6px">Then save access</p>
+      <button class="cta ghost">Email me a code</button>
+      <div style="height:8px"></div>
+      <button class="cta ghost">I’ll copy the manage link</button>
+      <div style="height:12px"></div>
+      <button class="cta ink" data-go="live">Done → see /c ads</button>
+    </div></div>
+  `,
+  live: `
+    ${nav}
+    <div class="scroll">
+      <p class="camp-eye">Ollabs campaign</p>
+      <h2 class="camp-title">Support our team</h2>
+      <div class="canvas" style="margin-top:8px"><div class="face"></div></div>
+      <p class="muted" style="text-align:center;font-weight:700;color:var(--blue-deep)">You’re in. Now bring your people.</p>
+      <button class="cta wa" style="padding:12px;font-size:13px">Share on WhatsApp</button>
+      ${AD_FILLED}
+      <div class="own">
+        <div class="t">Want one of your own?</div>
+        <p>Make a frame for your team. Free, one link like this.</p>
+        <button class="cta ink" style="padding:12px;font-size:13px">Make your own frame</button>
+      </div>
+      <div class="row2">
+        <button type="button">New photo</button>
+        <button type="button">Share</button>
+      </div>
+      <div class="count-card"><div class="n">128</div><p class="muted" style="margin:4px 0 0">people supporting</p></div>
+      ${AD_FILLED}
+      <p class="muted" style="text-align:center;opacity:.7">Report this campaign</p>
+    </div>
+    <div class="bar">
+      <div class="pair">
+        <button type="button">Save or share</button>
+        <button type="button" class="cta ghost" style="padding:13px">Download</button>
+      </div>
+    </div>
+  `
+};
+
+const subs = {
+  today: {
+    frame: "Dense builder. No ads on /create.",
+    name: "Heavy publish form. No ads.",
+    send: "Organizer share + save access. No ads.",
+    live: "Before Save: one quiet unit under the canvas / fit controls (above the sticky bar). Never on the photo. Same for every campaign."
+  },
+  proposed: {
+    frame: "Short Frame beat. Still ad-free.",
+    name: "Title + email. Ad-free.",
+    send: "WhatsApp → save access → Done. Ad-free.",
+    live: "After save: before-save unit unmounts; mid-stack + lower units mount. Still labelled, in-flow, never on the photo."
+  }
+};
+
+const STEP_LABEL = { frame: "1. Frame", name: "2. Name", send: "3. Send", live: "4. Live /c" };
+const SIDE_LABEL = { today: "Today / before", proposed: "Proposed / after" };
+
+let step = "live"; // open on ads so they're ready to review
+let commentMode = false;
+let comments = loadComments();
+let selectedId = null;
+let pendingPin = null;
+
+function loadComments() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
+  catch { return []; }
+}
+function saveComments() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(comments));
+}
+
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove("show"), 1800);
+}
+
+function renderScreens() {
+  const live = step === "live";
+  document.getElementById("left-title").textContent = live ? "Before save" : "Today";
+  document.getElementById("right-title").textContent = live ? "After save · ad live" : "Proposed";
+  SIDE_LABEL.today = live ? "Before save" : "Today";
+  SIDE_LABEL.proposed = live ? "After save" : "Proposed";
+
+  document.getElementById("today").innerHTML = today[step];
+  document.getElementById("proposed").innerHTML = proposed[step];
+  document.getElementById("today-sub").textContent = subs.today[step];
+  document.getElementById("prop-sub").textContent = subs.proposed[step];
+  document.querySelectorAll(".step").forEach((b) => {
+    b.setAttribute("aria-pressed", b.dataset.step === step ? "true" : "false");
+  });
+  document.querySelectorAll("[data-go]").forEach((b) => {
+    b.addEventListener("click", (e) => {
+      if (commentMode) { e.preventDefault(); e.stopPropagation(); return; }
+      step = b.dataset.go;
+      render();
+    });
+  });
+  renderPins();
+}
+
+function renderPins() {
+  document.querySelectorAll(".phone-wrap .pin").forEach((p) => p.remove());
+  comments.filter((c) => c.step === step).forEach((c) => {
+    const wrap = document.getElementById(c.side === "today" ? "wrap-today" : "wrap-proposed");
+    const phone = wrap.querySelector(".phone");
+    const pin = document.createElement("button");
+    pin.type = "button";
+    pin.className = "pin" + (c.id === selectedId ? " sel" : "");
+    pin.textContent = String(globalIndex(c) + 1);
+    pin.style.left = (c.x * 100) + "%";
+    pin.style.top = (c.y * 100) + "%";
+    pin.title = c.text;
+    pin.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectedId = c.id;
+      renderPanel();
+      renderPins();
+      document.getElementById("c-" + c.id)?.scrollIntoView({ block: "nearest" });
+    });
+    phone.appendChild(pin);
+  });
+}
+
+function globalIndex(c) {
+  return comments.findIndex((x) => x.id === c.id);
+}
+
+function renderPanel() {
+  const list = document.getElementById("clist");
+  document.getElementById("comment-count").textContent =
+    comments.length === 0 ? "0 notes" : `${comments.length} note${comments.length === 1 ? "" : "s"}`;
+  if (comments.length === 0) {
+    list.innerHTML = `<p class="empty">Pin notes on the Live /c step if the ad placement or label should change. Copy for Cursor when ready.</p>`;
+    return;
+  }
+  list.innerHTML = comments.map((c, i) => `
+    <div class="citem ${c.id === selectedId ? "sel" : ""}" id="c-${c.id}" data-id="${c.id}">
+      <div class="meta">#${i + 1} · ${SIDE_LABEL[c.side] || c.side} · ${STEP_LABEL[c.step]}</div>
+      <div class="body">${escapeHtml(c.text)}</div>
+      <div class="row">
+        <button type="button" data-edit="${c.id}">Edit</button>
+        <button type="button" data-del="${c.id}">Delete</button>
+      </div>
+    </div>
+  `).join("");
+
+  list.querySelectorAll(".citem").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      if (e.target.closest("[data-del],[data-edit]")) return;
+      const id = el.dataset.id;
+      const c = comments.find((x) => x.id === id);
+      if (!c) return;
+      selectedId = id;
+      if (c.step !== step) { step = c.step; render(); }
+      else { renderPanel(); renderPins(); }
+    });
+  });
+  list.querySelectorAll("[data-del]").forEach((b) => {
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      comments = comments.filter((c) => c.id !== b.dataset.del);
+      if (selectedId === b.dataset.del) selectedId = null;
+      saveComments();
+      renderPanel();
+      renderPins();
+    });
+  });
+  list.querySelectorAll("[data-edit]").forEach((b) => {
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const c = comments.find((x) => x.id === b.dataset.edit);
+      if (!c) return;
+      openComposer({ side: c.side, x: c.x, y: c.y, id: c.id, text: c.text });
+    });
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (ch) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[ch]);
+}
+
+function render() {
+  document.getElementById("wrap-today").classList.toggle("comment-mode", commentMode);
+  document.getElementById("wrap-proposed").classList.toggle("comment-mode", commentMode);
+  document.getElementById("btn-comment").classList.toggle("active", commentMode);
+  document.getElementById("mode-hint").textContent = commentMode
+    ? "Comment mode — click a phone to pin."
+    : "Browse mode — step 4 shows before vs after save with the real Advertisement chrome.";
+  renderScreens();
+  renderPanel();
+}
+
+function openComposer(pin) {
+  pendingPin = pin;
+  const editing = Boolean(pin.id);
+  document.getElementById("composer-title").textContent = editing ? "Edit comment" : "Add comment";
+  document.getElementById("composer-meta").textContent =
+    `${SIDE_LABEL[pin.side] || pin.side} · ${STEP_LABEL[step]}`;
+  document.getElementById("composer-text").value = pin.text || "";
+  document.getElementById("composer").classList.remove("hidden");
+  document.getElementById("composer-text").focus();
+}
+
+function closeComposer() {
+  pendingPin = null;
+  document.getElementById("composer").classList.add("hidden");
+}
+
+function saveComposer() {
+  const text = document.getElementById("composer-text").value.trim();
+  if (!text || !pendingPin) return;
+  if (pendingPin.id) {
+    const c = comments.find((x) => x.id === pendingPin.id);
+    if (c) { c.text = text; c.updatedAt = new Date().toISOString(); }
+    selectedId = pendingPin.id;
+  } else {
+    const c = {
+      id: "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      side: pendingPin.side,
+      step,
+      x: pendingPin.x,
+      y: pendingPin.y,
+      text,
+      createdAt: new Date().toISOString()
+    };
+    comments.push(c);
+    selectedId = c.id;
+  }
+  saveComments();
+  closeComposer();
+  commentMode = false;
+  render();
+  toast("Comment saved");
+}
+
+function exportMarkdown() {
+  const lines = [
+    "# Campaign builder + live ads feedback",
+    "",
+    `_Exported ${new Date().toISOString()}_`,
+    "",
+    "Update `brand/campaign-builder-flow.html` and/or product ads from these notes.",
+    ""
+  ];
+  if (!comments.length) lines.push("_No comments yet._");
+  else comments.forEach((c, i) => {
+    lines.push(`## ${i + 1}. ${SIDE_LABEL[c.side] || c.side} — ${STEP_LABEL[c.step]}`);
+    lines.push("");
+    lines.push(c.text);
+    lines.push("");
+  });
+  return lines.join("\n");
+}
+
+async function copyForCursor() {
+  const md = exportMarkdown();
+  try {
+    await navigator.clipboard.writeText(md);
+    toast("Copied — paste into Cursor chat");
+  } catch {
+    prompt("Copy this feedback:", md);
+  }
+}
+
+function downloadMd() {
+  const blob = new Blob([exportMarkdown()], { type: "text/markdown;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "campaign-builder-feedback.md";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Downloaded feedback.md");
+}
+
+["wrap-today", "wrap-proposed"].forEach((id) => {
+  const wrap = document.getElementById(id);
+  wrap.addEventListener("click", (e) => {
+    if (!commentMode) return;
+    if (e.target.closest(".pin,[data-go],button,a,input,textarea,select,label")) return;
+    const phone = wrap.querySelector(".phone");
+    const rect = phone.getBoundingClientRect();
+    const x = Math.min(0.95, Math.max(0.05, (e.clientX - rect.left) / rect.width));
+    const y = Math.min(0.95, Math.max(0.05, (e.clientY - rect.top) / rect.height));
+    openComposer({ side: wrap.dataset.side, x, y });
+  });
+});
+
+document.querySelectorAll(".step").forEach((b) => {
+  b.addEventListener("click", () => { step = b.dataset.step; render(); });
+});
+document.getElementById("btn-comment").addEventListener("click", () => { commentMode = !commentMode; render(); });
+document.getElementById("btn-copy").addEventListener("click", copyForCursor);
+document.getElementById("btn-copy-2").addEventListener("click", copyForCursor);
+document.getElementById("btn-download").addEventListener("click", downloadMd);
+document.getElementById("btn-clear").addEventListener("click", () => {
+  if (!comments.length) return;
+  if (!confirm("Clear all comments?")) return;
+  comments = []; selectedId = null; saveComments(); render();
+});
+document.getElementById("composer-cancel").addEventListener("click", closeComposer);
+document.getElementById("composer-save").addEventListener("click", saveComposer);
+document.getElementById("composer").addEventListener("click", (e) => {
+  if (e.target.id === "composer") closeComposer();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (!document.getElementById("composer").classList.contains("hidden")) closeComposer();
+    else if (commentMode) { commentMode = false; render(); }
+  }
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !document.getElementById("composer").classList.contains("hidden")) {
+    saveComposer();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
