@@ -42,6 +42,12 @@ Next: org pilots in BR/ID. AdSense: create two display units in the dashboard
 Code already branches in `AdSlot.tsx`; both env vars still fall back to the same
 slot until you set them.
 
+Email (Resend): `RESEND_API_KEY` + verified `ollabs.studio`. Outbound uses
+`EMAIL_FROM` (default `Ollabs <hello@ollabs.studio>`) and `EMAIL_REPLY_TO`
+(default `hello@ollabs.studio`). Webhook at `/api/webhooks/resend` needs
+`RESEND_WEBHOOK_SECRET` (Svix signing secret from the Resend webhook). Optional
+`CONTACT_NOTIFY_EMAIL` forwards inbound `hello@` mail to your personal inbox.
+
 **Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
 “Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page
 holds still. Upload a custom frame PNG and confirm the live preview stays visible while

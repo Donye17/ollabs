@@ -11,6 +11,8 @@
 import { organizerShareText, whatsappUrl } from '@/lib/share';
 
 const FROM = process.env.EMAIL_FROM || 'Ollabs <hello@ollabs.studio>';
+/** Replies to organizer mail land in Resend Receiving once MX is verified. */
+const REPLY_TO = process.env.EMAIL_REPLY_TO || 'hello@ollabs.studio';
 const KEY = process.env.RESEND_API_KEY;
 
 export const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://ollabs.studio';
@@ -26,21 +28,55 @@ export function normalizeEmail(value: string): string {
     return value.trim().toLowerCase();
 }
 
-type SendArgs = { to: string; subject: string; html: string; text: string };
+export type EmailTag =
+    | 'campaign_live'
+    | 'first_supporter'
+    | 'milestone'
+    | 'login_code'
+    | 'recover'
+    | 'contact_forward';
 
-export async function sendEmail({ to, subject, html, text }: SendArgs): Promise<boolean> {
+type SendArgs = {
+    to: string;
+    subject: string;
+    html: string;
+    text: string;
+    /** Resend analytics tag; shows up on the email in the dashboard. */
+    tag?: EmailTag;
+    /** Override default Reply-To (hello@). */
+    replyTo?: string | null;
+};
+
+export async function sendEmail({
+    to,
+    subject,
+    html,
+    text,
+    tag,
+    replyTo = REPLY_TO,
+}: SendArgs): Promise<boolean> {
     if (!KEY) {
         console.warn(`[email] RESEND_API_KEY not set, skipping send to ${to}: ${subject}`);
         return false;
     }
     try {
+        const body: Record<string, unknown> = {
+            from: FROM,
+            to: [to],
+            subject,
+            html,
+            text,
+        };
+        if (replyTo) body.reply_to = replyTo;
+        if (tag) body.tags = [{ name: 'type', value: tag }];
+
         const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${KEY}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ from: FROM, to: [to], subject, html, text }),
+            body: JSON.stringify(body),
         });
         if (!res.ok) {
             console.error('[email] send failed', res.status, await res.text().catch(() => ''));

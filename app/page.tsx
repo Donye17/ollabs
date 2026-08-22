@@ -233,6 +233,7 @@ export default function Home() {
                             <div>
                                 <h5 className="font-display font-bold mb-4">Legal</h5>
                                 <ul className="space-y-2 text-sm text-muted">
+                                    <li><Link href="/about" className="hover:text-brand-deep transition-colors">About</Link></li>
                                     <li><Link href="/privacy" className="hover:text-brand-deep transition-colors">Privacy</Link></li>
                                     <li><Link href="/terms" className="hover:text-brand-deep transition-colors">Terms</Link></li>
                                 </ul>

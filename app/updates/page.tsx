@@ -42,6 +42,10 @@ export default function UpdatesPage() {
                         <Link href="/privacy" className="hover:text-brand-deep transition-colors">
                             Privacy
                         </Link>
+                        {' · '}
+                        <Link href="/about" className="hover:text-brand-deep transition-colors">
+                            About
+                        </Link>
                     </p>
                 </div>
             </section>

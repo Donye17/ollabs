@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
                         slug: campaign.slug,
                         ownerToken: campaign.owner_token,
                     });
-                    const ok = await sendEmail({ to, ...msg });
+                    const ok = await sendEmail({ to, ...msg, tag: 'campaign_live' });
                     if (ok) {
                         await pool.query(
                             `UPDATE campaigns SET email_sent_at = NOW() WHERE id = $1`,

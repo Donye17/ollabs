@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         );
 
         const msg = loginCodeEmail({ code, minutes: CODE_TTL_MINUTES });
-        await sendEmail({ to: email, ...msg });
+        await sendEmail({ to: email, ...msg, tag: 'login_code' });
         return generic;
     } catch (error) {
         console.error('Failed to send login code:', error);

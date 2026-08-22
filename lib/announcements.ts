@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-22-about',
+        date: '2026-08-22',
+        title: 'A short About page',
+        summary: 'Who Ollabs is for, how it stays free, and how to reach us.',
+        items: [
+            'New About page at /about with contact at hello@ollabs.studio.',
+            'Linked from the home footer next to Privacy and Terms.',
+            'Campaign emails now reply to hello@ so organizers can reach you.',
+        ],
+    },
+    {
         id: '2026-08-22-filipino-use-cases',
         date: '2026-08-22',
         title: 'More campaign guides in Filipino',

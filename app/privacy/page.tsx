@@ -56,7 +56,7 @@ export default function PrivacyPage() {
 
                     <section>
                         <h2 className="font-display text-xl font-bold text-ink mb-2">7. Contact us</h2>
-                        <p>If you have any questions about this Privacy Policy, contact us at <a href="mailto:feedback@ollabs.studio" className="text-brand-deep hover:underline">feedback@ollabs.studio</a>.</p>
+                        <p>If you have any questions about this Privacy Policy, contact us at <a href="mailto:feedback@ollabs.studio" className="text-brand-deep hover:underline">feedback@ollabs.studio</a>. Learn more about the product on our <a href="/about" className="text-brand-deep font-semibold hover:underline">About</a> page.</p>
                     </section>
                 </div>
             </main>

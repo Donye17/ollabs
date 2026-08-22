@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         );
 
         const msg = recoveryEmail({ token, count });
-        await sendEmail({ to: email, ...msg });
+        await sendEmail({ to: email, ...msg, tag: 'recover' });
         return generic;
     } catch (error) {
         console.error('Failed to start recovery:', error);

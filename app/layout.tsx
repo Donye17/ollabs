@@ -118,6 +118,9 @@ const jsonLd = {
                 '@type': 'ImageObject',
                 'url': 'https://ollabs.studio/Ollabs%20Logo%20Black.png',
             },
+            'email': 'hello@ollabs.studio',
+            'description':
+                'Free profile-picture frame campaigns for causes, teams, and events. No watermark for supporters.',
         },
         {
             '@type': 'WebSite',

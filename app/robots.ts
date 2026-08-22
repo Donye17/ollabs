@@ -4,7 +4,7 @@ export default function robots(): MetadataRoute.Robots {
     return {
         rules: {
             userAgent: '*',
-            allow: ['/', '/create', '/c', '/u', '/pt', '/id', '/tl', '/hi', '/es', '/for', '/day', '/vs', '/updates', '/explore'],
+            allow: ['/', '/create', '/c', '/u', '/pt', '/id', '/tl', '/hi', '/es', '/for', '/day', '/vs', '/updates', '/about', '/explore'],
             disallow: ['/api/', '/hub', '/mine', '/login', '/recover', '/admin'],
         },
         sitemap: 'https://ollabs.studio/sitemap.xml',

@@ -91,7 +91,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                         country: supporterCountry,
                         countryName: countryLabel(supporterCountry),
                     });
-                    await sendEmail({ to: campaign.organizer_email, ...msg });
+                    await sendEmail({ to: campaign.organizer_email, ...msg, tag: 'first_supporter' });
                 } catch (e) {
                     console.error('[use] first supporter email failed', e);
                 }
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                         count,
                         goal: campaign.goal,
                     });
-                    await sendEmail({ to: campaign.organizer_email, ...msg });
+                    await sendEmail({ to: campaign.organizer_email, ...msg, tag: 'milestone' });
                 } catch (e) {
                     console.error('[use] milestone email failed', e);
                 }
