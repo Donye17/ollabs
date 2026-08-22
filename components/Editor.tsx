@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { FrameConfig } from '@/lib/types';
-import { canShareFiles } from '@/lib/share';
-import { downloadBlob } from '@/lib/download';
+import { saveFramedPhoto, preferShareSheetForSave } from '@/lib/savePhoto';
 import { useEditorLogic } from './editor/useEditorLogic';
 import { CanvasArea } from './editor/CanvasArea';
 import { EditorToolbar } from './editor/EditorToolbar';
@@ -37,15 +36,8 @@ export const Editor: React.FC<EditorProps> = ({
   const [canSharePhoto, setCanSharePhoto] = useState(false);
   const [sharingPhoto, setSharingPhoto] = useState(false);
 
-  // Probe with a throwaway PNG: canShare inspects the file's type rather than
-  // its contents, so a one byte file answers the question honestly.
   useEffect(() => {
-    try {
-      const probe = new File([new Uint8Array([0])], 'probe.png', { type: 'image/png' });
-      setCanSharePhoto(canShareFiles([probe]));
-    } catch {
-      setCanSharePhoto(false);
-    }
+    setCanSharePhoto(preferShareSheetForSave());
   }, []);
 
   // Panning the photo is the whole interaction model now. This used to open with
@@ -83,28 +75,24 @@ export const Editor: React.FC<EditorProps> = ({
   const handleDownload = async () => {
     const blob = await renderedBlob();
     if (!blob) return;
-    // See lib/download.ts: the anchor has to be in the document and the object
-    // URL has to outlive the click, or mobile silently drops the file.
-    downloadBlob(blob, `ollabs-frame-${Date.now()}.png`);
+    await saveFramedPhoto({
+      blob,
+      filename: `ollabs-frame-${Date.now()}.png`,
+      title: 'Ollabs frame',
+      forceDownload: true,
+    });
   };
 
-  /**
-   * Hand the finished PNG to the OS share sheet.
-   *
-   * Inside the WhatsApp and Instagram in-app browsers on iOS an <a download>
-   * is ignored entirely, so Download can look like it worked and leave the
-   * person with nothing. The sheet gives them Save Image instead.
-   */
   const handleSharePhoto = async () => {
     setSharingPhoto(true);
     try {
       const blob = await renderedBlob();
       if (!blob) return;
-      const file = new File([blob], `ollabs-frame-${Date.now()}.png`, { type: 'image/png' });
-      if (!canShareFiles([file])) return;
-      await navigator.share({ files: [file], title: 'Ollabs frame' });
-    } catch {
-      // Cancelled from the sheet, or the OS refused the payload.
+      await saveFramedPhoto({
+        blob,
+        filename: `ollabs-frame-${Date.now()}.png`,
+        title: 'Ollabs frame',
+      });
     } finally {
       setSharingPhoto(false);
     }

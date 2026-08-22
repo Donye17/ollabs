@@ -6,8 +6,7 @@ import { FrameConfig } from '@/lib/types';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { addPngMetadata } from '@/lib/pngMeta';
 import { track } from '@/lib/analytics';
-import { canShareFiles } from '@/lib/share';
-import { downloadBlob } from '@/lib/download';
+import { saveFramedPhoto, preferShareSheetForSave, isIOS } from '@/lib/savePhoto';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import { Upload, Download, Loader2, ArrowRight, ImageDown, AlertCircle } from 'lucide-react';
 
@@ -58,15 +57,8 @@ export const DayFrameTool: React.FC<{
 
     const drag = useRef({ active: false, startX: 0, startY: 0, baseX: 0, baseY: 0 });
 
-    // Probe with a throwaway PNG: canShare inspects the file's type rather than
-    // its contents, so a one byte file answers the question honestly.
     useEffect(() => {
-        try {
-            const probe = new File([new Uint8Array([0])], 'probe.png', { type: 'image/png' });
-            setCanSharePhoto(canShareFiles([probe]));
-        } catch {
-            setCanSharePhoto(false);
-        }
+        setCanSharePhoto(preferShareSheetForSave());
     }, []);
 
     const draw = useCallback(() => {
@@ -150,6 +142,11 @@ export const DayFrameTool: React.FC<{
         }
     };
 
+    const markSaved = () => {
+        setDone(true);
+        setError(null);
+    };
+
     const download = async () => {
         if (!canvasRef.current || !hasImage) return;
         setDownloading(true);
@@ -160,9 +157,18 @@ export const DayFrameTool: React.FC<{
                 setError('That image could not be saved. Try again.');
                 return;
             }
-            downloadBlob(blob, `${daySlug}-ollabs.png`);
-            setDone(true);
-            track('frame_download', dimension);
+            const outcome = await saveFramedPhoto({
+                blob,
+                filename: `${daySlug}-ollabs.png`,
+                title: dayName,
+                forceDownload: true,
+            });
+            if (outcome === 'shared' || outcome === 'downloaded') {
+                markSaved();
+                track('frame_download', dimension);
+            } else if (outcome === 'unavailable') {
+                setError(t.savePhotoUnavailable);
+            }
         } finally {
             setDownloading(false);
         }
@@ -183,13 +189,20 @@ export const DayFrameTool: React.FC<{
         try {
             const blob = await taggedBlob();
             if (!blob) return;
-            const file = new File([blob], `${daySlug}-ollabs.png`, { type: 'image/png' });
-            if (!canShareFiles([file])) return;
-            await navigator.share({ files: [file], title: dayName });
-            setDone(true);
-            track('frame_share_photo', dimension);
-        } catch {
-            // Cancelled from the sheet, or the OS refused the payload.
+            const outcome = await saveFramedPhoto({
+                blob,
+                filename: `${daySlug}-ollabs.png`,
+                title: dayName,
+            });
+            if (outcome === 'shared') {
+                markSaved();
+                track('frame_share_photo', dimension);
+            } else if (outcome === 'downloaded') {
+                markSaved();
+                track('frame_download', dimension);
+            } else if (outcome === 'unavailable') {
+                setError(t.savePhotoUnavailable);
+            }
         } finally {
             setSharingPhoto(false);
         }
@@ -292,24 +305,35 @@ export const DayFrameTool: React.FC<{
             {hasImage && (
                 <div className="fixed bottom-0 inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
                     <div className="w-full max-w-md mx-auto flex flex-col gap-2">
-                        {canSharePhoto && (
-                            <button
-                                onClick={sharePhoto} disabled={sharingPhoto}
-                                className="w-full h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 transition-all disabled:opacity-60"
-                            >
-                                {sharingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageDown size={18} />}
-                                {t.saveOrShare}
-                            </button>
-                        )}
-                        <div className="flex gap-2">
+                        {canSharePhoto ? (
+                            <>
+                                <button
+                                    onClick={sharePhoto} disabled={sharingPhoto}
+                                    className="w-full h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 transition-all disabled:opacity-60"
+                                >
+                                    {sharingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageDown size={18} />}
+                                    {t.saveOrShare}
+                                </button>
+                                {!isIOS() && (
+                                    <button
+                                        onClick={download} disabled={downloading}
+                                        className="w-full h-11 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 text-ink hover:bg-ink/5 transition-all disabled:opacity-60"
+                                    >
+                                        {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={16} />}
+                                        {t.download}
+                                    </button>
+                                )}
+                                <p className="text-[11px] text-muted text-center leading-snug px-1">{t.savePhotoHint}</p>
+                            </>
+                        ) : (
                             <button
                                 onClick={download} disabled={downloading}
-                                className={`flex-1 h-12 rounded-xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-60 ${canSharePhoto ? 'bg-cream border border-ink/10 text-ink hover:bg-ink/5' : 'bg-brand text-ink hover:brightness-105'}`}
+                                className="w-full h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 transition-all disabled:opacity-60"
                             >
                                 {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={18} />}
                                 {t.download}
                             </button>
-                        </div>
+                        )}
                     </div>
                 </div>
             )}

@@ -16,6 +16,8 @@ export type Messages = {
         stepShare: string;
         size: string;
         saveOrShare: string;
+        savePhotoHint: string;
+        savePhotoUnavailable: string;
         download: string;
         downloadedAgain: string;
         copyImage: string;
@@ -113,6 +115,8 @@ export type Messages = {
         zoom: string;
         changePhoto: string;
         saveOrShare: string;
+        savePhotoHint: string;
+        savePhotoUnavailable: string;
         download: string;
         saved: string;
         createCampaign: string;
@@ -213,6 +217,8 @@ const en: Messages = {
         stepShare: 'Download & share',
         size: 'Size',
         saveOrShare: 'Save or share photo',
+        savePhotoHint: 'In the sheet, tap Save Image to add it to your Photos app.',
+        savePhotoUnavailable: 'Could not save here. Open this page in Safari, then try again.',
         download: 'Download',
         downloadedAgain: 'Downloaded, download again',
         copyImage: 'Copy image',
@@ -322,6 +328,8 @@ const en: Messages = {
         zoom: 'Zoom',
         changePhoto: 'Change photo',
         saveOrShare: 'Save or share photo',
+        savePhotoHint: 'In the sheet, tap Save Image to add it to your Photos app.',
+        savePhotoUnavailable: 'Could not save here. Open this page in Safari, then try again.',
         download: 'Download',
         saved: 'Saved. Go set it as your profile picture.',
         createCampaign: 'Create a campaign',
@@ -345,6 +353,8 @@ const pt: Messages = {
         stepShare: 'Baixe e compartilhe',
         size: 'Tamanho',
         saveOrShare: 'Salvar ou compartilhar foto',
+        savePhotoHint: 'Na folha de compartilhamento, toque em Salvar imagem para ir às Fotos.',
+        savePhotoUnavailable: 'Não deu para salvar aqui. Abra no Safari e tente de novo.',
         download: 'Baixar',
         downloadedAgain: 'Baixado, baixar de novo',
         copyImage: 'Copiar imagem',
@@ -456,6 +466,8 @@ const pt: Messages = {
         zoom: 'Zoom',
         changePhoto: 'Trocar foto',
         saveOrShare: 'Salvar ou compartilhar foto',
+        savePhotoHint: 'Na folha de compartilhamento, toque em Salvar imagem para ir às Fotos.',
+        savePhotoUnavailable: 'Não deu para salvar aqui. Abra no Safari e tente de novo.',
         download: 'Baixar',
         saved: 'Salvo. Agora use como foto de perfil.',
         createCampaign: 'Criar uma campanha',
@@ -479,6 +491,8 @@ const id: Messages = {
         stepShare: 'Unduh & bagikan',
         size: 'Ukuran',
         saveOrShare: 'Simpan atau bagikan foto',
+        savePhotoHint: 'Di lembar bagikan, ketuk Simpan Gambar untuk masuk ke Foto.',
+        savePhotoUnavailable: 'Tidak bisa simpan di sini. Buka di Safari, lalu coba lagi.',
         download: 'Unduh',
         downloadedAgain: 'Sudah diunduh, unduh lagi',
         copyImage: 'Salin gambar',
@@ -591,6 +605,8 @@ const id: Messages = {
         zoom: 'Zoom',
         changePhoto: 'Ganti foto',
         saveOrShare: 'Simpan atau bagikan foto',
+        savePhotoHint: 'Di lembar bagikan, ketuk Simpan Gambar untuk masuk ke Foto.',
+        savePhotoUnavailable: 'Tidak bisa simpan di sini. Buka di Safari, lalu coba lagi.',
         download: 'Unduh',
         saved: 'Tersimpan. Pasang sebagai foto profilmu.',
         createCampaign: 'Buat kampanye',

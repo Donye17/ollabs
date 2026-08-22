@@ -7,8 +7,8 @@ import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { addPngMetadata } from '@/lib/pngMeta';
 import { track, withUtm } from '@/lib/analytics';
 import { XGlyph, WhatsAppGlyph, FacebookGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
-import { supporterShareText, whatsappUrl, canShareFiles } from '@/lib/share';
-import { downloadBlob } from '@/lib/download';
+import { supporterShareText, whatsappUrl } from '@/lib/share';
+import { saveFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome } from '@/lib/savePhoto';
 import { AdSlot } from '@/components/AdSlot';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles, ArrowRight } from 'lucide-react';
@@ -57,6 +57,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     const [imageCopied, setImageCopied] = useState(false);
     const [canSharePhoto, setCanSharePhoto] = useState(false);
     const [sharingPhoto, setSharingPhoto] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
 
     useEffect(() => {
         setCanCopyImage(
@@ -64,15 +65,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
             typeof window.ClipboardItem !== 'undefined' &&
             !!navigator.clipboard && typeof navigator.clipboard.write === 'function'
         );
-        // Probe with a throwaway PNG. canShare inspects the file's type rather
-        // than its contents, so a one byte file answers the question honestly
-        // and costs nothing.
-        try {
-            const probe = new File([new Uint8Array([0])], 'probe.png', { type: 'image/png' });
-            setCanSharePhoto(canShareFiles([probe]));
-        } catch {
-            setCanSharePhoto(false);
-        }
+        setCanSharePhoto(preferShareSheetForSave());
     }, []);
 
     const handleCopyImage = async () => {
@@ -276,17 +269,34 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         }
     };
 
+    const applySaveOutcome = (outcome: SavePhotoOutcome) => {
+        if (outcome === 'shared' || outcome === 'downloaded') {
+            bumpCount();
+            setJustDownloaded(true);
+            setSaveError(null);
+            return true;
+        }
+        if (outcome === 'unavailable') {
+            setSaveError(t.savePhotoUnavailable);
+        }
+        return false;
+    };
+
     const handleDownload = async () => {
         const canvas = canvasRef.current;
         if (!canvas || !hasImage) return;
         setDownloading(true);
+        setSaveError(null);
         try {
             const blob = await taggedBlob();
-            if (blob) {
-                // Same mobile-safe path as /day and /create — see lib/download.ts.
-                downloadBlob(blob, `ollabs-${slug}.png`);
-                bumpCount();
-                setJustDownloaded(true);
+            if (!blob) return;
+            const outcome = await saveFramedPhoto({
+                blob,
+                filename: `ollabs-${slug}.png`,
+                title,
+                forceDownload: true,
+            });
+            if (applySaveOutcome(outcome)) {
                 track('frame_download', { campaign: slug });
             }
         } finally {
@@ -307,18 +317,22 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         const canvas = canvasRef.current;
         if (!canvas || !hasImage) return;
         setSharingPhoto(true);
+        setSaveError(null);
         try {
             const blob = await taggedBlob();
             if (!blob) return;
-            const file = new File([blob], `ollabs-${slug}.png`, { type: 'image/png' });
-            if (!canShareFiles([file])) return;
-            await navigator.share({ files: [file], title, text: shareText() });
-            // Only counted once the sheet resolves, so a cancel is not a download.
-            if (!justDownloaded) bumpCount();
-            setJustDownloaded(true);
-            track('frame_share_photo', { campaign: slug });
-        } catch {
-            // Cancelled from the sheet, or the OS refused the payload.
+            const outcome = await saveFramedPhoto({
+                blob,
+                filename: `ollabs-${slug}.png`,
+                title,
+            });
+            if (outcome === 'shared' && applySaveOutcome(outcome)) {
+                track('frame_share_photo', { campaign: slug });
+            } else if (outcome === 'downloaded' && applySaveOutcome(outcome)) {
+                track('frame_download', { campaign: slug });
+            } else {
+                applySaveOutcome(outcome);
+            }
         } finally {
             setSharingPhoto(false);
         }
@@ -579,16 +593,24 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
             {hasImage && (
                 <div className="fixed bottom-0 inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
                     <div className="w-full max-w-sm mx-auto flex flex-col gap-2">
+                        {saveError && (
+                            <p role="alert" className="text-xs text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2 text-center">
+                                {saveError}
+                            </p>
+                        )}
                         {canSharePhoto ? (
                             <>
                                 <button onClick={handleSharePhoto} disabled={sharingPhoto}
                                     className="w-full min-h-[52px] py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all disabled:opacity-50">
                                     {sharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> {t.saveOrShare}</>}
                                 </button>
-                                <button onClick={handleDownload} disabled={downloading}
-                                    className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors disabled:opacity-50">
-                                    {downloading ? <Loader2 size={16} className="animate-spin" /> : <><Download size={16} /> {t.download}</>}
-                                </button>
+                                {!isIOS() && (
+                                    <button onClick={handleDownload} disabled={downloading}
+                                        className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors disabled:opacity-50">
+                                        {downloading ? <Loader2 size={16} className="animate-spin" /> : <><Download size={16} /> {t.download}</>}
+                                    </button>
+                                )}
+                                <p className="text-[11px] text-muted text-center leading-snug px-1">{t.savePhotoHint}</p>
                             </>
                         ) : (
                             <button onClick={handleDownload} disabled={downloading}

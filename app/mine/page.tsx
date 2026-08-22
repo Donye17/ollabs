@@ -17,6 +17,12 @@ export default function MinePage() {
                 <div className="max-w-2xl mx-auto text-center">
                     <h1 className="font-display text-4xl font-extrabold mb-3">My campaigns</h1>
                     <p className="text-ink/70">Your campaigns, and quick links back to each dashboard.</p>
+                    <Link
+                        href="/hub"
+                        className="inline-flex mt-6 min-h-[48px] items-center justify-center gap-2 rounded-xl bg-brand px-6 py-3 text-sm font-bold text-ink hover:brightness-105 transition-all"
+                    >
+                        Edit your hub — /u/your-handle
+                    </Link>
                 </div>
             </section>
             <section className="px-6 pb-24">
