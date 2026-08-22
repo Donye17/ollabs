@@ -29,8 +29,7 @@ category, country, or politics. Never on the photo; never on `/create`.
 carry denser labelled inventory between content blocks.
 **Paid upgrade:** deferred until hubs show demand.
 
-Next: post-download “run your own campaign” prompt, more PT/ID `/for` pages, or
-artwork upgrades for the new day rings.
+Next: org pilots in BR/ID, Spanish `/for` pages, admin country dashboard, AdSense slot split when approved.
 
 **Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
 “Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page
