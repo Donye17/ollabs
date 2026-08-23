@@ -31,6 +31,7 @@ export function normalizeEmail(value: string): string {
 export type EmailTag =
     | 'campaign_live'
     | 'first_supporter'
+    | 'zero_supporter'
     | 'milestone'
     | 'login_code'
     | 'recover'
@@ -185,6 +186,39 @@ export function firstSupporterEmail(opts: {
 <tr><td style="padding-bottom:12px;">${button(whatsapp, 'Share again on WhatsApp')}</td></tr>
 <tr><td style="padding-bottom:20px;">${button(manage, 'See your numbers')}</td></tr>
 <tr><td style="font-size:13px;line-height:1.6;color:#6B7280;">Share again: <a href="${url}" style="color:#0369A1;">${url}</a></td></tr>`),
+    };
+}
+
+/** Still zero supporters ~20 minutes after publish. Share now or it usually stays dead. */
+export function zeroSupporterEmail(opts: {
+    title: string;
+    slug: string;
+    ownerToken: string;
+}) {
+    const manage = `${SITE}/c/${opts.slug}/manage?k=${opts.ownerToken}`;
+    const url = `${SITE}/c/${opts.slug}`;
+    const whatsapp = whatsappUrl(organizerShareText(opts.title, 'en'), url);
+    const t = esc(opts.title);
+    return {
+        subject: `Share "${opts.title}" before the window closes`,
+        text: [
+            `Your campaign "${opts.title}" is live, but nobody has joined yet.`,
+            ``,
+            `Most campaigns that get a supporter get the first one within the first hour. Open WhatsApp and send the link to one group now.`,
+            ``,
+            `Share on WhatsApp: ${whatsapp}`,
+            ``,
+            `Campaign: ${url}`,
+            `Dashboard: ${manage}`,
+        ].join('\n'),
+        html: shell(`
+<tr><td style="font-size:22px;font-weight:800;padding-bottom:8px;">Share it while it is still fresh</td></tr>
+<tr><td style="font-size:15px;line-height:1.6;color:#374151;padding-bottom:22px;">
+<strong>${t}</strong> is live with zero supporters so far. Campaigns that take off almost always get their first person in the first hour. One WhatsApp group is enough to start.
+</td></tr>
+<tr><td style="padding-bottom:12px;">${button(whatsapp, 'Share on WhatsApp')}</td></tr>
+<tr><td style="padding-bottom:20px;">${button(manage, 'Open your dashboard')}</td></tr>
+<tr><td style="font-size:13px;line-height:1.6;color:#6B7280;">Your link: <a href="${url}" style="color:#0369A1;">${url}</a></td></tr>`),
     };
 }
 

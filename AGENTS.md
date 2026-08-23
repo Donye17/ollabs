@@ -11,49 +11,44 @@ link. Supporters open that link, drop in a photo, and download the framed result
 
 ## Where things stand (2026-08-22)
 
-**On `main`:** Phases 1–7 plus calendar moments (Phase 8 content, no paid upgrade).
+**On `main` (pending push of path-to-million work):** Phases 1–8 plus Path A–E thesis-safe
+slice (P0 conversion, hub H1–H10, P1 growth, P2 polish, owner-token hash + manage sessions,
+9:16 story export, hub upgrade interest waitlist). Skipped by thesis: social feed, full frame
+designer, Stripe billing.
+
 Mobile shell, custom-frame create (Frame → Name → Send), organizer save + slug 301s, quiet ads, PT-BR,
-organizer hubs, Bahasa, Tagalog/Hindi/Spanish landings (`/tl`, `/hi`, `/es`), localized `/pt/for`,
+organizer hubs (themes, reorder, social icons, click counts, hide campaigns, one-tap claim), Bahasa,
+Tagalog/Hindi/Spanish landings (`/tl`, `/hi`, `/es`), product UI overlays for ES/TL, localized `/pt/for`,
 `/id/for`, and `/es/for` pages, `/pt/vs/twibbonize` and `/id/vs/twibbonize`, top-market `/day` pages
-(NG, MX, MY, PH, TH), geo tracking (`publisher_country`, `first_supporter_country`, supporter rows),
-first-supporter organizer email (migration 0016), country breakdown on `/mine`, hub handle suggestion
-after publish and on `/hub`, Messenger share on publish for ID/TL locales, and language banner offers
-for `/tl`, `/hi`, `/es`. iPhone share-first save on `/c`. Hub public pages show a **Made with** +
-Ollabs logo footer. **My campaigns** stays visible in the top nav on every phone screen (pill on mobile).
-A fixed **Mine · Create · Hub** tab bar (ink plate, raised Create) sits on organizer
-mobile surfaces (home, create, mine, hub, explore, manage). It is **hidden** on
-supporter and visitor journeys (`/c` public, `/u` hubs, `/for`, `/day`, locale
-landings, `/vs`) so Save/Share keeps the thumb zone. Page save bars stack above
-the tab bar when it is present; on `/c` and `/day` tools they sit flush to the
-safe area. Language banner never covers a save/publish bar.
+(NG, MX, MY, PH, TH) with WhatsApp share + frame OG, geo-biased Explore, starter frame packs,
+geo tracking, first-supporter + zero-supporter organizer email (cron), country breakdown on manage,
+Messenger+WhatsApp parity on publish for ID/TL, funnel `track()` events, report auto-hide.
+
+**Still needs a real phone (Phase 0):** see `docs/REAL_PHONE_QA.md`.
 
 **Copy:** no em dashes in user-facing hub, create, or mine strings. Hub Support CTA
 is two lines (`Support` / campaign title), not `Support — title`.
 
 **Ads:** same quiet in-flow units on every campaign — no special rules by
 category, country, or politics. Never on the photo; never on `/create`.
-`/c` stays lean (1 before save, 2 after). SEO pages (`/for`, `/day`, hubs)
-carry denser labelled inventory between content blocks.
-**Paid upgrade:** deferred until hubs show demand.
+`/c` stays lean (1 before save, 2 after). SEO pages (`/for`, `/day`, hubs,
+locale landings, `/vs`) carry denser labelled inventory between content blocks.
+**Paid upgrade:** interest waitlist on `/hub` only; billing still deferred until demand is clear.
 
-Next: org pilots in BR/ID. AdSense: create two display units in the dashboard
-(Campaign inline + SEO inline), set `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` and
-`NEXT_PUBLIC_ADSENSE_SLOT_SEO` on Vercel, keep Auto ads / anchors / vignettes OFF.
-Code already branches in `AdSlot.tsx`; both env vars still fall back to the same
-slot until you set them.
+AdSense: set `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` and `NEXT_PUBLIC_ADSENSE_SLOT_SEO`
+on Vercel; keep Auto ads / anchors / vignettes OFF. See `docs/ADSENSE_SLOTS.md`.
 
 Email (Resend): `RESEND_API_KEY` + verified `ollabs.studio`. Outbound uses
 `EMAIL_FROM` (default `Ollabs <hello@ollabs.studio>`) and `EMAIL_REPLY_TO`
 (default `hello@ollabs.studio`). Webhook at `/api/webhooks/resend` needs
-`RESEND_WEBHOOK_SECRET` (Svix signing secret from the Resend webhook). Optional
-`CONTACT_NOTIFY_EMAIL` forwards inbound `hello@` mail to your personal inbox.
+`RESEND_WEBHOOK_SECRET`. Optional `CONTACT_NOTIFY_EMAIL` forwards inbound mail.
+Zero-supporter cron: set `CRON_SECRET` for `/api/cron/zero-supporter` (`vercel.json`).
 
-**Still needs a real phone (Phase 0):** open a preview from inside WhatsApp and confirm
-“Save or share photo” → Save Image works. Finger-drag on `/create` and confirm the page
-holds still. Upload a custom frame PNG and confirm the live preview stays visible while
-adjusting the photo window.
+Organizer mobile tab bar (**Mine · Create · Hub**): show on organizer surfaces;
+**hide** on `/c` public, `/u` hubs, `/for`, `/day`, locale landings, `/vs` —
+see `lib/mobileNav.ts`. Language banner never covers a save/publish bar.
 
-Execution plan canvas: `ollabs-execution-plan` in the Cursor canvases folder.
+Execution brief: `docs/PATH_TO_MILLION_HANDOFF.md`.
 
 ---
 

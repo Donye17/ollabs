@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FrameConfig, FrameType } from '@/lib/types';
 import { Upload, AlertCircle, Loader2 } from 'lucide-react';
 import { upload } from '@vercel/blob/client';
 import { useLocale } from '@/components/i18n/LocaleProvider';
+import { assessFrameTransparency } from '@/lib/frameAlpha';
 
 interface CustomFramePanelProps {
     frame: FrameConfig;
@@ -15,14 +16,28 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
     const t = messages.create;
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [opaqueWarning, setOpaqueWarning] = useState(false);
 
     const isCustom = frame.type === FrameType.CUSTOM_IMAGE && !!frame.imageUrl;
     const cutout = frame.cutoutScale ?? 0;
+
+    useEffect(() => {
+        if (!frame.imageUrl || frame.type !== FrameType.CUSTOM_IMAGE) {
+            setOpaqueWarning(false);
+            return;
+        }
+        let cancelled = false;
+        assessFrameTransparency(frame.imageUrl).then((result) => {
+            if (!cancelled) setOpaqueWarning(result.opaque);
+        });
+        return () => { cancelled = true; };
+    }, [frame.imageUrl, frame.type]);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         setError(null);
+        setOpaqueWarning(false);
         setUploading(true);
         try {
             const { url } = await upload(`frame-${Date.now()}-${file.name}`, file, {
@@ -89,6 +104,12 @@ export const CustomFramePanel: React.FC<CustomFramePanelProps> = ({ frame, onCha
             {error && (
                 <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5">
                     {error}
+                </p>
+            )}
+
+            {opaqueWarning && isCustom && (
+                <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5">
+                    {t.opaqueFrameWarning}
                 </p>
             )}
 

@@ -17,6 +17,44 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-22-path-p3',
+        date: '2026-08-22',
+        title: 'Story share, safer manage links, hub waitlist',
+        summary: 'Share a 9:16 story crop after you save, manage cookies drop the key from the address bar, and organizers can raise a hand for paid hub upgrades.',
+        items: [
+            'After you frame a photo, Share as story builds a tall 9:16 PNG for Instagram and WhatsApp status.',
+            'Opening your manage link sets a short cookie and clears ?k= from the URL so screenshots leak less.',
+            'On your hub editor, you can join the waitlist for paid upgrades. No billing yet.',
+            'Campaigns with enough distinct reports hide from Explore automatically.',
+        ],
+    },
+    {
+        id: '2026-08-22-path-full',
+        date: '2026-08-22',
+        title: 'Hubs, explore, and day pages push harder toward Share',
+        summary: 'Bio hubs get themes and tap counts, Explore leans toward your country, and calendar days open WhatsApp with one tap.',
+        items: [
+            'Hub Support labels match Portuguese, Bahasa, Spanish, and Filipino when your browser does.',
+            'Reorder hub links, hide extra campaigns, pick a theme, and see Support and link tap counts.',
+            'Starter frame packs for Brasil, Indonesia, Pilipinas, México, and Nigeria sit above colour rings.',
+            'Explore softly boosts campaigns from your country. Manage shows supporter countries.',
+            'Day pages share on WhatsApp and unfurl with the day frame art.',
+        ],
+    },
+    {
+        id: '2026-08-22-path-ab',
+        date: '2026-08-22',
+        title: 'Share faster after save, claim your hub in one tap',
+        summary: 'Supporters get a clearer next step, and organizers get a live bio link tied to the campaign they just published.',
+        items: [
+            'After you save a framed photo, Share leads on phones so WhatsApp and Save Image stay obvious.',
+            'Publishing while signed in can claim your /u hub and feature that campaign without a detour.',
+            'Hubs show the featured campaign as a Support card with preview and supporter count.',
+            'Zero-supporter campaigns get a Share now nudge on manage and mine, plus an optional email after about 20 minutes.',
+            'Opaque custom frames warn before publish when the PNG has no clear photo window.',
+        ],
+    },
+    {
         id: '2026-08-22-about',
         date: '2026-08-22',
         title: 'A short About page',

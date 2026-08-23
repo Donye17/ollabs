@@ -2,21 +2,21 @@
  * Lightweight locale for Ollabs.
  *
  * Not a full i18n framework. A cookie, dictionaries for converting surfaces
- * (campaign, create/publish), and SEO landings at /pt and /id. Marketing
+ * (campaign, create/publish), and SEO landings at /pt, /id, /es, /tl. Marketing
  * English stays the default site.
  */
 
-export type Locale = 'en' | 'pt' | 'id';
+export type Locale = 'en' | 'pt' | 'id' | 'es' | 'tl';
 
-export const LOCALES: Locale[] = ['en', 'pt', 'id'];
+export const LOCALES: Locale[] = ['en', 'pt', 'id', 'es', 'tl'];
 export const DEFAULT_LOCALE: Locale = 'en';
 export const LOCALE_COOKIE = 'ollabs_locale';
 
 export function isLocale(value: string | null | undefined): value is Locale {
-    return value === 'en' || value === 'pt' || value === 'id';
+    return value === 'en' || value === 'pt' || value === 'id' || value === 'es' || value === 'tl';
 }
 
-/** Prefer an explicit locale, then cookie, then navigator (pt* / id*), else English. */
+/** Prefer an explicit locale, then cookie, then navigator (pt* / id* / es* / tl*), else English. */
 export function resolveLocale(opts: {
     explicit?: string | null;
     cookie?: string | null;
@@ -30,6 +30,8 @@ export function resolveLocale(opts: {
         const lower = l.toLowerCase();
         if (lower.startsWith('pt')) return 'pt';
         if (lower.startsWith('id')) return 'id';
+        if (lower.startsWith('es')) return 'es';
+        if (lower.startsWith('fil') || lower.startsWith('tl')) return 'tl';
     }
     return DEFAULT_LOCALE;
 }
@@ -37,12 +39,16 @@ export function resolveLocale(opts: {
 export function htmlLang(locale: Locale): string {
     if (locale === 'pt') return 'pt-BR';
     if (locale === 'id') return 'id';
+    if (locale === 'es') return 'es';
+    if (locale === 'tl') return 'fil';
     return 'en';
 }
 
 export function ogLocale(locale: Locale): string {
     if (locale === 'pt') return 'pt_BR';
     if (locale === 'id') return 'id_ID';
+    if (locale === 'es') return 'es_MX';
+    if (locale === 'tl') return 'fil_PH';
     return 'en_US';
 }
 
@@ -50,5 +56,7 @@ export function ogLocale(locale: Locale): string {
 export function localeLandingPath(locale: Locale): string | null {
     if (locale === 'pt') return '/pt';
     if (locale === 'id') return '/id';
+    if (locale === 'es') return '/es';
+    if (locale === 'tl') return '/tl';
     return null;
 }

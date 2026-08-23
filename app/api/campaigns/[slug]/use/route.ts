@@ -2,6 +2,7 @@ import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse, after } from 'next/server';
 import { firstSupporterEmail, milestoneEmail, sendEmail } from '@/lib/email';
 import { countryLabel, publisherCountry } from '@/lib/geo';
+import { clientIp, rateLimit } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,9 +20,20 @@ function milestoneReached(count: number, alreadyNotified: number): number | null
 
 // POST /api/campaigns/[slug]/use, a supporter applied the frame; bump the counter.
 // Body (optional): { imageUrl } if the supporter opts in to the supporter wall.
+//
+// Rate limit is per-instance (see lib/rateLimit.ts). Limits are generous for a
+// real supporter saving once; they blunt scripted counter inflation.
 export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
     try {
         const { slug } = await params;
+        const ip = clientIp(request);
+        if (!rateLimit(`use:${ip}`, 40, 10 * 60 * 1000)
+            || !rateLimit(`use:${ip}:${slug}`, 20, 10 * 60 * 1000)) {
+            return NextResponse.json(
+                { error: 'Too many saves from this network. Try again in a few minutes.' },
+                { status: 429 }
+            );
+        }
 
         const campaignRes = await pool.query(
             `SELECT id, title, owner_token, organizer_email, goal,

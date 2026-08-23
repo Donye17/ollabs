@@ -7,6 +7,7 @@ import { campaignLiveEmail, isValidEmail, normalizeEmail, sendEmail } from '@/li
 import { getDay } from '@/lib/days';
 import { getSessionOrganizer } from '@/lib/auth';
 import { publisherCountry } from '@/lib/geo';
+import { hashOwnerToken } from '@/lib/ownerToken';
 
 export const dynamic = 'force-dynamic';
 
@@ -125,22 +126,36 @@ export async function POST(request: NextRequest) {
 
         const baseSlug = slugify(title);
         const token = ownerToken();
+        // Hash at rest for lookups; plaintext stays for manage emails + dual-read
+        // until old campaigns are backfilled (see lib/ownerToken.ts).
+        const tokenHash = await hashOwnerToken(token);
 
         let campaign = null;
         for (let attempt = 0; attempt < 5; attempt++) {
             const slug = `${baseSlug}-${randomSuffix()}`;
             try {
                 const result = await pool.query(
-                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, goal, category, organizer_email, day_slug, publisher_country, referrer_slug, created_at)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())
+                    `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, owner_token_hash, goal, category, organizer_email, day_slug, publisher_country, referrer_slug, created_at)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW())
                      RETURNING id, slug, title, supporter_count, owner_token, created_at, publisher_country`,
-                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, goalValue, categoryValue, emailValue, dayValue, country, referrerValue]
+                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, tokenHash, goalValue, categoryValue, emailValue, dayValue, country, referrerValue]
                 );
                 campaign = result.rows[0];
                 break;
             } catch (e: any) {
                 // 23505 = unique_violation on slug; retry with a fresh suffix
                 if (e?.code === '23505') continue;
+                // Column may be missing on a stale preview; fall back without hash.
+                if (e?.code === '42703' && String(e?.message || '').includes('owner_token_hash')) {
+                    const result = await pool.query(
+                        `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, goal, category, organizer_email, day_slug, publisher_country, referrer_slug, created_at)
+                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())
+                         RETURNING id, slug, title, supporter_count, owner_token, created_at, publisher_country`,
+                        [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, goalValue, categoryValue, emailValue, dayValue, country, referrerValue]
+                    );
+                    campaign = result.rows[0];
+                    break;
+                }
                 throw e;
             }
         }

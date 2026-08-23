@@ -2,6 +2,14 @@ import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { CATEGORY_KEYS } from '@/lib/categories';
 import { hasVisibleFrame } from '@/lib/frameValidity';
+import {
+    createManageSession,
+    findCampaignByManageSession,
+    findCampaignByOwnerToken,
+    MANAGE_SESSION_COOKIE,
+    manageSessionCookieOptions,
+    type OwnedCampaign,
+} from '@/lib/ownerToken';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,28 +23,75 @@ function slugify(input: string): string {
     return base;
 }
 
+async function resolveOwned(
+    request: NextRequest,
+    slug: string,
+    tokenFromClient: string
+): Promise<{ owned: OwnedCampaign; mintSession: boolean } | null> {
+    if (tokenFromClient) {
+        const byToken = await findCampaignByOwnerToken(slug, tokenFromClient);
+        if (byToken) return { owned: byToken, mintSession: true };
+    }
+
+    const session = request.cookies.get(MANAGE_SESSION_COOKIE)?.value || '';
+    if (session) {
+        const bySession = await findCampaignByManageSession(slug, session);
+        if (bySession) return { owned: bySession, mintSession: false };
+    }
+
+    return null;
+}
+
+async function withOptionalManageCookie(
+    response: NextResponse,
+    campaignId: string,
+    mintSession: boolean
+): Promise<NextResponse> {
+    if (!mintSession) return response;
+    try {
+        const sessionToken = await createManageSession(campaignId);
+        const opts = manageSessionCookieOptions(sessionToken);
+        response.cookies.set(opts.name, opts.value, {
+            httpOnly: opts.httpOnly,
+            secure: opts.secure,
+            sameSite: opts.sameSite,
+            path: opts.path,
+            maxAge: opts.maxAge,
+        });
+    } catch (e) {
+        // Session table may be missing on a stale preview; manage still works via k=.
+        console.error('manage session mint failed', e);
+    }
+    return response;
+}
+
 // GET /api/campaigns/[slug]/manage?token=XXX
-// Returns real stats for the owner. Requires the private owner token.
+// Returns real stats for the owner. Accepts owner token or manage session cookie.
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
     try {
         const { slug } = await params;
         const token = new URL(request.url).searchParams.get('token') || '';
-        if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 401 });
+
+        const resolved = await resolveOwned(request, slug, token);
+        if (!resolved) {
+            return NextResponse.json({ error: 'Not found or wrong key' }, { status: 404 });
+        }
+        const { owned, mintSession } = resolved;
 
         const result = await pool.query(
             `SELECT id, slug, title, description, frame_config, supporter_count, view_count, goal, category, preview_url, is_public, created_at
              FROM campaigns
-             WHERE slug = $1 AND owner_token = $2
+             WHERE id = $1
              LIMIT 1`,
-            [slug, token]
+            [owned.id]
         );
         if (result.rows.length === 0) {
             return NextResponse.json({ error: 'Not found or wrong key' }, { status: 404 });
         }
         const { id, ...campaign } = result.rows[0];
 
-        // Real daily supporter counts for the last 30 days (from each recorded use).
         let daily: { day: string; n: number }[] = [];
+        let countries: { country: string; n: number }[] = [];
         try {
             const ts = await pool.query(
                 `SELECT to_char(date_trunc('day', created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS day, COUNT(*)::int AS n
@@ -50,7 +105,23 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             console.error('timeseries failed', e);
         }
 
-        return NextResponse.json({ ...campaign, daily });
+        try {
+            const geo = await pool.query(
+                `SELECT supporter_country AS country, COUNT(*)::int AS n
+                 FROM campaign_uses
+                 WHERE campaign_id = $1 AND supporter_country IS NOT NULL
+                 GROUP BY 1
+                 ORDER BY n DESC
+                 LIMIT 8`,
+                [id]
+            );
+            countries = geo.rows;
+        } catch (e) {
+            console.error('country breakdown failed', e);
+        }
+
+        const response = NextResponse.json({ ...campaign, daily, countries });
+        return withOptionalManageCookie(response, id, mintSession);
     } catch (error) {
         console.error('Failed to load manage data:', error);
         return NextResponse.json({ error: 'Failed to load' }, { status: 500 });
@@ -58,24 +129,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 // PATCH /api/campaigns/[slug]/manage
-// Body: { token, title?, description?, slug? }. Requires the owner token.
+// Body: { token?, title?, description?, slug? }. Requires owner token or manage session.
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
     try {
         const { slug } = await params;
         const body = await request.json().catch(() => ({}));
         const token = typeof body.token === 'string' ? body.token : '';
-        if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 401 });
 
-        // Confirm ownership first.
-        const owned = await pool.query(
-            `SELECT id, slug FROM campaigns WHERE slug = $1 AND owner_token = $2 LIMIT 1`,
-            [slug, token]
-        );
-        if (owned.rows.length === 0) {
+        const resolved = await resolveOwned(request, slug, token);
+        if (!resolved) {
             return NextResponse.json({ error: 'Not found or wrong key' }, { status: 404 });
         }
-        const id = owned.rows[0].id as string;
-        const currentSlug = owned.rows[0].slug as string;
+        const id = resolved.owned.id;
+        const currentSlug = resolved.owned.slug;
 
         const sets: string[] = [];
         const values: unknown[] = [];
@@ -183,7 +249,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
                 }
             }
 
-            return NextResponse.json(result.rows[0]);
+            const response = NextResponse.json(result.rows[0]);
+            return withOptionalManageCookie(response, id, resolved.mintSession);
         } catch (e: any) {
             if (e?.code === '23505') {
                 return NextResponse.json({ error: 'That link name is taken. Try another.' }, { status: 409 });

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
+import { AdSlot } from '@/components/AdSlot';
 import { ArrowRight, Check, X } from 'lucide-react';
 import type { VsCopy } from '@/lib/vsTwibbonizeCopy';
 
@@ -77,6 +78,12 @@ export function VsTwibbonizeShell({ copy }: { copy: VsCopy; canonical?: string }
                     </table>
                 </div>
                 <p className="max-w-3xl mx-auto text-xs text-muted mt-3 leading-relaxed">{copy.disclaimer}</p>
+            </section>
+
+            <section className="px-4 sm:px-6 pb-8">
+                <div className="max-w-3xl mx-auto">
+                    <AdSlot surface="seo" />
+                </div>
             </section>
 
             <section className="px-4 sm:px-6 py-12 sm:py-16">

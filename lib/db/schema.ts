@@ -12,16 +12,20 @@ export const campaigns = pgTable("campaigns", {
 	title: text().notNull(),
 	description: text(),
 	frameConfig: jsonb("frame_config").notNull(),
-	// Nullable and always null today. Kept so organizer accounts can be added
-	// later without another migration.
+	// Set to organizers.id (as text) when the creator is signed in or later
+	// claims the campaign. Still nullable for anonymous publishes.
 	creatorId: text("creator_id"),
 	creatorName: text("creator_name").default('Anonymous'),
 	supporterCount: integer("supporter_count").default(0),
 	viewCount: integer("view_count").default(0),
 	goal: integer("goal"),
 	category: text("category"),
+	// Awareness-day attribution when the builder was opened from /day/[slug].
+	daySlug: text("day_slug"),
 	referrerSlug: text("referrer_slug"),
 	ownerToken: text("owner_token"),
+	/** SHA-256 hex of owner_token. Dual-read with plaintext during migration. */
+	ownerTokenHash: text("owner_token_hash"),
 	previewUrl: text("preview_url"),
 	isPublic: boolean("is_public").default(true),
 	isHidden: boolean("is_hidden").default(false),
@@ -33,16 +37,39 @@ export const campaigns = pgTable("campaigns", {
 	publisherCountry: text("publisher_country"),
 	firstSupporterCountry: text("first_supporter_country"),
 	firstSupporterEmailedAt: timestamp("first_supporter_emailed_at", { withTimezone: true, mode: 'string' }),
+	zeroSupporterEmailedAt: timestamp("zero_supporter_emailed_at", { withTimezone: true, mode: 'string' }),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
 	index("idx_campaigns_slug").using("btree", table.slug.asc().nullsLast()),
 	index("idx_campaigns_created_at").using("btree", table.createdAt.desc().nullsLast()),
 	index("idx_campaigns_category").using("btree", table.category.asc().nullsLast()),
+	index("idx_campaigns_day_slug").using("btree", table.daySlug.asc().nullsLast()),
 	index("idx_campaigns_referrer_slug").using("btree", table.referrerSlug.asc().nullsLast()),
 	index("idx_campaigns_organizer_email").using("btree", table.organizerEmail.asc().nullsLast()),
 	index("idx_campaigns_publisher_country").using("btree", table.publisherCountry.asc().nullsLast()),
 	index("idx_campaigns_first_supporter_country").using("btree", table.firstSupporterCountry.asc().nullsLast()),
 	unique("campaigns_slug_key").on(table.slug),
+]);
+
+// Old /c/[slug] links keep working after an organizer renames their URL.
+export const campaignSlugRedirects = pgTable("campaign_slug_redirects", {
+	oldSlug: text("old_slug").primaryKey().notNull(),
+	campaignId: uuid("campaign_id").notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	index("idx_slug_redirects_campaign").using("btree", table.campaignId.asc().nullsLast()),
+	foreignKey({
+		columns: [table.campaignId],
+		foreignColumns: [campaigns.id],
+		name: "campaign_slug_redirects_campaign_id_fkey"
+	}).onDelete("cascade"),
+]);
+
+// Runtime frame art for /day pages (override → bundled file → colour ring).
+export const dayFrameOverrides = pgTable("day_frame_overrides", {
+	slug: text().primaryKey().notNull(),
+	imageUrl: text("image_url").notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 ]);
 
 export const campaignUses = pgTable("campaign_uses", {
@@ -110,9 +137,30 @@ export const organizers = pgTable("organizers", {
 	bio: text(),
 	avatarUrl: text("avatar_url"),
 	featuredCampaignId: uuid("featured_campaign_id"),
+	hubTheme: text("hub_theme").default('default'),
+	hubHiddenCampaignIds: jsonb("hub_hidden_campaign_ids").$type<string[]>().default([]),
+	supportClickCount: integer("support_click_count").default(0),
 	hubUpdatedAt: timestamp("hub_updated_at", { withTimezone: true, mode: 'string' }),
+	/** Interest in paid hub upgrades; no billing yet. */
+	upgradeInterestedAt: timestamp("upgrade_interested_at", { withTimezone: true, mode: 'string' }),
 }, (table) => [
 	unique("idx_organizers_email").on(table.email),
+]);
+
+// Short-lived manage cookies after a successful k= verify (see lib/ownerToken.ts).
+export const campaignManageSessions = pgTable("campaign_manage_sessions", {
+	tokenHash: text("token_hash").primaryKey().notNull(),
+	campaignId: uuid("campaign_id").notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+	expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'string' }).notNull(),
+}, (table) => [
+	index("idx_manage_sessions_campaign").using("btree", table.campaignId.asc().nullsLast()),
+	index("idx_manage_sessions_expires").using("btree", table.expiresAt.asc().nullsLast()),
+	foreignKey({
+		columns: [table.campaignId],
+		foreignColumns: [campaigns.id],
+		name: "campaign_manage_sessions_campaign_id_fkey"
+	}).onDelete("cascade"),
 ]);
 
 // Extra buttons on the organizer hub (Instagram, donate, press kit, …).
@@ -122,6 +170,7 @@ export const organizerHubLinks = pgTable("organizer_hub_links", {
 	title: text().notNull(),
 	url: text().notNull(),
 	sortOrder: integer("sort_order").default(0).notNull(),
+	clickCount: integer("click_count").default(0),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
 	index("idx_hub_links_organizer").using("btree", table.organizerId.asc().nullsLast(), table.sortOrder.asc().nullsLast()),

@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { ExternalLink, Globe, Pencil, Trash2, Inbox, LogIn, LogOut, Loader2, Users } from 'lucide-react';
 import { countryLabel } from '@/lib/geo';
 import { suggestHandleFromEmail } from '@/lib/hub';
+import { organizerShareText, whatsappUrl } from '@/lib/share';
+import { track, withUtm } from '@/lib/analytics';
+import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 
 interface SavedCampaign {
     slug: string;
@@ -34,6 +37,8 @@ interface Row {
     firstSupporterCountry: string | null;
     /** Present only for rows that live in this browser but not on the account. */
     localCreatedAt?: number;
+    /** ISO created_at when known (account campaigns) for zero-supporter timing. */
+    createdAtIso?: string | null;
 }
 
 const LOCAL_KEY = 'ollabs_my_campaigns';
@@ -89,6 +94,7 @@ export const MyCampaignsClient: React.FC = () => {
                 supporters: c.supporter_count,
                 publisherCountry: c.publisher_country,
                 firstSupporterCountry: c.first_supporter_country,
+                createdAtIso: c.created_at,
             })),
         [account, origin]
     );
@@ -235,10 +241,12 @@ export const MyCampaignsClient: React.FC = () => {
                     </p>
                     <p className="text-sm text-ink/70 mb-6">
                         {signedIn
-                            ? 'Anything you create from now on lands here, on every device you sign in from.'
-                            : 'Campaigns you create in this browser show up here so you can find their dashboards again.'}
+                            ? 'Create a frame, then share the link on WhatsApp in the first hour. That is when most campaigns get their first supporter.'
+                            : 'Create a frame in this browser, then send the link on WhatsApp right away. Campaigns that are not shared in the first hour almost never take off.'}
                     </p>
-                    <Link href="/create" className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">Create a campaign</Link>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <Link href="/create" className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">Create a campaign</Link>
+                    </div>
                 </div>
             ) : (
                 <div className="space-y-3">
@@ -291,9 +299,18 @@ export const MyCampaignsClient: React.FC = () => {
 const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRemove }) => {
     const pub = countryChip(row.publisherCountry);
     const first = countryChip(row.firstSupporterCountry);
+    const zeroSupporters = (row.supporters ?? 0) === 0;
+    const ageMs = row.createdAtIso
+        ? Date.now() - new Date(row.createdAtIso).getTime()
+        : row.localCreatedAt
+          ? Date.now() - row.localCreatedAt
+          : null;
+    // Surface after ~15 minutes, or immediately when we lack a timestamp.
+    const showShareNudge = zeroSupporters && (ageMs == null || ageMs >= 15 * 60 * 1000);
 
     return (
-        <div className="bg-cream border border-ink/10 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="bg-cream border border-ink/10 rounded-2xl p-4 flex flex-col gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <div className="min-w-0 flex-1">
                 <p className="font-display font-bold truncate text-[15px]">{row.title}</p>
                 <p className="text-xs text-muted truncate flex items-center gap-2 mt-0.5 flex-wrap">
@@ -334,6 +351,19 @@ const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRem
                     </button>
                 )}
             </div>
+            </div>
+            {showShareNudge && (
+                <a
+                    href={whatsappUrl(organizerShareText(row.title), withUtm(row.url, 'whatsapp'))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => track('campaign_share', { campaign: row.slug, method: 'whatsapp', from: 'mine_zero_nudge' })}
+                    className="w-full min-h-[44px] py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white hover:brightness-105 transition-all"
+                    style={{ backgroundColor: WHATSAPP_GREEN }}
+                >
+                    <WhatsAppGlyph size={15} /> Share now on WhatsApp
+                </a>
+            )}
         </div>
     );
 };

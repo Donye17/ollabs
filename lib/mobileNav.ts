@@ -45,6 +45,7 @@ export function shouldShowMobileOrganizerNav(pathname: string): boolean {
 /**
  * Language offer must never cover a thumb-zone save/publish bar.
  * Soft offer stays on home and browse; hide wherever a primary bottom CTA lives.
+ * Public /c is included so Save/Share stays unobstructed on phones.
  */
 export function shouldHideLanguageBanner(pathname: string): boolean {
     const path = pathname || '/';

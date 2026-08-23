@@ -12,6 +12,7 @@ import {
     normalizeHandle,
     type HubLinkInput,
 } from '@/lib/hub';
+import { isHubThemeId } from '@/lib/hubThemes';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,16 +24,32 @@ type CampaignRow = {
     preview_url: string | null;
 };
 
+function parseHiddenIds(raw: unknown): string[] {
+    if (Array.isArray(raw)) return raw.map(String);
+    if (typeof raw === 'string') {
+        try {
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed.map(String) : [];
+        } catch {
+            return [];
+        }
+    }
+    return [];
+}
+
 async function loadHubBundle(organizerId: string) {
     const [orgRes, linksRes, campsRes] = await Promise.all([
         pool.query(
             `SELECT id, email, handle, display_name, bio, avatar_url,
-                    featured_campaign_id, hub_updated_at
+                    featured_campaign_id, hub_updated_at, hub_theme,
+                    COALESCE(hub_hidden_campaign_ids, '[]'::jsonb) AS hub_hidden_campaign_ids,
+                    COALESCE(support_click_count, 0) AS support_click_count,
+                    upgrade_interested_at
              FROM organizers WHERE id = $1 LIMIT 1`,
             [organizerId]
         ),
         pool.query(
-            `SELECT id, title, url, sort_order
+            `SELECT id, title, url, sort_order, COALESCE(click_count, 0) AS click_count
              FROM organizer_hub_links
              WHERE organizer_id = $1
              ORDER BY sort_order ASC, created_at ASC`,
@@ -58,6 +75,7 @@ async function loadHubBundle(organizerId: string) {
     const featured = featuredId
         ? campaigns.find((c) => c.id === featuredId) ?? null
         : null;
+    const hiddenCampaignIds = parseHiddenIds(org.hub_hidden_campaign_ids);
 
     return {
         email: org.email as string,
@@ -66,6 +84,10 @@ async function loadHubBundle(organizerId: string) {
         bio: (org.bio as string | null) ?? null,
         avatarUrl: (org.avatar_url as string | null) ?? null,
         featuredCampaignId: featuredId,
+        hubTheme: (org.hub_theme as string | null) || 'default',
+        hiddenCampaignIds,
+        supportClickCount: Number(org.support_click_count) || 0,
+        upgradeInterested: !!org.upgrade_interested_at,
         featured: featured
             ? {
                   slug: featured.slug,
@@ -81,11 +103,18 @@ async function loadHubBundle(organizerId: string) {
             supporter_count: c.supporter_count,
             preview_url: c.preview_url,
         })),
-        links: linksRes.rows.map((l: { id: string; title: string; url: string; sort_order: number }) => ({
+        links: linksRes.rows.map((l: {
+            id: string;
+            title: string;
+            url: string;
+            sort_order: number;
+            click_count: number;
+        }) => ({
             id: l.id,
             title: l.title,
             url: l.url,
             sortOrder: l.sort_order,
+            clickCount: Number(l.click_count) || 0,
         })),
         hubUpdatedAt: (org.hub_updated_at as string | null) ?? null,
     };
@@ -130,7 +159,6 @@ export async function PATCH(request: NextRequest) {
         let nextHandle: string | null | undefined;
         if ('handle' in body) {
             if (body.handle === null || body.handle === '') {
-                // Clearing a published hub is allowed; old /u links 404.
                 nextHandle = null;
             } else {
                 const normalized = normalizeHandle(body.handle);
@@ -189,6 +217,33 @@ export async function PATCH(request: NextRequest) {
                     );
                 }
                 featuredCampaignId = owned.rows[0].id;
+            }
+        }
+
+        // ---- theme --------------------------------------------------------
+        let hubTheme: string | undefined;
+        if ('hubTheme' in body) {
+            if (!isHubThemeId(body.hubTheme)) {
+                return NextResponse.json({ error: 'Unknown theme.' }, { status: 400 });
+            }
+            hubTheme = body.hubTheme;
+        }
+
+        // ---- hidden campaigns (hub list only; not account-wide is_hidden) -
+        let hiddenCampaignIds: string[] | undefined;
+        if ('hiddenCampaignIds' in body) {
+            if (!Array.isArray(body.hiddenCampaignIds)) {
+                return NextResponse.json({ error: 'hiddenCampaignIds must be a list.' }, { status: 400 });
+            }
+            const ids = body.hiddenCampaignIds.map(String).slice(0, 50);
+            if (ids.length > 0) {
+                const owned = await pool.query(
+                    `SELECT id FROM campaigns WHERE creator_id = $1 AND id = ANY($2::uuid[])`,
+                    [organizer.id, ids]
+                );
+                hiddenCampaignIds = owned.rows.map((r: { id: string }) => r.id);
+            } else {
+                hiddenCampaignIds = [];
             }
         }
 
@@ -259,6 +314,16 @@ export async function PATCH(request: NextRequest) {
             if (bio !== undefined) push('bio', bio);
             if (avatarUrl !== undefined) push('avatar_url', avatarUrl);
             if (featuredCampaignId !== undefined) push('featured_campaign_id', featuredCampaignId);
+            if (hubTheme !== undefined) push('hub_theme', hubTheme);
+            if (hiddenCampaignIds !== undefined) {
+                vals.push(JSON.stringify(hiddenCampaignIds));
+                sets.push(`hub_hidden_campaign_ids = $${vals.length}::jsonb`);
+            }
+
+            // Paid upgrades are deferred; this only records interest for demand.
+            if (body.upgradeInterest === true) {
+                sets.push(`upgrade_interested_at = COALESCE(upgrade_interested_at, NOW())`);
+            }
 
             vals.push(organizer.id);
             await client.query(

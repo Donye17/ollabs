@@ -1,4 +1,5 @@
 import type { Locale } from './locale';
+import { applyLocaleOverlay } from './localeOverlays';
 
 /** UI chrome strings. Campaign titles stay as the organizer wrote them. */
 export type Messages = {
@@ -31,7 +32,10 @@ export type Messages = {
         goalReached: string;
         youreIn: string;
         bringPeople: string;
+        sharePhoto: string;
+        shareStory: string;
         shareWhatsApp: string;
+        shareLinkWhatsApp: string;
         shareMessenger: string;
         shareAnother: string;
         copyLink: string;
@@ -66,6 +70,7 @@ export type Messages = {
         changeFrame: string;
         uploading: string;
         pngTip: string;
+        opaqueFrameWarning: string;
         photoWindow: string;
         photoWindowHint: string;
         tipLogo: string;
@@ -120,6 +125,11 @@ export type Messages = {
         savedToAccount: (email: string) => string;
         setupHub: string;
         setupHubBody: string;
+        claimHub: string;
+        claimingHub: string;
+        hubLive: (handle: string) => string;
+        openHub: string;
+        shareHubWhatsApp: string;
     };
     day: {
         tapAdd: string;
@@ -323,8 +333,11 @@ const en: Messages = {
         ofSupporters: 'supporters',
         goalReached: 'goal reached',
         youreIn: "You're in. Now bring your people.",
-        bringPeople: 'Post your framed photo, and share the link so others can add it too.',
+        bringPeople: 'Share your framed photo first. Then send the link so others can add it too.',
+        sharePhoto: 'Share photo',
+        shareStory: 'Share as story',
         shareWhatsApp: 'Share on WhatsApp',
+        shareLinkWhatsApp: 'Share link on WhatsApp',
         shareMessenger: 'Share on Messenger',
         shareAnother: 'Share another way',
         copyLink: 'Copy link',
@@ -361,6 +374,8 @@ const en: Messages = {
         changeFrame: 'Change frame image',
         uploading: 'Uploading…',
         pngTip: 'PNG with transparency works best',
+        opaqueFrameWarning:
+            'This image looks opaque in the center. Use a PNG with a transparent hole for the photo, or open the photo window with the slider below.',
         photoWindow: 'Photo window',
         photoWindowHint:
             'Cut a circle so the photo shows through. Left = more frame, right = more photo. Set to 0 if your PNG already has a transparent center.',
@@ -425,6 +440,11 @@ const en: Messages = {
             `Saved to your account, ${email}. Open it from any device by signing in with a code at /login.`,
         setupHub: 'Set up your campaign hub',
         setupHubBody: 'One link for your bio, Support button, and every campaign you run.',
+        claimHub: 'Claim hub with this campaign',
+        claimingHub: 'Claiming hub…',
+        hubLive: (handle) => `Your hub is live at ollabs.studio/u/${handle}`,
+        openHub: 'Open your hub',
+        shareHubWhatsApp: 'Share hub on WhatsApp',
     },
     day: {
         tapAdd: 'Tap to add your photo',
@@ -474,8 +494,11 @@ const pt: Messages = {
         goalReached: 'meta atingida',
         youreIn: 'Pronto. Agora chame a sua galera.',
         bringPeople:
-            'Poste a foto com a moldura e compartilhe o link para outras pessoas também colocarem.',
+            'Compartilhe a foto com a moldura primeiro. Depois envie o link para outras pessoas também colocarem.',
+        sharePhoto: 'Compartilhar foto',
+        shareStory: 'Compartilhar nos stories',
         shareWhatsApp: 'Compartilhar no WhatsApp',
+        shareLinkWhatsApp: 'Compartilhar link no WhatsApp',
         shareMessenger: 'Compartilhar no Messenger',
         shareAnother: 'Compartilhar de outro jeito',
         copyLink: 'Copiar link',
@@ -512,6 +535,8 @@ const pt: Messages = {
         changeFrame: 'Trocar imagem da moldura',
         uploading: 'Enviando…',
         pngTip: 'PNG com transparência funciona melhor',
+        opaqueFrameWarning:
+            'Esta imagem parece opaca no centro. Use um PNG com um buraco transparente para a foto, ou abra a janela da foto com o controle abaixo.',
         photoWindow: 'Janela da foto',
         photoWindowHint:
             'Abra um círculo para a foto aparecer. Esquerda = mais moldura, direita = mais foto. Use 0 se o PNG já tiver o centro transparente.',
@@ -577,6 +602,11 @@ const pt: Messages = {
             `Salva na sua conta, ${email}. Abra em qualquer dispositivo entrando com um código em /login.`,
         setupHub: 'Configure seu hub de campanhas',
         setupHubBody: 'Um link para bio, botão Apoiar e todas as suas campanhas.',
+        claimHub: 'Criar hub com esta campanha',
+        claimingHub: 'Criando hub…',
+        hubLive: (handle) => `Seu hub está no ar em ollabs.studio/u/${handle}`,
+        openHub: 'Abrir seu hub',
+        shareHubWhatsApp: 'Compartilhar hub no WhatsApp',
     },
     day: {
         tapAdd: 'Toque para adicionar sua foto',
@@ -626,8 +656,11 @@ const id: Messages = {
         goalReached: 'target tercapai',
         youreIn: 'Sudah masuk. Sekarang ajak barenganmu.',
         bringPeople:
-            'Posting fotomu yang sudah dibingkai, dan bagikan linknya supaya orang lain juga bisa pasang.',
+            'Bagikan dulu fotomu yang sudah dibingkai. Lalu kirim linknya supaya orang lain juga bisa pasang.',
+        sharePhoto: 'Bagikan foto',
+        shareStory: 'Bagikan ke story',
         shareWhatsApp: 'Bagikan di WhatsApp',
+        shareLinkWhatsApp: 'Bagikan link di WhatsApp',
         shareMessenger: 'Bagikan di Messenger',
         shareAnother: 'Bagikan cara lain',
         copyLink: 'Salin link',
@@ -664,6 +697,8 @@ const id: Messages = {
         changeFrame: 'Ganti gambar bingkai',
         uploading: 'Mengunggah…',
         pngTip: 'PNG dengan transparansi paling bagus',
+        opaqueFrameWarning:
+            'Gambar ini terlihat solid di tengah. Pakai PNG dengan lubang transparan untuk foto, atau buka jendela foto dengan slider di bawah.',
         photoWindow: 'Jendela foto',
         photoWindowHint:
             'Potong lingkaran supaya fotonya terlihat. Kiri = lebih banyak bingkai, kanan = lebih banyak foto. Setel 0 jika PNG-mu sudah transparan di tengah.',
@@ -729,6 +764,11 @@ const id: Messages = {
             `Disimpan ke akunmu, ${email}. Buka dari perangkat mana saja dengan masuk pakai kode di /login.`,
         setupHub: 'Atur hub kampanyemu',
         setupHubBody: 'Satu link untuk bio, tombol Dukung, dan semua kampanyemu.',
+        claimHub: 'Klaim hub dengan kampanye ini',
+        claimingHub: 'Mengklaim hub…',
+        hubLive: (handle) => `Hubmu sudah live di ollabs.studio/u/${handle}`,
+        openHub: 'Buka hubmu',
+        shareHubWhatsApp: 'Bagikan hub di WhatsApp',
     },
     day: {
         tapAdd: 'Ketuk untuk menambah fotomu',
@@ -748,8 +788,11 @@ const id: Messages = {
     landingEs,
 };
 
-export const dictionaries: Record<Locale, Messages> = { en, pt, id };
+export const dictionaries: Record<'en' | 'pt' | 'id', Messages> = { en, pt, id };
 
 export function getMessages(locale: Locale): Messages {
+    if (locale === 'es' || locale === 'tl') {
+        return applyLocaleOverlay(en, locale);
+    }
     return dictionaries[locale] || dictionaries.en;
 }

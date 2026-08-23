@@ -5,11 +5,13 @@ import { pool } from '@/lib/neon';
 import { NavBar } from '@/components/NavBar';
 import { DayFrameTool } from '@/components/day/DayFrameTool';
 import { DAYS, getDay, nextOccurrence, formatOccurrence, countdownLabel, resolveFrame } from '@/lib/days';
+import { FrameType } from '@/lib/types';
 import { getUseCase } from '@/lib/useCases';
 import { visibleFrameSql } from '@/lib/frameValidity';
 import { getFrameOverride } from '@/lib/dayFrames';
 import { AdSlot } from '@/components/AdSlot';
 import { ArrowRight, CalendarDays, Users } from 'lucide-react';
+import { DayShareButton } from '@/components/day/DayShareButton';
 
 // Matches the campaign pages: fresh enough for the live campaign block without
 // hitting Neon on every crawl.
@@ -27,14 +29,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const when = formatOccurrence(day, occ);
     const url = `https://ollabs.studio/day/${day.slug}`;
     const description = `${day.name} is ${when}. ${day.tagline} Make a free profile picture frame and share one link. No signup, no watermark.`;
+    const overrideUrl = await getFrameOverride(day.slug);
+    const frame = resolveFrame(day, overrideUrl);
+    const ogImage =
+        (frame.type === FrameType.CUSTOM_IMAGE && frame.imageUrl) ? frame.imageUrl
+        : overrideUrl || '/og.png';
     return {
         title: `${day.name} Profile Picture Frame`,
         description,
         keywords: [day.keyword, `${day.name.toLowerCase()} frame`, `${day.name.toLowerCase()} profile picture`,
             'profile picture frame', 'twibbon alternative'],
         alternates: { canonical: url },
-        openGraph: { type: 'website', url, siteName: 'Ollabs', title: `${day.name} Profile Picture Frame`, description, images: ['/og.png'] },
-        twitter: { card: 'summary_large_image', title: `${day.name} Profile Picture Frame`, description, images: ['/og.png'] },
+        openGraph: { type: 'website', url, siteName: 'Ollabs', title: `${day.name} Profile Picture Frame`, description, images: [ogImage] },
+        twitter: { card: 'summary_large_image', title: `${day.name} Profile Picture Frame`, description, images: [ogImage] },
     };
 }
 
@@ -149,6 +156,9 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                             Free, no signup, and no watermark. Your photo never leaves your browser.
                         </p>
                         <DayFrameTool frame={resolveFrame(day, overrideUrl)} dayName={day.name} daySlug={day.slug} />
+                        <div className="mt-5">
+                            <DayShareButton dayName={day.name} daySlug={day.slug} />
+                        </div>
                     </div>
                 </div>
             </section>
@@ -234,7 +244,10 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                             <p className="text-ink/75 mb-5">
                                 Make the frame, share one link, and your supporter count starts moving today.
                             </p>
-                            <Link href={`/create?day=${day.slug}`} className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all">
+                            <Link
+                                href={`/create?day=${day.slug}`}
+                                className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all"
+                            >
                                 Create a campaign <ArrowRight size={16} />
                             </Link>
                         </div>

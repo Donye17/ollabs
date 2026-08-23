@@ -84,12 +84,10 @@ export const useEditorLogic = ({
                 return;
             }
             try {
-                // @ts-ignore
                 const colorThief = new ColorThief();
                 const palette = colorThief.getPalette(imageObject, 3);
                 if (palette && palette.length > 0) {
-                    // @ts-ignore
-                    const hexPalette = palette.map((rgb: number[]) => rgbToHex(rgb[0], rgb[1], rgb[2]));
+                    const hexPalette = palette.map((rgb) => rgbToHex(rgb[0], rgb[1], rgb[2]));
                     resolve(hexPalette);
                 } else {
                     reject("No colors found");
@@ -104,8 +102,18 @@ export const useEditorLogic = ({
         const canvas = canvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
-        const clientX = 'touches' in e ? (e as any).touches[0].clientX : (e as React.MouseEvent).clientX;
-        const clientY = 'touches' in e ? (e as any).touches[0].clientY : (e as React.MouseEvent).clientY;
+        let clientX: number;
+        let clientY: number;
+        if ('touches' in e && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else if ('changedTouches' in e && e.changedTouches.length > 0) {
+            clientX = e.changedTouches[0].clientX;
+            clientY = e.changedTouches[0].clientY;
+        } else {
+            clientX = (e as MouseEvent | React.MouseEvent).clientX;
+            clientY = (e as MouseEvent | React.MouseEvent).clientY;
+        }
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
         return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };

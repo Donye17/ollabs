@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { NavBar } from '@/components/NavBar';
 import { ExploreClient, ExploreCampaign } from '@/components/ExploreClient';
 import { FrameConfig } from '@/lib/types';
@@ -19,17 +20,27 @@ export const metadata: Metadata = {
 
 type Sort = 'popular' | 'trending' | 'newest';
 
-async function getCampaigns(sort: Sort, category: string | null): Promise<ExploreCampaign[]> {
-    const base = `SELECT c.slug, c.title, c.frame_config, c.supporter_count FROM campaigns c`;
+async function getCampaigns(
+    sort: Sort,
+    category: string | null,
+    visitorCountry: string | null
+): Promise<ExploreCampaign[]> {
+    const base = `SELECT c.slug, c.title, c.frame_config, c.supporter_count, c.preview_url, c.publisher_country FROM campaigns c`;
     // category is validated against the fixed allowlist before reaching here, so it is safe to inline.
     const catClause = category ? ` AND c.category = '${category}'` : '';
     // Explore filters on frame validity only, no supporter floor. A brand new campaign
     // has 0 supporters by definition, and gating discovery on traction would mean a
     // legitimate campaign can never surface here.
     const where = `WHERE c.is_public = true AND c.is_hidden IS NOT TRUE AND ${visibleFrameSql('c')}${catClause}`;
+    // Soft geo boost: same-country publishers float slightly without hiding others.
+    const geoBoost = visitorCountry
+        ? `CASE WHEN c.publisher_country = '${visitorCountry.replace(/[^A-Z]/g, '')}' THEN 1 ELSE 0 END`
+        : '0';
     let query: string;
     if (sort === 'newest') {
-        query = `${base} ${where} ORDER BY c.created_at DESC LIMIT 60`;
+        query = `${base} ${where}
+            ORDER BY ${geoBoost} DESC, c.created_at DESC
+            LIMIT 60`;
     } else if (sort === 'trending') {
         query = `${base}
             LEFT JOIN (
@@ -39,12 +50,11 @@ async function getCampaigns(sort: Sort, category: string | null): Promise<Explor
                 GROUP BY campaign_id
             ) r ON r.campaign_id = c.id
             ${where}
-            ORDER BY COALESCE(r.recent, 0) DESC, c.supporter_count DESC NULLS LAST, c.created_at DESC
+            ORDER BY ${geoBoost} DESC, COALESCE(r.recent, 0) DESC, c.supporter_count DESC NULLS LAST, c.created_at DESC
             LIMIT 60`;
     } else {
-        // Popular = real downloads recorded in campaign_uses, not a denormalized
-        // counter that can be seeded ahead of real traffic.
-        query = `SELECT c.slug, c.title, c.frame_config,
+        // Popular = real downloads × recency feel, with a soft country bias.
+        query = `SELECT c.slug, c.title, c.frame_config, c.preview_url, c.publisher_country,
                         COALESCE(u.real_uses, 0)::int AS supporter_count
                  FROM campaigns c
                  LEFT JOIN (
@@ -53,7 +63,7 @@ async function getCampaigns(sort: Sort, category: string | null): Promise<Explor
                      GROUP BY campaign_id
                  ) u ON u.campaign_id = c.id
                  ${where}
-                 ORDER BY COALESCE(u.real_uses, 0) DESC, c.created_at DESC
+                 ORDER BY ${geoBoost} DESC, COALESCE(u.real_uses, 0) DESC, c.created_at DESC
                  LIMIT 60`;
     }
     try {
@@ -63,6 +73,7 @@ async function getCampaigns(sort: Sort, category: string | null): Promise<Explor
             title: r.title,
             supporterCount: r.supporter_count ?? 0,
             frame: (typeof r.frame_config === 'string' ? JSON.parse(r.frame_config) : r.frame_config) as FrameConfig,
+            previewUrl: typeof r.preview_url === 'string' ? r.preview_url : null,
         }));
     } catch (e) {
         console.error('Failed to load explore campaigns', e);
@@ -88,7 +99,10 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
     const sp = await searchParams;
     const sort: Sort = sp.sort === 'newest' ? 'newest' : sp.sort === 'trending' ? 'trending' : 'popular';
     const category = sp.category && CATEGORY_KEYS.includes(sp.category) ? sp.category : null;
-    const campaigns = await getCampaigns(sort, category);
+    const hdrs = await headers();
+    const rawCountry = (hdrs.get('x-vercel-ip-country') || hdrs.get('cf-ipcountry') || '').toUpperCase();
+    const visitorCountry = /^[A-Z]{2}$/.test(rawCountry) && rawCountry !== 'XX' ? rawCountry : null;
+    const campaigns = await getCampaigns(sort, category, visitorCountry);
 
     return (
         <main className="min-h-screen bg-paper text-ink">

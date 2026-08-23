@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, KeyRound, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { track } from '@/lib/analytics';
 
 type Step = 'email' | 'code' | 'done';
 
@@ -40,6 +41,7 @@ export const LoginClient: React.FC = () => {
             }
             setCode('');
             setStep('code');
+            track('login_code_sent');
         } catch {
             setError('Could not reach the server. Please try again.');
         } finally {
@@ -65,6 +67,10 @@ export const LoginClient: React.FC = () => {
             }
             setClaimed(typeof data?.claimed === 'number' ? data.claimed : 0);
             setStep('done');
+            track('login', { claimed: typeof data?.claimed === 'number' ? data.claimed : 0 });
+            if (typeof data?.claimed === 'number' && data.claimed > 0) {
+                track('campaign_claim', { count: data.claimed, from: 'login' });
+            }
             // Let them read the confirmation for a beat before the next page loads.
             setTimeout(() => {
                 router.push(nextPath);

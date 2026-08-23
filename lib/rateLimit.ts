@@ -1,6 +1,10 @@
-// Best-effort, in-memory rate limiter. On serverless this is per-instance,
-// so it is a speed bump against spam, not a hard guarantee. Good enough to
-// blunt abusive bursts of campaign creation from a single client.
+// Best-effort, in-memory rate limiter.
+//
+// On Vercel serverless each isolate has its own Map, so this is a speed bump
+// against burst abuse from a single client hitting one instance — not a global
+// quota. That is enough for campaign use/view spam and create floods. A hard
+// multi-instance cap would need Redis/Upstash; we deliberately keep this
+// dependency-free until abuse volume justifies it.
 type Bucket = { count: number; reset: number };
 const buckets = new Map<string, Bucket>();
 

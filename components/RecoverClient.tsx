@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { Mail, CheckCircle2, Loader2 } from 'lucide-react';
+import { track } from '@/lib/analytics';
 
 export const RecoverClient: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -25,6 +26,7 @@ export const RecoverClient: React.FC = () => {
                 return;
             }
             setState('sent');
+            track('recover_requested');
         } catch {
             setError('Could not reach the server. Please try again.');
             setState('idle');

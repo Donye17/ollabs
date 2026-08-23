@@ -21,6 +21,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             : `Campaigns and links from ${hub.displayName}.`);
 
     const index = hubIsIndexable(hub);
+    // Prefer featured frame art for WhatsApp unfurls; avatar is a weaker signal.
+    const ogImage = hub.featured?.preview_url || hub.avatarUrl || null;
 
     return {
         title,
@@ -30,13 +32,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             title,
             description,
             url: `https://ollabs.studio/u/${hub.handle}`,
-            ...(hub.avatarUrl ? { images: [{ url: hub.avatarUrl }] } : {}),
+            ...(ogImage ? { images: [{ url: ogImage }] } : {}),
             type: 'profile',
         },
         twitter: {
-            card: hub.avatarUrl ? 'summary' : 'summary',
+            card: ogImage ? 'summary_large_image' : 'summary',
             title,
             description,
+            ...(ogImage ? { images: [ogImage] } : {}),
         },
         alternates: {
             canonical: `https://ollabs.studio/u/${hub.handle}`,

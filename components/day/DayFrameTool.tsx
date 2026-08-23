@@ -7,6 +7,7 @@ import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { addPngMetadata } from '@/lib/pngMeta';
 import { track } from '@/lib/analytics';
 import { saveFramedPhoto, preferShareSheetForSave, isIOS } from '@/lib/savePhoto';
+import { framedCircleToStoryBlob } from '@/lib/storyExport';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import { Upload, Download, Loader2, ArrowRight, ImageDown, AlertCircle } from 'lucide-react';
 
@@ -33,6 +34,7 @@ export const DayFrameTool: React.FC<{
 }> = ({ frame, dayName, daySlug, section = 'day' }) => {
     const { messages } = useLocale();
     const t = messages.day;
+    const shareStoryLabel = messages.campaign.shareStory;
     const isFlag = section === 'flags';
     // Keep the day dimension clean: flag downloads report under their own key
     // rather than masquerading as an awareness day in GA.
@@ -50,6 +52,7 @@ export const DayFrameTool: React.FC<{
     const [tick, setTick] = useState(0);
     const [canSharePhoto, setCanSharePhoto] = useState(false);
     const [sharingPhoto, setSharingPhoto] = useState(false);
+    const [sharingStory, setSharingStory] = useState(false);
     // An alert() is the wrong thing on a phone: it covers the page, and inside
     // an in-app browser it can be dismissed before it is read. The message
     // belongs next to the control that failed.
@@ -208,6 +211,30 @@ export const DayFrameTool: React.FC<{
         }
     };
 
+    const shareStory = async () => {
+        const canvas = canvasRef.current;
+        if (!canvas || !hasImage) return;
+        setSharingStory(true);
+        setError(null);
+        try {
+            const story = await framedCircleToStoryBlob(canvas);
+            if (!story) return;
+            const outcome = await saveFramedPhoto({
+                blob: story,
+                filename: `${daySlug}-ollabs-story.png`,
+                title: dayName,
+            });
+            if (outcome === 'shared' || outcome === 'downloaded') {
+                markSaved();
+                track('frame_share_story', { ...dimension, outcome });
+            } else if (outcome === 'unavailable') {
+                setError(t.savePhotoUnavailable);
+            }
+        } finally {
+            setSharingStory(false);
+        }
+    };
+
     const start = (x: number, y: number) => {
         if (!hasImage) return;
         drag.current = { active: true, startX: x, startY: y, baseX: pos.x, baseY: pos.y };
@@ -314,6 +341,12 @@ export const DayFrameTool: React.FC<{
                                     {sharingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageDown size={18} />}
                                     {t.saveOrShare}
                                 </button>
+                                <button
+                                    onClick={shareStory} disabled={sharingStory}
+                                    className="w-full h-11 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 text-ink hover:bg-ink/5 transition-all disabled:opacity-60"
+                                >
+                                    {sharingStory ? <Loader2 className="w-4 h-4 animate-spin" /> : shareStoryLabel}
+                                </button>
                                 {!isIOS() && (
                                     <button
                                         onClick={download} disabled={downloading}
@@ -326,13 +359,21 @@ export const DayFrameTool: React.FC<{
                                 <p className="text-[11px] text-muted text-center leading-snug px-1">{t.savePhotoHint}</p>
                             </>
                         ) : (
-                            <button
-                                onClick={download} disabled={downloading}
-                                className="w-full h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 transition-all disabled:opacity-60"
-                            >
-                                {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={18} />}
-                                {t.download}
-                            </button>
+                            <>
+                                <button
+                                    onClick={download} disabled={downloading}
+                                    className="w-full h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 transition-all disabled:opacity-60"
+                                >
+                                    {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={18} />}
+                                    {t.download}
+                                </button>
+                                <button
+                                    onClick={shareStory} disabled={sharingStory}
+                                    className="w-full h-11 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 text-ink hover:bg-ink/5 transition-all disabled:opacity-60"
+                                >
+                                    {sharingStory ? <Loader2 className="w-4 h-4 animate-spin" /> : shareStoryLabel}
+                                </button>
+                            </>
                         )}
                     </div>
                 </div>

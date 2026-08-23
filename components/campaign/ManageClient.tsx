@@ -5,7 +5,8 @@ import { CATEGORIES } from '@/lib/categories';
 import { organizerShareText, whatsappUrl } from '@/lib/share';
 import { track, withUtm } from '@/lib/analytics';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
-import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck, Palette } from 'lucide-react';
+import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck, Palette, Globe } from 'lucide-react';
+import { countryLabel } from '@/lib/geo';
 
 interface ManageData {
     slug: string;
@@ -18,6 +19,7 @@ interface ManageData {
     preview_url: string | null;
     created_at: string;
     daily?: { day: string; n: number }[];
+    countries?: { country: string; n: number }[];
 }
 
 export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
@@ -44,14 +46,20 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     const shareUrl = `${origin}/c/${currentSlug}`;
 
     useEffect(() => {
-        const k = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('k') : null;
-        setToken(k);
+        const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const fromUrl = params?.get('k') || null;
+        const storageKey = `ollabs_manage_k:${slug}`;
+        let k = fromUrl;
         if (!k) {
-            setError('This page needs your private manage key. Use the link you saved when you created the campaign.');
-            setLoading(false);
-            return;
+            try {
+                k = sessionStorage.getItem(storageKey);
+            } catch { /* private mode */ }
         }
-        fetch(`/api/campaigns/${slug}/manage?token=${encodeURIComponent(k)}`)
+        setToken(k);
+        const url = k
+            ? `/api/campaigns/${slug}/manage?token=${encodeURIComponent(k)}`
+            : `/api/campaigns/${slug}/manage`;
+        fetch(url, { credentials: 'include' })
             .then(async (r) => {
                 if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Could not load this campaign');
                 return r.json();
@@ -64,8 +72,21 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                 setGoalInput(d.goal != null ? String(d.goal) : '');
                 setCategoryInput(d.category || '');
                 setSlugInput(d.slug);
+                if (k) {
+                    try {
+                        sessionStorage.setItem(storageKey, k);
+                    } catch { /* ignore */ }
+                    // Drop k= from the address bar once the manage cookie is set,
+                    // so refreshes and screenshots do not keep leaking the key.
+                    if (fromUrl) {
+                        window.history.replaceState(null, '', `/c/${d.slug}/manage`);
+                    }
+                }
             })
-            .catch((e) => setError(e.message))
+            .catch((e) => setError(
+                e.message ||
+                'This page needs your private manage key. Use the link you saved when you created the campaign.'
+            ))
             .finally(() => setLoading(false));
     }, [slug]);
 
@@ -78,16 +99,17 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     };
 
     const save = async () => {
-        if (!token) return;
         setSaving(true);
         setSaveMsg(null);
         setSaveErr(null);
-        const payload: Record<string, string> = { token, title, description, goal: goalInput, category: categoryInput };
+        const payload: Record<string, string> = { title, description, goal: goalInput, category: categoryInput };
+        if (token) payload.token = token;
         if (slugInput && slugInput !== currentSlug) payload.slug = slugInput;
         try {
             const res = await fetch(`/api/campaigns/${currentSlug}/manage`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(payload),
             });
             const body = await res.json().catch(() => ({}));
@@ -98,8 +120,13 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                 if (body.slug && body.slug !== currentSlug) {
                     setCurrentSlug(body.slug);
                     setSlugInput(body.slug);
-                    // keep the browser on a valid manage URL for the new slug
-                    window.history.replaceState(null, '', `/c/${body.slug}/manage?k=${token}`);
+                    window.history.replaceState(null, '', `/c/${body.slug}/manage`);
+                    if (token) {
+                        try {
+                            sessionStorage.setItem(`ollabs_manage_k:${body.slug}`, token);
+                            sessionStorage.removeItem(`ollabs_manage_k:${currentSlug}`);
+                        } catch { /* ignore */ }
+                    }
                 }
                 setTimeout(() => setSaveMsg(null), 2000);
             }
@@ -167,6 +194,25 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                             <span className="text-xs font-bold text-brand-deep shrink-0">Set up</span>
                         </a>
 
+                        {data.supporter_count === 0 && (
+                            <div className="mb-6 rounded-2xl border border-coral/30 bg-coral/10 p-4 space-y-3">
+                                <p className="font-display font-bold text-ink">No supporters yet. Share now.</p>
+                                <p className="text-sm text-ink/75 leading-relaxed">
+                                    Most campaigns that take off get their first person in the first hour. Open WhatsApp and send the link to one group.
+                                </p>
+                                <a
+                                    href={whatsappUrl(organizerShareText(title || data.title), withUtm(shareUrl, 'whatsapp'))}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={() => track('campaign_share', { campaign: currentSlug, method: 'whatsapp', from: 'manage_zero_nudge' })}
+                                    className="w-full min-h-[48px] py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white hover:brightness-105 transition-all"
+                                    style={{ backgroundColor: WHATSAPP_GREEN }}
+                                >
+                                    <WhatsAppGlyph size={16} /> Share on WhatsApp
+                                </a>
+                            </div>
+                        )}
+
                         {/* Real stats */}
                         <div className="grid grid-cols-3 gap-3 mb-6">
                             <div className="bg-cream border border-ink/10 rounded-2xl p-4 text-center">
@@ -213,6 +259,33 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                 </>
                             )}
                         </div>
+
+                        {data.countries && data.countries.length > 0 && (
+                            <div className="bg-cream border border-ink/10 rounded-2xl p-4 mb-6">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Globe size={14} className="text-muted" />
+                                    <p className="text-xs font-bold text-muted uppercase tracking-wider">Supporters by country</p>
+                                </div>
+                                <ul className="space-y-2">
+                                    {data.countries.map((c) => {
+                                        const max = data.countries![0].n || 1;
+                                        const label = countryLabel(c.country) || c.country;
+                                        return (
+                                            <li key={c.country} className="flex items-center gap-3">
+                                                <span className="text-xs font-semibold w-28 truncate">{label}</span>
+                                                <div className="flex-1 h-2 rounded-full bg-paper overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded-full bg-brand"
+                                                        style={{ width: `${Math.max(8, Math.round((c.n / max) * 100))}%` }}
+                                                    />
+                                                </div>
+                                                <span className="text-xs font-bold tabular-nums w-8 text-right">{c.n}</span>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        )}
 
                         {/* Share — WhatsApp leads for the same reason as publish:
                             organizers on a phone are usually already in WhatsApp. */}

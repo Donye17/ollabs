@@ -58,29 +58,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     if (!c) return { title: 'Campaign not found' };
     const description = c.description || `Add the ${c.title} frame to your profile picture and show your support.`;
 
-    // Share image, in priority order.
-    //
-    // 1. The campaign's own frame artwork, for CUSTOM_IMAGE campaigns. This is
-    //    the branding the organizer actually uploaded, it stays correct when
-    //    they edit the frame, and it does not depend on whatever the editor
-    //    canvas happened to be showing at the moment they hit publish.
-    //
-    //    That last part was a real bug. ImageFrameRenderer bails out early
-    //    while the uploaded PNG is still decoding, so publishing during that
-    //    window stored a bare default ring as the campaign's permanent share
-    //    image. Three of the twelve largest campaigns were affected, including
-    //    the biggest one at 934 supporters, which had been sharing to WhatsApp
-    //    as an empty blue donut.
-    //
-    // 2. The stored composite preview, which is still the best image for the
-    //    plain geometric frame types that have no artwork of their own.
-    //
-    // 3. The Ollabs card, so a link is never shared with no image at all.
+    // Prefer a stored face-in-frame composite when present (WhatsApp unfurls
+    // read better with a real face). Fall back to custom frame artwork, then
+    // the site card. Custom artwork alone used to win always to avoid the
+    // "empty donut" bug from publishing mid-decode; composites uploaded after
+    // a successful canvas render are trustworthy now.
     const frameImage = typeof c.frame_config?.imageUrl === 'string'
         && c.frame_config.imageUrl.startsWith('https://')
         ? c.frame_config.imageUrl as string
         : null;
-    const shareImage = frameImage || c.preview_url || 'https://ollabs.studio/og.png';
+    const shareImage = c.preview_url || frameImage || 'https://ollabs.studio/og.png';
 
     return {
         title: c.title,

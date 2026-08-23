@@ -9,6 +9,7 @@ import { track, withUtm } from '@/lib/analytics';
 import { XGlyph, WhatsAppGlyph, FacebookGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { supporterShareText, whatsappUrl, messengerShareUrl, prefersTagalog } from '@/lib/share';
 import { saveFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome } from '@/lib/savePhoto';
+import { framedCircleToStoryBlob } from '@/lib/storyExport';
 import { AdSlot } from '@/components/AdSlot';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles, ArrowRight } from 'lucide-react';
@@ -57,6 +58,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     const [imageCopied, setImageCopied] = useState(false);
     const [canSharePhoto, setCanSharePhoto] = useState(false);
     const [sharingPhoto, setSharingPhoto] = useState(false);
+    const [sharingStory, setSharingStory] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -250,7 +252,12 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         countedRef.current = true;
         fetch(`/api/campaigns/${slug}/use`, { method: 'POST' })
             .then(r => r.ok ? r.json() : null)
-            .then(d => { if (d && typeof d.supporter_count === 'number') setCount(d.supporter_count); })
+            .then(d => {
+                if (d && typeof d.supporter_count === 'number') {
+                    setCount(d.supporter_count);
+                    track('supporter_joined', { campaign: slug, count: d.supporter_count });
+                }
+            })
             .catch(() => { countedRef.current = false; });
     };
 
@@ -342,6 +349,33 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
             }
         } finally {
             setSharingPhoto(false);
+        }
+    };
+
+    /** 9:16 story PNG for Instagram / WhatsApp status. Square PF save stays primary. */
+    const handleShareStory = async () => {
+        const canvas = canvasRef.current;
+        if (!canvas || !hasImage) return;
+        setSharingStory(true);
+        setSaveError(null);
+        try {
+            const story = await framedCircleToStoryBlob(canvas);
+            if (!story) return;
+            const outcome = await saveFramedPhoto({
+                blob: story,
+                filename: `ollabs-${slug}-story.png`,
+                title,
+            });
+            if (outcome === 'shared' || outcome === 'downloaded') {
+                bumpCount();
+                setJustDownloaded(true);
+                setSaveError(null);
+                track('frame_share_story', { campaign: slug, outcome });
+            } else if (outcome === 'unavailable') {
+                setSaveError(t.savePhotoUnavailable);
+            }
+        } finally {
+            setSharingStory(false);
         }
     };
 
@@ -461,13 +495,38 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                                     <p className="text-xs text-muted mt-1">{t.bringPeople}</p>
                                 </div>
 
-                                {/* WhatsApp leads here for the same reason it leads on the
-                                    publish screen: it is where these links travel. */}
-                                <button onClick={() => openShare('whatsapp')}
-                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
-                                    style={{ backgroundColor: WHATSAPP_GREEN }}>
-                                    <WhatsAppGlyph size={18} /> {t.shareWhatsApp}
+                                {/* Framed photo leads: viral loops start from the face
+                                    in the frame, not only the campaign URL. Link share
+                                    stays one tap below for group chats. */}
+                                {canSharePhoto ? (
+                                    <button onClick={handleSharePhoto} disabled={sharingPhoto}
+                                        className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all disabled:opacity-50"
+                                        style={{ backgroundColor: WHATSAPP_GREEN }}>
+                                        {sharingPhoto
+                                            ? <Loader2 size={18} className="animate-spin" />
+                                            : <><WhatsAppGlyph size={18} /> {t.sharePhoto}</>}
+                                    </button>
+                                ) : (
+                                    <button onClick={() => openShare('whatsapp')}
+                                        className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
+                                        style={{ backgroundColor: WHATSAPP_GREEN }}>
+                                        <WhatsAppGlyph size={18} /> {t.shareWhatsApp}
+                                    </button>
+                                )}
+
+                                <button onClick={handleShareStory} disabled={sharingStory}
+                                    className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all disabled:opacity-50">
+                                    {sharingStory
+                                        ? <Loader2 size={16} className="animate-spin" />
+                                        : t.shareStory}
                                 </button>
+
+                                {canSharePhoto && (
+                                    <button onClick={() => openShare('whatsapp')}
+                                        className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all">
+                                        <WhatsAppGlyph size={16} /> {t.shareLinkWhatsApp}
+                                    </button>
+                                )}
 
                                 {(prefersTagalog() || locale === 'id') && (
                                     <button
@@ -642,7 +701,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                             <>
                                 <button onClick={handleSharePhoto} disabled={sharingPhoto}
                                     className="w-full min-h-[52px] py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all disabled:opacity-50">
-                                    {sharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> {t.saveOrShare}</>}
+                                    {sharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> {justDownloaded ? t.sharePhoto : t.saveOrShare}</>}
                                 </button>
                                 {!isIOS() && (
                                     <button onClick={handleDownload} disabled={downloading}

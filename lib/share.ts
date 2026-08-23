@@ -105,6 +105,17 @@ export function prefersTagalog(): boolean {
     });
 }
 
+/** What an organizer sends when sharing their permanent bio hub URL. */
+export function hubShareText(displayName: string, locale?: Locale | 'es' | 'tl' | null): string {
+    const name = displayName.replace(/^@/, '').trim() || 'me';
+    const lang = shareLocale(locale);
+    if (lang === 'pt') return `Meu hub no Ollabs (@${name}). Apoie a campanha por aqui:`;
+    if (lang === 'id') return `Hub Ollabs saya (@${name}). Dukung kampanyenya di sini:`;
+    if (lang === 'es') return `Mi hub en Ollabs (@${name}). Apoya la campaña aquí:`;
+    if (lang === 'tl') return `Hub ko sa Ollabs (@${name}). Supportahan ang campaign dito:`;
+    return `My Ollabs hub (@${name}). Support the campaign here:`;
+}
+
 /**
  * Whether this browser can hand a PNG to the OS share sheet.
  *

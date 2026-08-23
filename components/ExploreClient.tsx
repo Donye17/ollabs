@@ -10,6 +10,7 @@ export interface ExploreCampaign {
     title: string;
     supporterCount: number;
     frame: FrameConfig;
+    previewUrl?: string | null;
 }
 
 // Explore loads up to 60 campaigns and used to mount a live canvas for every
@@ -30,10 +31,12 @@ const THUMB_RESOLUTION = 256;
 // by the time it scrolls into view.
 const NEAR_VIEWPORT = '600px';
 
-const LazyPreview: React.FC<{ frame: FrameConfig; eager: boolean }> = ({ frame, eager }) => {
+const LazyPreview: React.FC<{ frame: FrameConfig; previewUrl?: string | null; eager: boolean }> = ({
+    frame,
+    previewUrl,
+    eager,
+}) => {
     const holder = useRef<HTMLDivElement>(null);
-    // `eager` is derived from the index, so the server and the first client
-    // render agree and there is nothing to reconcile.
     const [show, setShow] = useState(eager);
 
     useEffect(() => {
@@ -41,8 +44,6 @@ const LazyPreview: React.FC<{ frame: FrameConfig; eager: boolean }> = ({ frame, 
         const el = holder.current;
         if (!el) return;
 
-        // No IntersectionObserver (old in-app browsers): draw rather than show
-        // an empty grid. Correctness beats the optimisation.
         if (typeof IntersectionObserver === 'undefined') {
             setShow(true);
             return;
@@ -61,11 +62,16 @@ const LazyPreview: React.FC<{ frame: FrameConfig; eager: boolean }> = ({ frame, 
         return () => io.disconnect();
     }, [show]);
 
-    // Once drawn it stays drawn. Unmounting on scroll-out would return the
-    // memory but repaint a blank circle every time you scrolled back.
     return (
         <div ref={holder} className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-ink/5">
-            {show && <FramePreview frame={frame} size={THUMB_RESOLUTION} className="w-full h-full" />}
+            {show && (
+                previewUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={previewUrl} alt="" className="w-full h-full object-cover" />
+                ) : (
+                    <FramePreview frame={frame} size={THUMB_RESOLUTION} className="w-full h-full" />
+                )
+            )}
         </div>
     );
 };
@@ -99,7 +105,11 @@ export const ExploreClient: React.FC<{ campaigns: ExploreCampaign[] }> = ({ camp
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                     {filtered.map((c, i) => (
                         <Link key={c.slug} href={`/c/${c.slug}`} className="group flex flex-col items-center gap-3 transition-transform hover:-translate-y-1">
-                            <LazyPreview frame={c.frame} eager={i < INITIAL_WINDOW} />
+                            <LazyPreview
+                                frame={c.frame}
+                                previewUrl={c.previewUrl}
+                                eager={i < INITIAL_WINDOW}
+                            />
                             <div className="text-center">
                                 <p className="text-sm font-semibold text-ink group-hover:text-brand-deep transition-colors line-clamp-1">{c.title}</p>
                                 <p className="text-xs text-muted">{c.supporterCount.toLocaleString()} supporting</p>

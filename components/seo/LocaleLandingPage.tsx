@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { HomeCreateCta } from '@/components/home/HomeCreateCta';
+import { AdSlot } from '@/components/AdSlot';
 import type { LandingCopy } from '@/lib/i18n/messages';
 
 type Props = {
@@ -79,6 +80,12 @@ export function LocaleLandingPage({ t, htmlLang, extraFooterLinks }: Props) {
                             </li>
                         ))}
                     </ul>
+                </div>
+            </section>
+
+            <section className="px-4 sm:px-6 pb-10">
+                <div className="max-w-3xl mx-auto">
+                    <AdSlot surface="seo" />
                 </div>
             </section>
 

@@ -1,6 +1,7 @@
 import { cache } from 'react';
 import { pool } from '@/lib/neon';
 import { normalizeHandle, type PublicHub } from '@/lib/hub';
+import { resolveHubTheme } from '@/lib/hubThemes';
 
 /** Load a published hub by handle. Returns null if missing or handle invalid. */
 export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub | null> => {
@@ -10,7 +11,8 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
     try {
         const orgRes = await pool.query(
             `SELECT id, handle, display_name, bio, avatar_url,
-                    featured_campaign_id, hub_updated_at
+                    featured_campaign_id, hub_updated_at, hub_theme,
+                    COALESCE(hub_hidden_campaign_ids, '[]'::jsonb) AS hub_hidden_campaign_ids
              FROM organizers
              WHERE handle = $1
              LIMIT 1`,
@@ -18,6 +20,15 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
         );
         const org = orgRes.rows[0];
         if (!org) return null;
+
+        const hiddenRaw = org.hub_hidden_campaign_ids;
+        const hiddenIds = new Set<string>(
+            Array.isArray(hiddenRaw)
+                ? hiddenRaw.map(String)
+                : typeof hiddenRaw === 'string'
+                  ? (JSON.parse(hiddenRaw) as string[])
+                  : []
+        );
 
         const [linksRes, campsRes] = await Promise.all([
             pool.query(
@@ -54,15 +65,16 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
             ? campaigns.find((c) => c.id === featuredId) ?? null
             : null;
 
-        // If they never picked one, promote the newest campaign so the CTA is never empty
-        // when they do have campaigns.
-        if (!featured && campaigns.length > 0) {
-            featured = campaigns[0];
+        // If they never picked one, promote the newest visible campaign.
+        if (!featured) {
+            featured = campaigns.find((c) => !hiddenIds.has(c.id)) ?? null;
         }
 
         const displayName =
             (org.display_name as string | null)?.trim() ||
             `@${org.handle}`;
+
+        const theme = resolveHubTheme(org.hub_theme as string | null).id;
 
         return {
             handle: org.handle as string,
@@ -75,15 +87,18 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
                       title: featured.title,
                       supporter_count: featured.supporter_count,
                       preview_url: featured.preview_url,
+                      id: featured.id,
                   }
                 : null,
             campaigns: campaigns
                 .filter((c) => !featured || c.slug !== featured.slug)
+                .filter((c) => !hiddenIds.has(c.id))
                 .map((c) => ({
                     slug: c.slug,
                     title: c.title,
                     supporter_count: c.supporter_count,
                     preview_url: c.preview_url,
+                    id: c.id,
                 })),
             links: linksRes.rows.map((l: { id: string; title: string; url: string }) => ({
                 id: l.id,
@@ -91,6 +106,7 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
                 url: l.url,
             })),
             updatedAt: (org.hub_updated_at as string | null) ?? null,
+            theme,
         };
     } catch (e) {
         console.error('Failed to load public hub', e);

@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode, UserPlus, KeyRound, Pencil, Save, Share2, LayoutGrid } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
@@ -8,8 +8,8 @@ import { FramePreview } from './FramePreview';
 import { QRCode } from './QRCode';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from './ShareGlyphs';
 import { track, withUtm } from '@/lib/analytics';
-import { organizerShareText, whatsappUrl, messengerShareUrl, prefersTagalog } from '@/lib/share';
-import { suggestHandleFromEmail } from '@/lib/hub';
+import { organizerShareText, whatsappUrl, messengerShareUrl, prefersTagalog, hubShareText } from '@/lib/share';
+import { normalizeHandle, suggestHandleFromEmail } from '@/lib/hub';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 
 interface EditTarget {
@@ -36,6 +36,7 @@ type AccountStep = 'offer' | 'sending' | 'code' | 'verifying' | 'saved';
 export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl, editTarget }) => {
     const { messages, locale } = useLocale();
     const tp = messages.publish;
+    const dialogRef = useRef<HTMLDivElement>(null);
     // Set when the builder was opened from a /day page, so the campaign can be
     // attributed to that day rather than guessed at by category.
     const [daySlug, setDaySlug] = useState<string | null>(null);
@@ -80,6 +81,9 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     const [manageUrl, setManageUrl] = useState<string | null>(null);
     const [ownerToken, setOwnerToken] = useState<string | null>(null);
     const [campaignSlug, setCampaignSlug] = useState<string | null>(null);
+    const [campaignId, setCampaignId] = useState<string | null>(null);
+    const [hubClaiming, setHubClaiming] = useState(false);
+    const [hubClaimError, setHubClaimError] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [manageCopied, setManageCopied] = useState(false);
     const [showQR, setShowQR] = useState(false);
@@ -167,6 +171,9 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         setManageUrl(null);
         setOwnerToken(null);
         setCampaignSlug(null);
+        setCampaignId(null);
+        setHubClaiming(false);
+        setHubClaimError(null);
         setShowQR(false);
         setAccountStep('offer');
         setAccountEmail('');
@@ -213,7 +220,26 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     useEffect(() => {
         if (!isOpen) return;
 
-        const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') handleClose();
+            // Focus trap: keep Tab cycling inside the dialog.
+            if (e.key !== 'Tab') return;
+            const root = dialogRef.current;
+            if (!root) return;
+            const focusable = root.querySelectorAll<HTMLElement>(
+                'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+            );
+            if (focusable.length === 0) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        };
         document.addEventListener('keydown', onKeyDown);
 
         const body = document.body;
@@ -229,7 +255,13 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         body.style.width = '100%';
         body.style.overflow = 'hidden';
 
+        // Move focus into the dialog after open.
+        const t = window.setTimeout(() => {
+            dialogRef.current?.querySelector<HTMLElement>('button, input, a')?.focus();
+        }, 0);
+
         return () => {
+            window.clearTimeout(t);
             document.removeEventListener('keydown', onKeyDown);
             body.style.position = prev.position;
             body.style.top = prev.top;
@@ -343,6 +375,52 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         );
     }
 
+    const claimHubForCampaign = useCallback(async (opts: {
+        campaignId: string;
+        existingHandle: string | null;
+        emailForSuggest: string | null;
+        campaignTitle: string;
+    }) => {
+        const handle =
+            opts.existingHandle
+            || (opts.emailForSuggest ? suggestHandleFromEmail(opts.emailForSuggest) : '');
+        const normalized = normalizeHandle(handle);
+        if (!normalized) return null;
+
+        setHubClaiming(true);
+        setHubClaimError(null);
+        try {
+            const body: Record<string, unknown> = {
+                featuredCampaignId: opts.campaignId,
+            };
+            // Only send handle when claiming for the first time. Re-claiming an
+            // existing hub would overwrite a custom handle they already chose.
+            if (!opts.existingHandle) {
+                body.handle = normalized;
+                body.displayName = opts.campaignTitle.slice(0, 60) || normalized;
+            }
+            const res = await fetch('/api/organizer/hub', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                setHubClaimError(data?.error || 'Could not claim your hub.');
+                return null;
+            }
+            const live = (data?.handle as string | null) || normalized;
+            setHubHandle(live);
+            track('hub_claimed', { handle: live, from: 'publish' });
+            return live;
+        } catch {
+            setHubClaimError('Could not reach the server to claim your hub.');
+            return null;
+        } finally {
+            setHubClaiming(false);
+        }
+    }, []);
+
     const handleCreate = async () => {
         if (!title) return;
         setIsSubmitting(true);
@@ -379,6 +457,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 const mUrl = campaign.owner_token ? `${window.location.origin}/c/${campaign.slug}/manage?k=${campaign.owner_token}` : null;
                 setCampaignUrl(cUrl);
                 setCampaignSlug(campaign.slug);
+                setCampaignId(campaign.id ?? null);
                 setOwnerToken(campaign.owner_token ?? null);
                 if (mUrl) setManageUrl(mUrl);
                 // Carry whatever they typed into the account panel so they do not
@@ -403,6 +482,17 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                     list.unshift({ slug: campaign.slug, title, url: cUrl, manageUrl: mUrl, createdAt: Date.now() });
                     localStorage.setItem(key, JSON.stringify(list.slice(0, 50)));
                 } catch { /* ignore */ }
+
+                // Signed-in organizers get a live /u hub featuring this campaign
+                // without a detour through the hub editor.
+                if (sessionEmail && campaign.id) {
+                    void claimHubForCampaign({
+                        campaignId: campaign.id,
+                        existingHandle: hubHandle,
+                        emailForSuggest: sessionEmail,
+                        campaignTitle: title,
+                    });
+                }
             } else {
                 const err = await res.json().catch(() => ({}));
                 setCreateError(err.error || 'Could not create your campaign. Nothing was lost. Try again.');
@@ -473,6 +563,16 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             setAccountStep('saved');
             setLinkSaved(true);
             setCloseBlocked(false);
+
+            // After light login, claim the bio hub featuring this campaign.
+            if (campaignId) {
+                void claimHubForCampaign({
+                    campaignId,
+                    existingHandle: hubHandle,
+                    emailForSuggest: accountEmail,
+                    campaignTitle: title,
+                });
+            }
         } catch {
             setAccountError('Could not reach the server. Try again.');
             setAccountStep('code');
@@ -535,6 +635,26 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         : suggestedHubHandle
           ? `/hub?suggest=${encodeURIComponent(suggestedHubHandle)}`
           : '/hub';
+    const hubLiveUrl = hubHandle
+        ? `${typeof window !== 'undefined' ? window.location.origin : 'https://ollabs.studio'}/u/${hubHandle}`
+        : null;
+
+    const shareHubWhatsApp = () => {
+        if (!hubLiveUrl || !hubHandle) return;
+        const text = hubShareText(title || hubHandle, locale === 'en' ? undefined : locale);
+        window.open(whatsappUrl(text, withUtm(hubLiveUrl, 'whatsapp')), '_blank', 'noopener,noreferrer');
+        track('hub_share', { handle: hubHandle, platform: 'whatsapp', from: 'publish' });
+    };
+
+    const manualClaimHub = () => {
+        if (!campaignId || !sessionEmail) return;
+        void claimHubForCampaign({
+            campaignId,
+            existingHandle: hubHandle,
+            emailForSuggest: sessionEmail || publishEmail,
+            campaignTitle: title,
+        });
+    };
 
     const handleCopyManage = async () => {
         if (!manageUrl) return;
@@ -580,6 +700,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 stops a scroll that reaches the end of this panel from handing off
                 to the builder page behind it. */}
             <div
+                ref={dialogRef}
                 role="dialog"
                 aria-modal="true"
                 aria-label={campaignUrl ? tp.liveTitle : tp.createTitle}
@@ -616,6 +737,21 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 <WhatsAppGlyph size={20} /> {tp.shareWhatsApp}
                             </button>
 
+                            {showMessengerShare && (
+                                <div className="grid grid-cols-1 gap-2">
+                                    <button
+                                        onClick={shareMessenger}
+                                        className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all shadow-sm"
+                                        style={{ backgroundColor: '#0084FF' }}
+                                    >
+                                        <Share2 size={20} /> {tp.shareMessenger}
+                                    </button>
+                                    <p className="text-[11px] text-muted text-center leading-snug">
+                                        WhatsApp and Messenger are both first-class here. Pick the app your group already uses.
+                                    </p>
+                                </div>
+                            )}
+
                             {showShareNudge && (
                                 <div className="rounded-xl border border-brand/30 bg-brand/10 p-4 text-center space-y-3">
                                     <p className="text-sm font-bold text-ink">Ready to send it?</p>
@@ -639,15 +775,6 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                         </button>
                                     </div>
                                 </div>
-                            )}
-
-                            {showMessengerShare && (
-                                <button
-                                    onClick={shareMessenger}
-                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-[#0084FF] text-white hover:brightness-105 active:brightness-95 transition-all"
-                                >
-                                    <Share2 size={18} /> {tp.shareMessenger}
-                                </button>
                             )}
 
                             {canNativeShare && (
@@ -695,15 +822,43 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 onClick={() => track('hub_from_publish', { campaign: campaignSlug || '' })}
                                 className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-brand/30 text-brand-deep hover:bg-brand/10 active:bg-brand/15 transition-all"
                             >
-                                <LayoutGrid size={16} /> {hubHandle ? 'Open your hub' : tp.setupHub}
+                                <LayoutGrid size={16} /> {hubHandle ? tp.openHub : tp.setupHub}
                             </Link>
+                            {hubHandle && hubLiveUrl && (
+                                <button
+                                    type="button"
+                                    onClick={shareHubWhatsApp}
+                                    className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white hover:brightness-105 transition-all"
+                                    style={{ backgroundColor: WHATSAPP_GREEN }}
+                                >
+                                    <WhatsAppGlyph size={16} /> {tp.shareHubWhatsApp}
+                                </button>
+                            )}
+                            {!hubHandle && sessionEmail && campaignId && (
+                                <button
+                                    type="button"
+                                    onClick={manualClaimHub}
+                                    disabled={hubClaiming}
+                                    className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand text-ink hover:brightness-105 disabled:opacity-60 transition-all"
+                                >
+                                    {hubClaiming ? <Loader2 size={16} className="animate-spin" /> : <LayoutGrid size={16} />}
+                                    {hubClaiming ? tp.claimingHub : tp.claimHub}
+                                </button>
+                            )}
                             <p className="text-xs text-muted text-center">
-                                {hubHandle
-                                    ? `Your hub is live at ollabs.studio/u/${hubHandle}`
-                                    : suggestedHubHandle
-                                      ? `Suggested handle: /u/${suggestedHubHandle}. ${tp.setupHubBody}`
-                                      : tp.setupHubBody}
+                                {hubClaiming
+                                    ? tp.claimingHub
+                                    : hubHandle
+                                      ? tp.hubLive(hubHandle)
+                                      : suggestedHubHandle
+                                        ? `Suggested handle: /u/${suggestedHubHandle}. ${tp.setupHubBody}`
+                                        : tp.setupHubBody}
                             </p>
+                            {hubClaimError && (
+                                <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center">
+                                    {hubClaimError}
+                                </p>
+                            )}
 
                             <div className="border-t border-ink/10 pt-4 space-y-3">
                                 <p className="text-sm font-bold text-ink">{tp.thenSaveAccess}</p>

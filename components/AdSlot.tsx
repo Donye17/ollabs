@@ -23,6 +23,10 @@ import React, { useEffect, useRef } from 'react';
  *
  * The AdSense script is loaded on first AdSlot mount, not in the root layout,
  * so /create and other ad-free screens never pay for the request.
+ *
+ * Env: NEXT_PUBLIC_ADSENSE_CLIENT, NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN,
+ * NEXT_PUBLIC_ADSENSE_SLOT_SEO (optional fallback NEXT_PUBLIC_ADSENSE_SLOT_INLINE).
+ * See docs/ADSENSE_SLOTS.md for the Vercel dashboard steps. Auto ads stay OFF.
  */
 
 const CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || 'ca-pub-5665798404376894';

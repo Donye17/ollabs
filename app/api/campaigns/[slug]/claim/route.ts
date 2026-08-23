@@ -2,6 +2,7 @@ import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, clientIp } from '@/lib/rateLimit';
 import { getSessionOrganizer } from '@/lib/auth';
+import { findCampaignByOwnerToken } from '@/lib/ownerToken';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,10 +28,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const token = typeof body.token === 'string' ? body.token : '';
         if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 401 });
 
+        const found = await findCampaignByOwnerToken(slug, token);
+        if (!found) {
+            return NextResponse.json({ error: 'Not found or wrong key' }, { status: 404 });
+        }
         const owned = await pool.query(
-            `SELECT id, creator_id, organizer_email FROM campaigns
-             WHERE slug = $1 AND owner_token = $2 LIMIT 1`,
-            [slug, token]
+            `SELECT id, creator_id, organizer_email FROM campaigns WHERE id = $1 LIMIT 1`,
+            [found.id]
         );
         if (owned.rows.length === 0) {
             return NextResponse.json({ error: 'Not found or wrong key' }, { status: 404 });

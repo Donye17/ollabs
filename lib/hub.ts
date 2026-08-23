@@ -50,6 +50,8 @@ export type HubCampaignSummary = {
     title: string;
     supporter_count: number | null;
     preview_url: string | null;
+    /** Campaign id for editor hide toggles. Optional on public payloads. */
+    id?: string;
 };
 
 export type PublicHub = {
@@ -61,6 +63,7 @@ export type PublicHub = {
     campaigns: HubCampaignSummary[];
     links: { id: string; title: string; url: string }[];
     updatedAt: string | null;
+    theme: string;
 };
 
 /** Normalize to lowercase a-z / digits / hyphens. Empty string if nothing left. */

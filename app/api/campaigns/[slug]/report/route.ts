@@ -4,6 +4,9 @@ import { rateLimit, clientIp } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 
+/** Distinct reporters at which we hide the campaign from Explore / public lists. */
+const AUTO_HIDE_AFTER = 5;
+
 // POST /api/campaigns/[slug]/report
 // Records a report against a campaign. Body (optional): { reason }.
 export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
@@ -17,13 +20,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         }
 
         const campaignRes = await pool.query(
-            `SELECT id FROM campaigns WHERE slug = $1 LIMIT 1`,
+            `SELECT id, is_hidden FROM campaigns WHERE slug = $1 LIMIT 1`,
             [slug]
         );
         if (campaignRes.rows.length === 0) {
             return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
         }
         const campaignId = campaignRes.rows[0].id;
+        const alreadyHidden = !!campaignRes.rows[0].is_hidden;
 
         let reason: string | null = null;
         try {
@@ -38,6 +42,27 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
              VALUES ($1, $2, $3, $4, NOW())`,
             [campaignId, slug, reason, ip]
         );
+
+        // Distinct IPs so one angry person cannot auto-hide alone.
+        if (!alreadyHidden) {
+            try {
+                const countRes = await pool.query(
+                    `SELECT COUNT(DISTINCT reporter_ip)::int AS n
+                     FROM campaign_reports
+                     WHERE campaign_id = $1`,
+                    [campaignId]
+                );
+                const n = Number(countRes.rows[0]?.n) || 0;
+                if (n >= AUTO_HIDE_AFTER) {
+                    await pool.query(
+                        `UPDATE campaigns SET is_hidden = true WHERE id = $1 AND is_hidden IS NOT TRUE`,
+                        [campaignId]
+                    );
+                }
+            } catch (e) {
+                console.error('report auto-hide check failed', e);
+            }
+        }
 
         return NextResponse.json({ ok: true });
     } catch (error) {

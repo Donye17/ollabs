@@ -10,6 +10,7 @@ import {
     type Locale,
 } from '@/lib/i18n/locale';
 import { shouldHideLanguageBanner, shouldShowMobileOrganizerNav } from '@/lib/mobileNav';
+import { track } from '@/lib/analytics';
 
 const DISMISS_KEY = 'ollabs_locale_banner_dismissed';
 
@@ -102,12 +103,20 @@ export function LanguageBanner() {
     const aboveOrganizerNav = shouldShowMobileOrganizerNav(pathname);
 
     const dismiss = () => {
+        track('language_banner_dismiss', { suggested: suggested || 'unknown' });
         try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch { /* ignore */ }
         setVisible(false);
     };
 
     const accept = () => {
-        if (suggested === 'pt' || suggested === 'id' || suggested === 'en') {
+        track('language_banner_accept', { suggested });
+        if (
+            suggested === 'pt'
+            || suggested === 'id'
+            || suggested === 'en'
+            || suggested === 'es'
+            || suggested === 'tl'
+        ) {
             setLocale(suggested);
         }
         dismiss();
