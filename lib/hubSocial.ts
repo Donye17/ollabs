@@ -32,3 +32,19 @@ export function detectSocial(url: string): SocialKind {
         return null;
     }
 }
+
+/** Quick-add presets for the hub link editor. */
+export const HUB_LINK_PRESETS: {
+    id: string;
+    title: string;
+    placeholder: string;
+    hint: string;
+}[] = [
+    { id: 'instagram', title: 'Instagram', placeholder: 'https://instagram.com/yourname', hint: 'Profile or post' },
+    { id: 'tiktok', title: 'TikTok', placeholder: 'https://tiktok.com/@yourname', hint: 'Profile' },
+    { id: 'youtube', title: 'YouTube', placeholder: 'https://youtube.com/@yourname', hint: 'Channel or video' },
+    { id: 'whatsapp', title: 'WhatsApp', placeholder: 'https://wa.me/55…', hint: 'Chat or group' },
+    { id: 'x', title: 'X', placeholder: 'https://x.com/yourname', hint: 'Profile' },
+    { id: 'facebook', title: 'Facebook', placeholder: 'https://facebook.com/…', hint: 'Page or profile' },
+    { id: 'other', title: 'Other link', placeholder: 'https://', hint: 'Any URL' },
+];

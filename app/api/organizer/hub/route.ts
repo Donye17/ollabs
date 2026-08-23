@@ -22,6 +22,7 @@ type CampaignRow = {
     title: string;
     supporter_count: number | null;
     preview_url: string | null;
+    frame_config: unknown;
 };
 
 function parseHiddenIds(raw: unknown): string[] {
@@ -56,7 +57,7 @@ async function loadHubBundle(organizerId: string) {
             [organizerId]
         ),
         pool.query(
-            `SELECT id, slug, title, supporter_count, preview_url
+            `SELECT id, slug, title, supporter_count, preview_url, frame_config
              FROM campaigns
              WHERE creator_id = $1
                AND is_public = true
@@ -96,13 +97,24 @@ async function loadHubBundle(organizerId: string) {
                   preview_url: featured.preview_url,
               }
             : null,
-        campaigns: campaigns.map((c) => ({
-            id: c.id,
-            slug: c.slug,
-            title: c.title,
-            supporter_count: c.supporter_count,
-            preview_url: c.preview_url,
-        })),
+        campaigns: campaigns.map((c) => {
+            let frameConfig = c.frame_config;
+            if (typeof frameConfig === 'string') {
+                try {
+                    frameConfig = JSON.parse(frameConfig);
+                } catch {
+                    frameConfig = null;
+                }
+            }
+            return {
+                id: c.id,
+                slug: c.slug,
+                title: c.title,
+                supporter_count: c.supporter_count,
+                preview_url: c.preview_url,
+                frameConfig: frameConfig ?? null,
+            };
+        }),
         links: linksRes.rows.map((l: {
             id: string;
             title: string;

@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-23-hub-framed-avatar',
+        date: '2026-08-23',
+        title: 'Frame your hub photo with a campaign',
+        summary: 'On /hub, pick one of your campaign frames, drop in a photo, and use the result as your bio picture.',
+        items: [
+            'Hub photo can use any campaign frame you already published, the same way supporters wear a frame.',
+            'Plain upload is still there if you want a photo without a frame.',
+        ],
+    },
+    {
         id: '2026-08-22-path-p3',
         date: '2026-08-22',
         title: 'Story share, safer manage links, hub waitlist',
