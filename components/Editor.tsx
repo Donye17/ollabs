@@ -121,7 +121,7 @@ export const Editor: React.FC<EditorProps> = ({
 
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-lg mx-auto">
+    <div className={`flex flex-col items-center w-full max-w-lg mx-auto ${frameFirst ? 'gap-2 lg:gap-6' : 'gap-6'}`}>
       <CanvasArea
         canvasRef={logic.canvasRef as React.RefObject<HTMLCanvasElement>}
         imageObject={logic.imageObject}
@@ -132,6 +132,7 @@ export const Editor: React.FC<EditorProps> = ({
         isDragOver={logic.isDragOver}
         interactionMode={logic.interactionMode}
         frameFirst={frameFirst}
+        compact={frameFirst}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleEnd}
@@ -155,27 +156,31 @@ export const Editor: React.FC<EditorProps> = ({
         }}
       />
 
-      <EditorToolbar
-        imageObject={logic.imageObject}
-        scale={logic.scale}
-        setScale={logic.setScale}
-        rotation={logic.rotation}
-        setRotation={logic.setRotation}
-        onReset={() => {
-          logic.setScale(1);
-          logic.setPosition({ x: 0, y: 0 });
-          logic.setRotation(0);
-          onReset();
-        }}
-        onAutoFit={logic.handleAutoFit}
-        onImageSelect={onImageSelect}
-        onRemoveBackground={onRemoveBackground}
-        isRemovingBackground={isRemovingBackground}
-        onDownload={handleDownload}
-        onSharePhoto={canSharePhoto ? handleSharePhoto : undefined}
-        isSharingPhoto={sharingPhoto}
-        frameFirst={frameFirst}
-      />
+      {/* On create, photo tools live under the frame upload on phones so the
+          sticky preview stays a small always-on frame, not a tall stack. */}
+      <div className={frameFirst ? 'hidden lg:block w-full' : 'w-full'}>
+        <EditorToolbar
+          imageObject={logic.imageObject}
+          scale={logic.scale}
+          setScale={logic.setScale}
+          rotation={logic.rotation}
+          setRotation={logic.setRotation}
+          onReset={() => {
+            logic.setScale(1);
+            logic.setPosition({ x: 0, y: 0 });
+            logic.setRotation(0);
+            onReset();
+          }}
+          onAutoFit={logic.handleAutoFit}
+          onImageSelect={onImageSelect}
+          onRemoveBackground={onRemoveBackground}
+          isRemovingBackground={isRemovingBackground}
+          onDownload={handleDownload}
+          onSharePhoto={canSharePhoto ? handleSharePhoto : undefined}
+          isSharingPhoto={sharingPhoto}
+          frameFirst={frameFirst}
+        />
+      </div>
     </div>
   );
 };

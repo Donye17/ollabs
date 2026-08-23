@@ -1,9 +1,12 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { MessageSquare } from 'lucide-react';
 
 export const NavBar: React.FC = () => {
+    const pathname = usePathname() || '/';
+    const onCreate = pathname === '/create' || pathname.startsWith('/create/');
     return (
         <nav className="fixed top-0 inset-x-0 z-50 border-b border-ink/10 bg-paper/85 backdrop-blur-xl pt-[env(safe-area-inset-top,0px)]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
@@ -34,13 +37,15 @@ export const NavBar: React.FC = () => {
                         <MessageSquare size={14} />
                         Feedback
                     </a>
-                    <Link
-                        href="/create"
-                        className="bg-brand hover:brightness-105 text-ink px-3.5 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all active:brightness-95 min-h-[44px] inline-flex items-center shrink-0"
-                    >
-                        <span className="sm:hidden">Create</span>
-                        <span className="hidden sm:inline">Create a campaign</span>
-                    </Link>
+                    {!onCreate && (
+                        <Link
+                            href="/create"
+                            className="bg-brand hover:brightness-105 text-ink px-3.5 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all active:brightness-95 min-h-[44px] inline-flex items-center shrink-0"
+                        >
+                            <span className="sm:hidden">Create</span>
+                            <span className="hidden sm:inline">Create a campaign</span>
+                        </Link>
+                    )}
                 </div>
             </div>
         </nav>

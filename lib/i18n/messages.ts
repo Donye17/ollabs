@@ -76,6 +76,12 @@ export type Messages = {
         createCampaign: string;
         saveChanges: string;
         dragTip: string;
+        nextNameIt: string;
+        stepFrame: string;
+        stepName: string;
+        stepSend: string;
+        tryPhotoOptional: string;
+        changePreviewPhoto: string;
     };
     publish: {
         createTitle: string;
@@ -344,9 +350,9 @@ const en: Messages = {
         yourFrame: 'Your frame',
         yourFrameHint:
             'Upload your logo, badge, or designed frame. Watch the live preview above while you open a window for the photo.',
-        artworkStep: '1. Your artwork',
+        artworkStep: 'Your frame',
         artworkStepHint: 'Logo, badge, or designed PNG.',
-        photoWindowStep: '2. Photo window',
+        photoWindowStep: 'Photo window',
         photoWindowStepHint: 'Left = more frame. Right = more photo.',
         addText: 'Add text',
         optional: 'optional',
@@ -367,6 +373,12 @@ const en: Messages = {
         createCampaign: 'Create campaign',
         saveChanges: 'Save changes',
         dragTip: 'Upload your frame first. Optionally drop a photo on the circle to preview how supporters will look.',
+        nextNameIt: 'Next: name it',
+        stepFrame: 'Frame',
+        stepName: 'Name',
+        stepSend: 'Send',
+        tryPhotoOptional: 'Try with a photo (optional)',
+        changePreviewPhoto: 'Change preview photo',
     },
     publish: {
         createTitle: 'Name it',
@@ -489,9 +501,9 @@ const pt: Messages = {
         yourFrame: 'Sua moldura',
         yourFrameHint:
             'Envie o logo, emblema ou moldura. Veja a prévia ao vivo enquanto abre a janela da foto.',
-        artworkStep: '1. Sua arte',
+        artworkStep: 'Sua moldura',
         artworkStepHint: 'Logo, emblema ou PNG desenhado.',
-        photoWindowStep: '2. Janela da foto',
+        photoWindowStep: 'Janela da foto',
         photoWindowStepHint: 'Esquerda = mais moldura. Direita = mais foto.',
         addText: 'Adicionar texto',
         optional: 'opcional',
@@ -511,7 +523,13 @@ const pt: Messages = {
         previewContacts: 'Prévia nos contatos',
         createCampaign: 'Criar campanha',
         saveChanges: 'Salvar alterações',
-        dragTip: 'Arraste uma foto para o círculo e veja como fica. Aperte ou arraste para encaixar.',
+        dragTip: 'Envie a moldura primeiro. Se quiser, solte uma foto no círculo para ver como fica.',
+        nextNameIt: 'Próximo: dar nome',
+        stepFrame: 'Moldura',
+        stepName: 'Nome',
+        stepSend: 'Enviar',
+        tryPhotoOptional: 'Testar com uma foto (opcional)',
+        changePreviewPhoto: 'Trocar foto de preview',
     },
     publish: {
         createTitle: 'Dê um nome',
@@ -635,9 +653,9 @@ const id: Messages = {
         yourFrame: 'Bingkaimu',
         yourFrameHint:
             'Unggah logo, lencana, atau desain bingkai. Lihat pratinjau langsung sambil membuka jendela untuk foto.',
-        artworkStep: '1. Desainmu',
+        artworkStep: 'Bingkaimu',
         artworkStepHint: 'Logo, lencana, atau PNG desain.',
-        photoWindowStep: '2. Jendela foto',
+        photoWindowStep: 'Jendela foto',
         photoWindowStepHint: 'Kiri = lebih banyak bingkai. Kanan = lebih banyak foto.',
         addText: 'Tambah teks',
         optional: 'opsional',
@@ -657,8 +675,13 @@ const id: Messages = {
         previewContacts: 'Pratinjau di kontak',
         createCampaign: 'Buat kampanye',
         saveChanges: 'Simpan perubahan',
-        dragTip:
-            'Seret foto ke lingkaran untuk melihat hasilnya. Cubit atau geser untuk menyesuaikan.',
+        dragTip: 'Unggah bingkai dulu. Opsional: jatuhkan foto ke lingkaran untuk pratinjau.',
+        nextNameIt: 'Lanjut: beri nama',
+        stepFrame: 'Bingkai',
+        stepName: 'Nama',
+        stepSend: 'Kirim',
+        tryPhotoOptional: 'Coba dengan foto (opsional)',
+        changePreviewPhoto: 'Ganti foto pratinjau',
     },
     publish: {
         createTitle: 'Beri nama',

@@ -203,7 +203,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     if (isLoading || editLoading) {
         return (
             <div className="min-h-screen bg-paper flex flex-col items-center justify-center text-ink font-sans">
-                <Loader2 className="w-12 h-12 text-brand-deep animate-spin mb-4" />
+                <Loader2 className="w-12 h-12 text-brand animate-spin mb-4" />
                 <p className="text-muted text-sm animate-pulse">{editLoading ? 'Loading your frame...' : 'Loading template...'}</p>
             </div>
         );
@@ -240,12 +240,11 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             <NavBar />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(3.5rem+env(safe-area-inset-top,0px)+0.5rem)] pb-6 lg:py-24">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-16 items-start">
 
-                    {/* Preview + title stick together on phones with solid paper
-                        so the subtitle never scrolls up through a transparent
-                        canvas plate into "1. Your artwork". */}
-                    <div className="lg:col-span-7 flex flex-col items-center sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-0 bg-paper py-2 lg:py-0 lg:bg-transparent h-fit">
+                    {/* Compact sticky preview — always on screen on phones so
+                        scrolling the controls never loses the frame. */}
+                    <div className="lg:col-span-7 flex flex-col items-center sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-20 bg-paper/95 backdrop-blur-sm border-b border-ink/10 lg:border-0 lg:bg-transparent lg:backdrop-blur-none py-2 lg:py-0 h-fit -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
                         <Editor
                             imageSrc={imageSrc}
                             onImageSelect={handleImageSelect}
@@ -258,25 +257,25 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             frameFirst
                         />
 
-                        <div className="mt-3 w-full max-w-lg px-1 text-center lg:text-left">
-                            <h1 className="font-display text-xl sm:text-2xl font-extrabold text-ink tracking-tight">
-                                {editTarget ? t.editTitle : t.title}
-                            </h1>
-                            <p className="text-xs text-muted font-medium">
-                                {editTarget
-                                    ? t.editSubtitle(editTarget.title)
-                                    : t.subtitle}
-                            </p>
-                        </div>
+                        <ol
+                            className="mt-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted lg:mt-4"
+                            aria-label="Create steps"
+                        >
+                            <li className="text-brand">{t.stepFrame}</li>
+                            <li aria-hidden className="text-ink/20">·</li>
+                            <li>{t.stepName}</li>
+                            <li aria-hidden className="text-ink/20">·</li>
+                            <li>{t.stepSend}</li>
+                        </ol>
 
                         {notice && (
-                            <div role="alert" className="mt-4 p-4 bg-coral/10 rounded-2xl border border-coral/30 text-sm text-ink/80 max-w-md w-full flex gap-3 items-start animate-fade-in">
-                                <AlertCircle className="shrink-0 text-coral mt-0.5" size={18} />
-                                <p className="flex-1">{notice}</p>
+                            <div role="alert" className="mt-3 p-3 bg-coral/10 rounded-xl border border-coral/30 text-sm text-ink/80 max-w-md w-full flex gap-2 items-start animate-fade-in">
+                                <AlertCircle className="shrink-0 text-coral mt-0.5" size={16} />
+                                <p className="flex-1 text-xs sm:text-sm">{notice}</p>
                                 <button
                                     onClick={() => setNotice(null)}
                                     aria-label="Dismiss"
-                                    className="shrink-0 text-muted hover:text-ink transition-colors -mt-0.5 px-1"
+                                    className="shrink-0 text-muted hover:text-ink transition-colors px-1"
                                 >
                                     &times;
                                 </button>
@@ -288,16 +287,38 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         </p>
                     </div>
 
-                    {/* Controls — custom frame first; premades demoted */}
+                    {/* Controls scroll under the sticky frame */}
                     <div className="lg:col-span-5 space-y-4 relative z-10">
+                        <div className="px-1">
+                            <h1 className="font-display text-xl sm:text-2xl font-extrabold text-ink tracking-tight">
+                                {editTarget ? t.editTitle : t.title}
+                            </h1>
+                            <p className="text-xs text-muted font-medium">
+                                {editTarget
+                                    ? t.editSubtitle(editTarget.title)
+                                    : t.subtitle}
+                            </p>
+                        </div>
+
                         <CustomFramePanel
                             frame={selectedFrame}
                             onChange={handleFrameUpdate}
                         />
 
-                        {/* Premades are a fallback. Real organizers upload brand art;
-                            leading with eight swatches made the product feel like a
-                            sticker picker instead of a campaign tool. */}
+                        {/* Photo is optional and sits after the frame job on phones. */}
+                        <label className="lg:hidden flex items-center justify-center gap-2 w-full min-h-[44px] rounded-xl border border-dashed border-ink/15 bg-cream px-4 text-sm font-semibold text-ink cursor-pointer hover:bg-ink/5 transition-colors">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleImageSelect(file);
+                                }}
+                            />
+                            {imageSrc ? t.changePreviewPhoto : t.tryPhotoOptional}
+                        </label>
+
                         <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
                             <summary className="flex items-center cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
                                 <span className="flex-1">{t.simpleStyles}</span>
@@ -310,33 +331,31 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             </div>
                         </details>
 
-                        {/* Desktop publish — phones use the sticky bar */}
                         <button
                             onClick={openPublish}
                             className="hidden lg:flex w-full min-h-[52px] items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 transition-all"
                         >
                             {editTarget
                                 ? <><Save size={18} /> {t.saveChanges}</>
-                                : <><Upload size={18} /> {t.createCampaign}</>}
+                                : <><Upload size={18} /> {t.nextNameIt}</>}
                         </button>
                     </div>
                 </div>
             </main>
 
-            {/* Thumb-zone create. Header buttons are easy to miss once you are
-                deep in cutout controls on a small screen. */}
-        <div
-            className="fixed inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper px-4 pt-3 pb-3"
-            style={{ bottom: ABOVE_MOBILE_NAV }}
-        >
+            {/* One publish action on phones — not another Create. */}
+            <div
+                className="fixed inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper px-4 pt-3 pb-3"
+                style={{ bottom: ABOVE_MOBILE_NAV }}
+            >
                 <div className="max-w-lg mx-auto">
                     <button
                         onClick={openPublish}
                         className="w-full min-h-[52px] flex items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 active:brightness-95 transition-all"
                     >
-                    {editTarget
-                        ? <><Save size={18} /> {t.saveChanges}</>
-                        : <><Upload size={18} /> {t.createCampaign}</>}
+                        {editTarget
+                            ? <><Save size={18} /> {t.saveChanges}</>
+                            : <><Upload size={18} /> {t.nextNameIt}</>}
                     </button>
                 </div>
             </div>
@@ -356,3 +375,4 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
         </div>
     );
 };
+

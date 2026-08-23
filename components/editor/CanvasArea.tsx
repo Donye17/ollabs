@@ -15,6 +15,8 @@ interface CanvasAreaProps {
     interactionMode: 'none' | 'pan';
     /** Hide photo-first empty state; campaign create is about the frame. */
     frameFirst?: boolean;
+    /** Smaller preview so the sticky create header leaves room to scroll controls. */
+    compact?: boolean;
 
     // Event Handlers
     onMouseDown: (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => void;
@@ -40,6 +42,7 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
     isDragOver,
     interactionMode,
     frameFirst = false,
+    compact = false,
     onMouseDown, onMouseMove, onMouseUp, onMouseLeave,
     onTouchStart, onTouchMove, onTouchEnd, onTouchCancel,
     onDragOver, onDragLeave, onDrop
@@ -110,14 +113,14 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
     return (
         <div
             className={`relative group rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                ${compact ? 'w-[min(42vw,10.5rem)] h-[min(42vw,10.5rem)] lg:w-[320px] lg:h-[320px]' : ''}
                 ${isDragOver ? 'scale-110 ring-8 ring-primary/50 shadow-[0_20px_50px_rgba(37,99,235,0.5)]' : 'scale-100 bg-cream backdrop-blur-3xl shadow-2xl shadow-black/50'}`}
             style={{
-                width: DISPLAY_SIZE,
-                height: DISPLAY_SIZE,
+                width: compact ? undefined : DISPLAY_SIZE,
+                height: compact ? undefined : DISPLAY_SIZE,
                 // Without this the browser claims a vertical drag for scrolling
                 // before onTouchMove's preventDefault can run, so dragging a photo
                 // on a phone scrolled the builder page instead of moving the photo.
-                // 'none' rather than 'pan-x': both axes belong to the pan.
                 touchAction: 'none',
                 cursor: imageObject ? (interactionMode !== 'none' ? 'grabbing' : 'grab') : 'default',
                 borderRadius: selectedFrame.type === FrameType.STAR || selectedFrame.type === FrameType.HEXAGON || selectedFrame.type === FrameType.HEART ? '0%' : '9999px'
@@ -132,8 +135,8 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-muted pointer-events-none p-4 text-center">
                     {frameFirst ? (
                         <>
-                            <span className="text-base font-bold text-ink/80 tracking-wide mb-1">Frame preview</span>
-                            <span className="text-xs text-muted max-w-[14rem]">Upload your artwork below. Try a photo after if you want.</span>
+                            <span className={`font-bold text-ink/80 tracking-wide mb-0.5 ${compact ? "text-[11px]" : "text-base"}`}>Frame</span>
+                            {!compact && (<span className="text-xs text-muted max-w-[14rem]">Upload your artwork below. Try a photo after if you want.</span>)}
                         </>
                     ) : (
                         <>
