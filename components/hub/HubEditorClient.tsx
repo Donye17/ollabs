@@ -742,20 +742,21 @@ export const HubEditorClient: React.FC = () => {
                 SEO surface matches public hubs; never near the save controls. */}
             <AdSlot surface="seo" className="pt-2 pb-4" />
 
-            {/* In-page preview sits under the Ollabs NavBar (same top offset as
-                the sticky Save bar) and above Mine · Create · Hub. */}
+            {/* Preview takes over the viewport above the Ollabs NavBar so the
+                chrome sits flush under the status bar. Thumb nav stays visible. */}
             {previewOpen && previewSrc && (
                 <div
-                    className="fixed inset-x-0 z-[35] flex flex-col bg-paper border-t border-ink/10"
+                    className="fixed inset-x-0 z-[60] flex flex-col bg-paper"
                     style={{
-                        top: 'calc(3.5rem + env(safe-area-inset-top, 0px))',
+                        top: 0,
                         bottom: ABOVE_MOBILE_NAV,
+                        paddingTop: 'env(safe-area-inset-top, 0px)',
                     }}
                     role="dialog"
                     aria-modal="true"
                     aria-label="Hub preview"
                 >
-                    <div className="sticky top-0 z-10 flex items-center gap-2 px-4 py-3 border-b border-ink/10 bg-paper/95 backdrop-blur-xl shrink-0">
+                    <div className="flex items-center gap-2 px-3 py-2.5 border-b border-ink/10 bg-paper shrink-0">
                         <button
                             type="button"
                             onClick={() => setPreviewOpen(false)}

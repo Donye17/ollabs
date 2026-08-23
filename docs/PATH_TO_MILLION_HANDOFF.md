@@ -152,10 +152,10 @@ Paid organizer upgrades, owner-token hashing / short-lived manage sessions, in-p
 - [x] No intentional regressions to WhatsApp save path or create `touchAction`  
 - [x] Ads still never on photo / create  
 - [x] Hub still clearly drives into `/c`, not a generic link dump  
+- [x] **Owner:** commit + push path-to-million when ready  
 - [ ] **Owner:** real iPhone + WhatsApp Save Image QA (`docs/REAL_PHONE_QA.md`)  
-- [x] **Owner:** Vercel `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` + `NEXT_PUBLIC_ADSENSE_SLOT_SEO` (already set)  
-- [x] **Owner:** Vercel `CRON_SECRET` (set on Production; zero-supporter cron needs a redeploy to pick it up)  
-- [ ] **Owner:** commit + push path-to-million when ready  
+
+Parked next ideas (grid banners, supporter collage, etc.): `docs/FUTURE_IDEAS.md`.
 
 ### Phase C + D
 - [x] P1.9–P1.18 growth surfaces (explore geo, packs, day share, locale depth, manage geo, funnel events, SEO ads, OG, Messenger parity)  

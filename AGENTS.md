@@ -49,6 +49,7 @@ Organizer mobile tab bar (**Mine · Create · Hub**): show on organizer surfaces
 see `lib/mobileNav.ts`. Language banner never covers a save/publish bar.
 
 Execution brief: `docs/PATH_TO_MILLION_HANDOFF.md`.
+Future backlog (not scheduled): `docs/FUTURE_IDEAS.md`.
 
 ---
 
