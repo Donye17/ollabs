@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-23-join-cta',
+        date: '2026-08-23',
+        title: 'Hubs say Join, not Support',
+        summary: 'The big hub button means put on the frame, not donate. Phones also drop the duplicate top Create and My campaigns links.',
+        items: [
+            'Public hubs use Join (Participar, Gabung, Unirme, Sumali) above the campaign title.',
+            'On phones, Mine Create Hub at the bottom is enough, so the top bar stays logo-only.',
+        ],
+    },
+    {
         id: '2026-08-23-hub-framed-avatar',
         date: '2026-08-23',
         title: 'Frame your hub photo with a campaign',

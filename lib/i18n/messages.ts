@@ -439,7 +439,7 @@ const en: Messages = {
         savedToAccount: (email) =>
             `Saved to your account, ${email}. Open it from any device by signing in with a code at /login.`,
         setupHub: 'Set up your campaign hub',
-        setupHubBody: 'One link for your bio, Support button, and every campaign you run.',
+        setupHubBody: 'One link for your bio, Join button, and every campaign you run.',
         claimHub: 'Claim hub with this campaign',
         claimingHub: 'Claiming hub…',
         hubLive: (handle) => `Your hub is live at ollabs.studio/u/${handle}`,
@@ -601,7 +601,7 @@ const pt: Messages = {
         savedToAccount: (email) =>
             `Salva na sua conta, ${email}. Abra em qualquer dispositivo entrando com um código em /login.`,
         setupHub: 'Configure seu hub de campanhas',
-        setupHubBody: 'Um link para bio, botão Apoiar e todas as suas campanhas.',
+        setupHubBody: 'Um link para bio, botão Participar e todas as suas campanhas.',
         claimHub: 'Criar hub com esta campanha',
         claimingHub: 'Criando hub…',
         hubLive: (handle) => `Seu hub está no ar em ollabs.studio/u/${handle}`,
@@ -763,7 +763,7 @@ const id: Messages = {
         savedToAccount: (email) =>
             `Disimpan ke akunmu, ${email}. Buka dari perangkat mana saja dengan masuk pakai kode di /login.`,
         setupHub: 'Atur hub kampanyemu',
-        setupHubBody: 'Satu link untuk bio, tombol Dukung, dan semua kampanyemu.',
+        setupHubBody: 'Satu link untuk bio, tombol Gabung, dan semua kampanyemu.',
         claimHub: 'Klaim hub dengan kampanye ini',
         claimingHub: 'Mengklaim hub…',
         hubLive: (handle) => `Hubmu sudah live di ollabs.studio/u/${handle}`,

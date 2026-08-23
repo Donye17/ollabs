@@ -385,7 +385,7 @@ export const HubEditorClient: React.FC = () => {
                         <WhatsAppGlyph size={16} /> Share hub on WhatsApp
                     </a>
                     <p className="text-xs text-ink/70 text-center leading-relaxed">
-                        Paste this in your Instagram or TikTok bio. The Support button opens your frame.
+                        Paste this in your Instagram or TikTok bio. The Join button opens your frame.
                     </p>
                 </div>
             )}
@@ -407,7 +407,7 @@ export const HubEditorClient: React.FC = () => {
                         />
                     </div>
                     <p className="text-xs text-muted mt-2 leading-relaxed">
-                        Letters, numbers, hyphens. This is your public home base. The Support
+                        Letters, numbers, hyphens. This is your public home base. The Join
                         button on it opens your frame page.
                     </p>
                 </div>
@@ -505,7 +505,7 @@ export const HubEditorClient: React.FC = () => {
                 }}
             />
             <section className="bg-cream border border-ink/10 rounded-2xl p-5 space-y-3">
-                <h2 className="font-display font-bold text-lg">Support button</h2>
+                <h2 className="font-display font-bold text-lg">Join button</h2>
                 <p className="text-sm text-ink/70 leading-relaxed">
                     The big button on your hub opens this campaign&apos;s frame page. People never
                     upload a photo on the hub itself.
@@ -533,7 +533,7 @@ export const HubEditorClient: React.FC = () => {
                 )}
                 {supportClicks > 0 && (
                     <p className="text-xs text-muted">
-                        Support taps: <span className="font-semibold text-ink">{supportClicks.toLocaleString()}</span>
+                        Join taps: <span className="font-semibold text-ink">{supportClicks.toLocaleString()}</span>
                     </p>
                 )}
             </section>
@@ -542,7 +542,7 @@ export const HubEditorClient: React.FC = () => {
                 <section className="bg-cream border border-ink/10 rounded-2xl p-5 space-y-3">
                     <h2 className="font-display font-bold text-lg">More campaigns</h2>
                     <p className="text-sm text-ink/70">
-                        Hide frames from the public list so Support plus one or two stay dominant.
+                        Hide frames from the public list so Join plus one or two stay dominant.
                     </p>
                     <ul className="space-y-2">
                         {campaigns
@@ -742,20 +742,20 @@ export const HubEditorClient: React.FC = () => {
                 SEO surface matches public hubs; never near the save controls. */}
             <AdSlot surface="seo" className="pt-2 pb-4" />
 
-            {/* In-page preview leaves Mine · Create · Hub visible underneath.
-                Closing returns to the editor with all draft state intact. */}
+            {/* In-page preview sits under the Ollabs NavBar (same top offset as
+                the sticky Save bar) and above Mine · Create · Hub. */}
             {previewOpen && previewSrc && (
                 <div
-                    className="fixed inset-x-0 top-0 z-[35] flex flex-col bg-paper border-t border-ink/10"
-                    style={{ bottom: ABOVE_MOBILE_NAV }}
+                    className="fixed inset-x-0 z-[35] flex flex-col bg-paper border-t border-ink/10"
+                    style={{
+                        top: 'calc(3.5rem + env(safe-area-inset-top, 0px))',
+                        bottom: ABOVE_MOBILE_NAV,
+                    }}
                     role="dialog"
                     aria-modal="true"
                     aria-label="Hub preview"
                 >
-                    <div
-                        className="flex items-center gap-2 px-4 py-3 border-b border-ink/10 bg-paper shrink-0"
-                        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}
-                    >
+                    <div className="sticky top-0 z-10 flex items-center gap-2 px-4 py-3 border-b border-ink/10 bg-paper/95 backdrop-blur-xl shrink-0">
                         <button
                             type="button"
                             onClick={() => setPreviewOpen(false)}
@@ -777,7 +777,7 @@ export const HubEditorClient: React.FC = () => {
                     <iframe
                         src={previewSrc}
                         title="Hub preview"
-                        className="flex-1 w-full border-0 bg-paper"
+                        className="flex-1 w-full border-0 bg-paper min-h-0"
                     />
                 </div>
             )}

@@ -21,9 +21,10 @@ export const NavBar: React.FC = () => {
                 </Link>
 
                 <div className="flex items-center gap-2 sm:gap-5 min-w-0">
+                    {/* Desktop only: phones already have Mine · Create · Hub. */}
                     <Link
                         href="/mine"
-                        className="text-[11px] sm:text-xs font-bold text-brand-deep sm:text-muted hover:text-brand-deep transition-colors uppercase tracking-wider min-h-[44px] inline-flex items-center px-2.5 sm:px-0 shrink-0 rounded-lg sm:rounded-none bg-brand/10 sm:bg-transparent border border-brand/20 sm:border-0"
+                        className="hidden lg:inline-flex text-xs font-bold text-muted hover:text-brand-deep transition-colors uppercase tracking-wider min-h-[44px] items-center"
                     >
                         My campaigns
                     </Link>
@@ -40,10 +41,9 @@ export const NavBar: React.FC = () => {
                     {!onCreate && (
                         <Link
                             href="/create"
-                            className="bg-brand hover:brightness-105 text-ink px-3.5 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all active:brightness-95 min-h-[44px] inline-flex items-center shrink-0"
+                            className="hidden lg:inline-flex bg-brand hover:brightness-105 text-ink px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:brightness-95 min-h-[44px] items-center shrink-0"
                         >
-                            <span className="sm:hidden">Create</span>
-                            <span className="hidden sm:inline">Create a campaign</span>
+                            Create a campaign
                         </Link>
                     )}
                 </div>

@@ -26,8 +26,8 @@ Messenger+WhatsApp parity on publish for ID/TL, funnel `track()` events, report 
 
 **Still needs a real phone (Phase 0):** see `docs/REAL_PHONE_QA.md`.
 
-**Copy:** no em dashes in user-facing hub, create, or mine strings. Hub Support CTA
-is two lines (`Support` / campaign title), not `Support — title`.
+**Copy:** no em dashes in user-facing hub, create, or mine strings. Hub Join CTA
+is two lines (`Join` / campaign title), not `Join — title`.
 
 **Ads:** same quiet in-flow units on every campaign — no special rules by
 category, country, or politics. Never on the photo; never on `/create`.

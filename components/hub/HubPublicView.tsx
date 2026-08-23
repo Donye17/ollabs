@@ -126,7 +126,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                                 />
                             )}
                             <div className="min-w-0 flex-1 flex flex-col justify-center py-0.5">
-                                {/* Two lines on purpose: Support / title. Never "Support — title". */}
+                                {/* Two lines on purpose: Join / title. Never "Join — title". */}
                                 <span className="text-base font-bold leading-tight">{verb}</span>
                                 <span className="text-sm font-semibold truncate mt-0.5 opacity-85">
                                     {featured.title}

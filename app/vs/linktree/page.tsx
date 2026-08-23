@@ -8,7 +8,7 @@ const URL = 'https://ollabs.studio/vs/linktree';
 export const metadata: Metadata = {
     title: 'Ollabs vs Linktree for campaigns',
     description:
-        'Linktree lists your links. Ollabs adds profile picture frame campaigns and a Support button that opens your twibbon-style page. Free hub at /u/your-handle.',
+        'Linktree lists your links. Ollabs adds profile picture frame campaigns and a Join button that opens your twibbon-style page. Free hub at /u/your-handle.',
     alternates: { canonical: URL },
     openGraph: { url: URL, title: 'Ollabs vs Linktree', siteName: 'Ollabs', images: ['/og.png'] },
 };

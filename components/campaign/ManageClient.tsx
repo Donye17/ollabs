@@ -188,7 +188,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                             <div className="min-w-0">
                                 <p className="font-display font-bold text-[15px]">Campaign hub</p>
                                 <p className="text-xs text-ink/70">
-                                    Bio, Support button, and other links at /u/…
+                                    Bio, Join button, and other links at /u/…
                                 </p>
                             </div>
                             <span className="text-xs font-bold text-brand-deep shrink-0">Set up</span>

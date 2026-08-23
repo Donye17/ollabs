@@ -4,7 +4,7 @@ import { HubEditorClient } from '@/components/hub/HubEditorClient';
 
 export const metadata: Metadata = {
     title: 'Your hub',
-    description: 'Claim your Ollabs hub: a campaign directory with a Support button to your frame.',
+    description: 'Claim your Ollabs hub: a campaign directory with a Join button to your frame.',
     robots: { index: false, follow: false },
 };
 
@@ -16,7 +16,7 @@ export default function HubEditPage() {
                 <div className="max-w-lg mx-auto text-center">
                     <h1 className="font-display text-2xl sm:text-4xl font-extrabold mb-2 sm:mb-3">Your hub</h1>
                     <p className="text-ink/70 text-[15px] leading-relaxed">
-                        One link for the whole campaign: bio, Support button to your frame, and
+                        One link for the whole campaign: bio, Join button to your frame, and
                         whatever else people need.
                     </p>
                 </div>

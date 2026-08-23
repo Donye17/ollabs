@@ -223,8 +223,8 @@ export const MyCampaignsClient: React.FC = () => {
                             {hubHandle
                                 ? `ollabs.studio/u/${hubHandle}`
                                 : suggestedHandle
-                                  ? `Suggested: /u/${suggestedHandle} with Support button, bio, and links`
-                                  : 'Claim /u/… with Support button, bio, and other links'}
+                                  ? `Suggested: /u/${suggestedHandle} with Join button, bio, and links`
+                                  : 'Claim /u/… with Join button, bio, and other links'}
                         </p>
                     </div>
                     <span className="text-xs font-bold text-brand-deep shrink-0">
