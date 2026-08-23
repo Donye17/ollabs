@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { HubMadeWithFooter } from '@/components/hub/HubMadeWithFooter';
+import { AdSlot } from '@/components/AdSlot';
 import { upload } from '@vercel/blob/client';
 import {
     ChevronDown,
@@ -52,7 +53,6 @@ type HubPayload = {
     hubTheme?: string;
     hiddenCampaignIds?: string[];
     supportClickCount?: number;
-    upgradeInterested?: boolean;
     campaigns: CampaignOpt[];
     links: { id: string; title: string; url: string; clickCount?: number }[];
 };
@@ -77,8 +77,6 @@ export const HubEditorClient: React.FC = () => {
     const [hubTheme, setHubTheme] = useState<HubThemeId>('default');
     const [hiddenIds, setHiddenIds] = useState<string[]>([]);
     const [supportClicks, setSupportClicks] = useState(0);
-    const [upgradeInterested, setUpgradeInterested] = useState(false);
-    const [upgradeBusy, setUpgradeBusy] = useState(false);
     const [campaigns, setCampaigns] = useState<CampaignOpt[]>([]);
     const [links, setLinks] = useState<LinkDraft[]>([]);
     const [publishedHandle, setPublishedHandle] = useState<string | null>(null);
@@ -121,7 +119,6 @@ export const HubEditorClient: React.FC = () => {
             );
             setHiddenIds(Array.isArray(data.hiddenCampaignIds) ? data.hiddenCampaignIds : []);
             setSupportClicks(Number(data.supportClickCount) || 0);
-            setUpgradeInterested(!!data.upgradeInterested);
             setCampaigns(data.campaigns || []);
             setLinks(
                 (data.links || []).map((l) => ({
@@ -159,13 +156,13 @@ export const HubEditorClient: React.FC = () => {
         }
     };
 
-    const save = async () => {
-        if (saving) return;
+    const save = async (): Promise<{ ok: boolean; handle: string | null }> => {
+        if (saving) return { ok: false, handle: null };
         const normalized = normalizeHandle(handle);
         const herr = handleError(normalized);
         if (herr) {
             setError(herr);
-            return;
+            return { ok: false, handle: null };
         }
 
         setSaving(true);
@@ -189,11 +186,12 @@ export const HubEditorClient: React.FC = () => {
             const body = await res.json().catch(() => ({}));
             if (!res.ok) {
                 setError(body.error || 'Could not save.');
-                return;
+                return { ok: false, handle: null };
             }
             const firstClaim = !publishedHandle && Boolean(body.handle || normalized);
-            setPublishedHandle(body.handle);
-            setHandle(body.handle || normalized);
+            const nextHandle = (body.handle as string | null) || normalized;
+            setPublishedHandle(nextHandle);
+            setHandle(nextHandle);
             if (typeof body.supportClickCount === 'number') setSupportClicks(body.supportClickCount);
             if (Array.isArray(body.links)) {
                 setLinks(
@@ -212,13 +210,25 @@ export const HubEditorClient: React.FC = () => {
                 has_featured_campaign: Boolean(featuredId),
             });
             setSaveMsg('Saved');
-            if (firstClaim) track('hub_claimed', { handle: body.handle || normalized });
+            if (firstClaim) track('hub_claimed', { handle: nextHandle });
             setTimeout(() => setSaveMsg(null), 2000);
+            return { ok: true, handle: nextHandle };
         } catch {
             setError('Could not reach the server.');
+            return { ok: false, handle: null };
         } finally {
             setSaving(false);
         }
+    };
+
+    /** Public /u only reflects the last save. Persist first, then open a new tab
+     *  so the editor (and unsaved work) stays put. */
+    const previewHub = async () => {
+        const result = await save();
+        if (!result.ok || !result.handle) return;
+        const url = `/u/${result.handle}`;
+        window.open(url, '_blank', 'noopener,noreferrer');
+        track('hub_preview', { handle: result.handle });
     };
 
     if (loading) {
@@ -256,15 +266,15 @@ export const HubEditorClient: React.FC = () => {
         <div className="max-w-lg mx-auto space-y-6 pb-[max(10rem,calc(6rem+env(safe-area-inset-bottom)))]">
             {previewPath && hubUrl && (
                 <div className="rounded-2xl border border-brand/30 bg-brand/10 p-4 space-y-3">
-                    <a
-                        href={previewPath}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between gap-3 text-sm font-semibold text-brand-deep"
+                    <button
+                        type="button"
+                        onClick={previewHub}
+                        disabled={saving}
+                        className="w-full flex items-center justify-between gap-3 text-sm font-semibold text-brand-deep text-left disabled:opacity-60"
                     >
                         <span className="truncate">{hubUrl}</span>
                         <ExternalLink size={16} className="shrink-0" />
-                    </a>
+                    </button>
                     <a
                         href={whatsappUrl(
                             hubShareText(displayName.trim() || publishedHandle || 'me'),
@@ -586,47 +596,9 @@ export const HubEditorClient: React.FC = () => {
 
             <HubMadeWithFooter className="pt-2" />
 
-            {publishedHandle && (
-                <div className="rounded-2xl border border-ink/10 bg-cream px-4 py-4 space-y-2">
-                    <p className="text-sm font-bold text-ink">Want more from your hub?</p>
-                    <p className="text-xs text-muted leading-relaxed">
-                        Custom domains and removing Made with are not for sale yet. Tell us you want them and we will email you when they open.
-                    </p>
-                    {upgradeInterested ? (
-                        <p className="text-xs font-semibold text-brand-deep">You are on the list. We will write when it is ready.</p>
-                    ) : (
-                        <button
-                            type="button"
-                            disabled={upgradeBusy}
-                            onClick={async () => {
-                                setUpgradeBusy(true);
-                                setError(null);
-                                try {
-                                    const res = await fetch('/api/organizer/hub', {
-                                        method: 'PATCH',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ upgradeInterest: true }),
-                                    });
-                                    if (!res.ok) {
-                                        const body = await res.json().catch(() => ({}));
-                                        setError(body.error || 'Could not save interest.');
-                                        return;
-                                    }
-                                    setUpgradeInterested(true);
-                                    track('hub_upgrade_interest', { handle: publishedHandle });
-                                } catch {
-                                    setError('Could not reach the server.');
-                                } finally {
-                                    setUpgradeBusy(false);
-                                }
-                            }}
-                            className="w-full min-h-[44px] rounded-xl bg-ink text-paper text-sm font-bold hover:brightness-125 disabled:opacity-60"
-                        >
-                            {upgradeBusy ? 'Saving…' : 'I want paid hub upgrades'}
-                        </button>
-                    )}
-                </div>
-            )}
+            {/* Below the fold: only people who scroll past the editor see it.
+                SEO surface matches public hubs; never near the save controls. */}
+            <AdSlot surface="seo" className="pt-2 pb-4" />
 
             <div
                 className="fixed inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-5 pt-3 pb-3"
@@ -635,7 +607,7 @@ export const HubEditorClient: React.FC = () => {
                 <div className="max-w-lg mx-auto flex items-center gap-3">
                     <button
                         type="button"
-                        onClick={save}
+                        onClick={() => { void save(); }}
                         disabled={saving}
                         className="flex-1 h-12 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 disabled:opacity-60"
                     >
@@ -657,16 +629,14 @@ export const HubEditorClient: React.FC = () => {
                             <WhatsAppGlyph size={15} /> Share
                         </a>
                     )}
-                    {previewPath && (
-                        <a
-                            href={previewPath}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="h-12 px-4 rounded-xl border border-ink/15 bg-cream font-bold text-sm flex items-center"
-                        >
-                            Preview
-                        </a>
-                    )}
+                    <button
+                        type="button"
+                        onClick={previewHub}
+                        disabled={saving}
+                        className="h-12 px-4 rounded-xl border border-ink/15 bg-cream font-bold text-sm flex items-center disabled:opacity-60"
+                    >
+                        Preview
+                    </button>
                 </div>
             </div>
         </div>

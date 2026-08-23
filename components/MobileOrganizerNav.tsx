@@ -12,9 +12,9 @@ const ITEMS = [
 ] as const;
 
 /**
- * Organizer thumb-zone nav on phones. Create sits raised in the middle so the
- * bar reads as a real app shell. Hidden on /c, /u, and SEO landings so
- * supporters only see the frame job.
+ * Organizer thumb-zone nav on phones. Create is a larger ring but shares the
+ * same baseline as Mine and Hub so it never floats above the bar and covers
+ * content. Hidden on /c, /u, and SEO landings so supporters only see the frame job.
  */
 export function MobileOrganizerNav() {
     const pathname = usePathname() || '/';
@@ -31,7 +31,7 @@ export function MobileOrganizerNav() {
                 className="border-t-2 border-brand/40 bg-ink text-paper shadow-[0_-8px_24px_rgba(6,20,31,0.18)] pb-[env(safe-area-inset-bottom,0px)]"
                 style={{ minHeight: MOBILE_NAV_H }}
             >
-                <div className="max-w-lg mx-auto grid grid-cols-3 items-end px-1">
+                <div className="max-w-lg mx-auto grid grid-cols-3 items-center px-1">
                     {ITEMS.map(({ href, label, Icon, ...rest }) => {
                         const primary = 'primary' in rest && rest.primary;
                         const active =
@@ -42,17 +42,16 @@ export function MobileOrganizerNav() {
                                 <Link
                                     key={href}
                                     href={href}
-                                    className="relative flex flex-col items-center justify-end pb-2 pt-1 min-h-[60px]"
+                                    className="flex flex-col items-center justify-center gap-1 min-h-[60px] py-2"
                                 >
-                                    {/* Hollow brand ring + plus, like the Ollabs mark.
-                                        Keeps Create distinct from the solid "Create
-                                        campaign" publish bar stacked above this nav. */}
+                                    {/* Hollow brand ring sits in the same row as
+                                        Mine/Hub icons — larger, not raised. */}
                                     <span
-                                        className={`-mt-5 mb-1 flex h-14 w-14 items-center justify-center rounded-full border-[3px] border-brand bg-ink text-brand shadow-lg shadow-brand/25 ring-4 ring-ink transition-transform active:scale-95 ${
+                                        className={`flex h-11 w-11 items-center justify-center rounded-full border-[3px] border-brand bg-ink text-brand transition-transform active:scale-95 ${
                                             active ? 'bg-brand/15' : 'hover:bg-brand/10'
                                         }`}
                                     >
-                                        <Icon size={26} strokeWidth={2.75} />
+                                        <Icon size={22} strokeWidth={2.75} />
                                     </span>
                                     <span
                                         className={`text-[11px] font-extrabold uppercase tracking-wider ${

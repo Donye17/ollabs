@@ -4,9 +4,9 @@
  */
 export const MOBILE_NAV_H = '3.75rem';
 
-/** Space reserved under page content so the raised Create tab does not cover it. */
+/** Space reserved under page content for the fixed tab bar. */
 export const MOBILE_NAV_CONTENT_PAD =
-    'calc(5.25rem + env(safe-area-inset-bottom, 0px))' as const;
+    'calc(3.75rem + env(safe-area-inset-bottom, 0px))' as const;
 
 /** CSS length: tab bar height + iOS home indicator (action bars sit above this). */
 export const ABOVE_MOBILE_NAV =
