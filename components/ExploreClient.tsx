@@ -31,11 +31,7 @@ const THUMB_RESOLUTION = 256;
 // by the time it scrolls into view.
 const NEAR_VIEWPORT = '600px';
 
-const LazyPreview: React.FC<{ frame: FrameConfig; previewUrl?: string | null; eager: boolean }> = ({
-    frame,
-    previewUrl,
-    eager,
-}) => {
+const LazyPreview: React.FC<{ frame: FrameConfig; eager: boolean }> = ({ frame, eager }) => {
     const holder = useRef<HTMLDivElement>(null);
     const [show, setShow] = useState(eager);
 
@@ -62,15 +58,13 @@ const LazyPreview: React.FC<{ frame: FrameConfig; previewUrl?: string | null; ea
         return () => io.disconnect();
     }, [show]);
 
+    // Always render from frame_config, same as the home podium. Stored preview_url
+    // PNGs are for OG/social unfurls; many were captured before the custom overlay
+    // finished loading, so they show the default cyan ring instead of the artwork.
     return (
         <div ref={holder} className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-ink/5">
             {show && (
-                previewUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={previewUrl} alt="" className="w-full h-full object-cover" />
-                ) : (
-                    <FramePreview frame={frame} size={THUMB_RESOLUTION} className="w-full h-full" />
-                )
+                <FramePreview frame={frame} size={THUMB_RESOLUTION} className="w-full h-full" />
             )}
         </div>
     );
@@ -107,7 +101,6 @@ export const ExploreClient: React.FC<{ campaigns: ExploreCampaign[] }> = ({ camp
                         <Link key={c.slug} href={`/c/${c.slug}`} className="group flex flex-col items-center gap-3 transition-transform hover:-translate-y-1">
                             <LazyPreview
                                 frame={c.frame}
-                                previewUrl={c.previewUrl}
                                 eager={i < INITIAL_WINDOW}
                             />
                             <div className="text-center">
