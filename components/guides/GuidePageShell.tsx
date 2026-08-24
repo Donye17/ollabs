@@ -113,6 +113,10 @@ export function GuidePageShell({ guide }: Props) {
                         Home
                     </Link>
                     {' · '}
+                    <Link href="/guides" className="hover:text-brand-deep transition-colors">
+                        Guides
+                    </Link>
+                    {' · '}
                     <Link href="/about" className="hover:text-brand-deep transition-colors">
                         About
                     </Link>

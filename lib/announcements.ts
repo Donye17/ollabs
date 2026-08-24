@@ -25,6 +25,7 @@ export const ANNOUNCEMENTS: Announcement[] = [
             'New guide: how to start a campaign, from frame upload to WhatsApp in the first hour.',
             'New guide: what a hub is, and when to share /u/ vs /c/.',
             'Home FAQ covers hub vs campaign. Hub editor links to the hub guide.',
+            'Footer has a Guides column, plus a /guides index of all explainers.',
         ],
     },
     {

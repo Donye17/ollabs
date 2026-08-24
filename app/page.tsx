@@ -143,17 +143,25 @@ export default function Home() {
                                 The fast way to run a profile-picture campaign. Ollabs is a play on collabs, because coming together is the whole point.
                             </p>
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
+                        <div className="flex flex-col sm:flex-row flex-wrap gap-8 sm:gap-12">
                             <div>
                                 <h5 className="font-display font-bold mb-4">Product</h5>
                                 <ul className="space-y-2 text-sm text-muted">
                                     <li><Link href="/create" className="hover:text-brand-deep transition-colors">Create a campaign</Link></li>
                                     <li><Link href="/explore" className="hover:text-brand-deep transition-colors">Explore campaigns</Link></li>
                                     <li><Link href="/mine" className="hover:text-brand-deep transition-colors">My campaigns</Link></li>
-                                    <li><Link href="/for" className="hover:text-brand-deep transition-colors">Use cases</Link></li>
+                                    <li><Link href="/hub" className="hover:text-brand-deep transition-colors">Your hub</Link></li>
+                                    <li><Link href="/updates" className="hover:text-brand-deep transition-colors">What&apos;s new</Link></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 className="font-display font-bold mb-4">
+                                    <Link href="/guides" className="hover:text-brand-deep transition-colors">Guides</Link>
+                                </h5>
+                                <ul className="space-y-2 text-sm text-muted">
                                     <li><Link href="/guides/start-a-campaign" className="hover:text-brand-deep transition-colors">Start a campaign</Link></li>
                                     <li><Link href="/guides/hub" className="hover:text-brand-deep transition-colors">What is a hub?</Link></li>
-                                    <li><Link href="/updates" className="hover:text-brand-deep transition-colors">What&apos;s new</Link></li>
+                                    <li><Link href="/guides" className="hover:text-brand-deep transition-colors">All guides</Link></li>
                                 </ul>
                             </div>
                             <div>
