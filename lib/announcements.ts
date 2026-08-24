@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-24-lane-a',
+        date: '2026-08-24',
+        title: 'Campaign page built for phones',
+        summary: 'Bigger preview, clearer adjust step, WhatsApp-first after you save, and hubs lead with Join.',
+        items: [
+            'On /c the frame fills more of the screen. After you add a photo, drag and Size sit right under it.',
+            'After you save, WhatsApp Share photo leads. Story share is next. The sticky save bar steps aside.',
+            'Public hubs show a large featured frame and a full-width Join button above the fold.',
+        ],
+    },
+    {
         id: '2026-08-23-home-explore-polish',
         date: '2026-08-23',
         title: 'Quieter home, real faces on Explore',

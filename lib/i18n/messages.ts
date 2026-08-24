@@ -16,6 +16,7 @@ export type Messages = {
         stepFit: string;
         stepShare: string;
         size: string;
+        dragHint: string;
         saveOrShare: string;
         savePhotoHint: string;
         savePhotoUnavailable: string;
@@ -318,6 +319,7 @@ const en: Messages = {
         stepFit: 'Adjust the fit',
         stepShare: 'Download & share',
         size: 'Size',
+        dragHint: 'Drag to move. Use Size to zoom.',
         saveOrShare: 'Save or share photo',
         savePhotoHint: 'In the sheet, tap Save Image to add it to your Photos app.',
         savePhotoUnavailable: 'Could not save here. Open this page in Safari, then try again.',
@@ -478,6 +480,7 @@ const pt: Messages = {
         stepFit: 'Ajuste o enquadramento',
         stepShare: 'Baixe e compartilhe',
         size: 'Tamanho',
+        dragHint: 'Arraste para mover. Use Tamanho para zoom.',
         saveOrShare: 'Salvar ou compartilhar foto',
         savePhotoHint: 'Na folha de compartilhamento, toque em Salvar imagem para ir às Fotos.',
         savePhotoUnavailable: 'Não deu para salvar aqui. Abra no Safari e tente de novo.',
@@ -640,6 +643,7 @@ const id: Messages = {
         stepFit: 'Sesuaikan posisi',
         stepShare: 'Unduh & bagikan',
         size: 'Ukuran',
+        dragHint: 'Geser untuk pindah. Pakai Ukuran untuk zoom.',
         saveOrShare: 'Simpan atau bagikan foto',
         savePhotoHint: 'Di lembar bagikan, ketuk Simpan Gambar untuk masuk ke Foto.',
         savePhotoUnavailable: 'Tidak bisa simpan di sini. Buka di Safari, lalu coba lagi.',

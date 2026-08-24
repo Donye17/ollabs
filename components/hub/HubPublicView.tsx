@@ -46,7 +46,10 @@ function beacon(handle: string, kind: 'support' | 'link', linkId?: string) {
     } catch { /* ignore */ }
 }
 
-/** Mobile-first Linktree column. Primary job: push people into /c for the frame. */
+/**
+ * Mobile-first Linktree column. Primary job: push people into /c for the frame.
+ * Featured campaign sits above the fold: large frame preview + filled Join CTA.
+ */
 export function HubPublicView({ hub }: { hub: PublicHub }) {
     const theme = resolveHubTheme(hub.theme);
     const ctaHref = hub.featured ? `/c/${hub.featured.slug}` : null;
@@ -57,6 +60,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                 || (typeof navigator !== 'undefined' ? navigator.language : undefined))
             : undefined;
     const verb = supportVerb(localeHint);
+    const count = featured?.supporter_count ?? 0;
 
     return (
         <div className="min-h-screen" style={{ background: theme.pageBg, color: theme.pageFg }}>
@@ -66,19 +70,20 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                 aria-hidden
             />
 
-            <div className="relative mx-auto max-w-md px-5 pt-[max(2.5rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
-                <header className="flex flex-col items-center text-center pt-6 pb-8">
+            <div className="relative mx-auto max-w-md px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
+                {/* Compact identity so Join + frame clear the first viewport on phones. */}
+                <header className="flex flex-col items-center text-center pt-3 pb-5">
                     {hub.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                             src={hub.avatarUrl}
                             alt=""
-                            className="h-24 w-24 rounded-full object-cover border-2 bg-cream shadow-sm"
+                            className="h-16 w-16 rounded-full object-cover border-2 bg-cream shadow-sm"
                             style={{ borderColor: theme.cardBorder }}
                         />
                     ) : (
                         <div
-                            className="h-24 w-24 rounded-full border-2 flex items-center justify-center font-display text-3xl font-extrabold"
+                            className="h-16 w-16 rounded-full border-2 flex items-center justify-center font-display text-2xl font-bold"
                             style={{
                                 background: theme.supportBg,
                                 color: theme.supportFg,
@@ -89,12 +94,12 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                             {hub.displayName.replace(/^@/, '').slice(0, 1).toUpperCase()}
                         </div>
                     )}
-                    <h1 className="mt-4 font-display text-2xl font-extrabold tracking-tight">
+                    <h1 className="mt-3 font-display text-xl font-bold tracking-tight">
                         {hub.displayName}
                     </h1>
-                    <p className="mt-1 text-sm" style={{ color: theme.muted }}>@{hub.handle}</p>
+                    <p className="mt-0.5 text-sm" style={{ color: theme.muted }}>@{hub.handle}</p>
                     {hub.bio && (
-                        <p className="mt-3 text-[15px] leading-relaxed max-w-sm opacity-90">
+                        <p className="mt-2 text-sm leading-relaxed max-w-sm opacity-90 line-clamp-3">
                             {hub.bio}
                         </p>
                     )}
@@ -102,52 +107,51 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
 
                 <div className="space-y-3">
                     {ctaHref && featured && (
-                        <Link
-                            href={ctaHref}
-                            onClick={() => beacon(hub.handle, 'support')}
-                            className="flex w-full items-stretch gap-3 rounded-2xl border p-3 shadow-sm transition-all active:scale-[0.99]"
-                            style={{
-                                background: theme.cardBg,
-                                borderColor: theme.cardBorder,
-                            }}
-                        >
+                        <div className="flex flex-col items-center gap-4 pb-1">
                             {featured.preview_url ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                     src={featured.preview_url}
                                     alt=""
-                                    className="h-20 w-20 shrink-0 rounded-xl object-cover border"
-                                    style={{ borderColor: theme.cardBorder }}
+                                    className="w-[min(72vw,16.5rem)] h-[min(72vw,16.5rem)] rounded-full object-cover shadow-md"
+                                    style={{ boxShadow: `0 8px 28px ${theme.cardBorder}` }}
                                 />
                             ) : (
                                 <div
-                                    className="h-20 w-20 shrink-0 rounded-xl border"
+                                    className="w-[min(72vw,16.5rem)] h-[min(72vw,16.5rem)] rounded-full border-2"
                                     style={{ background: theme.supportBg, borderColor: theme.cardBorder }}
                                 />
                             )}
-                            <div className="min-w-0 flex-1 flex flex-col justify-center py-0.5">
-                                {/* Two lines on purpose: Join / title. Never "Join — title". */}
-                                <span className="text-base font-bold leading-tight">{verb}</span>
-                                <span className="text-sm font-semibold truncate mt-0.5 opacity-85">
+
+                            {/* Two lines on purpose: Join / title. Never Join + em dash + title. */}
+                            <div className="text-center px-2">
+                                <p className="font-display text-lg font-bold leading-tight">{verb}</p>
+                                <p className="text-[15px] font-semibold mt-0.5 opacity-90 line-clamp-2">
                                     {featured.title}
-                                </span>
-                                {featured.supporter_count != null && featured.supporter_count > 0 && (
-                                    <span
-                                        className="text-xs flex items-center gap-1 mt-1.5"
+                                </p>
+                                {count > 0 && (
+                                    <p
+                                        className="text-sm flex items-center justify-center gap-1.5 mt-2"
                                         style={{ color: theme.muted }}
                                     >
-                                        <Users size={11} />
-                                        {supportersLabel(featured.supporter_count, localeHint)}
-                                    </span>
+                                        <Users size={14} aria-hidden />
+                                        {supportersLabel(count, localeHint)}
+                                    </p>
                                 )}
                             </div>
-                            <span
-                                className="self-center shrink-0 rounded-xl px-3 py-2 text-xs font-bold"
-                                style={{ background: theme.supportBg, color: theme.supportFg }}
+
+                            <Link
+                                href={ctaHref}
+                                onClick={() => beacon(hub.handle, 'support')}
+                                className="flex w-full min-h-[56px] items-center justify-center rounded-2xl px-5 text-base font-bold shadow-sm transition-opacity active:opacity-90"
+                                style={{
+                                    background: theme.supportBg,
+                                    color: theme.supportFg,
+                                }}
                             >
                                 {verb}
-                            </span>
-                        </Link>
+                            </Link>
+                        </div>
                     )}
 
                     {hub.links.map((link) => {
@@ -177,7 +181,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                     {hub.campaigns.length > 0 && (
                         <div className="pt-4">
                             <p
-                                className="mb-3 text-xs font-bold uppercase tracking-wider px-1"
+                                className="mb-3 text-sm font-semibold px-1"
                                 style={{ color: theme.muted }}
                             >
                                 More campaigns
@@ -198,12 +202,12 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                                                 <img
                                                     src={c.preview_url}
                                                     alt=""
-                                                    className="h-11 w-11 rounded-xl object-cover border"
+                                                    className="h-11 w-11 rounded-full object-cover border"
                                                     style={{ borderColor: theme.cardBorder }}
                                                 />
                                             ) : (
                                                 <div
-                                                    className="h-11 w-11 rounded-xl border"
+                                                    className="h-11 w-11 rounded-full border"
                                                     style={{
                                                         background: theme.supportBg,
                                                         borderColor: theme.cardBorder,

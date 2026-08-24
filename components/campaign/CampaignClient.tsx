@@ -411,21 +411,40 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         } catch { /* clipboard unavailable */ }
     };
 
+    // Adjust = photo loaded, not yet saved. Post-save = viral share screen.
+    // Empty = upload. Chrome stays out of the way once they are fitting a face.
+    const adjusting = hasImage && !justDownloaded;
+    const bottomPad = adjusting
+        ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]'
+        : 'pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]';
+
     return (
-        <div className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-6 ${hasImage ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]' : 'pb-6'}`}>
-            <BrandMark className="mb-6" />
+        <div className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-[max(0.75rem,env(safe-area-inset-top,0px))] ${bottomPad}`}>
+            {/* A3: mark only on empty / post-save. During adjust the frame is the UI. */}
+            {!adjusting && <BrandMark className="mb-4 mt-2" size={24} />}
 
-            <div className="w-full max-w-sm flex flex-col items-center gap-4">
-                <div className="text-center">
-                    <p className="text-[11px] uppercase tracking-[0.2em] font-bold text-muted">{t.eyebrow}</p>
-                    <h1 className="font-display text-2xl font-extrabold mt-1">{title}</h1>
-                    {description && <p className="text-sm text-ink/70 mt-1">{description}</p>}
-                </div>
+            <div className="w-full max-w-sm flex flex-col items-center gap-3">
+                {justDownloaded ? (
+                    <div className="text-center animate-fade-in px-1">
+                        <p className="font-display text-xl font-bold leading-tight">{t.youreIn}</p>
+                        <p className="text-sm text-muted mt-1.5 leading-relaxed">{t.bringPeople}</p>
+                    </div>
+                ) : (
+                    <div className="text-center">
+                        {!hasImage && (
+                            <p className="text-sm font-semibold text-muted">{t.eyebrow}</p>
+                        )}
+                        <h1 className={`font-display font-bold text-balance ${hasImage ? 'text-lg mt-0' : 'text-2xl mt-1'}`}>
+                            {title}
+                        </h1>
+                        {!hasImage && description && (
+                            <p className="text-sm text-ink/70 mt-1">{description}</p>
+                        )}
+                    </div>
+                )}
 
-                {/* Sized in vw so the preview fills a phone properly. It was a flat
-                    256px, which on a modern handset left a third of the screen empty
-                    while people were judging their own face in it. Capped at the old
-                    desktop size, so nothing above sm changes. */}
+                {/* A1: canvas ~60dvh on phones so the face fills the first viewport.
+                    Cap for desktop so the circle does not dominate a wide screen. */}
                 <canvas
                     ref={canvasRef}
                     width={CANVAS}
@@ -438,23 +457,34 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     onDragLeave={onDragLeave}
                     onDrop={onDrop}
                     onClick={() => { if (!hasImage) fileRef.current?.click(); }}
-                    className={`w-[78vw] h-[78vw] max-w-[288px] max-h-[288px] rounded-full touch-none transition-all ${hasImage ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${dragOver ? 'ring-4 ring-brand/70 scale-[1.03]' : ''}`}
+                    className={`rounded-full touch-none shadow-md shadow-ink/10 ${
+                        hasImage
+                            ? 'w-[min(88vw,58dvh)] h-[min(88vw,58dvh)] max-w-[400px] max-h-[400px] cursor-grab active:cursor-grabbing'
+                            : 'w-[min(82vw,52dvh)] h-[min(82vw,52dvh)] max-w-[320px] max-h-[320px] cursor-pointer'
+                    } ${dragOver ? 'ring-4 ring-brand/70' : ''}`}
                     style={{ background: 'transparent' }}
                 />
 
-                {hasImage ? (
-                    <div className="w-full flex items-center gap-3 px-2 py-1">
-                        <span className="text-xs font-semibold text-muted">{t.size}</span>
-                        {/* h-8 rather than the default hairline: a range input is one of
-                            the easiest things to miss with a thumb. */}
-                        <input type="range" min={0.3} max={3} step={0.01} value={zoom}
-                            onChange={(e) => setZoom(parseFloat(e.target.value))}
-                            aria-label="Photo size"
-                            className="flex-1 h-8 accent-brand cursor-pointer" />
+                {adjusting && (
+                    <div className="w-full space-y-2 animate-fade-in">
+                        <p className="text-sm text-muted text-center">{t.dragHint}</p>
+                        <div className="flex items-center gap-3 px-1">
+                            <span className="text-xs font-semibold text-muted shrink-0">{t.size}</span>
+                            <input
+                                type="range"
+                                min={0.3}
+                                max={3}
+                                step={0.01}
+                                value={zoom}
+                                onChange={(e) => setZoom(parseFloat(e.target.value))}
+                                aria-label={t.size}
+                                className="flex-1 h-8 accent-brand cursor-pointer"
+                            />
+                        </div>
                     </div>
-                ) : (
-                    <p className="text-sm text-muted">{t.tapHint}</p>
                 )}
+
+                {!hasImage && <p className="text-sm text-muted">{t.tapHint}</p>}
 
                 {uploadError && (
                     <p role="alert" className="w-full text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center">
@@ -462,238 +492,238 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     </p>
                 )}
 
-                {/* Before save: one unit under the canvas / fit controls, above the
-                    sticky Download bar. Never on the photo itself. Hidden once they
-                    save so the post-download pair does not stack three deep. */}
-                {!justDownloaded && <AdSlot surface="campaign" className="w-full mt-1" />}
+                {/* Before save only: under fit controls, above sticky bar. Never on photo. */}
+                {adjusting && <AdSlot surface="campaign" className="w-full mt-1" />}
 
-                <input ref={fileRef} type="file" accept="image/*" className="hidden"
-                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+                <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleFile(f);
+                    }}
+                />
 
-                {!hasImage ? (
-                    <>
-                        <button onClick={() => fileRef.current?.click()}
-                            className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all">
-                            <Upload size={18} /> {t.uploadPhoto}
-                        </button>
-                        <div className="w-full grid grid-cols-3 gap-2 mt-1">
-                            {[
-                                { n: 1, label: t.stepAdd },
-                                { n: 2, label: t.stepFit },
-                                { n: 3, label: t.stepShare },
-                            ].map((s) => (
-                                <div key={s.n} className="flex flex-col items-center text-center gap-1.5 bg-cream border border-ink/10 rounded-xl py-3 px-1">
-                                    <span className="w-6 h-6 rounded-full bg-brand text-ink font-display font-extrabold text-xs flex items-center justify-center">{s.n}</span>
-                                    <span className="text-[11px] leading-tight text-ink/70 font-medium">{s.label}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        {/* Primary save actions live in the sticky thumb bar below.
-                            Keeping a desktop-only duplicate here would fight the bar
-                            on phones; the bar is always the one path. */}
-
-                        {canCopyImage && (
-                            <button onClick={handleCopyImage}
-                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
-                                {imageCopied ? <><Check size={16} className="text-brand-deep" /> {t.imageCopied}</> : <><Copy size={16} /> {t.copyImage}</>}
-                            </button>
-                        )}
-
-                        {justDownloaded && (
-                            <div className="w-full bg-cream border border-ink/10 rounded-2xl p-4 space-y-3 animate-fade-in">
-                                <div className="text-center">
-                                    <p className="font-display font-extrabold text-lg leading-tight">{t.youreIn}</p>
-                                    <p className="text-xs text-muted mt-1">{t.bringPeople}</p>
-                                </div>
-
-                                {/* Framed photo leads: viral loops start from the face
-                                    in the frame, not only the campaign URL. Link share
-                                    stays one tap below for group chats. */}
-                                {canSharePhoto ? (
-                                    <button onClick={handleSharePhoto} disabled={sharingPhoto}
-                                        className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all disabled:opacity-50"
-                                        style={{ backgroundColor: WHATSAPP_GREEN }}>
-                                        {sharingPhoto
-                                            ? <Loader2 size={18} className="animate-spin" />
-                                            : <><WhatsAppGlyph size={18} /> {t.sharePhoto}</>}
-                                    </button>
-                                ) : (
-                                    <button onClick={() => openShare('whatsapp')}
-                                        className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
-                                        style={{ backgroundColor: WHATSAPP_GREEN }}>
-                                        <WhatsAppGlyph size={18} /> {t.shareWhatsApp}
-                                    </button>
-                                )}
-
-                                <button onClick={handleShareStory} disabled={sharingStory}
-                                    className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all disabled:opacity-50">
-                                    {sharingStory
-                                        ? <Loader2 size={16} className="animate-spin" />
-                                        : t.shareStory}
-                                </button>
-
-                                {canSharePhoto && (
-                                    <button onClick={() => openShare('whatsapp')}
-                                        className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all">
-                                        <WhatsAppGlyph size={16} /> {t.shareLinkWhatsApp}
-                                    </button>
-                                )}
-
-                                {(prefersTagalog() || locale === 'id') && (
-                                    <button
-                                        onClick={() => openShare('messenger')}
-                                        className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white hover:brightness-105 active:brightness-95 transition-all"
-                                        style={{ backgroundColor: '#0084FF' }}
-                                    >
-                                        {t.shareMessenger}
-                                    </button>
-                                )}
-
-                                {canNativeShare && (
-                                    <button onClick={handleShare}
-                                        className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 transition-all">
-                                        <Share2 size={16} /> {t.shareAnother}
-                                    </button>
-                                )}
-
-                                <div className="grid grid-cols-2 gap-2">
-                                    <button onClick={() => openShare('x')}
-                                        className="min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 bg-ink text-white hover:brightness-125 transition-all">
-                                        <XGlyph size={15} /> X
-                                    </button>
-                                    <button onClick={() => openShare('facebook')}
-                                        className="min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-all"
-                                        style={{ backgroundColor: '#1877F2' }}>
-                                        <FacebookGlyph size={15} /> Facebook
-                                    </button>
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <button onClick={copyLink}
-                                        className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
-                                        {linkCopied ? <><Check size={15} className="text-brand-deep" /> {t.copied}</> : <><Copy size={15} /> {t.copyLink}</>}
-                                    </button>
-                                    <button onClick={() => setShowQR((v) => !v)}
-                                        className="min-h-[48px] py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-paper border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
-                                        <QrCode size={15} /> QR
-                                    </button>
-                                </div>
-
-                                {showQR && (
-                                    <div className="flex flex-col items-center gap-2 pt-1">
-                                        <QRCode value={pageUrl} size={168} className="border border-ink/10" />
-                                        <p className="text-[11px] text-muted">{t.scanCampaign}</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Mid-stack after Share: the before-save unit unmounts here, so
-                            this is the first post-download impression in view. */}
-                        {justDownloaded && <AdSlot surface="campaign" className="mt-1" />}
-
-                        {justDownloaded && (
-                            <div className="w-full bg-brand/10 border border-brand/40 rounded-2xl p-4 text-center space-y-3 animate-fade-in">
-                                <div>
-                                    <p className="font-display font-extrabold text-lg leading-tight flex items-center justify-center gap-1.5">
-                                        <Sparkles size={17} className="text-brand-deep" /> {t.wantOwn}
-                                    </p>
-                                    <p className="text-xs text-ink/70 mt-1.5 leading-relaxed">
-                                        {t.wantOwnBody}
-                                    </p>
-                                </div>
-                                <a
-                                    href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_page')}
-                                    onClick={() => track('create_from_campaign', { campaign: slug })}
-                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 active:brightness-110 transition-all"
-                                >
-                                    {t.makeOwn} <ArrowRight size={17} />
-                                </a>
-                                <a
-                                    href={withUtm('/hub', 'campaign_post_save')}
-                                    onClick={() => track('hub_from_campaign', { campaign: slug })}
-                                    className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-brand/30 text-brand-deep hover:bg-brand/10 transition-all"
-                                >
-                                    {t.setupHub}
-                                </a>
-                            </div>
-                        )}
-
-                        <div className="w-full flex gap-3">
-                            <button onClick={() => fileRef.current?.click()}
-                                className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
-                                <Upload size={16} /> {t.newPhoto}
-                            </button>
-                            <button onClick={handleShare}
-                                className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors">
-                                {copied ? <><Check size={16} className="text-brand-deep" /> {t.copied}</> : <><Share2 size={16} /> {t.share}</>}
-                            </button>
-                        </div>
-                    </>
+                {!hasImage && (
+                    <button
+                        onClick={() => fileRef.current?.click()}
+                        className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all"
+                    >
+                        <Upload size={18} /> {t.uploadPhoto}
+                    </button>
                 )}
 
-                <div className="w-full bg-cream border border-ink/10 rounded-xl py-4 px-4 text-center mt-1">
-                    <div className="font-display flex items-center justify-center gap-2 text-2xl font-extrabold">
-                        <span className="w-2.5 h-2.5 rounded-full bg-coral" /> {count.toLocaleString()}
-                    </div>
-                    {goal && goal > 0 ? (
-                        <>
-                            <div className="mt-2 h-2 w-full rounded-full bg-paper2 overflow-hidden">
-                                <div
-                                    className="h-full rounded-full bg-brand transition-all"
-                                    style={{ width: `${Math.min(100, Math.round((count / goal) * 100))}%` }}
-                                />
-                            </div>
-                            <p className="text-xs text-muted mt-1.5">
-                                {count.toLocaleString()} {t.of} {goal.toLocaleString()} {t.ofSupporters}
-                                {count >= goal ? ` · ${t.goalReached}` : ''}
-                            </p>
-                        </>
-                    ) : (
-                        <p className="text-xs text-muted mt-0.5">{t.peopleSupporting}</p>
-                    )}
-                </div>
+                {/* A2: post-save. Framed result stays above; WhatsApp leads; story next. */}
+                {justDownloaded && (
+                    <div className="w-full space-y-3 animate-fade-in">
+                        {canSharePhoto ? (
+                            <button
+                                onClick={handleSharePhoto}
+                                disabled={sharingPhoto}
+                                className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all disabled:opacity-50"
+                                style={{ backgroundColor: WHATSAPP_GREEN }}
+                            >
+                                {sharingPhoto
+                                    ? <Loader2 size={20} className="animate-spin" />
+                                    : <><WhatsAppGlyph size={20} /> {t.sharePhoto}</>}
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => openShare('whatsapp')}
+                                className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
+                                style={{ backgroundColor: WHATSAPP_GREEN }}
+                            >
+                                <WhatsAppGlyph size={20} /> {t.shareWhatsApp}
+                            </button>
+                        )}
 
-                <a
-                    href={`/create?from=${encodeURIComponent(slug)}`}
-                    onClick={() => track('create_from_campaign', { campaign: slug, from: 'footer' })}
-                    className="text-xs text-muted hover:text-brand-deep transition-colors mt-1"
-                >
-                    {t.makeOwnFooter}
-                </a>
+                        <button
+                            onClick={handleShareStory}
+                            disabled={sharingStory}
+                            className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-all disabled:opacity-50"
+                        >
+                            {sharingStory
+                                ? <Loader2 size={16} className="animate-spin" />
+                                : t.shareStory}
+                        </button>
 
-                {/* Second unit for people who keep scrolling (count / report). Same
-                    rules: post-download only, labelled, in-flow, never on the photo. */}
-                {justDownloaded && <AdSlot surface="campaign" className="mt-4" />}
+                        {canSharePhoto && (
+                            <button
+                                onClick={() => openShare('whatsapp')}
+                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-all"
+                            >
+                                <WhatsAppGlyph size={16} /> {t.shareLinkWhatsApp}
+                            </button>
+                        )}
 
-                {reportDone ? (
-                    <p className="text-[11px] text-muted/70">{t.reportThanks}</p>
-                ) : reportOpen ? (
-                    <div className="w-full max-w-xs bg-cream border border-ink/10 rounded-xl p-3 space-y-2">
-                        <p className="text-xs font-semibold text-ink">{t.reportTitle}</p>
-                        <textarea
-                            value={reportReason}
-                            onChange={(e) => setReportReason(e.target.value)}
-                            placeholder={t.reportPlaceholder}
-                            className="w-full bg-paper border border-ink/10 rounded-lg px-2.5 py-2 text-sm text-ink placeholder-muted outline-none focus:ring-2 focus:ring-brand/40 resize-none min-h-[56px]"
-                        />
+                        {(prefersTagalog() || locale === 'id') && (
+                            <button
+                                onClick={() => openShare('messenger')}
+                                className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white hover:brightness-105 active:brightness-95 transition-all"
+                                style={{ backgroundColor: '#0084FF' }}
+                            >
+                                {t.shareMessenger}
+                            </button>
+                        )}
+
                         <div className="flex gap-2">
-                            <button onClick={submitReport} className="flex-1 py-2 rounded-lg text-xs font-bold bg-coral text-white hover:brightness-105 transition-all">{t.submitReport}</button>
-                            <button onClick={() => setReportOpen(false)} className="py-2 px-3 rounded-lg text-xs font-semibold bg-paper border border-ink/10 text-ink hover:bg-ink/5 transition-colors">{t.cancel}</button>
+                            {canNativeShare && (
+                                <button
+                                    onClick={handleShare}
+                                    className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 transition-all"
+                                >
+                                    <Share2 size={15} /> {t.shareAnother}
+                                </button>
+                            )}
+                            <button
+                                onClick={copyLink}
+                                className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
+                            >
+                                {linkCopied
+                                    ? <><Check size={15} className="text-brand-deep" /> {t.copied}</>
+                                    : <><Copy size={15} /> {t.copyLink}</>}
+                            </button>
+                            <button
+                                onClick={() => setShowQR((v) => !v)}
+                                className="min-h-[48px] py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
+                            >
+                                <QrCode size={15} /> QR
+                            </button>
                         </div>
+
+                        {showQR && (
+                            <div className="flex flex-col items-center gap-2 pt-1">
+                                <QRCode value={pageUrl} size={168} className="border border-ink/10" />
+                                <p className="text-[11px] text-muted">{t.scanCampaign}</p>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <button
+                                onClick={() => openShare('x')}
+                                className="min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 bg-ink text-white hover:brightness-125 transition-all"
+                            >
+                                <XGlyph size={14} /> X
+                            </button>
+                            <button
+                                onClick={() => openShare('facebook')}
+                                className="min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-all"
+                                style={{ backgroundColor: '#1877F2' }}
+                            >
+                                <FacebookGlyph size={14} /> Facebook
+                            </button>
+                        </div>
+
+                        <AdSlot surface="campaign" className="mt-1" />
+
+                        <div className="w-full text-center space-y-3 pt-2">
+                            <p className="font-display font-bold text-lg leading-tight flex items-center justify-center gap-1.5">
+                                <Sparkles size={17} className="text-brand-deep" /> {t.wantOwn}
+                            </p>
+                            <p className="text-sm text-ink/70 leading-relaxed px-1">{t.wantOwnBody}</p>
+                            <a
+                                href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_page')}
+                                onClick={() => track('create_from_campaign', { campaign: slug })}
+                                className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 active:brightness-110 transition-all"
+                            >
+                                {t.makeOwn} <ArrowRight size={17} />
+                            </a>
+                            <a
+                                href={withUtm('/hub', 'campaign_post_save')}
+                                onClick={() => track('hub_from_campaign', { campaign: slug })}
+                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-brand/30 bg-brand/10 text-brand-deep hover:bg-brand/15 transition-all"
+                            >
+                                {t.setupHub}
+                            </a>
+                        </div>
+
+                        <button
+                            onClick={() => {
+                                setJustDownloaded(false);
+                                fileRef.current?.click();
+                            }}
+                            className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
+                        >
+                            <Upload size={16} /> {t.newPhoto}
+                        </button>
                     </div>
-                ) : (
-                    <button onClick={() => setReportOpen(true)} className="text-[11px] text-muted/70 hover:text-coral transition-colors">{t.report}</button>
+                )}
+
+                {adjusting && canCopyImage && (
+                    <button
+                        onClick={handleCopyImage}
+                        className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
+                    >
+                        {imageCopied
+                            ? <><Check size={16} className="text-brand-deep" /> {t.imageCopied}</>
+                            : <><Copy size={16} /> {t.copyImage}</>}
+                    </button>
+                )}
+
+                {/* Count stays below the fold while adjusting so the save bar leads. */}
+                {!adjusting && (
+                    <div className="w-full border-t border-ink/10 pt-5 mt-2 text-center">
+                        <div className="font-display flex items-center justify-center gap-2 text-2xl font-bold">
+                            <span className="w-2.5 h-2.5 rounded-full bg-coral" /> {count.toLocaleString()}
+                        </div>
+                        {goal && goal > 0 ? (
+                            <>
+                                <div className="mt-2 h-2 w-full rounded-full bg-paper2 overflow-hidden">
+                                    <div
+                                        className="h-full rounded-full bg-brand transition-all"
+                                        style={{ width: `${Math.min(100, Math.round((count / goal) * 100))}%` }}
+                                    />
+                                </div>
+                                <p className="text-xs text-muted mt-1.5">
+                                    {count.toLocaleString()} {t.of} {goal.toLocaleString()} {t.ofSupporters}
+                                    {count >= goal ? ` · ${t.goalReached}` : ''}
+                                </p>
+                            </>
+                        ) : (
+                            <p className="text-xs text-muted mt-0.5">{t.peopleSupporting}</p>
+                        )}
+                    </div>
+                )}
+
+                {!hasImage && (
+                    <a
+                        href={`/create?from=${encodeURIComponent(slug)}`}
+                        onClick={() => track('create_from_campaign', { campaign: slug, from: 'footer' })}
+                        className="text-xs text-muted hover:text-brand-deep transition-colors mt-1"
+                    >
+                        {t.makeOwnFooter}
+                    </a>
+                )}
+
+                {justDownloaded && <AdSlot surface="campaign" className="mt-2" />}
+
+                {!adjusting && (
+                    reportDone ? (
+                        <p className="text-[11px] text-muted/70">{t.reportThanks}</p>
+                    ) : reportOpen ? (
+                        <div className="w-full max-w-xs bg-cream border border-ink/10 rounded-xl p-3 space-y-2">
+                            <p className="text-xs font-semibold text-ink">{t.reportTitle}</p>
+                            <textarea
+                                value={reportReason}
+                                onChange={(e) => setReportReason(e.target.value)}
+                                placeholder={t.reportPlaceholder}
+                                className="w-full bg-paper border border-ink/10 rounded-lg px-2.5 py-2 text-sm text-ink placeholder-muted outline-none focus:ring-2 focus:ring-brand/40 resize-none min-h-[56px]"
+                            />
+                            <div className="flex gap-2">
+                                <button onClick={submitReport} className="flex-1 py-2 rounded-lg text-xs font-bold bg-coral text-white hover:brightness-105 transition-all">{t.submitReport}</button>
+                                <button onClick={() => setReportOpen(false)} className="py-2 px-3 rounded-lg text-xs font-semibold bg-paper border border-ink/10 text-ink hover:bg-ink/5 transition-colors">{t.cancel}</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <button onClick={() => setReportOpen(true)} className="text-[11px] text-muted/70 hover:text-coral transition-colors">{t.report}</button>
+                    )
                 )}
             </div>
 
-            {/* Thumb-zone save bar. Share sheet leads on phones (iOS in-app
-                browsers ignore <a download>); Download leads where the sheet
-                does not exist. Safe-area so the home indicator never covers it. */}
-            {hasImage && (
+            {/* A3: thumb-zone only while adjusting. After save, share CTAs above lead. */}
+            {adjusting && (
                 <div className="fixed bottom-0 inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
                     <div className="w-full max-w-sm mx-auto flex flex-col gap-2">
                         {saveError && (
@@ -713,22 +743,37 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                         )}
                         {canSharePhoto ? (
                             <>
-                                <button onClick={handleSharePhoto} disabled={sharingPhoto}
-                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all disabled:opacity-50">
-                                    {sharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> {justDownloaded ? t.sharePhoto : t.saveOrShare}</>}
+                                <button
+                                    onClick={handleSharePhoto}
+                                    disabled={sharingPhoto}
+                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all disabled:opacity-50"
+                                >
+                                    {sharingPhoto
+                                        ? <Loader2 size={20} className="animate-spin" />
+                                        : <><ImageDown size={20} /> {t.saveOrShare}</>}
                                 </button>
                                 {!isIOS() && (
-                                    <button onClick={handleDownload} disabled={downloading}
-                                        className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors disabled:opacity-50">
-                                        {downloading ? <Loader2 size={16} className="animate-spin" /> : <><Download size={16} /> {t.download}</>}
+                                    <button
+                                        onClick={handleDownload}
+                                        disabled={downloading}
+                                        className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors disabled:opacity-50"
+                                    >
+                                        {downloading
+                                            ? <Loader2 size={16} className="animate-spin" />
+                                            : <><Download size={16} /> {t.download}</>}
                                     </button>
                                 )}
                                 <p className="text-[11px] text-muted text-center leading-snug px-1">{t.savePhotoHint}</p>
                             </>
                         ) : (
-                            <button onClick={handleDownload} disabled={downloading}
-                                className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50">
-                                {downloading ? <Loader2 size={18} className="animate-spin" /> : <>{justDownloaded ? <><Check size={18} /> {t.downloadedAgain}</> : <><Download size={18} /> {t.download}</>}</>}
+                            <button
+                                onClick={handleDownload}
+                                disabled={downloading}
+                                className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
+                            >
+                                {downloading
+                                    ? <Loader2 size={18} className="animate-spin" />
+                                    : <><Download size={18} /> {t.download}</>}
                             </button>
                         )}
                     </div>
