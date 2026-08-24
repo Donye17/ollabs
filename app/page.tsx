@@ -1,13 +1,14 @@
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import type { Metadata } from "next";
-import { ArrowRight, Palette, Link2, Users, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 import { ExamplesSkeleton } from "@/components/home/ExamplesSkeleton";
 import { HomeExamplesSection } from "@/components/home/HomeExamplesSection";
 import { HomeCalendarSection } from "@/components/home/HomeCalendarSection";
 import { HomeCreateCta } from "@/components/home/HomeCreateCta";
+import { HomeHowItWorks } from "@/components/home/HomeHowItWorks";
 import { BrandMark } from "@/components/BrandMark";
 import { HOME_FAQS } from "@/lib/faqs";
 
@@ -34,12 +35,6 @@ const FAQSection = dynamic(
     { loading: () => <div className="h-80 bg-paper2/50" aria-hidden /> }
 );
 
-const steps = [
-    { icon: Palette, title: "Make a frame", body: "Pick a clean style or upload your own design: a logo, colors, a slogan." },
-    { icon: Link2, title: "Share one link", body: "Post it anywhere. One link is all your people need." },
-    { icon: Users, title: "They add it", body: "They drop in a photo, download it framed, and your counter ticks up." },
-];
-
 const audiences = [
     { label: "Fundraisers", href: "/for/fundraisers" },
     { label: "Nonprofits", href: "/for/nonprofits" },
@@ -47,15 +42,6 @@ const audiences = [
     { label: "Churches", href: "/for/churches" },
     { label: "Schools", href: "/for/schools" },
     { label: "Events", href: "/for/events" },
-];
-
-const reasons = [
-    "No signup required",
-    "No watermark, ever",
-    "Supporters never pay",
-    "Upload your own design",
-    "Live supporter counter",
-    "Works on any phone",
 ];
 
 const faqJsonLd = {
@@ -80,27 +66,20 @@ export default function Home() {
             />
             <NavBar />
 
-            {/* Hero stays type + CTA only. Decorative rings and a coral blob
-                used to sit behind this copy; they read as template chrome and
-                fight the framed photos in Top campaigns. Top campaigns stays
-                in the next section so overflow cannot cut podium titles. */}
             <section className="relative pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] sm:pt-32 pb-10 sm:pb-14 px-4 sm:px-6">
                 <div className="max-w-4xl mx-auto text-center">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-cream border border-ink/10 px-4 py-1.5 text-xs font-bold text-muted mb-5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-brand" /> From collabs, for coming together
-                    </span>
-                    <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-extrabold leading-[1.02] mb-4 sm:mb-6 text-balance">
+                    <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.02] mb-4 sm:mb-6 text-balance">
                         Bring your people <span className="text-brand-deep">together.</span>
                     </h1>
-                    <p className="text-[15px] sm:text-lg md:text-xl text-ink/70 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-[15px] sm:text-lg text-ink/70 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
                         Make a profile-picture frame for your cause, team, or event. Share one link and your people add it to their photo in seconds. Free, no signup, no watermark.
                     </p>
                     <div className="flex flex-col items-center gap-3">
                         <HomeCreateCta
-                            className="group h-12 px-7 rounded-xl bg-brand text-ink font-bold inline-flex items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all"
+                            className="h-12 px-7 rounded-xl bg-brand text-ink font-bold inline-flex items-center gap-2 hover:brightness-105 transition-all"
                         >
                             Create a campaign
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            <ArrowRight className="w-4 h-4" />
                         </HomeCreateCta>
                         <div className="flex items-center justify-center">
                             <Link
@@ -117,7 +96,7 @@ export default function Home() {
             <section className="px-4 sm:px-6 pb-12 sm:pb-16">
                 <Suspense fallback={
                     <div className="relative z-10">
-                        <p className="text-center text-xs uppercase tracking-[0.2em] text-muted font-bold mb-8">Top campaigns</p>
+                        <p className="text-center text-sm text-muted font-semibold mb-8">Top campaigns</p>
                         <ExamplesSkeleton />
                     </div>
                 }>
@@ -129,67 +108,48 @@ export default function Home() {
                 <HomeCalendarSection />
             </Suspense>
 
-            <section className="px-6 py-20">
-                <div className="max-w-5xl mx-auto">
-                    <h2 className="font-display text-3xl md:text-4xl font-extrabold text-center mb-14">How it works</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {steps.map((s, i) => (
-                            <div key={i} className="bg-cream border border-ink/10 rounded-2xl p-7 text-center">
-                                <div className="w-12 h-12 rounded-xl bg-brand/15 flex items-center justify-center mx-auto mb-4">
-                                    <s.icon className="w-6 h-6 text-brand-deep" />
-                                </div>
-                                <p className="text-[11px] font-bold text-muted uppercase tracking-wider mb-1">Step {i + 1}</p>
-                                <h3 className="font-display text-lg font-bold mb-2">{s.title}</h3>
-                                <p className="text-sm text-ink/70 leading-relaxed">{s.body}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+            <HomeHowItWorks />
 
-            <section className="px-6 py-14">
+            <section className="px-6 py-14 border-t border-ink/10">
                 <div className="max-w-4xl mx-auto text-center">
-                    <p className="text-xs uppercase tracking-[0.2em] text-muted font-bold mb-6">Made for</p>
-                    <div className="flex flex-wrap items-center justify-center gap-3">
-                        {audiences.map((a) => (
-                            <Link key={a.href} href={a.href} className="px-4 py-2 rounded-full bg-brand/12 border border-brand/30 text-brand-deep text-sm font-semibold hover:bg-brand/20 transition-colors">{a.label}</Link>
+                    <p className="text-sm text-muted font-semibold mb-4">Made for</p>
+                    <p className="text-[15px] text-ink/80 leading-relaxed">
+                        {audiences.map((a, i) => (
+                            <span key={a.href}>
+                                {i > 0 && <span className="text-muted/50 mx-1.5">·</span>}
+                                <Link href={a.href} className="font-medium text-ink hover:text-brand-deep transition-colors">
+                                    {a.label}
+                                </Link>
+                            </span>
                         ))}
-                    </div>
-                    <div className="mt-6">
-                        <Link href="/for" className="text-sm font-semibold text-brand-deep hover:underline">See all the ways people use Ollabs</Link>
+                    </p>
+                    <div className="mt-5">
+                        <Link href="/for" className="text-sm font-semibold text-brand-deep hover:underline">
+                            See all use cases
+                        </Link>
                     </div>
                 </div>
             </section>
 
-            <section className="px-6 py-20">
-                <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-3xl md:text-4xl font-extrabold text-center mb-4">Why Ollabs</h2>
-                    <p className="text-center text-ink/70 mb-12">The clean alternative to Twibbon. Your supporters never pay and never get a watermark.</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {reasons.map((r) => (
-                            <div key={r} className="flex items-center gap-3 bg-cream border border-ink/10 rounded-xl px-5 py-4">
-                                <div className="w-6 h-6 rounded-full bg-brand/20 flex items-center justify-center shrink-0">
-                                    <Check className="w-4 h-4 text-brand-deep" />
-                                </div>
-                                <span className="text-ink font-medium">{r}</span>
-                            </div>
-                        ))}
-                    </div>
+            <section className="px-6 py-16 border-t border-ink/10">
+                <div className="max-w-2xl mx-auto text-center">
+                    <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3">Free for supporters</h2>
+                    <p className="text-ink/70 leading-relaxed">
+                        No signup, no watermark, no paywall. Upload your own frame art, share one link, and watch the counter climb.
+                    </p>
                 </div>
             </section>
 
             <FAQSection />
 
-            <section className="px-6 py-24">
-                <div className="max-w-3xl mx-auto text-center relative">
-                    <div className="bg-ink text-paper rounded-3xl px-8 py-16">
-                        <h2 className="font-display text-3xl md:text-5xl font-extrabold mb-4">Ready to rally your people?</h2>
-                        <p className="text-paper/70 mb-8">Make a campaign in under a minute. No account needed.</p>
-                        <Link href="/create" className="group inline-flex h-12 px-8 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all">
-                            Create a campaign
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
+            <section className="px-6 py-20 border-t border-ink/10">
+                <div className="max-w-3xl mx-auto text-center">
+                    <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3">Make a frame</h2>
+                    <p className="text-ink/70 mb-8">Takes under a minute. No account needed.</p>
+                    <Link href="/create" className="inline-flex h-12 px-8 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all">
+                        Create a campaign
+                        <ArrowRight className="w-4 h-4" />
+                    </Link>
                 </div>
             </section>
 

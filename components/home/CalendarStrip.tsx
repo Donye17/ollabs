@@ -50,7 +50,7 @@ export const CalendarStrip: React.FC<{ items: StripItem[] }> = ({ items }) => {
             href={`/day/${i.slug}`}
             onClick={() => track('calendar_strip_click', { day: i.slug, past: i.past })}
             className={`group shrink-0 w-[190px] snap-center rounded-2xl border border-ink/10 bg-cream
-                        overflow-hidden transition-all hover:border-brand/50 hover:-translate-y-1
+                        overflow-hidden transition-all hover:border-brand/50
                         ${i.past ? 'opacity-50 hover:opacity-90' : ''}`}
         >
             {/* date header, the calendar tile */}

@@ -1,5 +1,6 @@
 import { pool } from '@/lib/neon';
 import { visibleFrameSql, HOME_TOP_CAMPAIGNS, MIN_SUPPORTERS_TO_DISPLAY } from '@/lib/frameValidity';
+import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
 import type { FrameConfig } from '@/lib/types';
 import type { TopCampaign } from '@/components/home/TopCampaignsPodium';
 import { HomeTopCampaignsClient } from '@/components/home/HomeTopCampaignsClient';
@@ -9,14 +10,16 @@ async function getTopCampaigns(): Promise<TopCampaign[]> {
         // Rank by real campaign_uses rows, not the denormalized counter. Seeded
         // demo frames used to inflate supporter_count without matching uses.
         const res = await pool.query(
-            `SELECT c.slug, c.title, c.frame_config,
-                    COALESCE(u.real_uses, 0)::int AS supporter_count
+            `SELECT c.slug, c.title, c.frame_config, c.preview_url,
+                    COALESCE(u.real_uses, 0)::int AS supporter_count,
+                    COALESCE(sp.supporter_photos, ARRAY[]::text[]) AS supporter_photos
              FROM campaigns c
              LEFT JOIN (
                  SELECT campaign_id, COUNT(*)::int AS real_uses
                  FROM campaign_uses
                  GROUP BY campaign_id
              ) u ON u.campaign_id = c.id
+             ${SUPPORTER_PHOTOS_LATERAL}
              WHERE c.is_public = true
                AND c.is_hidden IS NOT TRUE
                AND COALESCE(u.real_uses, 0) >= $1
@@ -30,6 +33,8 @@ async function getTopCampaigns(): Promise<TopCampaign[]> {
             title: r.title,
             supporterCount: r.supporter_count ?? 0,
             frame: (typeof r.frame_config === 'string' ? JSON.parse(r.frame_config) : r.frame_config) as FrameConfig,
+            previewUrl: typeof r.preview_url === 'string' ? r.preview_url : null,
+            supporterPhotos: parseSupporterPhotos(r.supporter_photos),
         }));
     } catch (e) {
         console.error('Failed to load top campaigns', e);
@@ -43,7 +48,7 @@ export async function HomeExamplesSection() {
 
     return (
         <div className="relative z-10">
-            <p className="text-center text-xs uppercase tracking-[0.2em] text-muted font-bold mb-2">
+            <p className="text-center text-sm text-muted font-semibold mb-2">
                 Top campaigns
             </p>
             <p className="text-center text-sm text-ink/65 mb-8 max-w-md mx-auto leading-relaxed">

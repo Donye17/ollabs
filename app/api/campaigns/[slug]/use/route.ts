@@ -19,7 +19,7 @@ function milestoneReached(count: number, alreadyNotified: number): number | null
 }
 
 // POST /api/campaigns/[slug]/use, a supporter applied the frame; bump the counter.
-// Body (optional): { imageUrl } if the supporter opts in to the supporter wall.
+// Body (optional): { imageUrl } — a small public JPEG for Explore thumbnails.
 //
 // Rate limit is per-instance (see lib/rateLimit.ts). Limits are generous for a
 // real supporter saving once; they blunt scripted counter inflation.

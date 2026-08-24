@@ -339,7 +339,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                         <p className="text-ink/70 mb-7 max-w-xl mx-auto">
                             Make the frame once, share one link, and watch the supporter count move. Takes about a minute.
                         </p>
-                        <Link href={`/create?day=${day.slug}`} className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all">
+                        <Link href={`/create?day=${day.slug}`} className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all">
                             Create a campaign <ArrowRight size={16} />
                         </Link>
                     </div>

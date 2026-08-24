@@ -42,7 +42,7 @@ export default function ForHub() {
                             <h2 className="font-display text-xl font-bold mb-1 group-hover:text-brand-deep transition-colors">{u.audience}</h2>
                             <p className="text-sm text-ink/70 mb-3">{u.subtitle}</p>
                             <span className="text-sm font-semibold text-brand-deep inline-flex items-center gap-1">
-                                See how <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                See how <ArrowRight className="w-4 h-4" />
                             </span>
                         </Link>
                     ))}

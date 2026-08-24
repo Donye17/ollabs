@@ -8,6 +8,7 @@ import { FrameConfig } from '@/lib/types';
 import { pool } from '@/lib/neon';
 import { CATEGORIES, CATEGORY_KEYS } from '@/lib/categories';
 import { visibleFrameSql } from '@/lib/frameValidity';
+import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
 
 export const revalidate = 300;
 
@@ -21,12 +22,14 @@ export const metadata: Metadata = {
 
 type Sort = 'popular' | 'trending' | 'newest';
 
+const EXPLORE_SELECT = `c.slug, c.title, c.frame_config, c.preview_url, c.publisher_country,
+    COALESCE(sp.supporter_photos, ARRAY[]::text[]) AS supporter_photos`;
+
 async function getCampaigns(
     sort: Sort,
     category: string | null,
     visitorCountry: string | null
 ): Promise<ExploreCampaign[]> {
-    const base = `SELECT c.slug, c.title, c.frame_config, c.supporter_count, c.preview_url, c.publisher_country FROM campaigns c`;
     // category is validated against the fixed allowlist before reaching here, so it is safe to inline.
     const catClause = category ? ` AND c.category = '${category}'` : '';
     // Explore filters on frame validity only, no supporter floor. A brand new campaign
@@ -39,23 +42,28 @@ async function getCampaigns(
         : '0';
     let query: string;
     if (sort === 'newest') {
-        query = `${base} ${where}
+        query = `SELECT ${EXPLORE_SELECT}, c.supporter_count
+            FROM campaigns c
+            ${SUPPORTER_PHOTOS_LATERAL}
+            ${where}
             ORDER BY ${geoBoost} DESC, c.created_at DESC
             LIMIT 60`;
     } else if (sort === 'trending') {
-        query = `${base}
+        query = `SELECT ${EXPLORE_SELECT}, c.supporter_count
+            FROM campaigns c
             LEFT JOIN (
                 SELECT campaign_id, COUNT(*)::int AS recent
                 FROM campaign_uses
                 WHERE created_at >= now() - interval '7 days'
                 GROUP BY campaign_id
             ) r ON r.campaign_id = c.id
+            ${SUPPORTER_PHOTOS_LATERAL}
             ${where}
             ORDER BY ${geoBoost} DESC, COALESCE(r.recent, 0) DESC, c.supporter_count DESC NULLS LAST, c.created_at DESC
             LIMIT 60`;
     } else {
         // Popular = real downloads × recency feel, with a soft country bias.
-        query = `SELECT c.slug, c.title, c.frame_config, c.preview_url, c.publisher_country,
+        query = `SELECT ${EXPLORE_SELECT},
                         COALESCE(u.real_uses, 0)::int AS supporter_count
                  FROM campaigns c
                  LEFT JOIN (
@@ -63,6 +71,7 @@ async function getCampaigns(
                      FROM campaign_uses
                      GROUP BY campaign_id
                  ) u ON u.campaign_id = c.id
+                 ${SUPPORTER_PHOTOS_LATERAL}
                  ${where}
                  ORDER BY ${geoBoost} DESC, COALESCE(u.real_uses, 0) DESC, c.created_at DESC
                  LIMIT 60`;
@@ -75,6 +84,7 @@ async function getCampaigns(
             supporterCount: r.supporter_count ?? 0,
             frame: (typeof r.frame_config === 'string' ? JSON.parse(r.frame_config) : r.frame_config) as FrameConfig,
             previewUrl: typeof r.preview_url === 'string' ? r.preview_url : null,
+            supporterPhotos: parseSupporterPhotos(r.supporter_photos),
         }));
     } catch (e) {
         console.error('Failed to load explore campaigns', e);
@@ -111,7 +121,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
 
             <section className="pt-32 pb-8 px-6">
                 <div className="max-w-3xl mx-auto text-center">
-                    <h1 className="font-display text-4xl md:text-5xl font-extrabold mb-4">Explore campaigns</h1>
+                    <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">Explore campaigns</h1>
                     <p className="text-lg text-ink/70">Real campaigns people are rallying behind right now. Add one to your photo, or start your own.</p>
                 </div>
             </section>

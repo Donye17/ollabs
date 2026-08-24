@@ -38,10 +38,10 @@ export function LocaleLandingPage({ t, htmlLang, extraFooterLinks }: Props) {
                     <div className="flex flex-wrap items-center justify-center gap-3">
                         <HomeCreateCta
                             eventFrom={htmlLang}
-                            className="group min-h-[48px] px-6 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 active:brightness-95 transition-all"
+                            className="group min-h-[48px] px-6 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:brightness-105 active:brightness-95 transition-all"
                         >
                             {t.cta}
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            <ArrowRight className="w-4 h-4" />
                         </HomeCreateCta>
                         <Link
                             href="/"

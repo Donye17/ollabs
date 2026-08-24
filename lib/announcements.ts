@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-23-home-explore-polish',
+        date: '2026-08-23',
+        title: 'Quieter home, real faces on Explore',
+        summary: 'Less template chrome on the homepage, and campaign grids can show supporter photos.',
+        items: [
+            'Homepage sections trimmed: plain flow steps, flat closing CTA, text use-case links.',
+            'Explore and the home podium pick a random supporter thumbnail when one exists.',
+            'Saving a framed photo uploads a small public thumb for the grid (starts filling on new saves).',
+        ],
+    },
+    {
         id: '2026-08-23-cool-paper-mark',
         date: '2026-08-23',
         title: 'Cooler paper, same O',

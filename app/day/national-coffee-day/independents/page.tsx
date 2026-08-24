@@ -164,7 +164,7 @@ export default async function IndependentsPage() {
                     </p>
                     <Link
                         href="/create?day=national-coffee-day"
-                        className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all"
+                        className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all"
                     >
                         Create your frame <ArrowRight size={16} />
                     </Link>

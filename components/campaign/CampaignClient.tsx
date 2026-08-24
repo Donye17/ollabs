@@ -10,6 +10,7 @@ import { XGlyph, WhatsAppGlyph, FacebookGlyph, WHATSAPP_GREEN } from '@/componen
 import { supporterShareText, whatsappUrl, messengerShareUrl, prefersTagalog } from '@/lib/share';
 import { saveFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome } from '@/lib/savePhoto';
 import { framedCircleToStoryBlob } from '@/lib/storyExport';
+import { uploadExploreThumb } from '@/lib/exploreThumb';
 import { AdSlot } from '@/components/AdSlot';
 import { BrandMark } from '@/components/BrandMark';
 import { useLocale } from '@/components/i18n/LocaleProvider';
@@ -80,7 +81,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
             await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
             setImageCopied(true);
             setTimeout(() => setImageCopied(false), 1500);
-            bumpCount();
+            recordSupporterUse();
             setJustDownloaded(true);
             track('frame_copy_image', { campaign: slug });
         } catch { /* clipboard image unavailable */ }
@@ -248,18 +249,32 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     };
     const onPointerUp = () => { drag.current.active = false; };
 
-    const bumpCount = () => {
+    const recordSupporterUse = () => {
         if (countedRef.current) return;
         countedRef.current = true;
-        fetch(`/api/campaigns/${slug}/use`, { method: 'POST' })
-            .then(r => r.ok ? r.json() : null)
-            .then(d => {
+
+        void (async () => {
+            let imageUrl: string | null = null;
+            const canvas = canvasRef.current;
+            if (canvas && hasImage) {
+                imageUrl = await uploadExploreThumb(canvas);
+            }
+
+            try {
+                const res = await fetch(`/api/campaigns/${slug}/use`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(imageUrl ? { imageUrl } : {}),
+                });
+                const d = res.ok ? await res.json() : null;
                 if (d && typeof d.supporter_count === 'number') {
                     setCount(d.supporter_count);
                     track('supporter_joined', { campaign: slug, count: d.supporter_count });
                 }
-            })
-            .catch(() => { countedRef.current = false; });
+            } catch {
+                countedRef.current = false;
+            }
+        })();
     };
 
     const pngEntries = (): Record<string, string> => ({
@@ -286,7 +301,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
 
     const applySaveOutcome = (outcome: SavePhotoOutcome) => {
         if (outcome === 'shared' || outcome === 'downloaded') {
-            bumpCount();
+            recordSupporterUse();
             setJustDownloaded(true);
             setSaveError(null);
             return true;
@@ -368,7 +383,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 title,
             });
             if (outcome === 'shared' || outcome === 'downloaded') {
-                bumpCount();
+                recordSupporterUse();
                 setJustDownloaded(true);
                 setSaveError(null);
                 track('frame_share_story', { campaign: slug, outcome });

@@ -31,10 +31,10 @@ export function VsTwibbonizeShell({ copy }: { copy: VsCopy; canonical?: string }
                     <div className="flex flex-wrap items-center gap-3">
                         <Link
                             href="/create"
-                            className="group min-h-[48px] px-6 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all"
+                            className="group min-h-[48px] px-6 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:brightness-105 transition-all"
                         >
                             {copy.createCta}
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            <ArrowRight className="w-4 h-4" />
                         </Link>
                         <Link
                             href="/explore"
@@ -114,7 +114,7 @@ export function VsTwibbonizeShell({ copy }: { copy: VsCopy; canonical?: string }
                     <p className="text-ink/70 mb-7 max-w-xl mx-auto">{copy.tryBody}</p>
                     <Link
                         href="/create"
-                        className="inline-flex min-h-[48px] px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all"
+                        className="inline-flex min-h-[48px] px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all"
                     >
                         {copy.tryCta}
                         <ArrowRight className="w-4 h-4" />

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Users } from 'lucide-react';
-import { FrameRendererFactory } from '@/components/renderer/FrameRendererFactory';
+import { FramePreview } from '@/components/FramePreview';
 import type { FrameConfig } from '@/lib/types';
 
 export type TopCampaign = {
@@ -11,65 +11,46 @@ export type TopCampaign = {
     title: string;
     supporterCount: number;
     frame: FrameConfig;
+    previewUrl?: string | null;
+    supporterPhotos: string[];
 };
 
-function PodiumFrame({ frame, size }: { frame: FrameConfig; size: number }) {
-    const ref = useRef<HTMLCanvasElement>(null);
-    const [tick, setTick] = useState(0);
-
-    useEffect(() => {
-        const canvas = ref.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        const cx = size / 2;
-        const cy = size / 2;
-        const radius = size / 2;
-
-        ctx.clearRect(0, 0, size, size);
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
-        const g = ctx.createLinearGradient(0, 0, 0, size);
-        g.addColorStop(0, '#3f3f46');
-        g.addColorStop(1, '#27272a');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, size, size);
-        ctx.fillStyle = 'rgba(255,255,255,0.12)';
-        ctx.beginPath();
-        ctx.arc(cx, cy - radius * 0.18, radius * 0.32, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.ellipse(cx, cy + radius * 0.72, radius * 0.6, radius * 0.42, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-        try {
-            FrameRendererFactory.render({
-                ctx,
-                centerX: cx,
-                centerY: cy,
-                radius,
-                frame,
-                onImageLoad: () => setTick((t) => t + 1),
-            });
-        } catch (e) {
-            console.error('podium frame render failed', e);
-        }
-    }, [frame, size, tick]);
-
-    return (
-        <canvas
-            ref={ref}
-            width={size}
-            height={size}
-            className="w-full h-full rounded-full"
-            aria-hidden
-        />
+function PodiumThumb({
+    frame,
+    previewUrl,
+    supporterPhotos,
+    canvasPx,
+}: {
+    frame: FrameConfig;
+    previewUrl?: string | null;
+    supporterPhotos: string[];
+    canvasPx: number;
+}) {
+    const [supporterPhoto] = useState(() =>
+        supporterPhotos.length > 0
+            ? supporterPhotos[Math.floor(Math.random() * supporterPhotos.length)]
+            : null
     );
+    const [previewFailed, setPreviewFailed] = useState(false);
+
+    if (supporterPhoto) {
+        return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={supporterPhoto} alt="" className="w-full h-full object-cover" />
+        );
+    }
+    if (previewUrl && !previewFailed) {
+        return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+                src={previewUrl}
+                alt=""
+                className="w-full h-full object-cover"
+                onError={() => setPreviewFailed(true)}
+            />
+        );
+    }
+    return <FramePreview frame={frame} size={canvasPx} className="w-full h-full" />;
 }
 
 type Slot = { rank: 1 | 2 | 3; campaign: TopCampaign };
@@ -106,7 +87,7 @@ export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) 
                                 }`}
                             >
                                 <span
-                                    className={`mb-2 inline-flex items-center justify-center rounded-full font-display font-extrabold tabular-nums ${
+                                    className={`mb-2 inline-flex items-center justify-center rounded-full font-display font-bold tabular-nums ${
                                         first
                                             ? 'h-8 min-w-8 px-2.5 text-sm bg-brand text-ink ring-4 ring-brand/25'
                                             : 'h-7 min-w-7 px-2 text-xs bg-ink/10 text-ink'
@@ -116,14 +97,19 @@ export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) 
                                     {rank}
                                 </span>
                                 <div
-                                    className={`rounded-full overflow-hidden bg-ink/5 transition-transform duration-300 group-hover:scale-[1.03] group-active:scale-[0.98] ${
+                                    className={`rounded-full overflow-hidden bg-ink/5 ${
                                         first
                                             ? 'ring-2 ring-brand/40 shadow-md shadow-brand/10'
                                             : 'ring-1 ring-ink/10'
                                     }`}
                                     style={{ width: framePx, height: framePx }}
                                 >
-                                    <PodiumFrame frame={campaign.frame} size={canvasPx} />
+                                    <PodiumThumb
+                                        frame={campaign.frame}
+                                        previewUrl={campaign.previewUrl}
+                                        supporterPhotos={campaign.supporterPhotos}
+                                        canvasPx={canvasPx}
+                                    />
                                 </div>
                                 <p
                                     className={`mt-3 font-display font-bold leading-snug line-clamp-2 text-balance group-hover:text-brand-deep transition-colors ${

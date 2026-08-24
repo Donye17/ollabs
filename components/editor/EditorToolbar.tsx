@@ -62,7 +62,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                 <div className="flex items-center gap-4 w-full px-4">
                     <label className="flex-1">
                         <input type="file" accept="image/*" className="hidden" onChange={handleFileInput} />
-                        <div className="flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-4 px-6 rounded-xl cursor-pointer transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 font-bold font-heading select-none hover:-translate-y-0.5">
+                        <div className="flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-4 px-6 rounded-xl cursor-pointer transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 font-bold font-heading select-none">
                             <Upload size={20} /> <span>{imageObject ? 'Change photo' : 'Upload photo'}</span>
                         </div>
                     </label>
@@ -78,7 +78,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                             {isSharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> <span>Save or share photo</span></>}
                         </button>
                     )}
-                    <button onClick={onDownload} className="w-full flex items-center justify-center gap-2 bg-cream hover:bg-paper2/80 backdrop-blur-md text-ink py-3.5 px-6 rounded-xl transition-all font-bold border border-ink/10 hover:border-ink/10 hover:-translate-y-0.5">
+                    <button onClick={onDownload} className="w-full flex items-center justify-center gap-2 bg-cream hover:bg-paper2/80 backdrop-blur-md text-ink py-3.5 px-6 rounded-xl transition-all font-bold border border-ink/10 hover:border-ink/10">
                         <Download size={20} /> <span>{onSharePhoto ? 'Download' : 'Save'}</span>
                     </button>
                 </div>

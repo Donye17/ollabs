@@ -67,9 +67,9 @@ export default async function UseCasePage({ params }: { params: Promise<{ use: s
                     <h1 className="font-display text-4xl md:text-6xl font-extrabold leading-[1.03] mb-5">{uc.h1}</h1>
                     <p className="text-lg md:text-xl text-ink/70 mb-8 max-w-2xl">{uc.subtitle}</p>
                     <div className="flex flex-wrap items-center gap-3">
-                        <Link href="/create" className="group h-12 px-7 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all">
+                        <Link href="/create" className="group h-12 px-7 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:brightness-105 transition-all">
                             Create a campaign
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            <ArrowRight className="w-4 h-4" />
                         </Link>
                         <a href="#how" className="h-12 px-7 rounded-xl border border-ink/15 text-ink font-bold flex items-center hover:bg-ink/5 transition-all">
                             How it works
@@ -160,9 +160,9 @@ export default async function UseCasePage({ params }: { params: Promise<{ use: s
                         <div className="absolute -right-16 -bottom-20 w-64 h-64 rounded-full border-[30px] border-brand/35 pointer-events-none" />
                         <h2 className="font-display text-3xl md:text-4xl font-extrabold mb-3 relative z-10">Ready to bring your people together?</h2>
                         <p className="text-paper/70 mb-8 relative z-10">Make a campaign in under a minute. No account needed.</p>
-                        <Link href="/create" className="group inline-flex h-12 px-8 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all relative z-10">
+                        <Link href="/create" className="group inline-flex h-12 px-8 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all relative z-10">
                             Create a campaign
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
                 </div>

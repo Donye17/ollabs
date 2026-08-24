@@ -143,10 +143,10 @@ export default function VsTwibbonizePage() {
                     <div className="flex flex-wrap items-center gap-3">
                         <Link
                             href="/create"
-                            className="group h-12 px-7 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all"
+                            className="group h-12 px-7 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:brightness-105 transition-all"
                         >
                             Create a free campaign
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            <ArrowRight className="w-4 h-4" />
                         </Link>
                         <Link
                             href="/explore"
@@ -246,7 +246,7 @@ export default function VsTwibbonizePage() {
                     </p>
                     <Link
                         href="/create"
-                        className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all"
+                        className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all"
                     >
                         Create a campaign
                         <ArrowRight className="w-4 h-4" />

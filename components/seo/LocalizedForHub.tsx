@@ -46,7 +46,7 @@ export function LocalizedForHub({
                             <p className="mb-3 text-sm text-ink/70">{useCase.subtitle}</p>
                             <span className="inline-flex items-center gap-1 text-sm font-semibold text-brand-deep">
                                 {linkLabel}
-                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight className="h-4 w-4 transition-transform" />
                             </span>
                         </Link>
                     ))}

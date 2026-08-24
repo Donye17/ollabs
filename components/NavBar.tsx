@@ -9,7 +9,7 @@ export const NavBar: React.FC = () => {
     const pathname = usePathname() || '/';
     const onCreate = pathname === '/create' || pathname.startsWith('/create/');
     return (
-        <nav className="fixed top-0 inset-x-0 z-50 border-b border-ink/10 bg-paper/85 backdrop-blur-xl pt-[env(safe-area-inset-top,0px)]">
+        <nav className="fixed top-0 inset-x-0 z-50 border-b border-ink/10 bg-paper/90 pt-[env(safe-area-inset-top,0px)]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
                 <BrandMark size={28} />
 
@@ -17,16 +17,16 @@ export const NavBar: React.FC = () => {
                     {/* Desktop only: phones already have Mine · Create · Hub. */}
                     <Link
                         href="/mine"
-                        className="hidden lg:inline-flex text-xs font-bold text-muted hover:text-brand-deep transition-colors uppercase tracking-wider min-h-[44px] items-center"
+                        className="hidden lg:inline-flex text-sm font-semibold text-muted hover:text-brand-deep transition-colors min-h-[44px] items-center"
                     >
                         My campaigns
                     </Link>
-                    <Link href="/explore" className="text-xs font-bold text-muted hover:text-brand-deep hidden md:block transition-colors uppercase tracking-wider">
+                    <Link href="/explore" className="text-sm font-semibold text-muted hover:text-brand-deep hidden md:block transition-colors">
                         Explore
                     </Link>
                     <a
                         href="mailto:feedback@ollabs.studio?subject=Ollabs%20Feedback"
-                        className="text-xs font-bold text-muted hover:text-brand-deep hidden lg:flex items-center gap-1.5 transition-colors uppercase tracking-wider"
+                        className="text-sm font-semibold text-muted hover:text-brand-deep hidden lg:flex items-center gap-1.5 transition-colors"
                     >
                         <MessageSquare size={14} />
                         Feedback
