@@ -32,10 +32,11 @@ async function getCampaigns(
 ): Promise<ExploreCampaign[]> {
     // category is validated against the fixed allowlist before reaching here, so it is safe to inline.
     const catClause = category ? ` AND c.category = '${category}'` : '';
-    // Explore filters on frame validity only, no supporter floor. A brand new campaign
-    // has 0 supporters by definition, and gating discovery on traction would mean a
-    // legitimate campaign can never surface here.
-    const where = `WHERE c.is_public = true AND c.is_hidden IS NOT TRUE AND ${visibleFrameSql('c')}${catClause}`;
+    // Explore is for social proof, not publish-day discovery. Require real traction so
+    // empty campaigns (and spam that never gets shared) stay off the grid. Direct /c
+    // links and hubs are unaffected.
+    const MIN_SUPPORTERS = 5;
+    const where = `WHERE c.is_public = true AND c.is_hidden IS NOT TRUE AND ${visibleFrameSql('c')} AND COALESCE(c.supporter_count, 0) >= ${MIN_SUPPORTERS}${catClause}`;
     // Soft geo boost: same-country publishers float slightly without hiding others.
     const geoBoost = visitorCountry
         ? `CASE WHEN c.publisher_country = '${visitorCountry.replace(/[^A-Z]/g, '')}' THEN 1 ELSE 0 END`
@@ -163,7 +164,11 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
                 <div className="max-w-6xl xl:max-w-7xl mx-auto">
                     {campaigns.length === 0 ? (
                         <div className="text-center">
-                            <p className="text-muted mb-6">No campaigns yet. Be the first.</p>
+                            <p className="text-muted mb-6">
+                                {category
+                                    ? 'No campaigns with enough supporters in this category yet.'
+                                    : 'No campaigns with enough supporters yet. Share yours and it will show up here.'}
+                            </p>
                             <Link href="/create" className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">Create a campaign</Link>
                         </div>
                     ) : (
