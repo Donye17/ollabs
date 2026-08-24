@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { AdSlot } from '@/components/AdSlot';
+import { BrandMark } from '@/components/BrandMark';
 import type { UseCase } from '@/lib/useCases';
 
 export type UseCaseLabels = {
@@ -187,7 +188,7 @@ export function UseCasePageShell({
 
             <footer className="border-t border-ink/10 py-10 bg-paper pb-[max(1rem,env(safe-area-inset-bottom))]">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
-                    <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-6 w-auto" />
+                    <BrandMark href="/" size={24} />
                     <p>{labels.footerCopy}</p>
                 </div>
             </footer>

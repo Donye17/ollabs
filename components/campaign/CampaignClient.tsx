@@ -11,6 +11,7 @@ import { supporterShareText, whatsappUrl, messengerShareUrl, prefersTagalog } fr
 import { saveFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome } from '@/lib/savePhoto';
 import { framedCircleToStoryBlob } from '@/lib/storyExport';
 import { AdSlot } from '@/components/AdSlot';
+import { BrandMark } from '@/components/BrandMark';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles, ArrowRight } from 'lucide-react';
 
@@ -397,9 +398,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
 
     return (
         <div className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-6 ${hasImage ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]' : 'pb-6'}`}>
-            <a href="/" className="mb-6">
-                <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-7 w-auto" />
-            </a>
+            <BrandMark className="mb-6" />
 
             <div className="w-full max-w-sm flex flex-col items-center gap-4">
                 <div className="text-center">

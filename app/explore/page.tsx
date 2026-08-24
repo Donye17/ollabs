@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { NavBar } from '@/components/NavBar';
+import { BrandMark } from '@/components/BrandMark';
 import { ExploreClient, ExploreCampaign } from '@/components/ExploreClient';
 import { FrameConfig } from '@/lib/types';
 import { pool } from '@/lib/neon';
@@ -170,7 +171,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
 
             <footer className="border-t border-ink/10 py-10 bg-paper">
                 <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
-                    <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-6 w-auto" />
+                    <BrandMark href="/" size={24} />
                     <p>&copy; 2026 Ollabs. Bring your people together.</p>
                 </div>
             </footer>

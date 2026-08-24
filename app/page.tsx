@@ -8,6 +8,7 @@ import { ExamplesSkeleton } from "@/components/home/ExamplesSkeleton";
 import { HomeExamplesSection } from "@/components/home/HomeExamplesSection";
 import { HomeCalendarSection } from "@/components/home/HomeCalendarSection";
 import { HomeCreateCta } from "@/components/home/HomeCreateCta";
+import { BrandMark } from "@/components/BrandMark";
 import { HOME_FAQS } from "@/lib/faqs";
 
 export const revalidate = 600;
@@ -79,14 +80,12 @@ export default function Home() {
             />
             <NavBar />
 
-            {/* Hero streams immediately. Decorative rings stay clipped here;
-                Top campaigns lives in the next section so overflow cannot cut
-                the podium titles and counts under the mobile tab bar. */}
-            <section className="relative pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] sm:pt-32 pb-10 sm:pb-14 px-4 sm:px-6 overflow-hidden">
-                <div className="absolute -top-24 -right-24 w-[380px] h-[380px] rounded-full border-[42px] border-brand/15 pointer-events-none" />
-                <div className="absolute top-28 right-24 w-16 h-16 rounded-full bg-coral/80 pointer-events-none hidden sm:block" />
-
-                <div className="max-w-4xl mx-auto text-center relative z-10">
+            {/* Hero stays type + CTA only. Decorative rings and a coral blob
+                used to sit behind this copy; they read as template chrome and
+                fight the framed photos in Top campaigns. Top campaigns stays
+                in the next section so overflow cannot cut podium titles. */}
+            <section className="relative pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] sm:pt-32 pb-10 sm:pb-14 px-4 sm:px-6">
+                <div className="max-w-4xl mx-auto text-center">
                     <span className="inline-flex items-center gap-2 rounded-full bg-cream border border-ink/10 px-4 py-1.5 text-xs font-bold text-muted mb-5">
                         <span className="w-2.5 h-2.5 rounded-full bg-brand" /> From collabs, for coming together
                     </span>
@@ -183,11 +182,10 @@ export default function Home() {
 
             <section className="px-6 py-24">
                 <div className="max-w-3xl mx-auto text-center relative">
-                    <div className="relative bg-ink text-paper rounded-3xl px-8 py-16 overflow-hidden">
-                        <div className="absolute -right-16 -bottom-20 w-64 h-64 rounded-full border-[30px] border-brand/35 pointer-events-none" />
-                        <h2 className="font-display text-3xl md:text-5xl font-extrabold mb-4 relative z-10">Ready to rally your people?</h2>
-                        <p className="text-paper/70 mb-8 relative z-10">Make a campaign in under a minute. No account needed.</p>
-                        <Link href="/create" className="group inline-flex h-12 px-8 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all relative z-10">
+                    <div className="bg-ink text-paper rounded-3xl px-8 py-16">
+                        <h2 className="font-display text-3xl md:text-5xl font-extrabold mb-4">Ready to rally your people?</h2>
+                        <p className="text-paper/70 mb-8">Make a campaign in under a minute. No account needed.</p>
+                        <Link href="/create" className="group inline-flex h-12 px-8 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:-translate-y-0.5 hover:brightness-105 transition-all">
                             Create a campaign
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
@@ -199,7 +197,7 @@ export default function Home() {
                 <div className="max-w-6xl mx-auto px-6">
                     <div className="flex flex-col md:flex-row items-start justify-between gap-12 mb-12">
                         <div className="max-w-xs">
-                            <img src="/Ollabs Logo Black.png" alt="Ollabs" width={105} height={28} className="h-7 w-auto mb-4" />
+                            <BrandMark href={null} size={28} className="mb-4" />
                             <p className="text-muted text-sm leading-relaxed">
                                 The fast way to run a profile-picture campaign. Ollabs is a play on collabs, because coming together is the whole point.
                             </p>

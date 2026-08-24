@@ -97,10 +97,11 @@ function esc(s: string): string {
 }
 
 function shell(body: string): string {
-    return `<!doctype html><html><body style="margin:0;padding:0;background:#F7F4EE;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#F7F4EE;padding:32px 16px;">
+    return `<!doctype html><html><body style="margin:0;padding:0;background:#F7F8F6;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F7F8F6;padding:32px 16px;">
 <tr><td align="center">
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:16px;padding:32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#06141F;">
+<tr><td style="padding-bottom:20px;"><img src="https://ollabs.studio/favicon/apple-touch-icon.png" width="40" height="40" alt="Ollabs" style="display:block;border-radius:9px;" /></td></tr>
 ${body}
 <tr><td style="padding-top:28px;border-top:1px solid #E8E3DA;color:#6B7280;font-size:12px;line-height:1.6;">
 Ollabs is free and never watermarks your supporters' photos.<br>

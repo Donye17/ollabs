@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-23-cool-paper-mark',
+        date: '2026-08-23',
+        title: 'Cooler paper, same O',
+        summary: 'The site background is a cooler white, and the logo is the cyan square with a white ring.',
+        items: [
+            'Page background moved off warm cream onto cool paper.',
+            'Favicon, app icons, and in-product logos use the blue mark with a thick white circle.',
+        ],
+    },
+    {
         id: '2026-08-23-join-cta',
         date: '2026-08-23',
         title: 'Hubs say Join, not Support',

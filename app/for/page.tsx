@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { USE_CASES } from '@/lib/useCases';
 import { AdSlot } from '@/components/AdSlot';
+import { BrandMark } from '@/components/BrandMark';
 
 export const metadata: Metadata = {
     title: 'Who uses Ollabs | Profile picture frame campaigns',
@@ -53,7 +54,7 @@ export default function ForHub() {
 
             <footer className="border-t border-ink/10 py-10 bg-paper">
                 <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
-                    <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-6 w-auto" />
+                    <BrandMark href="/" size={24} />
                     <p>&copy; 2026 Ollabs. Bring your people together.</p>
                 </div>
             </footer>

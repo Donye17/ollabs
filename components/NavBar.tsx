@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MessageSquare } from 'lucide-react';
+import { BrandMark } from '@/components/BrandMark';
 
 export const NavBar: React.FC = () => {
     const pathname = usePathname() || '/';
@@ -10,15 +11,7 @@ export const NavBar: React.FC = () => {
     return (
         <nav className="fixed top-0 inset-x-0 z-50 border-b border-ink/10 bg-paper/85 backdrop-blur-xl pt-[env(safe-area-inset-top,0px)]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
-                <Link href="/" className="flex items-center shrink-0 group min-h-[44px]">
-                    <img
-                        src="/Ollabs Logo Black.png"
-                        alt="Ollabs"
-                        width={105}
-                        height={28}
-                        className="h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-                    />
-                </Link>
+                <BrandMark size={28} />
 
                 <div className="flex items-center gap-2 sm:gap-5 min-w-0">
                     {/* Desktop only: phones already have Mine · Create · Hub. */}

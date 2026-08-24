@@ -4,7 +4,7 @@
 
 @layer base {
     :root {
-        --paper: #F4F1EA;
+        --paper: #F7F8F6;
         --ink: #06141F;
         --brand: #01BEF6;
     }
@@ -17,7 +17,7 @@
        scrollTo themselves. */
 
     body {
-        background-color: #F4F1EA;
+        background-color: #F7F8F6;
         color: #06141F;
         font-feature-settings: "rlig" 1, "calt" 1;
     }
@@ -34,7 +34,7 @@
         letter-spacing: -0.02em;
     }
 
-    /* Warm card on the cream page */
+    /* Elevated card on cool paper */
     .cream-card {
         @apply bg-cream border border-ink/10 rounded-2xl;
     }

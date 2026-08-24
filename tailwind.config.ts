@@ -14,9 +14,9 @@ const config: Config = {
             colors: {
                 // Ollabs brand system
                 ink: '#06141F',
-                paper: '#F4F1EA',
-                paper2: '#EAE6DC',
-                cream: '#FDFCF9',
+                paper: '#F7F8F6',
+                paper2: '#ECEEEC',
+                cream: '#FFFFFF',
                 brand: {
                     DEFAULT: '#01BEF6',
                     deep: '#0288B8',
@@ -24,7 +24,7 @@ const config: Config = {
                 },
                 coral: '#FF5C39',
                 amber: '#FFC24B',
-                muted: '#726C5F',
+                muted: '#5A6570',
                 // legacy aliases kept so existing components compile
                 primary: '#01BEF6',
                 secondary: '#EAE6DC',

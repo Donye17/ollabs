@@ -26,8 +26,10 @@ Messenger+WhatsApp parity on publish for ID/TL, funnel `track()` events, report 
 
 **Still needs a real phone (Phase 0):** see `docs/REAL_PHONE_QA.md`.
 
-**Copy:** no em dashes in user-facing hub, create, or mine strings. Hub Join CTA
-is two lines (`Join` / campaign title), not `Join — title`.
+**Copy:** no em dashes (`—`) anywhere on the platform. Hard rule. UI, emails,
+metadata, share text, OG, announcements, SEO pages, day taglines, mocks that
+mirror product copy. Use a period, comma, colon, or rewrite the sentence. Hub
+Join CTA is two lines (`Join` / campaign title), never `Join` + em dash + title.
 
 **Ads:** same quiet in-flow units on every campaign — no special rules by
 category, country, or politics. Never on the photo; never on `/create`.

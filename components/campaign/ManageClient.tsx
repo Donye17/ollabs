@@ -7,6 +7,7 @@ import { track, withUtm } from '@/lib/analytics';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck, Palette, Globe } from 'lucide-react';
 import { countryLabel } from '@/lib/geo';
+import { BrandMark } from '@/components/BrandMark';
 
 interface ManageData {
     slug: string;
@@ -158,7 +159,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
 
     return (
         <div className="min-h-screen bg-paper text-ink flex flex-col items-center px-4 py-8">
-            <a href="/" className="mb-6"><img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-7 w-auto" /></a>
+            <BrandMark className="mb-6" />
 
             <div className="w-full max-w-lg">
                 <div className="flex items-center gap-2 mb-1">

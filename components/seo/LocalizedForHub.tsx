@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { AdSlot } from '@/components/AdSlot';
+import { BrandMark } from '@/components/BrandMark';
 import type { UseCase } from '@/lib/useCases';
 
 type LocalizedForHubProps = {
@@ -57,7 +58,7 @@ export function LocalizedForHub({
 
             <footer className="border-t border-ink/10 bg-paper py-10">
                 <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-xs text-muted sm:flex-row">
-                    <img src="/Ollabs Logo Black.png" alt="Ollabs" className="h-6 w-auto" />
+                    <BrandMark href="/" size={24} />
                     <p>{footerCopy}</p>
                 </div>
             </footer>

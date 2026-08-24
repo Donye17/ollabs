@@ -56,4 +56,7 @@ __pycache__/
 .env.*
 !.env.example
 
+# Cursor MCP configs can embed Penpot userToken secrets
+.cursor/mcp.json
+
 .vercel
