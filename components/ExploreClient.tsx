@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { FramePreview } from '@/components/FramePreview';
+import { CampaignGridThumb } from '@/components/CampaignGridThumb';
 import { FrameConfig } from '@/lib/types';
 
 export interface ExploreCampaign {
@@ -10,7 +10,6 @@ export interface ExploreCampaign {
     title: string;
     supporterCount: number;
     frame: FrameConfig;
-    previewUrl?: string | null;
     supporterPhotos: string[];
 }
 
@@ -32,22 +31,13 @@ const THUMB_RESOLUTION = 256;
 // by the time it scrolls into view.
 const NEAR_VIEWPORT = '600px';
 
-const LazyPreview: React.FC<{
-    frame: FrameConfig;
-    previewUrl?: string | null;
-    supporterPhotos: string[];
-    eager: boolean;
-}> = ({ frame, previewUrl, supporterPhotos, eager }) => {
+const LazyPreview: React.FC<{ frame: FrameConfig; supporterPhotos: string[]; eager: boolean }> = ({
+    frame,
+    supporterPhotos,
+    eager,
+}) => {
     const holder = useRef<HTMLDivElement>(null);
     const [show, setShow] = useState(eager);
-    // Pick once per mount so a full page refresh can surface a different supporter
-    // when the campaign has more than one saved thumbnail in the pool.
-    const [supporterPhoto] = useState(() =>
-        supporterPhotos.length > 0
-            ? supporterPhotos[Math.floor(Math.random() * supporterPhotos.length)]
-            : null
-    );
-    const [previewFailed, setPreviewFailed] = useState(false);
 
     useEffect(() => {
         if (show) return;
@@ -75,22 +65,12 @@ const LazyPreview: React.FC<{
     return (
         <div ref={holder} className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-ink/5">
             {show && (
-                supporterPhoto ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={supporterPhoto} alt="" className="w-full h-full object-cover" />
-                ) : previewUrl && !previewFailed ? (
-                    // Publish-time preview until supporter thumbnails exist. Some
-                    // are stale cyan rings; onError falls through to live frame art.
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        src={previewUrl}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        onError={() => setPreviewFailed(true)}
-                    />
-                ) : (
-                    <FramePreview frame={frame} size={THUMB_RESOLUTION} className="w-full h-full" />
-                )
+                <CampaignGridThumb
+                    frame={frame}
+                    supporterPhotos={supporterPhotos}
+                    size={THUMB_RESOLUTION}
+                    className="w-full h-full"
+                />
             )}
         </div>
     );
@@ -127,7 +107,6 @@ export const ExploreClient: React.FC<{ campaigns: ExploreCampaign[] }> = ({ camp
                         <Link key={c.slug} href={`/c/${c.slug}`} className="group flex flex-col items-center gap-3">
                             <LazyPreview
                                 frame={c.frame}
-                                previewUrl={c.previewUrl}
                                 supporterPhotos={c.supporterPhotos}
                                 eager={i < INITIAL_WINDOW}
                             />

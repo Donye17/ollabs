@@ -10,7 +10,7 @@ async function getTopCampaigns(): Promise<TopCampaign[]> {
         // Rank by real campaign_uses rows, not the denormalized counter. Seeded
         // demo frames used to inflate supporter_count without matching uses.
         const res = await pool.query(
-            `SELECT c.slug, c.title, c.frame_config, c.preview_url,
+            `SELECT c.slug, c.title, c.frame_config,
                     COALESCE(u.real_uses, 0)::int AS supporter_count,
                     COALESCE(sp.supporter_photos, ARRAY[]::text[]) AS supporter_photos
              FROM campaigns c
@@ -33,7 +33,6 @@ async function getTopCampaigns(): Promise<TopCampaign[]> {
             title: r.title,
             supporterCount: r.supporter_count ?? 0,
             frame: (typeof r.frame_config === 'string' ? JSON.parse(r.frame_config) : r.frame_config) as FrameConfig,
-            previewUrl: typeof r.preview_url === 'string' ? r.preview_url : null,
             supporterPhotos: parseSupporterPhotos(r.supporter_photos),
         }));
     } catch (e) {

@@ -83,7 +83,6 @@ async function getCampaigns(
             title: r.title,
             supporterCount: r.supporter_count ?? 0,
             frame: (typeof r.frame_config === 'string' ? JSON.parse(r.frame_config) : r.frame_config) as FrameConfig,
-            previewUrl: typeof r.preview_url === 'string' ? r.preview_url : null,
             supporterPhotos: parseSupporterPhotos(r.supporter_photos),
         }));
     } catch (e) {

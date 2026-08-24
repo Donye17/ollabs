@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Users } from 'lucide-react';
-import { FramePreview } from '@/components/FramePreview';
+import { CampaignGridThumb } from '@/components/CampaignGridThumb';
 import type { FrameConfig } from '@/lib/types';
 
 export type TopCampaign = {
@@ -11,47 +11,8 @@ export type TopCampaign = {
     title: string;
     supporterCount: number;
     frame: FrameConfig;
-    previewUrl?: string | null;
     supporterPhotos: string[];
 };
-
-function PodiumThumb({
-    frame,
-    previewUrl,
-    supporterPhotos,
-    canvasPx,
-}: {
-    frame: FrameConfig;
-    previewUrl?: string | null;
-    supporterPhotos: string[];
-    canvasPx: number;
-}) {
-    const [supporterPhoto] = useState(() =>
-        supporterPhotos.length > 0
-            ? supporterPhotos[Math.floor(Math.random() * supporterPhotos.length)]
-            : null
-    );
-    const [previewFailed, setPreviewFailed] = useState(false);
-
-    if (supporterPhoto) {
-        return (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={supporterPhoto} alt="" className="w-full h-full object-cover" />
-        );
-    }
-    if (previewUrl && !previewFailed) {
-        return (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-                src={previewUrl}
-                alt=""
-                className="w-full h-full object-cover"
-                onError={() => setPreviewFailed(true)}
-            />
-        );
-    }
-    return <FramePreview frame={frame} size={canvasPx} className="w-full h-full" />;
-}
 
 type Slot = { rank: 1 | 2 | 3; campaign: TopCampaign };
 
@@ -104,11 +65,11 @@ export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) 
                                     }`}
                                     style={{ width: framePx, height: framePx }}
                                 >
-                                    <PodiumThumb
+                                    <CampaignGridThumb
                                         frame={campaign.frame}
-                                        previewUrl={campaign.previewUrl}
                                         supporterPhotos={campaign.supporterPhotos}
-                                        canvasPx={canvasPx}
+                                        size={canvasPx}
+                                        className="w-full h-full"
                                     />
                                 </div>
                                 <p
