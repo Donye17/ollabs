@@ -256,8 +256,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         void (async () => {
             let imageUrl: string | null = null;
             const canvas = canvasRef.current;
-            if (canvas && hasImage) {
+            // Wait two frames so the last drag/zoom paint is on the canvas before
+            // we snapshot. Failures stay silent; the join still counts.
+            if (canvas && imgRef.current) {
+                await new Promise<void>((resolve) => {
+                    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+                });
                 imageUrl = await uploadExploreThumb(canvas);
+                track('explore_thumb', { campaign: slug, ok: imageUrl ? 1 : 0 });
             }
 
             try {

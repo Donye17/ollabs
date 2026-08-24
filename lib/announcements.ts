@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-24-lane-b',
+        date: '2026-08-24',
+        title: 'Discovery with real frames',
+        summary: 'Explore and the home top list show larger live frames, and desktop gets more campaigns at a glance.',
+        items: [
+            'Explore thumbs are larger, especially on desktop, with a wider grid.',
+            'Home keeps the mobile podium and shows up to six campaigns on desktop.',
+            'First-screen frame art is prefetched so custom overlays paint faster.',
+        ],
+    },
+    {
         id: '2026-08-24-lane-a',
         date: '2026-08-24',
         title: 'Campaign page built for phones',

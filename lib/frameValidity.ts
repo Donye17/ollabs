@@ -61,10 +61,13 @@ export function visibleFrameSql(alias = 'c'): string {
 }
 
 /**
- * How many campaigns sit on the home podium. Fixed at three so the layout
- * reads as 2nd / 1st / 3rd without a sliding carousel.
+ * How many campaigns to fetch for the home discovery block.
+ * Mobile still renders a top-3 podium; desktop shows up to six tiles.
  */
-export const HOME_TOP_CAMPAIGNS = 3;
+export const HOME_TOP_CAMPAIGNS = 6;
+
+/** Ranks shown in the mobile podium layout (2nd / 1st / 3rd). */
+export const HOME_PODIUM_SLOTS = 3;
 
 /** @deprecated Prefer HOME_TOP_CAMPAIGNS. Kept briefly for any stray imports. */
 export const HOME_SHOWCASE_LIMIT = HOME_TOP_CAMPAIGNS;

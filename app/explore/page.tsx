@@ -121,7 +121,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
             <section className="pt-32 pb-8 px-6">
                 <div className="max-w-3xl mx-auto text-center">
                     <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">Explore campaigns</h1>
-                    <p className="text-lg text-ink/70">Real campaigns people are rallying behind right now. Add one to your photo, or start your own.</p>
+                    <p className="text-lg text-ink/70 max-w-2xl mx-auto">Real campaigns people are rallying behind right now. Add one to your photo, or start your own.</p>
                 </div>
             </section>
 
@@ -160,7 +160,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
             </section>
 
             <section className="px-6 pb-20">
-                <div className="max-w-5xl mx-auto">
+                <div className="max-w-6xl xl:max-w-7xl mx-auto">
                     {campaigns.length === 0 ? (
                         <div className="text-center">
                             <p className="text-muted mb-6">No campaigns yet. Be the first.</p>

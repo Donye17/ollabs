@@ -1,9 +1,11 @@
 "use client";
+
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { CampaignGridThumb } from '@/components/CampaignGridThumb';
-import { FrameConfig } from '@/lib/types';
+import { prefetchFrameOverlays } from '@/components/renderer/strategies';
+import { FrameConfig, FrameType } from '@/lib/types';
 
 export interface ExploreCampaign {
     slug: string;
@@ -22,14 +24,19 @@ export interface ExploreCampaign {
 //      it comes near the viewport, so a visitor who never scrolls pays for
 //      eight canvases instead of sixty.
 //   2. Thumbnails render at 256 rather than the 512 default. They display at
-//      112-128 CSS px, so 256 is still 2x on a retina phone, at a quarter of
-//      the memory.
+//      112-176 CSS px, so 256 is still 2x on a retina phone.
 const INITIAL_WINDOW = 8;
 const THUMB_RESOLUTION = 256;
 
 // Start drawing before the card is actually on screen, so it is already painted
 // by the time it scrolls into view.
 const NEAR_VIEWPORT = '600px';
+
+function frameOverlayUrl(frame: FrameConfig): string | null {
+    if (typeof frame.imageUrl === 'string' && frame.imageUrl.trim()) return frame.imageUrl.trim();
+    if (frame.type === FrameType.CUSTOM_IMAGE) return null;
+    return null;
+}
 
 const LazyPreview: React.FC<{ frame: FrameConfig; supporterPhotos: string[]; eager: boolean }> = ({
     frame,
@@ -63,7 +70,10 @@ const LazyPreview: React.FC<{ frame: FrameConfig; supporterPhotos: string[]; eag
     }, [show]);
 
     return (
-        <div ref={holder} className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-ink/5">
+        <div
+            ref={holder}
+            className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full overflow-hidden bg-ink/5 ring-1 ring-ink/10"
+        >
             {show && (
                 <CampaignGridThumb
                     frame={frame}
@@ -78,6 +88,20 @@ const LazyPreview: React.FC<{ frame: FrameConfig; supporterPhotos: string[]; eag
 
 export const ExploreClient: React.FC<{ campaigns: ExploreCampaign[] }> = ({ campaigns }) => {
     const [q, setQ] = useState('');
+
+    // Warm custom-frame PNGs for the first screen before canvases mount, so
+    // thumbs paint artwork instead of a gray silhouette flash (Lane B5).
+    useEffect(() => {
+        const eager = campaigns.slice(0, INITIAL_WINDOW);
+        prefetchFrameOverlays(eager.map((c) => frameOverlayUrl(c.frame)));
+        for (const c of eager) {
+            for (const url of c.supporterPhotos.slice(0, 2)) {
+                const img = new Image();
+                img.decoding = 'async';
+                img.src = url;
+            }
+        }
+    }, [campaigns]);
 
     const filtered = useMemo(() => {
         const term = q.trim().toLowerCase();
@@ -102,7 +126,7 @@ export const ExploreClient: React.FC<{ campaigns: ExploreCampaign[] }> = ({ camp
             {filtered.length === 0 ? (
                 <p className="text-center text-muted">No campaigns match that search.</p>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 md:gap-8">
                     {filtered.map((c, i) => (
                         <Link key={c.slug} href={`/c/${c.slug}`} className="group flex flex-col items-center gap-3">
                             <LazyPreview
@@ -110,9 +134,13 @@ export const ExploreClient: React.FC<{ campaigns: ExploreCampaign[] }> = ({ camp
                                 supporterPhotos={c.supporterPhotos}
                                 eager={i < INITIAL_WINDOW}
                             />
-                            <div className="text-center">
-                                <p className="text-sm font-semibold text-ink group-hover:text-brand-deep transition-colors line-clamp-1">{c.title}</p>
-                                <p className="text-xs text-muted">{c.supporterCount.toLocaleString()} supporting</p>
+                            <div className="text-center max-w-[11rem]">
+                                <p className="text-sm font-semibold text-ink group-hover:text-brand-deep transition-colors line-clamp-2">
+                                    {c.title}
+                                </p>
+                                <p className="text-xs text-muted mt-0.5">
+                                    {c.supporterCount.toLocaleString()} supporting
+                                </p>
                             </div>
                         </Link>
                     ))}

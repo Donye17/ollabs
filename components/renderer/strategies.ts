@@ -69,6 +69,18 @@ function loadOverlay(url: string, onLoad?: () => void): HTMLImageElement {
     return img;
 }
 
+/**
+ * Warm the shared overlay cache before Explore/home thumbs paint. Without this
+ * the first screen flashes a gray silhouette until each custom PNG finishes
+ * decoding. Call with the eager window only (first ~8), not the full grid.
+ */
+export function prefetchFrameOverlays(imageUrls: (string | null | undefined)[]): void {
+    if (typeof window === 'undefined') return;
+    for (const url of imageUrls) {
+        if (typeof url === 'string' && url.trim()) loadOverlay(url.trim());
+    }
+}
+
 // --- Base Helper for standard shapes ---
 abstract class BaseShapeRenderer implements IFrameRenderer {
     abstract createPath(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number): void;
