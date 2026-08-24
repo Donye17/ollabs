@@ -72,15 +72,17 @@ const LazyPreview: React.FC<{ frame: FrameConfig; supporterPhotos: string[]; eag
     return (
         <div
             ref={holder}
-            className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full overflow-hidden bg-ink/5 ring-1 ring-ink/10"
+            className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full overflow-hidden bg-ink/5 ring-1 ring-ink/10 frame-shadow"
         >
-            {show && (
+            {show ? (
                 <CampaignGridThumb
                     frame={frame}
                     supporterPhotos={supporterPhotos}
                     size={THUMB_RESOLUTION}
                     className="w-full h-full"
                 />
+            ) : (
+                <div className="w-full h-full rounded-full bg-ink/10 animate-pulse" aria-hidden />
             )}
         </div>
     );

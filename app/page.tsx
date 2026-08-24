@@ -7,8 +7,8 @@ import { NavBar } from "@/components/NavBar";
 import { ExamplesSkeleton } from "@/components/home/ExamplesSkeleton";
 import { HomeExamplesSection } from "@/components/home/HomeExamplesSection";
 import { HomeCalendarSection } from "@/components/home/HomeCalendarSection";
-import { HomeCreateCta } from "@/components/home/HomeCreateCta";
 import { HomeHowItWorks } from "@/components/home/HomeHowItWorks";
+import { HomeHero } from "@/components/home/HomeHero";
 import { BrandMark } from "@/components/BrandMark";
 import { HOME_FAQS } from "@/lib/faqs";
 
@@ -66,32 +66,13 @@ export default function Home() {
             />
             <NavBar />
 
-            <section className="relative pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] sm:pt-32 pb-10 sm:pb-14 px-4 sm:px-6">
-                <div className="max-w-4xl mx-auto text-center">
-                    <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.02] mb-4 sm:mb-6 text-balance">
-                        Bring your people <span className="text-brand-deep">together.</span>
-                    </h1>
-                    <p className="text-[15px] sm:text-lg text-ink/70 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
-                        Make a profile-picture frame for your cause, team, or event. Share one link and your people add it to their photo in seconds. Free, no signup, no watermark.
-                    </p>
-                    <div className="flex flex-col items-center gap-3">
-                        <HomeCreateCta
-                            className="h-12 px-7 rounded-xl bg-brand text-ink font-bold inline-flex items-center gap-2 hover:brightness-105 transition-all"
-                        >
-                            Create a campaign
-                            <ArrowRight className="w-4 h-4" />
-                        </HomeCreateCta>
-                        <div className="flex items-center justify-center">
-                            <Link
-                                href="/mine"
-                                className="min-h-[44px] px-4 rounded-xl border border-ink/15 bg-cream text-ink text-sm font-bold inline-flex items-center hover:bg-ink/5 transition-colors"
-                            >
-                                My campaigns
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <Suspense fallback={
+                <section className="pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] sm:pt-28 pb-10 px-4">
+                    <div className="max-w-5xl mx-auto h-64 animate-pulse rounded-2xl bg-ink/5" aria-hidden />
+                </section>
+            }>
+                <HomeHero />
+            </Suspense>
 
             <section className="px-4 sm:px-6 pb-12 sm:pb-16">
                 <Suspense fallback={

@@ -241,7 +241,7 @@ export function HubAvatarComposer({ open, campaigns, onClose, onDone }: Props) {
                         </p>
                     ) : (
                         <div className="space-y-2">
-                            <p className="text-xs font-bold uppercase tracking-wider text-muted">Frame</p>
+                            <p className="text-sm font-semibold text-muted">Frame</p>
                             <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto overscroll-contain">
                                 {campaigns.map((c) => {
                                     const active = c.id === campaignId;

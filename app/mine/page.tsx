@@ -14,8 +14,8 @@ export default function MinePage() {
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
             <section className="pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] pb-6 px-4 sm:px-6">
-                <div className="max-w-2xl mx-auto text-center">
-                    <h1 className="font-display text-2xl sm:text-4xl font-extrabold mb-2 sm:mb-3">My campaigns</h1>
+                <div className="max-w-2xl lg:max-w-3xl mx-auto text-center">
+                    <h1 className="font-display text-2xl sm:text-4xl font-bold mb-2 sm:mb-3">My campaigns</h1>
                     <p className="text-[15px] sm:text-base text-ink/70 leading-relaxed">Your campaigns, and quick links back to each dashboard.</p>
                     <Link
                         href="/hub"

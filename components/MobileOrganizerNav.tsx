@@ -47,7 +47,7 @@ export function MobileOrganizerNav() {
                                     {/* Hollow brand ring sits in the same row as
                                         Mine/Hub icons — larger, not raised. */}
                                     <span
-                                        className={`flex h-11 w-11 items-center justify-center rounded-full border-[3px] border-brand bg-ink text-brand transition-transform active:scale-95 ${
+                                        className={`flex h-11 w-11 items-center justify-center rounded-full border-[3px] border-brand bg-ink text-brand ${
                                             active ? 'bg-brand/15' : 'hover:bg-brand/10'
                                         }`}
                                     >

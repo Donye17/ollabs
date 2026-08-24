@@ -12,6 +12,9 @@ import { getFrameOverride } from '@/lib/dayFrames';
 import { AdSlot } from '@/components/AdSlot';
 import { ArrowRight, CalendarDays, Users } from 'lucide-react';
 import { DayShareButton } from '@/components/day/DayShareButton';
+import { SeoCampaignExample } from '@/components/seo/SeoCampaignExample';
+import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
+import type { FrameConfig } from '@/lib/types';
 
 // Matches the campaign pages: fresh enough for the live campaign block without
 // hitting Neon on every crawl.
@@ -45,7 +48,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
 }
 
-type LiveCampaign = { slug: string; title: string; supporter_count: number };
+type LiveCampaign = {
+    slug: string;
+    title: string;
+    supporter_count: number;
+    frame_config: unknown;
+    supporter_photos: unknown;
+};
 
 /**
  * Real campaigns in this day's category, with real counts.
@@ -62,8 +71,11 @@ async function liveCampaigns(slug: string): Promise<LiveCampaign[]> {
             //
             // Zero-supporter campaigns are excluded: a grid of six zeroes reads
             // as a dead platform and makes the heading a lie.
-            `SELECT c.slug, c.title, COALESCE(c.supporter_count, 0) AS supporter_count
+            `SELECT c.slug, c.title, c.frame_config,
+                    COALESCE(c.supporter_count, 0) AS supporter_count,
+                    COALESCE(sp.supporter_photos, ARRAY[]::text[]) AS supporter_photos
              FROM campaigns c
+             ${SUPPORTER_PHOTOS_LATERAL}
              WHERE c.is_public = true AND c.is_hidden IS NOT TRUE
                AND c.day_slug = $1 AND COALESCE(c.supporter_count, 0) > 0
                AND ${visibleFrameSql('c')}
@@ -129,14 +141,13 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             <NavBar />
 
             {/* Hero */}
-            <section className="relative pt-32 pb-12 px-6 overflow-hidden">
-                <div className="absolute -top-24 -right-24 w-[380px] h-[380px] rounded-full border-[42px] border-brand/15 pointer-events-none" />
-                <div className="max-w-3xl mx-auto relative z-10">
-                    <div className="flex flex-wrap items-center gap-2 mb-6">
-                        <span className="inline-flex items-center gap-2 rounded-full bg-cream border border-ink/10 px-4 py-1.5 text-xs font-bold text-muted">
-                            <CalendarDays size={13} /> {when}
+            <section className="relative pt-32 pb-12 px-6">
+                <div className="max-w-3xl mx-auto">
+                    <div className="flex flex-wrap items-center gap-3 mb-6">
+                        <span className="text-sm font-semibold text-muted inline-flex items-center gap-1.5">
+                            <CalendarDays size={14} /> {when}
                         </span>
-                        <span className="inline-flex items-center gap-2 rounded-full bg-brand/15 border border-brand/30 px-4 py-1.5 text-xs font-bold text-brand-deep">
+                        <span className="text-sm font-semibold text-brand-deep">
                             {countdown}
                         </span>
                     </div>
@@ -151,7 +162,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             <section className="px-6 pb-16">
                 <div className="max-w-3xl mx-auto">
                     <div className="bg-cream border border-ink/10 rounded-3xl p-6 md:p-10">
-                        <h2 className="font-display text-2xl font-extrabold mb-1 text-center">Add the frame to your photo</h2>
+                        <h2 className="font-display text-2xl font-bold mb-1 text-center">Add the frame to your photo</h2>
                         <p className="text-sm text-ink/70 mb-7 text-center">
                             Free, no signup, and no watermark. Your photo never leaves your browser.
                         </p>
@@ -184,7 +195,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                 an individual actually searches. */}
             <section className="px-6 py-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-6">
+                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">
                         How to celebrate {day.name}
                     </h2>
                     <div className="space-y-4">
@@ -200,7 +211,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
 
             <section className="px-6 py-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-4">What {day.name} is</h2>
+                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">What {day.name} is</h2>
                     <div className="space-y-4">
                         {day.background.map((p, i) => <p key={i} className="text-lg text-ink/75 leading-relaxed">{p}</p>)}
                     </div>
@@ -210,7 +221,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             {/* How organisations mark it */}
             <section className="px-6 pb-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-6">How organisations mark it</h2>
+                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">How organisations mark it</h2>
                     <div className="space-y-4">
                         {day.howOrgsMark.map((b) => (
                             <div key={b.title} className="bg-cream border border-ink/10 rounded-2xl p-5">
@@ -228,10 +239,10 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                 </div>
             </section>
 
-            {/* Live campaigns, real data */}
+            {/* Live campaigns, real data. Lead with one framed example when we have it. */}
             <section className="px-6 pb-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-2">
+                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-2">
                         {campaigns.length === 0 ? 'Be the first' : 'Campaigns running now'}
                     </h2>
                     <p className="text-ink/70 mb-6">
@@ -240,7 +251,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                             : `Live ${day.category} campaigns on Ollabs, with real supporter counts.`}
                     </p>
                     {campaigns.length === 0 ? (
-                        <div className="bg-cream border border-ink/10 rounded-2xl p-8 text-center">
+                        <div className="border border-dashed border-ink/15 rounded-2xl p-8 text-center">
                             <p className="text-ink/75 mb-5">
                                 Make the frame, share one link, and your supporter count starts moving today.
                             </p>
@@ -252,18 +263,48 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                             </Link>
                         </div>
                     ) : (
-                        <div className="grid gap-3 sm:grid-cols-2">
-                            {campaigns.map((c) => (
-                                <Link key={c.slug} href={`/c/${c.slug}`}
-                                    className="bg-cream border border-ink/10 rounded-2xl p-4 hover:border-brand/40 transition-colors">
-                                    <p className="font-display font-bold truncate">{c.title}</p>
-                                    <p className="text-xs text-muted flex items-center gap-1.5 mt-1">
-                                        <Users size={12} />
-                                        {c.supporter_count.toLocaleString()} supporter{c.supporter_count === 1 ? '' : 's'}
-                                    </p>
-                                </Link>
-                            ))}
-                        </div>
+                        <>
+                            {(() => {
+                                const featured = campaigns[0];
+                                const raw =
+                                    typeof featured.frame_config === 'string'
+                                        ? JSON.parse(featured.frame_config as string)
+                                        : featured.frame_config;
+                                return (
+                                    <div className="mb-8 flex justify-center">
+                                        <SeoCampaignExample
+                                            campaign={{
+                                                slug: featured.slug,
+                                                title: featured.title,
+                                                supporterCount: featured.supporter_count,
+                                                frame: raw as FrameConfig,
+                                                supporterPhotos: parseSupporterPhotos(featured.supporter_photos),
+                                            }}
+                                            size={200}
+                                            title="Example campaign"
+                                        />
+                                    </div>
+                                );
+                            })()}
+                            {campaigns.length > 1 && (
+                                <ul className="divide-y divide-ink/10 border-y border-ink/10">
+                                    {campaigns.slice(1).map((c) => (
+                                        <li key={c.slug}>
+                                            <Link
+                                                href={`/c/${c.slug}`}
+                                                className="flex items-center justify-between gap-3 py-3.5 hover:text-brand-deep transition-colors"
+                                            >
+                                                <p className="font-display font-bold truncate">{c.title}</p>
+                                                <p className="text-xs text-muted flex items-center gap-1.5 shrink-0">
+                                                    <Users size={12} />
+                                                    {c.supporter_count.toLocaleString()}
+                                                </p>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </>
                     )}
                 </div>
             </section>
@@ -271,7 +312,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             {/* Ideas */}
             <section className="px-6 pb-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-6">Campaign ideas</h2>
+                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">Campaign ideas</h2>
                     <ul className="space-y-3">
                         {day.campaignIdeas.map((idea, i) => (
                             <li key={i} className="flex gap-3 text-lg text-ink/75 leading-relaxed">
@@ -292,7 +333,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             {/* FAQ */}
             <section className="px-6 pb-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-6">Common questions</h2>
+                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">Common questions</h2>
                     <div className="space-y-4">
                         {day.faqs.map((f) => (
                             <div key={f.q} className="bg-cream border border-ink/10 rounded-2xl p-5">
@@ -316,7 +357,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             {day.slug === 'national-coffee-day' && (
                 <section className="px-6 pb-12">
                     <div className="max-w-3xl mx-auto bg-ink text-paper rounded-3xl p-8 md:p-10">
-                        <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-3">The Independents List</h2>
+                        <h2 className="font-display text-2xl md:text-3xl font-bold mb-3">The Independents List</h2>
                         <p className="text-paper/80 leading-relaxed mb-6">
                             The chains own this day with free-cup offers. Your shop made the coffee. Run a frame and
                             you go on a public list of every independent marking the day, published every year.
@@ -335,7 +376,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             <section className="px-6 pb-24">
                 <div className="max-w-3xl mx-auto">
                     <div className="bg-cream border border-ink/10 rounded-3xl p-10 text-center mb-10">
-                        <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-3">Run it for your organisation</h2>
+                        <h2 className="font-display text-2xl md:text-3xl font-bold mb-3">Run it for your organisation</h2>
                         <p className="text-ink/70 mb-7 max-w-xl mx-auto">
                             Make the frame once, share one link, and watch the supporter count move. Takes about a minute.
                         </p>

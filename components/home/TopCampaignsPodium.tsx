@@ -55,10 +55,8 @@ function PodiumLink({
                 {rank}
             </span>
             <div
-                className={`rounded-full overflow-hidden bg-ink/5 ${
-                    first
-                        ? 'ring-2 ring-brand/40 shadow-md shadow-brand/10'
-                        : 'ring-1 ring-ink/10'
+                className={`rounded-full overflow-hidden bg-ink/5 frame-shadow ${
+                    first ? 'ring-2 ring-brand/40' : 'ring-1 ring-ink/10'
                 }`}
                 style={{ width: framePx, height: framePx }}
             >
@@ -91,7 +89,7 @@ function DesktopTile({ campaign, rank }: { campaign: TopCampaign; rank: number }
             className="group flex flex-col items-center text-center outline-none"
         >
             <div className="relative">
-                <div className="w-36 h-36 lg:w-40 lg:h-40 rounded-full overflow-hidden bg-ink/5 ring-1 ring-ink/10 shadow-sm shadow-ink/5">
+                <div className="w-36 h-36 lg:w-40 lg:h-40 rounded-full overflow-hidden bg-ink/5 ring-1 ring-ink/10 frame-shadow">
                     <CampaignGridThumb
                         frame={campaign.frame}
                         supporterPhotos={campaign.supporterPhotos}

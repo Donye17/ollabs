@@ -62,7 +62,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                 <div className="flex items-center gap-4 w-full px-4">
                     <label className="flex-1">
                         <input type="file" accept="image/*" className="hidden" onChange={handleFileInput} />
-                        <div className="flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-4 px-6 rounded-xl cursor-pointer transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 font-bold font-heading select-none">
+                        <div className="flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-4 px-6 rounded-xl cursor-pointer transition-all font-bold font-heading select-none">
                             <Upload size={20} /> <span>{imageObject ? 'Change photo' : 'Upload photo'}</span>
                         </div>
                     </label>
@@ -74,7 +74,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                     {/* Where the share sheet exists it leads: it is the only path
                         that reliably saves the picture on a phone. */}
                     {onSharePhoto && (
-                        <button onClick={onSharePhoto} disabled={isSharingPhoto} className="w-full flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-3.5 px-6 rounded-xl transition-all font-bold shadow-lg shadow-primary/20 disabled:opacity-50">
+                        <button onClick={onSharePhoto} disabled={isSharingPhoto} className="w-full flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-3.5 px-6 rounded-xl transition-all font-bold disabled:opacity-50">
                             {isSharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> <span>Save or share photo</span></>}
                         </button>
                     )}

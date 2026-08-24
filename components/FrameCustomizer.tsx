@@ -119,7 +119,7 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
                 className={`
                             px-2 py-2 rounded-lg text-[11px] font-medium border transition-all
                             ${frame.type === style.type
-                    ? 'bg-brand border-brand text-ink shadow-lg shadow-blue-900/50'
+                    ? 'bg-brand border-brand text-ink'
                     : 'bg-cream border-ink/10 text-muted hover:border-ink/15 hover:text-ink'}
                         `}
                 title={`Change frame style to ${style.label}`}
@@ -134,7 +134,7 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
         {onAutoMatch && (
           <button
             onClick={onAutoMatch}
-            className="w-full py-2.5 rounded-xl bg-brand hover:brightness-105 text-ink font-bold text-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+            className="w-full py-2.5 rounded-xl bg-brand hover:brightness-105 text-ink font-bold text-xs flex items-center justify-center gap-2 transition-all"
           >
             <Sparkles size={14} /> Auto-match colors
           </button>
@@ -152,7 +152,7 @@ export const FrameCustomizer: React.FC<FrameCustomizerProps> = ({
               <button
                 key={c}
                 onClick={() => handleColorChange('color1', c)}
-                className="w-5 h-5 rounded-full ring-1 ring-ink/15 hover:scale-110 transition-transform relative group"
+                className="w-5 h-5 rounded-full ring-1 ring-ink/15 relative group"
                 style={{ backgroundColor: c }}
                 title={`Apply color: ${c}`}
               >

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { UseCasePageShell } from '@/components/seo/UseCasePageShell';
 import { USE_CASES_ID, getUseCaseId } from '@/lib/useCasesId';
 import { englishSlugFromId, useCaseLanguageAlternates } from '@/lib/useCaseHreflang';
+import { getSeoExampleCampaign, USE_CASE_CATEGORY } from '@/lib/seoExampleCampaign';
 
 export const revalidate = 86400;
 
@@ -21,6 +22,7 @@ const labels = {
     readyBody: 'Kurang dari satu menit. Tanpa daftar.',
     alsoGreat: 'Juga cocok untuk',
     footerCopy: '© 2026 Ollabs. Kumpulkan barengannya.',
+    exampleTitle: 'Contoh kampanye',
 };
 
 export function generateStaticParams() {
@@ -49,12 +51,16 @@ export default async function UseCaseIdPage({ params }: { params: Promise<{ use:
     const uc = getUseCaseId(use);
     if (!uc) notFound();
 
+    const enSlug = englishSlugFromId(uc.slug);
+    const example = await getSeoExampleCampaign(USE_CASE_CATEGORY[enSlug] ?? null);
+
     return (
         <UseCasePageShell
             uc={uc}
             labels={labels}
             related={USE_CASES_ID.filter((u) => u.slug !== uc.slug)}
             relatedHref={(slug) => `/id/for/${slug}`}
+            example={example}
         />
     );
 }

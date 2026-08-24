@@ -34,6 +34,11 @@
         letter-spacing: -0.02em;
     }
 
+    /* Soft ambient under the circular frame only. Nowhere else. */
+    .frame-shadow {
+        box-shadow: 0 12px 40px rgba(6, 20, 31, 0.12);
+    }
+
     /* Elevated card on cool paper */
     .cream-card {
         @apply bg-cream border border-ink/10 rounded-2xl;

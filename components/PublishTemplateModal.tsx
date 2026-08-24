@@ -311,7 +311,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
                     <div className="p-6 space-y-5">
                         <div className="flex justify-center py-2">
-                            <FramePreview frame={config} className="w-40 h-40 rounded-full border-4 border-cream bg-paper2 shadow-lg mx-auto" />
+                            <FramePreview frame={config} className="w-40 h-40 rounded-full border-4 border-cream bg-paper2 frame-shadow mx-auto" />
                         </div>
 
                         {frameSaved ? (
@@ -719,7 +719,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 <div className="p-6 space-y-6">
                     {/* Preview */}
                     {!campaignUrl && <div className="flex justify-center py-2">
-                        <FramePreview frame={config} className="w-40 h-40 rounded-full border-4 border-cream bg-paper2 shadow-lg mx-auto" />
+                        <FramePreview frame={config} className="w-40 h-40 rounded-full border-4 border-cream bg-paper2 frame-shadow mx-auto" />
                     </div>}
 
                     {campaignUrl ? (
@@ -731,7 +731,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
                             <button
                                 onClick={shareWhatsApp}
-                                className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all shadow-sm"
+                                className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
                                 style={{ backgroundColor: WHATSAPP_GREEN }}
                             >
                                 <WhatsAppGlyph size={20} /> {tp.shareWhatsApp}
@@ -741,7 +741,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 <div className="grid grid-cols-1 gap-2">
                                     <button
                                         onClick={shareMessenger}
-                                        className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all shadow-sm"
+                                        className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
                                         style={{ backgroundColor: '#0084FF' }}
                                     >
                                         <Share2 size={20} /> {tp.shareMessenger}

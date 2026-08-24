@@ -463,7 +463,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     onDragLeave={onDragLeave}
                     onDrop={onDrop}
                     onClick={() => { if (!hasImage) fileRef.current?.click(); }}
-                    className={`rounded-full touch-none shadow-md shadow-ink/10 ${
+                    className={`rounded-full touch-none frame-shadow ${
                         hasImage
                             ? 'w-[min(88vw,58dvh)] h-[min(88vw,58dvh)] max-w-[400px] max-h-[400px] cursor-grab active:cursor-grabbing'
                             : 'w-[min(82vw,52dvh)] h-[min(82vw,52dvh)] max-w-[320px] max-h-[320px] cursor-pointer'

@@ -87,6 +87,8 @@ export const HubEditorClient: React.FC = () => {
     const [avatarComposerOpen, setAvatarComposerOpen] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+    /** Bumps the desktop side-pane iframe after each successful save. */
+    const [previewKey, setPreviewKey] = useState(0);
     const [linkPickerOpen, setLinkPickerOpen] = useState(false);
 
     const load = useCallback(async () => {
@@ -227,6 +229,7 @@ export const HubEditorClient: React.FC = () => {
                 has_featured_campaign: Boolean(featuredId),
             });
             setSaveMsg('Saved');
+            setPreviewKey((k) => k + 1);
             if (firstClaim) track('hub_claimed', { handle: nextHandle });
             setTimeout(() => setSaveMsg(null), 2000);
             return { ok: true, handle: nextHandle };
@@ -238,15 +241,18 @@ export const HubEditorClient: React.FC = () => {
         }
     };
 
-    /** Public /u only reflects the last save. Persist first, then open an
-     *  in-page preview so the editor (and thumb menu) stay put. In-app browsers
-     *  often swallow window.open and strand people on /u with no way back. */
+    /** Public /u only reflects the last save. Persist first, then preview.
+     *  Desktop: side pane reloads. Phone: full-screen iframe so the editor
+     *  (and thumb menu) stay put. In-app browsers often swallow window.open. */
     const previewHub = async () => {
         const result = await save();
         if (!result.ok || !result.handle) return;
         const path = `/u/${result.handle}`;
         setPreviewSrc(path);
-        setPreviewOpen(true);
+        const narrow =
+            typeof window !== 'undefined' &&
+            window.matchMedia('(max-width: 1023px)').matches;
+        if (narrow) setPreviewOpen(true);
         track('hub_preview', { handle: result.handle });
     };
 
@@ -316,7 +322,8 @@ export const HubEditorClient: React.FC = () => {
     const hubUrl = previewPath ? `${origin}${previewPath}` : null;
 
     return (
-        <div className="max-w-lg mx-auto space-y-6 pb-[max(5rem,calc(4rem+env(safe-area-inset-bottom)))]">
+        <div className="max-w-lg lg:max-w-6xl mx-auto lg:grid lg:grid-cols-12 lg:gap-10 lg:items-start pb-[max(5rem,calc(4rem+env(safe-area-inset-bottom)))]">
+            <div className="lg:col-span-6 xl:col-span-5 space-y-6">
             {/* Sticky under the site NavBar so Save never fights the thumb tab bar. */}
             <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-30 -mx-1 px-1 py-2 bg-paper/95 backdrop-blur-xl border-b border-ink/10">
                 <div className="flex items-center gap-2">
@@ -351,9 +358,17 @@ export const HubEditorClient: React.FC = () => {
                         type="button"
                         onClick={() => { void previewHub(); }}
                         disabled={saving}
-                        className="h-11 px-3 rounded-xl border border-ink/15 bg-cream font-bold text-sm flex items-center shrink-0 disabled:opacity-60"
+                        className="h-11 px-3 rounded-xl border border-ink/15 bg-cream font-bold text-sm flex items-center shrink-0 disabled:opacity-60 lg:hidden"
                     >
                         Preview
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => { void previewHub(); }}
+                        disabled={saving}
+                        className="hidden lg:inline-flex h-11 px-3 rounded-xl border border-ink/15 bg-cream font-bold text-sm items-center shrink-0 disabled:opacity-60"
+                    >
+                        Refresh
                     </button>
                 </div>
             </div>
@@ -392,7 +407,7 @@ export const HubEditorClient: React.FC = () => {
 
             <section className="bg-cream border border-ink/10 rounded-2xl p-5 space-y-4">
                 <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
+                    <label className="block text-sm font-semibold text-muted mb-2">
                         Your handle
                     </label>
                     <div className="flex items-center gap-0 rounded-xl border border-ink/15 bg-paper overflow-hidden focus-within:ring-2 focus-within:ring-brand">
@@ -413,7 +428,7 @@ export const HubEditorClient: React.FC = () => {
                 </div>
 
                 <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
+                    <label className="block text-sm font-semibold text-muted mb-2">
                         Display name
                     </label>
                     <input
@@ -426,7 +441,7 @@ export const HubEditorClient: React.FC = () => {
                 </div>
 
                 <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
+                    <label className="block text-sm font-semibold text-muted mb-2">
                         Bio
                     </label>
                     <textarea
@@ -441,7 +456,7 @@ export const HubEditorClient: React.FC = () => {
                 </div>
 
                 <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
+                    <label className="block text-sm font-semibold text-muted mb-2">
                         Photo
                     </label>
                     <p className="text-xs text-muted mb-3 leading-relaxed">
@@ -625,7 +640,7 @@ export const HubEditorClient: React.FC = () => {
 
                 {linkPickerOpen && (
                     <div className="rounded-xl border border-ink/10 bg-paper p-3 space-y-2">
-                        <p className="text-xs font-bold uppercase tracking-wider text-muted">What kind of link?</p>
+                        <p className="text-sm font-semibold text-muted">What kind of link?</p>
                         <div className="grid grid-cols-2 gap-2">
                             {HUB_LINK_PRESETS.map((p) => (
                                 <button
@@ -651,7 +666,7 @@ export const HubEditorClient: React.FC = () => {
                         <li key={link.key} className="rounded-xl border border-ink/10 bg-paper p-3 space-y-2">
                             <div className="flex items-center gap-2 text-muted">
                                 <GripVertical size={14} className="opacity-40" />
-                                <span className="text-xs font-bold uppercase tracking-wider">Link {idx + 1}</span>
+                                <span className="text-sm font-semibold text-muted">Link {idx + 1}</span>
                                 {(link.clickCount ?? 0) > 0 && (
                                     <span className="text-[11px] font-semibold text-ink/70">
                                         {link.clickCount} taps
@@ -741,6 +756,43 @@ export const HubEditorClient: React.FC = () => {
             {/* Below the fold: only people who scroll past the editor see it.
                 SEO surface matches public hubs; never near the save controls. */}
             <AdSlot surface="seo" className="pt-2 pb-4" />
+            </div>
+
+            {/* Desktop: live /u beside the form. Phone keeps the full-screen overlay. */}
+            <aside className="hidden lg:block lg:col-span-6 xl:col-span-7 lg:sticky lg:top-[calc(3.5rem+env(safe-area-inset-top,0px)+0.5rem)] lg:self-start">
+                <div className="rounded-2xl border border-ink/10 bg-cream overflow-hidden flex flex-col h-[min(78dvh,44rem)]">
+                    <div className="flex items-center gap-2 px-3 py-2.5 border-b border-ink/10 bg-paper shrink-0">
+                        <p className="text-sm font-semibold text-ink truncate flex-1">
+                            {previewPath ? 'Live hub' : 'Preview'}
+                        </p>
+                        {previewPath && (
+                            <a
+                                href={previewPath}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="h-9 w-9 rounded-xl border border-ink/15 flex items-center justify-center hover:bg-ink/5"
+                                aria-label="Open hub in new tab"
+                            >
+                                <ExternalLink size={15} />
+                            </a>
+                        )}
+                    </div>
+                    {previewPath ? (
+                        <iframe
+                            key={previewKey}
+                            src={`${previewPath}?hubPreview=${previewKey}`}
+                            title="Hub live preview"
+                            className="flex-1 w-full border-0 bg-paper min-h-0"
+                        />
+                    ) : (
+                        <div className="flex-1 flex items-center justify-center px-8 text-center">
+                            <p className="text-sm text-muted leading-relaxed">
+                                Save your hub to see the public page here. Edits show after each save.
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </aside>
 
             {/* Preview takes over the viewport above the Ollabs NavBar so the
                 chrome sits flush under the status bar. Thumb nav stays visible. */}

@@ -78,7 +78,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                         <img
                             src={hub.avatarUrl}
                             alt=""
-                            className="h-16 w-16 rounded-full object-cover border-2 bg-cream shadow-sm"
+                            className="h-16 w-16 rounded-full object-cover border-2 bg-cream"
                             style={{ borderColor: theme.cardBorder }}
                         />
                     ) : (
@@ -113,8 +113,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                                 <img
                                     src={featured.preview_url}
                                     alt=""
-                                    className="w-[min(72vw,16.5rem)] h-[min(72vw,16.5rem)] rounded-full object-cover shadow-md"
-                                    style={{ boxShadow: `0 8px 28px ${theme.cardBorder}` }}
+                                    className="w-[min(72vw,16.5rem)] h-[min(72vw,16.5rem)] rounded-full object-cover frame-shadow"
                                 />
                             ) : (
                                 <div
@@ -143,7 +142,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                             <Link
                                 href={ctaHref}
                                 onClick={() => beacon(hub.handle, 'support')}
-                                className="flex w-full min-h-[56px] items-center justify-center rounded-2xl px-5 text-base font-bold shadow-sm transition-opacity active:opacity-90"
+                                className="flex w-full min-h-[56px] items-center justify-center rounded-2xl px-5 text-base font-bold transition-opacity active:opacity-90"
                                 style={{
                                     background: theme.supportBg,
                                     color: theme.supportFg,

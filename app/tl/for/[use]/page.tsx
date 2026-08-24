@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { UseCasePageShell } from '@/components/seo/UseCasePageShell';
 import { USE_CASES_TL, getUseCaseTl } from '@/lib/useCasesTl';
 import { englishSlugFromTl, useCaseLanguageAlternates } from '@/lib/useCaseHreflang';
+import { getSeoExampleCampaign, USE_CASE_CATEGORY } from '@/lib/seoExampleCampaign';
 
 export const revalidate = 86400;
 
@@ -21,6 +22,7 @@ const labels = {
     readyBody: 'Wala pang isang minuto. Hindi kailangan ng account.',
     alsoGreat: 'Mainam din para sa',
     footerCopy: '© 2026 Ollabs. Pagsamahin ang inyong mga tao.',
+    exampleTitle: 'Halimbawang campaign',
 };
 
 export function generateStaticParams() {
@@ -49,12 +51,16 @@ export default async function UseCaseTlPage({ params }: { params: Promise<{ use:
     const uc = getUseCaseTl(use);
     if (!uc) notFound();
 
+    const enSlug = englishSlugFromTl(uc.slug);
+    const example = await getSeoExampleCampaign(USE_CASE_CATEGORY[enSlug] ?? null);
+
     return (
         <UseCasePageShell
             uc={uc}
             labels={labels}
             related={USE_CASES_TL.filter((u) => u.slug !== uc.slug)}
             relatedHref={(slug) => `/tl/for/${slug}`}
+            example={example}
         />
     );
 }

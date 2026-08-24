@@ -244,7 +244,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
                     {/* Compact sticky preview — always on screen on phones so
                         scrolling the controls never loses the frame. */}
-                    <div className="lg:col-span-7 flex flex-col items-center sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-20 bg-paper/95 backdrop-blur-sm border-b border-ink/10 lg:border-0 lg:bg-transparent lg:backdrop-blur-none py-2 lg:py-0 h-fit -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
+                    <div className="lg:col-span-7 flex flex-col items-center sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-20 bg-paper/95 backdrop-blur-sm border-b border-ink/10 lg:border-0 lg:bg-transparent lg:backdrop-blur-none py-2 lg:py-0 h-fit -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 lg:min-h-[min(70vh,36rem)] lg:justify-center">
                         <Editor
                             imageSrc={imageSrc}
                             onImageSelect={handleImageSelect}
@@ -258,13 +258,13 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         />
 
                         <ol
-                            className="mt-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted lg:mt-4"
+                            className="mt-2 flex items-center gap-2 text-sm font-semibold text-muted lg:mt-5"
                             aria-label="Create steps"
                         >
-                            <li className="text-brand">{t.stepFrame}</li>
-                            <li aria-hidden className="text-ink/20">·</li>
+                            <li className="text-ink">{t.stepFrame}</li>
+                            <li aria-hidden className="text-ink/25">·</li>
                             <li>{t.stepName}</li>
-                            <li aria-hidden className="text-ink/20">·</li>
+                            <li aria-hidden className="text-ink/25">·</li>
                             <li>{t.stepSend}</li>
                         </ol>
 
@@ -290,10 +290,10 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                     {/* Controls scroll under the sticky frame */}
                     <div className="lg:col-span-5 space-y-4 relative z-10">
                         <div className="px-1">
-                            <h1 className="font-display text-xl sm:text-2xl font-extrabold text-ink tracking-tight">
+                            <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-ink tracking-tight">
                                 {editTarget ? t.editTitle : t.title}
                             </h1>
-                            <p className="text-xs text-muted font-medium">
+                            <p className="text-sm text-muted font-medium mt-1">
                                 {editTarget
                                     ? t.editSubtitle(editTarget.title)
                                     : t.subtitle}

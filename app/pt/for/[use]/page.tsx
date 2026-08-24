@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { UseCasePageShell } from '@/components/seo/UseCasePageShell';
 import { USE_CASES_PT, getUseCasePt } from '@/lib/useCasesPt';
 import { englishSlugFromPt, useCaseLanguageAlternates } from '@/lib/useCaseHreflang';
+import { getSeoExampleCampaign, USE_CASE_CATEGORY } from '@/lib/seoExampleCampaign';
 
 export const revalidate = 86400;
 
@@ -21,6 +22,7 @@ const labels = {
     readyBody: 'Leva menos de um minuto. Sem conta.',
     alsoGreat: 'Também serve para',
     footerCopy: '© 2026 Ollabs. Reúna a sua galera.',
+    exampleTitle: 'Exemplo de campanha',
 };
 
 export function generateStaticParams() {
@@ -49,12 +51,16 @@ export default async function UseCasePtPage({ params }: { params: Promise<{ use:
     const uc = getUseCasePt(use);
     if (!uc) notFound();
 
+    const enSlug = englishSlugFromPt(uc.slug);
+    const example = await getSeoExampleCampaign(USE_CASE_CATEGORY[enSlug] ?? null);
+
     return (
         <UseCasePageShell
             uc={uc}
             labels={labels}
             related={USE_CASES_PT.filter((u) => u.slug !== uc.slug)}
             relatedHref={(slug) => `/pt/for/${slug}`}
+            example={example}
         />
     );
 }

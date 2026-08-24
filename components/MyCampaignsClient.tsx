@@ -7,6 +7,9 @@ import { suggestHandleFromEmail } from '@/lib/hub';
 import { organizerShareText, whatsappUrl } from '@/lib/share';
 import { track, withUtm } from '@/lib/analytics';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
+import { CampaignGridThumb } from '@/components/CampaignGridThumb';
+import { hasVisibleFrame } from '@/lib/frameValidity';
+import type { FrameConfig } from '@/lib/types';
 
 interface SavedCampaign {
     slug: string;
@@ -25,6 +28,7 @@ interface AccountCampaign {
     created_at: string;
     publisher_country: string | null;
     first_supporter_country: string | null;
+    frameConfig?: FrameConfig | null;
 }
 
 interface Row {
@@ -35,6 +39,7 @@ interface Row {
     supporters: number | null;
     publisherCountry: string | null;
     firstSupporterCountry: string | null;
+    frame?: FrameConfig | null;
     /** Present only for rows that live in this browser but not on the account. */
     localCreatedAt?: number;
     /** ISO created_at when known (account campaigns) for zero-supporter timing. */
@@ -95,6 +100,7 @@ export const MyCampaignsClient: React.FC = () => {
                 publisherCountry: c.publisher_country,
                 firstSupporterCountry: c.first_supporter_country,
                 createdAtIso: c.created_at,
+                frame: c.frameConfig ?? null,
             })),
         [account, origin]
     );
@@ -143,6 +149,7 @@ export const MyCampaignsClient: React.FC = () => {
                 publisherCountry: null,
                 firstSupporterCountry: null,
                 localCreatedAt: c.createdAt,
+                frame: null,
             }));
     }, [local, accountRows]);
 
@@ -161,7 +168,7 @@ export const MyCampaignsClient: React.FC = () => {
 
     if (!loaded) {
         return (
-            <div className="max-w-2xl mx-auto flex items-center justify-center gap-2 text-muted py-10">
+            <div className="max-w-2xl lg:max-w-3xl mx-auto flex items-center justify-center gap-2 text-muted py-10">
                 <Loader2 size={18} className="animate-spin" /> Loading your campaigns...
             </div>
         );
@@ -170,7 +177,7 @@ export const MyCampaignsClient: React.FC = () => {
     const nothingAnywhere = accountRows.length === 0 && localOnly.length === 0;
 
     return (
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl lg:max-w-3xl mx-auto">
             {signedIn && (
                 <div className="flex items-center justify-between gap-3 mb-4 px-1">
                     <p className="text-xs text-muted truncate">
@@ -183,8 +190,8 @@ export const MyCampaignsClient: React.FC = () => {
             )}
 
             {signedIn && countrySummary && (
-                <div className="mb-4 rounded-2xl border border-ink/10 bg-paper px-4 py-3">
-                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted mb-2">
+                <div className="mb-4 border-y border-ink/10 py-3 px-1">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-muted mb-2">
                         <Globe size={13} /> Where your campaigns travel
                     </div>
                     <div className="space-y-2 text-sm text-ink/80">
@@ -234,7 +241,7 @@ export const MyCampaignsClient: React.FC = () => {
             )}
 
             {nothingAnywhere ? (
-                <div className="bg-cream border border-ink/10 rounded-2xl p-10 text-center">
+                <div className="border border-ink/10 rounded-2xl p-10 text-center bg-cream">
                     <Inbox className="w-8 h-8 text-muted mx-auto mb-3" />
                     <p className="font-display font-bold text-lg mb-1">
                         {signedIn ? 'No campaigns on this account yet' : 'No campaigns yet on this device'}
@@ -249,13 +256,13 @@ export const MyCampaignsClient: React.FC = () => {
                     </div>
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div className="divide-y divide-ink/10 border-y border-ink/10">
                     {accountRows.map((c) => (
                         <CampaignRow key={`acct-${c.slug}`} row={c} />
                     ))}
 
                     {localOnly.length > 0 && accountRows.length > 0 && (
-                        <p className="text-xs font-bold uppercase tracking-wider text-muted pt-4 px-1">Only in this browser</p>
+                        <p className="text-xs font-semibold text-muted pt-4 pb-2 px-1">Only in this browser</p>
                     )}
 
                     {localOnly.map((c) => (
@@ -267,7 +274,7 @@ export const MyCampaignsClient: React.FC = () => {
                     ))}
 
                     {localOnly.length > 0 && (
-                        <p className="text-xs text-muted text-center pt-2 leading-relaxed">
+                        <p className="text-xs text-muted text-center py-3 leading-relaxed">
                             Campaigns in this section live only in this browser. Keep their dashboard links saved
                             somewhere safe.
                         </p>
@@ -276,7 +283,7 @@ export const MyCampaignsClient: React.FC = () => {
             )}
 
             {!signedIn && (
-                <div className="mt-5 bg-cream border border-ink/10 rounded-2xl p-5">
+                <div className="mt-5 border border-ink/10 rounded-2xl p-5 bg-cream">
                     <div className="flex items-start gap-3">
                         <LogIn size={18} className="text-brand-deep mt-0.5 shrink-0" />
                         <div className="min-w-0">
@@ -307,50 +314,87 @@ const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRem
           : null;
     // Surface after ~15 minutes, or immediately when we lack a timestamp.
     const showShareNudge = zeroSupporters && (ageMs == null || ageMs >= 15 * 60 * 1000);
+    const showThumb = row.frame && hasVisibleFrame(row.frame);
 
     return (
-        <div className="bg-cream border border-ink/10 rounded-2xl p-4 flex flex-col gap-3">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="min-w-0 flex-1">
-                <p className="font-display font-bold truncate text-[15px]">{row.title}</p>
-                <p className="text-xs text-muted truncate flex items-center gap-2 mt-0.5 flex-wrap">
-                    <span className="truncate">ollabs.studio/c/{row.slug}</span>
-                    {row.supporters != null && (
-                        <span className="inline-flex items-center gap-1 shrink-0">
-                            <Users size={11} /> {row.supporters.toLocaleString()}
-                        </span>
+        <div className="py-4 flex flex-col gap-3">
+            <div className="flex items-start gap-3 sm:items-center">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-cream border border-ink/10 shrink-0 frame-shadow">
+                    {showThumb ? (
+                        <CampaignGridThumb
+                            frame={row.frame!}
+                            supporterPhotos={[]}
+                            size={64}
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-sm font-bold text-muted">
+                            {row.title.slice(0, 1).toUpperCase()}
+                        </div>
                     )}
-                </p>
-                {(pub || first) && (
-                    <p className="text-[11px] text-ink/60 mt-1 leading-snug">
-                        {pub && <span>Published {pub}</span>}
-                        {pub && first && <span> · </span>}
-                        {first && <span>First join {first}</span>}
+                </div>
+                <div className="min-w-0 flex-1">
+                    <p className="font-display font-bold truncate text-[15px]">{row.title}</p>
+                    <p className="text-xs text-muted truncate flex items-center gap-2 mt-0.5 flex-wrap">
+                        <span className="truncate">ollabs.studio/c/{row.slug}</span>
+                        {row.supporters != null && (
+                            <span className="inline-flex items-center gap-1 shrink-0">
+                                <Users size={11} /> {row.supporters.toLocaleString()}
+                            </span>
+                        )}
                     </p>
-                )}
+                    {(pub || first) && (
+                        <p className="text-[11px] text-ink/60 mt-1 leading-snug">
+                            {pub && <span>Published {pub}</span>}
+                            {pub && first && <span> · </span>}
+                            {first && <span>First join {first}</span>}
+                        </p>
+                    )}
+                </div>
+                <div className="hidden sm:flex items-center gap-2 shrink-0">
+                    <a href={row.url} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:bg-ink/5 transition-colors" title="Open campaign">
+                        <ExternalLink size={16} className="text-ink" />
+                    </a>
+                    {row.manageUrl && (
+                        <a href={row.manageUrl} className="min-h-11 px-4 rounded-lg bg-brand text-ink font-semibold text-sm flex items-center gap-1.5 hover:brightness-105 active:brightness-95 transition-all justify-center" title="Edit this campaign and see its stats">
+                            <Pencil size={15} /> Manage
+                        </a>
+                    )}
+                    <a
+                        href={`/create?remix=${encodeURIComponent(row.slug)}`}
+                        className="min-h-11 px-3 rounded-lg border border-ink/15 text-ink font-semibold text-sm flex items-center gap-1 hover:bg-ink/5 transition-colors justify-center"
+                        title="Start a new campaign with this frame"
+                    >
+                        Reuse frame
+                    </a>
+                    {onRemove && (
+                        <button onClick={onRemove} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:text-coral transition-colors" title="Remove from this list">
+                            <Trash2 size={16} />
+                        </button>
+                    )}
+                </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
-                <a href={row.url} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-paper border border-ink/10 hover:bg-ink/5 transition-colors" title="Open campaign">
+            <div className="flex sm:hidden items-center gap-2">
+                <a href={row.url} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:bg-ink/5 transition-colors" title="Open campaign">
                     <ExternalLink size={16} className="text-ink" />
                 </a>
                 {row.manageUrl && (
-                    <a href={row.manageUrl} className="min-h-11 px-4 rounded-lg bg-brand text-ink font-semibold text-sm flex items-center gap-1.5 hover:brightness-105 active:brightness-95 transition-all flex-1 sm:flex-none justify-center" title="Edit this campaign and see its stats">
+                    <a href={row.manageUrl} className="min-h-11 px-4 rounded-lg bg-brand text-ink font-semibold text-sm flex items-center gap-1.5 hover:brightness-105 active:brightness-95 transition-all flex-1 justify-center" title="Edit this campaign and see its stats">
                         <Pencil size={15} /> Manage
                     </a>
                 )}
                 <a
                     href={`/create?remix=${encodeURIComponent(row.slug)}`}
-                    className="min-h-11 px-3 rounded-lg bg-paper border border-ink/15 text-ink font-semibold text-sm flex items-center gap-1 hover:bg-ink/5 transition-colors justify-center"
+                    className="min-h-11 px-3 rounded-lg border border-ink/15 text-ink font-semibold text-sm flex items-center gap-1 hover:bg-ink/5 transition-colors justify-center"
                     title="Start a new campaign with this frame"
                 >
-                    Reuse frame
+                    Reuse
                 </a>
                 {onRemove && (
-                    <button onClick={onRemove} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg bg-paper border border-ink/10 hover:text-coral transition-colors" title="Remove from this list">
+                    <button onClick={onRemove} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:text-coral transition-colors" title="Remove from this list">
                         <Trash2 size={16} />
                     </button>
                 )}
-            </div>
             </div>
             {showShareNudge && (
                 <a

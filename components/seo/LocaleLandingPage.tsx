@@ -56,7 +56,7 @@ export function LocaleLandingPage({ t, htmlLang, extraFooterLinks }: Props) {
 
             <section className="px-4 sm:px-6 py-14 sm:py-20">
                 <div className="max-w-5xl mx-auto">
-                    <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-center mb-10">{t.howTitle}</h2>
+                    <h2 className="font-display text-2xl sm:text-3xl font-bold text-center mb-10">{t.howTitle}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                         {steps.map((s, i) => (
                             <div key={s.title} className="bg-cream border border-ink/10 rounded-2xl p-6 text-center">
@@ -71,7 +71,7 @@ export function LocaleLandingPage({ t, htmlLang, extraFooterLinks }: Props) {
 
             <section className="px-4 sm:px-6 py-12 sm:py-16 bg-paper2/50">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-center mb-8">{t.whyTitle}</h2>
+                    <h2 className="font-display text-2xl sm:text-3xl font-bold text-center mb-8">{t.whyTitle}</h2>
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {reasons.map((r) => (
                             <li key={r} className="flex items-start gap-3 bg-cream border border-ink/10 rounded-xl px-4 py-3 text-sm font-semibold">

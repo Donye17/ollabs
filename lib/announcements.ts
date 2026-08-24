@@ -17,6 +17,40 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-24-lane-e',
+        date: '2026-08-24',
+        title: 'Quieter craft',
+        summary: 'One soft shadow under frames, skeleton circles while Explore loads, and calmer type on marketing pages.',
+        items: [
+            'Circular frames share one ambient shadow. Buttons and chrome stay flat.',
+            'Explore shows pulsing circle placeholders until each thumb paints.',
+            'Section titles use bold. Heroes keep extrabold.',
+        ],
+    },
+    {
+        id: '2026-08-24-lane-d',
+        date: '2026-08-24',
+        title: 'Marketing pages with a real frame',
+        summary: 'Home and SEO pages lead with a live campaign example, not decorative rings.',
+        items: [
+            'Home desktop shows a large framed campaign beside the headline.',
+            'Use-case and day pages include one live example campaign with a real thumb.',
+            'Hub editor labels use sentence case instead of all-caps section chrome.',
+        ],
+    },
+    {
+        id: '2026-08-24-lane-c',
+        date: '2026-08-24',
+        title: 'Organizer desktop that breathes',
+        summary: 'Create, manage, hub, and Mine feel like documents on a wide screen, not phone cards stretched out.',
+        items: [
+            'Create keeps the live canvas beside the controls on large screens.',
+            'Campaign manage is a wider document: inline share, stats as rows, less widget chrome.',
+            'Hub editor shows a live /u preview beside the form on desktop.',
+            'Mine lists live frame thumbs and sorts by recent supporter activity.',
+        ],
+    },
+    {
         id: '2026-08-24-lane-b',
         date: '2026-08-24',
         title: 'Discovery with real frames',
