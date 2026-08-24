@@ -373,6 +373,17 @@ export const HubEditorClient: React.FC = () => {
                 </div>
             </div>
 
+            <div className="rounded-xl border border-brand/25 bg-brand/10 px-4 py-3.5 text-sm text-ink/80 leading-relaxed">
+                <p>
+                    <span className="font-semibold text-ink">Your hub is your bio link.</span>{' '}
+                    Join opens your featured frame. Paste <span className="font-mono text-xs">/u/your-handle</span> in Instagram or TikTok;
+                    share <span className="font-mono text-xs">/c/...</span> in WhatsApp when you want speed.{' '}
+                    <Link href="/guides/hub" className="text-brand-deep font-semibold hover:underline">
+                        What is a hub?
+                    </Link>
+                </p>
+            </div>
+
             {previewPath && hubUrl && (
                 <div className="rounded-2xl border border-brand/30 bg-brand/10 p-4 space-y-3">
                     <button

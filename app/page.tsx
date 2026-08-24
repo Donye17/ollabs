@@ -151,6 +151,8 @@ export default function Home() {
                                     <li><Link href="/explore" className="hover:text-brand-deep transition-colors">Explore campaigns</Link></li>
                                     <li><Link href="/mine" className="hover:text-brand-deep transition-colors">My campaigns</Link></li>
                                     <li><Link href="/for" className="hover:text-brand-deep transition-colors">Use cases</Link></li>
+                                    <li><Link href="/guides/start-a-campaign" className="hover:text-brand-deep transition-colors">Start a campaign</Link></li>
+                                    <li><Link href="/guides/hub" className="hover:text-brand-deep transition-colors">What is a hub?</Link></li>
                                     <li><Link href="/updates" className="hover:text-brand-deep transition-colors">What&apos;s new</Link></li>
                                 </ul>
                             </div>

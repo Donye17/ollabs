@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-24-guides',
+        date: '2026-08-24',
+        title: 'Organizer guides',
+        summary: 'Short explainers for starting a campaign and using your hub, plus a hint in the hub editor.',
+        items: [
+            'New guide: how to start a campaign, from frame upload to WhatsApp in the first hour.',
+            'New guide: what a hub is, and when to share /u/ vs /c/.',
+            'Home FAQ covers hub vs campaign. Hub editor links to the hub guide.',
+        ],
+    },
+    {
         id: '2026-08-24-lane-e',
         date: '2026-08-24',
         title: 'Quieter craft',

@@ -80,7 +80,15 @@ export default function AboutPage() {
                             <Link href="/day" className="text-brand-deep font-semibold hover:underline">
                                 calendar moments
                             </Link>
-                            , or an honest comparison as a{' '}
+                            , or step-by-step guides for{' '}
+                            <Link href="/guides/start-a-campaign" className="text-brand-deep font-semibold hover:underline">
+                                starting a campaign
+                            </Link>
+                            {' '}and{' '}
+                            <Link href="/guides/hub" className="text-brand-deep font-semibold hover:underline">
+                                using a hub
+                            </Link>
+                            . See an honest comparison as a{' '}
                             <Link href="/vs/twibbonize" className="text-brand-deep font-semibold hover:underline">
                                 Twibbonize alternative
                             </Link>
