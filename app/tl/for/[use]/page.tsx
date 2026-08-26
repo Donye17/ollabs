@@ -20,6 +20,7 @@ const labels = {
     questionsTitle: 'Mga tanong',
     readyTitle: 'Handa nang pagsamahin ang inyong mga tao?',
     readyBody: 'Wala pang isang minuto. Hindi kailangan ng account.',
+    exploreCampaigns: 'Tingnan ang mga campaign',
     alsoGreat: 'Mainam din para sa',
     footerCopy: '© 2026 Ollabs. Pagsamahin ang inyong mga tao.',
     exampleTitle: 'Halimbawang campaign',

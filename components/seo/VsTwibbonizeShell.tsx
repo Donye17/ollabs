@@ -121,6 +121,14 @@ export function VsTwibbonizeShell({ copy }: { copy: VsCopy; canonical?: string }
                         {copy.tryCta}
                         <ArrowRight className="w-4 h-4" />
                     </Link>
+                    <div className="mt-3">
+                        <Link
+                            href="/explore"
+                            className="inline-flex min-h-[44px] px-4 text-sm font-semibold text-muted hover:text-brand-deep transition-colors items-center"
+                        >
+                            {copy.exploreCta}
+                        </Link>
+                    </div>
                 </div>
             </section>
 

@@ -54,6 +54,22 @@ export default function GuidesIndexPage() {
                     ))}
                 </ul>
 
+                <div className="mt-10 flex flex-wrap items-center gap-3">
+                    <Link
+                        href="/create"
+                        className="inline-flex min-h-[48px] items-center gap-2 rounded-xl bg-brand px-6 font-bold text-ink hover:brightness-105 transition-all"
+                    >
+                        Create a campaign
+                        <ArrowRight size={16} />
+                    </Link>
+                    <Link
+                        href="/explore"
+                        className="inline-flex min-h-[48px] items-center px-4 text-sm font-semibold text-muted hover:text-brand-deep transition-colors"
+                    >
+                        Explore campaigns
+                    </Link>
+                </div>
+
                 <p className="text-center text-xs text-muted mt-12">
                     <Link href="/" className="hover:text-brand-deep transition-colors">
                         Home

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
+import { SiteFooter } from '@/components/SiteFooter';
 import { HomeCreateCta } from '@/components/home/HomeCreateCta';
 import { AdSlot } from '@/components/AdSlot';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
@@ -90,12 +91,33 @@ export function LocaleLandingPage({ t, htmlLang, extraFooterLinks }: Props) {
                 </div>
             </section>
 
-            <footer className="py-10 text-center text-sm text-muted border-t border-ink/10 pb-[max(1rem,env(safe-area-inset-bottom))]">
-                <Link href="/" hrefLang="en" className="font-semibold text-brand-deep hover:underline">
-                    {t.englishSite}
-                </Link>
-                {extraFooterLinks}
-            </footer>
+            <section className="px-4 sm:px-6 py-14 sm:py-16">
+                <div className="max-w-3xl mx-auto text-center">
+                    <div className="flex flex-wrap items-center justify-center gap-3">
+                        <HomeCreateCta
+                            eventFrom={htmlLang}
+                            className="group min-h-[48px] px-6 rounded-xl bg-brand text-ink font-bold flex items-center gap-2 hover:brightness-105 active:brightness-95 transition-all"
+                        >
+                            {t.cta}
+                            <ArrowRight className="w-4 h-4" />
+                        </HomeCreateCta>
+                        <Link
+                            href="/explore"
+                            className="min-h-[48px] px-6 rounded-xl border border-ink/15 text-ink font-bold flex items-center hover:bg-ink/5 transition-all"
+                        >
+                            Explore
+                        </Link>
+                    </div>
+                    <p className="mt-5 text-sm text-muted">
+                        <Link href="/" hrefLang="en" className="font-semibold text-brand-deep hover:underline">
+                            {t.englishSite}
+                        </Link>
+                        {extraFooterLinks}
+                    </p>
+                </div>
+            </section>
+
+            <SiteFooter />
         </main>
     );
 }

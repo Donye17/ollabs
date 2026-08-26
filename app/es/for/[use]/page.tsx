@@ -20,6 +20,7 @@ const labels = {
     questionsTitle: 'Preguntas',
     readyTitle: '¿Listo para reunir a tu gente?',
     readyBody: 'Toma menos de un minuto. Sin cuenta.',
+    exploreCampaigns: 'Explorar campañas',
     alsoGreat: 'También sirve para',
     footerCopy: '© 2026 Ollabs. Reúne a tu gente.',
     exampleTitle: 'Campaña de ejemplo',

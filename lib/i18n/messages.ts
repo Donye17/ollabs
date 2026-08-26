@@ -127,6 +127,7 @@ export type Messages = {
         savedToAccount: (email: string) => string;
         setupHub: string;
         setupHubBody: string;
+        hubNextOptional: string;
         claimHub: string;
         claimingHub: string;
         hubLive: (handle: string) => string;
@@ -443,7 +444,8 @@ const en: Messages = {
         savedToAccount: (email) =>
             `Saved to your account, ${email}. Open it from any device by signing in with a code at /login.`,
         setupHub: 'Set up your campaign hub',
-        setupHubBody: 'One link for your bio, Join button, and every campaign you run.',
+        setupHubBody: 'Optional: one public page with a Join button for this campaign and the ones you run next.',
+        hubNextOptional: 'Optional next: your hub',
         claimHub: 'Claim hub with this campaign',
         claimingHub: 'Claiming hub…',
         hubLive: (handle) => `Your hub is live at ollabs.studio/u/${handle}`,
@@ -607,7 +609,8 @@ const pt: Messages = {
         savedToAccount: (email) =>
             `Salva na sua conta, ${email}. Abra em qualquer dispositivo entrando com um código em /login.`,
         setupHub: 'Configure seu hub de campanhas',
-        setupHubBody: 'Um link para bio, botão Participar e todas as suas campanhas.',
+        setupHubBody: 'Opcional: uma página pública com botão Participar para esta campanha e as próximas.',
+        hubNextOptional: 'Opcional: seu hub',
         claimHub: 'Criar hub com esta campanha',
         claimingHub: 'Criando hub…',
         hubLive: (handle) => `Seu hub está no ar em ollabs.studio/u/${handle}`,
@@ -771,7 +774,8 @@ const id: Messages = {
         savedToAccount: (email) =>
             `Disimpan ke akunmu, ${email}. Buka dari perangkat mana saja dengan masuk pakai kode di /login.`,
         setupHub: 'Atur hub kampanyemu',
-        setupHubBody: 'Satu link untuk bio, tombol Gabung, dan semua kampanyemu.',
+        setupHubBody: 'Opsional: satu halaman publik dengan tombol Gabung untuk kampanye ini dan berikutnya.',
+        hubNextOptional: 'Opsional: hubmu',
         claimHub: 'Klaim hub dengan kampanye ini',
         claimingHub: 'Mengklaim hub…',
         hubLive: (handle) => `Hubmu sudah live di ollabs.studio/u/${handle}`,

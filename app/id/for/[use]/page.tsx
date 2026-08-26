@@ -20,6 +20,7 @@ const labels = {
     questionsTitle: 'Pertanyaan',
     readyTitle: 'Siap kumpulkan orang?',
     readyBody: 'Kurang dari satu menit. Tanpa daftar.',
+    exploreCampaigns: 'Jelajahi kampanye',
     alsoGreat: 'Juga cocok untuk',
     footerCopy: '© 2026 Ollabs. Kumpulkan barengannya.',
     exampleTitle: 'Contoh kampanye',

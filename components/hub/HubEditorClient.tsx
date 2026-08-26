@@ -72,6 +72,7 @@ export const HubEditorClient: React.FC = () => {
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [saveMsg, setSaveMsg] = useState<string | null>(null);
+    const [lastSavedOk, setLastSavedOk] = useState(false);
 
     const [handle, setHandle] = useState('');
     const [displayName, setDisplayName] = useState('');
@@ -229,6 +230,7 @@ export const HubEditorClient: React.FC = () => {
                 has_featured_campaign: Boolean(featuredId),
             });
             setSaveMsg('Saved');
+            setLastSavedOk(true);
             setPreviewKey((k) => k + 1);
             if (firstClaim) track('hub_claimed', { handle: nextHandle });
             setTimeout(() => setSaveMsg(null), 2000);
@@ -373,16 +375,51 @@ export const HubEditorClient: React.FC = () => {
                 </div>
             </div>
 
-            <div className="rounded-xl border border-brand/25 bg-brand/10 px-4 py-3.5 text-sm text-ink/80 leading-relaxed">
-                <p>
-                    <span className="font-semibold text-ink">Your hub is your bio link.</span>{' '}
-                    Join opens your featured frame. Paste <span className="font-mono text-xs">/u/your-handle</span> in Instagram or TikTok;
-                    share <span className="font-mono text-xs">/c/...</span> in WhatsApp when you want speed.{' '}
-                    <Link href="/guides/hub" className="text-brand-deep font-semibold hover:underline">
-                        What is a hub?
+            {campaigns.length === 0 ? (
+                <div className="rounded-xl border border-brand/25 bg-brand/10 px-4 py-4 space-y-3">
+                    <p className="font-display font-bold text-[15px] text-ink">
+                        A hub is your public page that lists campaigns
+                    </p>
+                    <p className="text-sm text-ink/80 leading-relaxed">
+                        Create a campaign first. Then come back here to set your{' '}
+                        <span className="font-mono text-xs">/u/</span> handle and the Join button.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <Link
+                            href="/create"
+                            className={`inline-flex items-center justify-center gap-2 px-5 ${ORGANIZER_PRIMARY_BTN}`}
+                        >
+                            Create a campaign
+                        </Link>
+                        <Link
+                            href="/guides/hub"
+                            className="inline-flex min-h-[48px] items-center justify-center px-4 text-sm font-semibold text-brand-deep hover:underline"
+                        >
+                            What is a hub?
+                        </Link>
+                    </div>
+                </div>
+            ) : (
+                <div className="rounded-xl border border-brand/25 bg-brand/10 px-4 py-3.5 text-sm text-ink/80 leading-relaxed">
+                    <p>
+                        <span className="font-semibold text-ink">Your hub is your bio link.</span>{' '}
+                        Join opens your featured frame. Paste <span className="font-mono text-xs">/u/your-handle</span> in Instagram or TikTok;
+                        share <span className="font-mono text-xs">/c/...</span> in WhatsApp when you want speed.{' '}
+                        <Link href="/guides/hub" className="text-brand-deep font-semibold hover:underline">
+                            What is a hub?
+                        </Link>
+                    </p>
+                </div>
+            )}
+
+            {lastSavedOk && (
+                <p className="text-xs text-muted px-0.5">
+                    Hub saved.{' '}
+                    <Link href="/mine" className="font-semibold text-brand-deep hover:underline">
+                        My campaigns
                     </Link>
                 </p>
-            </div>
+            )}
 
             {previewPath && hubUrl && (
                 <div className="rounded-2xl border border-brand/30 bg-brand/10 p-4 space-y-3">
@@ -537,13 +574,18 @@ export const HubEditorClient: React.FC = () => {
                     upload a photo on the hub itself.
                 </p>
                 {campaigns.length === 0 ? (
-                    <p className="text-sm text-muted">
-                        No campaigns on this account yet.{' '}
-                        <Link href="/create" className="text-brand-deep font-semibold hover:underline">
-                            Create one
+                    <div className="rounded-xl border border-ink/10 bg-paper px-4 py-4 space-y-2">
+                        <p className="text-sm font-semibold text-ink">No campaigns on this account yet</p>
+                        <p className="text-sm text-muted leading-relaxed">
+                            The Join button needs a campaign to open. Create one, then pick it here.
+                        </p>
+                        <Link
+                            href="/create"
+                            className="inline-flex text-sm font-semibold text-brand-deep hover:underline"
+                        >
+                            Create a campaign
                         </Link>
-                        .
-                    </p>
+                    </div>
                 ) : (
                     <select
                         value={featuredId}

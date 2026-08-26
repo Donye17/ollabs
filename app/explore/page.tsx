@@ -169,12 +169,18 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
                 <div className="max-w-6xl xl:max-w-7xl mx-auto">
                     {campaigns.length === 0 ? (
                         <div className="text-center">
-                            <p className="text-muted mb-6">
+                            <p className="text-muted mb-2 max-w-md mx-auto">
                                 {category
-                                    ? 'No campaigns with enough supporters in this category yet.'
-                                    : 'No campaigns with enough supporters yet. Share yours and it will show up here.'}
+                                    ? 'No campaigns with 5 or more supporters in this category yet.'
+                                    : 'Explore only lists campaigns with 5 or more supporters, so quiet frames stay off the public grid.'}
                             </p>
-                            <Link href="/create" className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">Create a campaign</Link>
+                            <p className="text-sm text-ink/70 mb-6 max-w-md mx-auto">
+                                Share yours in the first hour. When it crosses five supporters, it can show up here.
+                            </p>
+                            <div className="flex flex-wrap items-center justify-center gap-3">
+                                <Link href="/create" className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">Create a campaign</Link>
+                                <Link href="/for" className="inline-flex min-h-[48px] px-5 rounded-xl border border-ink/15 text-ink font-bold items-center hover:bg-ink/5 transition-all">Browse use cases</Link>
+                            </div>
                         </div>
                     ) : (
                         <ExploreClient campaigns={campaigns} />

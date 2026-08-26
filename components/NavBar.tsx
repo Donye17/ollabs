@@ -6,6 +6,25 @@ import { MessageSquare } from 'lucide-react';
 import { BrandMark } from '@/components/BrandMark';
 import { BackControl } from '@/components/BackControl';
 
+/** Short label so phones know where they are without reading the page H1. */
+function chromeTitle(pathname: string): string | null {
+    if (pathname === '/create' || pathname.startsWith('/create/')) return 'Create';
+    if (pathname === '/hub' || pathname.startsWith('/hub/')) return 'Hub';
+    if (pathname === '/mine' || pathname.startsWith('/mine/')) return 'Mine';
+    if (pathname.includes('/manage')) return 'Manage';
+    if (pathname === '/login' || pathname.startsWith('/login')) return 'Sign in';
+    if (pathname === '/recover' || pathname.startsWith('/recover')) return 'Recover';
+    return null;
+}
+
+function backFallbackFor(pathname: string, onCreate: boolean): string {
+    if (onCreate || pathname.startsWith('/hub')) return '/mine';
+    if (pathname.includes('/manage')) return '/mine';
+    if (pathname.startsWith('/login') || pathname.startsWith('/recover')) return '/mine';
+    if (pathname === '/mine' || pathname.startsWith('/mine/')) return '/';
+    return '/';
+}
+
 export const NavBar: React.FC = () => {
     const pathname = usePathname() || '/';
     const onCreate = pathname === '/create' || pathname.startsWith('/create/');
@@ -13,10 +32,8 @@ export const NavBar: React.FC = () => {
     // Phones: logo alone always jumped home and wiped mid-flow work. Back keeps
     // create / hub / mine / manage reachable without starting over.
     const showBack = !onHome;
-    const backFallback =
-        onCreate || pathname.startsWith('/hub')
-            ? '/mine'
-            : '/';
+    const backFallback = backFallbackFor(pathname, onCreate);
+    const title = chromeTitle(pathname);
 
     return (
         <nav className="fixed top-0 inset-x-0 z-50 border-b border-ink/10 bg-paper/90 pt-[env(safe-area-inset-top,0px)]">
@@ -29,6 +46,11 @@ export const NavBar: React.FC = () => {
                         />
                     )}
                     <BrandMark size={28} />
+                    {title && (
+                        <span className="lg:hidden ml-1.5 text-sm font-semibold text-ink truncate max-w-[9rem]">
+                            {title}
+                        </span>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-5 min-w-0">

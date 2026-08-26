@@ -225,14 +225,22 @@ export const MyCampaignsClient: React.FC = () => {
                 >
                     <div className="min-w-0">
                         <p className="font-display font-bold text-[15px]">
-                            {hubHandle ? 'Your campaign hub' : 'Claim your campaign hub'}
+                            {hubHandle
+                                ? 'Your campaign hub'
+                                : accountRows.length > 0
+                                  ? 'Put these on one public page'
+                                  : 'Claim your campaign hub'}
                         </p>
                         <p className="text-xs text-ink/70 truncate">
                             {hubHandle
                                 ? `ollabs.studio/u/${hubHandle}`
-                                : suggestedHandle
-                                  ? `Suggested: /u/${suggestedHandle} with Join button, bio, and links`
-                                  : 'Claim /u/… with Join button, bio, and other links'}
+                                : accountRows.length > 0
+                                  ? suggestedHandle
+                                    ? `Set up /u/${suggestedHandle} with a Join button for your campaigns`
+                                    : 'One bio link with a Join button for the campaigns you run'
+                                  : suggestedHandle
+                                    ? `Suggested: /u/${suggestedHandle} with Join button, bio, and links`
+                                    : 'Claim /u/… with Join button, bio, and other links'}
                         </p>
                     </div>
                     <span className="text-xs font-bold text-brand-deep shrink-0">

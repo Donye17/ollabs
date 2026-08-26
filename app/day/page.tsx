@@ -73,6 +73,22 @@ export default function DayIndexPage() {
                 <div className="max-w-3xl mx-auto mt-10">
                     <AdSlot surface="seo" />
                 </div>
+                <div className="max-w-3xl mx-auto mt-10 text-center">
+                    <Link
+                        href="/create"
+                        className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all"
+                    >
+                        Create a campaign <ArrowRight size={16} />
+                    </Link>
+                    <div className="mt-3">
+                        <Link
+                            href="/explore"
+                            className="inline-flex min-h-[44px] px-4 text-sm font-semibold text-muted hover:text-brand-deep transition-colors"
+                        >
+                            Explore campaigns
+                        </Link>
+                    </div>
+                </div>
             </section>
 
             <SiteFooter />

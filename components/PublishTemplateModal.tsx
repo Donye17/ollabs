@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { X, Check, Loader2, Copy, ExternalLink, ShieldCheck, QrCode, UserPlus, KeyRound, Pencil, Save, Share2, LayoutGrid, ArrowRight } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { upload } from '@vercel/blob/client';
@@ -37,6 +38,7 @@ type AccountStep = 'offer' | 'sending' | 'code' | 'verifying' | 'saved';
 export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl, editTarget }) => {
     const { messages, locale } = useLocale();
     const tp = messages.publish;
+    const router = useRouter();
     const dialogRef = useRef<HTMLDivElement>(null);
     // Set when the builder was opened from a /day page, so the campaign can be
     // attributed to that day rather than guessed at by category.
@@ -205,9 +207,12 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             setCloseBlocked(true);
             return;
         }
+        const resumeMine = Boolean(campaignUrl && !editTarget);
         onClose();
         resetForm();
-    }, [onClose, resetForm, campaignUrl, sessionEmail, linkSaved, shareFired, shareNudgeShown]);
+        // Mine is the organizer home base after publish, not the create canvas.
+        if (resumeMine) router.push('/mine');
+    }, [onClose, resetForm, campaignUrl, sessionEmail, linkSaved, shareFired, shareNudgeShown, editTarget, router]);
 
     /**
      * Escape closes the modal, and the page behind it stays where it was.
@@ -689,8 +694,10 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             setCloseBlocked(true);
             return;
         }
+        const resumeMine = Boolean(campaignUrl && !editTarget);
         onClose();
         resetForm();
+        if (resumeMine) router.push('/mine');
     };
 
     // Already signed in when the campaign was created, or signed in just now via
@@ -825,6 +832,8 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 </div>
                             )}
 
+                            <div className="border-t border-ink/10 pt-4 space-y-3">
+                                <p className="text-sm font-bold text-ink">{tp.hubNextOptional}</p>
                             <Link
                                 href={hubHref}
                                 onClick={() => track('hub_from_publish', { campaign: campaignSlug || '' })}
@@ -867,6 +876,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     {hubClaimError}
                                 </p>
                             )}
+                            </div>
 
                             <div className="border-t border-ink/10 pt-4 space-y-3">
                                 <p className="text-sm font-bold text-ink">{tp.thenSaveAccess}</p>

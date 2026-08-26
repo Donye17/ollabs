@@ -41,6 +41,7 @@ const labels = {
     questionsTitle: 'Questions',
     readyTitle: 'Ready to bring your people together?',
     readyBody: 'Make a campaign in under a minute. No account needed.',
+    exploreCampaigns: 'Explore campaigns',
     alsoGreat: 'Also great for',
     footerCopy: '© 2026 Ollabs. Bring your people together.',
     exampleTitle: 'Example campaign',

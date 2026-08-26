@@ -21,6 +21,8 @@ export type UseCaseLabels = {
     footerCopy: string;
     /** Optional: “Example campaign” above the live proof. */
     exampleTitle?: string;
+    /** Secondary exit next to Create on the ready block. */
+    exploreCampaigns?: string;
 };
 
 type Props = {
@@ -166,13 +168,21 @@ export function UseCasePageShell({
                 <div className="max-w-3xl mx-auto text-center">
                     <h2 className="font-display text-2xl sm:text-3xl font-extrabold mb-3">{labels.readyTitle}</h2>
                     <p className="text-ink/70 mb-7">{labels.readyBody}</p>
-                    <Link
-                        href={createHref}
-                        className="group inline-flex min-h-[48px] px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all"
-                    >
-                        {labels.createCampaign}
-                        <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    <div className="flex flex-wrap items-center justify-center gap-3">
+                        <Link
+                            href={createHref}
+                            className="group inline-flex min-h-[48px] px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all"
+                        >
+                            {labels.createCampaign}
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
+                        <Link
+                            href="/explore"
+                            className="inline-flex min-h-[48px] px-6 rounded-xl border border-ink/15 text-ink font-bold items-center hover:bg-ink/5 transition-all"
+                        >
+                            {labels.exploreCampaigns || 'Explore campaigns'}
+                        </Link>
+                    </div>
                 </div>
             </section>
 

@@ -54,6 +54,22 @@ export function LocalizedForHub({
                 <div className="mx-auto mt-10 max-w-3xl">
                     <AdSlot surface="seo" />
                 </div>
+                <div className="mx-auto mt-10 max-w-3xl text-center">
+                    <Link
+                        href="/create"
+                        className="inline-flex h-12 items-center gap-2 rounded-xl bg-brand px-7 font-bold text-ink hover:brightness-105 transition-all"
+                    >
+                        Create a campaign <ArrowRight className="h-4 w-4" />
+                    </Link>
+                    <div className="mt-3">
+                        <Link
+                            href="/explore"
+                            className="inline-flex min-h-[44px] items-center px-4 text-sm font-semibold text-muted hover:text-brand-deep transition-colors"
+                        >
+                            Explore campaigns
+                        </Link>
+                    </div>
+                </div>
             </section>
 
             <SiteFooter />

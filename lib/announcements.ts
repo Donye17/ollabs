@@ -17,6 +17,18 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-26-nav-clarity',
+        date: '2026-08-26',
+        title: 'Clearer paths after you publish',
+        summary: 'Hub vs campaign is clearer, Done lands in My campaigns, and SEO pages always offer a next step.',
+        items: [
+            'Empty hub explains that it is your public page and points you to Create first.',
+            'After you publish, Done opens My campaigns. Hub setup stays an optional next step.',
+            'Returning organizers see Continue in My campaigns on the home page.',
+            'Use cases, day pages, guides, and locale landings end with Create plus Explore.',
+        ],
+    },
+    {
         id: '2026-08-26-platform-polish',
         date: '2026-08-26',
         title: 'Platform polish pass',

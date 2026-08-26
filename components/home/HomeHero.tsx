@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { HomeCreateCta } from '@/components/home/HomeCreateCta';
+import { HomeResumeLink } from '@/components/home/HomeResumeLink';
 import { SeoCampaignExample } from '@/components/seo/SeoCampaignExample';
 import { getSeoExampleCampaign } from '@/lib/seoExampleCampaign';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
@@ -29,12 +29,7 @@ export async function HomeHero() {
                             Create a campaign
                             <ArrowRight className="w-4 h-4" />
                         </HomeCreateCta>
-                        <Link
-                            href="/mine"
-                            className="min-h-[44px] px-4 text-sm font-semibold text-muted hover:text-brand-deep transition-colors inline-flex items-center"
-                        >
-                            My campaigns
-                        </Link>
+                        <HomeResumeLink />
                     </div>
                 </div>
 
