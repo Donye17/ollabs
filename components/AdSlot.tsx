@@ -21,8 +21,10 @@ import React, { useEffect, useRef } from 'react';
  * the page down as it loads is the most annoying thing a display unit does, and
  * on a phone it moves the button someone is already reaching for.
  *
- * The AdSense script is loaded on first AdSlot mount, not in the root layout,
- * so /create and other ad-free screens never pay for the request.
+ * The AdSense loader lives in the root layout so crawlers see it on home and
+ * other high-traffic HTML. AdSlot still only pushes units where we place them
+ * (never on /create or on the photo). loadAdSenseScript below is a fallback if
+ * the layout script is slow or blocked.
  *
  * Env: NEXT_PUBLIC_ADSENSE_CLIENT, NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN,
  * NEXT_PUBLIC_ADSENSE_SLOT_SEO (optional fallback NEXT_PUBLIC_ADSENSE_SLOT_INLINE).
@@ -62,11 +64,20 @@ function loadAdSenseScript(): Promise<void> {
     }
     if (scriptPromise) return scriptPromise;
     scriptPromise = new Promise((resolve) => {
-        const existing = document.querySelector('script[data-ollabs-adsense]');
+        // Layout injects next/script (#adsense-loader); older mounts used data-ollabs-adsense.
+        const existing = document.querySelector(
+            'script#adsense-loader, script[data-ollabs-adsense], script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]'
+        );
         if (existing) {
-            existing.addEventListener('load', () => resolve());
             // Already loaded earlier in this session.
-            if ((window as unknown as { adsbygoogle?: unknown[] }).adsbygoogle) resolve();
+            if ((window as unknown as { adsbygoogle?: unknown[] }).adsbygoogle) {
+                resolve();
+                return;
+            }
+            existing.addEventListener('load', () => resolve(), { once: true });
+            existing.addEventListener('error', () => resolve(), { once: true });
+            // next/script may already be done without adsbygoogle yet; short settle.
+            window.setTimeout(() => resolve(), 1500);
             return;
         }
         const s = document.createElement('script');

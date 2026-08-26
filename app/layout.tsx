@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Bricolage_Grotesque } from 'next/font/google';
+import Script from 'next/script';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 import { LanguageBanner } from '@/components/i18n/LanguageBanner';
 import { MobileOrganizerNav } from '@/components/MobileOrganizerNav';
@@ -161,6 +162,9 @@ const jsonLd = {
 };
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-0E75K2XJ5Q';
+// Same client as AdSlot / meta tag. Loaded sitewide so AdSense crawlers see the
+// connection snippet on high-traffic HTML (home), not only after a unit mounts.
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || 'ca-pub-5665798404376894';
 
 export default function RootLayout({
     children,
@@ -183,9 +187,15 @@ export default function RootLayout({
                     <LanguageBanner />
                 </LocaleProvider>
                 {GA_ID ? <DeferredAnalytics gaId={GA_ID} /> : null}
-                {/* AdSense script is loaded by AdSlot on first mount, not here.
-                    Create and other ad-free screens should not pay for it.
-                    Dashboard: keep Auto ads, anchor, and vignette OFF. */}
+                {/* Script only: no Auto ads. Units still render only via AdSlot,
+                    never on /create or on the photo. Keep Auto/anchor/vignette OFF. */}
+                <Script
+                    id="adsense-loader"
+                    async
+                    src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+                    crossOrigin="anonymous"
+                    strategy="afterInteractive"
+                />
                 <Analytics />
                 <SpeedInsights />
             </body>

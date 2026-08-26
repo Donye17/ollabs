@@ -39,6 +39,12 @@ export function SiteFooter({ className = '' }: Props) {
                     <Link href="/privacy" className="hover:text-brand-deep transition-colors">
                         Privacy
                     </Link>
+                    <span aria-hidden className="text-ink/20">
+                        ·
+                    </span>
+                    <Link href="/terms" className="hover:text-brand-deep transition-colors">
+                        Terms
+                    </Link>
                 </nav>
                 <p className="text-center sm:text-right">&copy; {new Date().getFullYear()} Ollabs</p>
             </div>
