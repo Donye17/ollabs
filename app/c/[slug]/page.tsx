@@ -3,7 +3,7 @@ import { pool } from '@/lib/neon';
 import { notFound, redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { CampaignClient } from '@/components/campaign/CampaignClient';
-import { FrameConfig } from '@/lib/types';
+import { parseFrameConfig } from '@/lib/parseFrameConfig';
 
 // Cache the rendered page for 60s per slug. Repeat visits and crawler hits are
 // served from cache instead of querying Postgres every time, which keeps Neon
@@ -93,9 +93,8 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
         notFound();
     }
 
-    const frame: FrameConfig = typeof campaign.frame_config === 'string'
-        ? JSON.parse(campaign.frame_config)
-        : campaign.frame_config;
+    const frame = parseFrameConfig(campaign.frame_config);
+    if (!frame) notFound();
 
     return (
         <CampaignClient

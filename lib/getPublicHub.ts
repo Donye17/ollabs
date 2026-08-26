@@ -3,6 +3,19 @@ import { pool } from '@/lib/neon';
 import { normalizeHandle, type PublicHub } from '@/lib/hub';
 import { resolveHubTheme } from '@/lib/hubThemes';
 
+function parseHiddenIds(raw: unknown): string[] {
+    try {
+        if (Array.isArray(raw)) return raw.map(String);
+        if (typeof raw === 'string') {
+            const parsed = JSON.parse(raw) as unknown;
+            return Array.isArray(parsed) ? parsed.map(String) : [];
+        }
+    } catch {
+        /* corrupt jsonb / string: treat as none hidden */
+    }
+    return [];
+}
+
 /** Load a published hub by handle. Returns null if missing or handle invalid. */
 export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub | null> => {
     const handle = normalizeHandle(rawHandle);
@@ -21,14 +34,7 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
         const org = orgRes.rows[0];
         if (!org) return null;
 
-        const hiddenRaw = org.hub_hidden_campaign_ids;
-        const hiddenIds = new Set<string>(
-            Array.isArray(hiddenRaw)
-                ? hiddenRaw.map(String)
-                : typeof hiddenRaw === 'string'
-                  ? (JSON.parse(hiddenRaw) as string[])
-                  : []
-        );
+        const hiddenIds = new Set<string>(parseHiddenIds(org.hub_hidden_campaign_ids));
 
         const [linksRes, campsRes] = await Promise.all([
             pool.query(

@@ -16,7 +16,7 @@ import { ArrowRight, CalendarDays, Users } from 'lucide-react';
 import { DayShareButton } from '@/components/day/DayShareButton';
 import { SeoCampaignExample } from '@/components/seo/SeoCampaignExample';
 import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
-import type { FrameConfig } from '@/lib/types';
+import { parseFrameConfig } from '@/lib/parseFrameConfig';
 
 // Matches the campaign pages: fresh enough for the live campaign block without
 // hitting Neon on every crawl.
@@ -268,18 +268,16 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                         <>
                             {(() => {
                                 const featured = campaigns[0];
-                                const raw =
-                                    typeof featured.frame_config === 'string'
-                                        ? JSON.parse(featured.frame_config as string)
-                                        : featured.frame_config;
+                                const frame = parseFrameConfig(featured.frame_config);
+                                if (!frame) return null;
                                 return (
                                     <div className="mb-8 flex justify-center">
                                         <SeoCampaignExample
                                             campaign={{
                                                 slug: featured.slug,
                                                 title: featured.title,
-                                                supporterCount: featured.supporter_count,
-                                                frame: raw as FrameConfig,
+                                                supporterCount: featured.supporter_count ?? 0,
+                                                frame,
                                                 supporterPhotos: parseSupporterPhotos(featured.supporter_photos),
                                             }}
                                             size={200}
@@ -299,7 +297,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                                                 <p className="font-display font-bold truncate">{c.title}</p>
                                                 <p className="text-xs text-muted flex items-center gap-1.5 shrink-0">
                                                     <Users size={12} />
-                                                    {c.supporter_count.toLocaleString()}
+                                                    {(c.supporter_count ?? 0).toLocaleString()}
                                                 </p>
                                             </Link>
                                         </li>

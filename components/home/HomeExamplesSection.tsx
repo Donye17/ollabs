@@ -1,9 +1,9 @@
 import { pool } from '@/lib/neon';
 import { visibleFrameSql, HOME_TOP_CAMPAIGNS, MIN_SUPPORTERS_TO_DISPLAY } from '@/lib/frameValidity';
 import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
-import type { FrameConfig } from '@/lib/types';
 import type { TopCampaign } from '@/components/home/TopCampaignsPodium';
 import { HomeTopCampaignsClient } from '@/components/home/HomeTopCampaignsClient';
+import { parseFrameConfig } from '@/lib/parseFrameConfig';
 
 async function getTopCampaigns(): Promise<TopCampaign[]> {
     try {
@@ -28,13 +28,17 @@ async function getTopCampaigns(): Promise<TopCampaign[]> {
              LIMIT $2`,
             [MIN_SUPPORTERS_TO_DISPLAY, HOME_TOP_CAMPAIGNS]
         );
-        return res.rows.map((r) => ({
-            slug: r.slug,
-            title: r.title,
-            supporterCount: r.supporter_count ?? 0,
-            frame: (typeof r.frame_config === 'string' ? JSON.parse(r.frame_config) : r.frame_config) as FrameConfig,
-            supporterPhotos: parseSupporterPhotos(r.supporter_photos),
-        }));
+        return res.rows.flatMap((r) => {
+            const frame = parseFrameConfig(r.frame_config);
+            if (!frame) return [];
+            return [{
+                slug: r.slug,
+                title: r.title,
+                supporterCount: r.supporter_count ?? 0,
+                frame,
+                supporterPhotos: parseSupporterPhotos(r.supporter_photos),
+            }];
+        });
     } catch (e) {
         console.error('Failed to load top campaigns', e);
         return [];

@@ -259,11 +259,11 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                         <dl className="mb-8 divide-y divide-ink/10 border-y border-ink/10">
                             <div className="flex items-center justify-between gap-4 py-3.5">
                                 <dt className="text-sm text-muted flex items-center gap-2"><Eye size={15} /> Views</dt>
-                                <dd className="font-display text-2xl font-bold tabular-nums">{data.view_count.toLocaleString()}</dd>
+                                <dd className="font-display text-2xl font-bold tabular-nums">{(data.view_count ?? 0).toLocaleString()}</dd>
                             </div>
                             <div className="flex items-center justify-between gap-4 py-3.5">
                                 <dt className="text-sm text-muted flex items-center gap-2"><Users size={15} /> Supporters</dt>
-                                <dd className="font-display text-2xl font-bold tabular-nums">{data.supporter_count.toLocaleString()}</dd>
+                                <dd className="font-display text-2xl font-bold tabular-nums">{(data.supporter_count ?? 0).toLocaleString()}</dd>
                             </div>
                             <div className="flex items-center justify-between gap-4 py-3.5">
                                 <dt className="text-sm text-muted flex items-center gap-2"><BarChart3 size={15} /> Conversion</dt>

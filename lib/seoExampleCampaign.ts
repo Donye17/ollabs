@@ -3,6 +3,7 @@ import { visibleFrameSql, MIN_SUPPORTERS_TO_DISPLAY } from '@/lib/frameValidity'
 import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
 import type { FrameConfig } from '@/lib/types';
 import type { CategoryKey } from '@/lib/categories';
+import { parseFrameConfig } from '@/lib/parseFrameConfig';
 
 export type SeoExampleCampaign = {
     slug: string;
@@ -32,13 +33,14 @@ function rowToExample(r: {
     supporter_count: number;
     frame_config: unknown;
     supporter_photos: unknown;
-}): SeoExampleCampaign {
-    const raw = typeof r.frame_config === 'string' ? JSON.parse(r.frame_config) : r.frame_config;
+}): SeoExampleCampaign | null {
+    const frame = parseFrameConfig(r.frame_config);
+    if (!frame) return null;
     return {
         slug: r.slug,
         title: r.title,
         supporterCount: r.supporter_count ?? 0,
-        frame: raw as FrameConfig,
+        frame,
         supporterPhotos: parseSupporterPhotos(r.supporter_photos),
     };
 }
@@ -66,7 +68,10 @@ export async function getSeoExampleCampaign(
                  LIMIT 1`,
                 [category, MIN_SUPPORTERS_TO_DISPLAY]
             );
-            if (byCat.rows[0]) return rowToExample(byCat.rows[0]);
+            if (byCat.rows[0]) {
+                const example = rowToExample(byCat.rows[0]);
+                if (example) return example;
+            }
         }
 
         const top = await pool.query(

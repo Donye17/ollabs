@@ -4,12 +4,12 @@ import { headers } from 'next/headers';
 import { NavBar } from '@/components/NavBar';
 import { SiteFooter } from '@/components/SiteFooter';
 import { ExploreClient, ExploreCampaign } from '@/components/ExploreClient';
-import { FrameConfig } from '@/lib/types';
 import { pool } from '@/lib/neon';
 import { CATEGORIES, CATEGORY_KEYS } from '@/lib/categories';
 import { visibleFrameSql } from '@/lib/frameValidity';
 import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
+import { parseFrameConfig } from '@/lib/parseFrameConfig';
 
 export const revalidate = 300;
 
@@ -80,13 +80,17 @@ async function getCampaigns(
     }
     try {
         const res = await pool.query(query);
-        return res.rows.map((r) => ({
-            slug: r.slug,
-            title: r.title,
-            supporterCount: r.supporter_count ?? 0,
-            frame: (typeof r.frame_config === 'string' ? JSON.parse(r.frame_config) : r.frame_config) as FrameConfig,
-            supporterPhotos: parseSupporterPhotos(r.supporter_photos),
-        }));
+        return res.rows.flatMap((r) => {
+            const frame = parseFrameConfig(r.frame_config);
+            if (!frame) return [];
+            return [{
+                slug: r.slug,
+                title: r.title,
+                supporterCount: r.supporter_count ?? 0,
+                frame,
+                supporterPhotos: parseSupporterPhotos(r.supporter_photos),
+            }];
+        });
     } catch (e) {
         console.error('Failed to load explore campaigns', e);
         return [];

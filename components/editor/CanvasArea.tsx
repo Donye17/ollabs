@@ -103,7 +103,12 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
         }
 
         // 3. Draw Frame Overlay (plus curved caption)
-        FrameRendererFactory.render({ ctx, centerX, centerY, radius, frame: selectedFrame, onImageLoad: () => setImgTick((t) => t + 1) });
+        try {
+            FrameRendererFactory.render({ ctx, centerX, centerY, radius, frame: selectedFrame, onImageLoad: () => setImgTick((t) => t + 1) });
+        } catch (e) {
+            // Bad remix/edit configs must not crash /create mid-draw.
+            console.error('canvas frame render failed', e);
+        }
     }, [canvasRef, imageObject, position, scale, rotation, selectedFrame]);
 
     // The only repaint path: runs on mount, on any drawing input changing, and
