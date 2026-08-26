@@ -252,7 +252,7 @@ export const MyCampaignsClient: React.FC = () => {
                             : 'Create a frame in this browser, then send the link on WhatsApp right away. Campaigns that are not shared in the first hour almost never take off.'}
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <Link href="/create" className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">Create a campaign</Link>
+                        <Link href="/create" className="inline-flex min-h-[48px] px-6 rounded-xl bg-ink text-paper text-[15px] font-semibold items-center hover:bg-ink/90 transition-colors">Create a campaign</Link>
                     </div>
                 </div>
             ) : (

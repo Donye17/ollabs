@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { X, Check, Loader2, Copy, ExternalLink, Rocket, ShieldCheck, QrCode, UserPlus, KeyRound, Pencil, Save, Share2, LayoutGrid } from 'lucide-react';
+import { X, Check, Loader2, Copy, ExternalLink, ShieldCheck, QrCode, UserPlus, KeyRound, Pencil, Save, Share2, LayoutGrid, ArrowRight } from 'lucide-react';
 import { FrameConfig } from '@/lib/types';
 import { upload } from '@vercel/blob/client';
 import { FramePreview } from './FramePreview';
@@ -11,6 +11,7 @@ import { track, withUtm } from '@/lib/analytics';
 import { organizerShareText, whatsappUrl, messengerShareUrl, prefersTagalog, hubShareText } from '@/lib/share';
 import { normalizeHandle, suggestHandleFromEmail } from '@/lib/hub';
 import { useLocale } from '@/components/i18n/LocaleProvider';
+import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 
 interface EditTarget {
     slug: string;
@@ -324,7 +325,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 <div className="flex gap-2">
                                     <a
                                         href={manageUrlForEdit}
-                                        className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all"
+                                        className={`flex-1 flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                                     >
                                         <Pencil size={17} /> Back to campaign
                                     </a>
@@ -332,7 +333,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                         href={`/c/${editTarget.slug}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
+                                        className="min-h-[48px] py-3 px-4 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors"
                                     >
                                         <ExternalLink size={17} /> View
                                     </a>
@@ -357,16 +358,16 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
                     <div className="p-6 border-t border-ink/10">
                         {frameSaved ? (
-                            <button onClick={handleClose} className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper transition-all">
-                                <Check size={20} /> Done
+                            <button onClick={handleClose} className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}>
+                                <Check size={18} /> Done
                             </button>
                         ) : (
                             <button
                                 onClick={saveFrame}
                                 disabled={savingFrame}
-                                className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
+                                className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                             >
-                                {savingFrame ? <Loader2 className="animate-spin" size={20} /> : <><Save size={20} /> Save frame</>}
+                                {savingFrame ? <Loader2 className="animate-spin" size={18} /> : <><Save size={17} /> Save frame</>}
                             </button>
                         )}
                     </div>
@@ -731,20 +732,20 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
                             <button
                                 onClick={shareWhatsApp}
-                                className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
+                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
                                 style={{ backgroundColor: WHATSAPP_GREEN }}
                             >
-                                <WhatsAppGlyph size={20} /> {tp.shareWhatsApp}
+                                <WhatsAppGlyph size={18} /> {tp.shareWhatsApp}
                             </button>
 
                             {showMessengerShare && (
                                 <div className="grid grid-cols-1 gap-2">
                                     <button
                                         onClick={shareMessenger}
-                                        className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
+                                        className="w-full min-h-[48px] py-3 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
                                         style={{ backgroundColor: '#0084FF' }}
                                     >
-                                        <Share2 size={20} /> {tp.shareMessenger}
+                                        <Share2 size={18} /> {tp.shareMessenger}
                                     </button>
                                     <p className="text-[11px] text-muted text-center leading-snug">
                                         WhatsApp and Messenger are both first-class here. Pick the app your group already uses.
@@ -780,9 +781,9 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                             {canNativeShare && (
                                 <button
                                     onClick={shareNative}
-                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-all"
+                                    className="w-full min-h-[48px] py-3 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2 bg-cream border border-ink/10 hover:bg-ink/5 text-ink transition-colors"
                                 >
-                                    <Share2 size={18} /> {tp.shareAnother}
+                                    <Share2 size={17} /> {tp.shareAnother}
                                 </button>
                             )}
 
@@ -1006,7 +1007,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                         /* Name it — title + email only; the rest waits on Manage */
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-muted uppercase tracking-wider">{tp.campaignTitle}</label>
+                                <label className="text-sm font-semibold text-ink">{tp.campaignTitle}</label>
                                 <input
                                     type="text"
                                     autoFocus
@@ -1026,7 +1027,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                 </div>
                             ) : (
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">
+                                    <label className="text-sm font-semibold text-ink">
                                         {tp.emailBack}
                                     </label>
                                     <input
@@ -1052,9 +1053,9 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                     {campaignUrl ? (
                         <button
                             onClick={handleClose}
-                            className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper transition-all"
+                            className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                         >
-                            <Check size={20} /> {linkSaved || onAccount ? tp.done : tp.saveThenDone}
+                            <Check size={18} /> {linkSaved || onAccount ? tp.done : tp.saveThenDone}
                         </button>
                     ) : (
                         <>
@@ -1066,9 +1067,9 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                         <button
                             onClick={handleCreate}
                             disabled={!title || isSubmitting}
-                            className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                         >
-                            {isSubmitting ? <Loader2 className="animate-spin" /> : <><Rocket size={20} /> {tp.createButton}</>}
+                            {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <>{tp.createButton} <ArrowRight size={17} strokeWidth={2} /></>}
                         </button>
                         </>
                     )}

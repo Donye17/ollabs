@@ -28,7 +28,7 @@ import {
     normalizeHandle,
     suggestHandleFromEmail,
 } from '@/lib/hub';
-import { ABOVE_MOBILE_NAV } from '@/lib/mobileNav';
+import { ABOVE_MOBILE_NAV, ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 import { track, withUtm } from '@/lib/analytics';
 import { hubShareText, whatsappUrl } from '@/lib/share';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
@@ -299,7 +299,7 @@ export const HubEditorClient: React.FC = () => {
                 </p>
                 <Link
                     href="/login?next=/hub"
-                    className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all"
+                    className={`inline-flex items-center justify-center gap-2 px-6 ${ORGANIZER_PRIMARY_BTN}`}
                 >
                     Sign in with a code
                 </Link>
@@ -322,7 +322,7 @@ export const HubEditorClient: React.FC = () => {
     const hubUrl = previewPath ? `${origin}${previewPath}` : null;
 
     return (
-        <div className="max-w-lg lg:max-w-6xl mx-auto lg:grid lg:grid-cols-12 lg:gap-10 lg:items-start pb-[max(5rem,calc(4rem+env(safe-area-inset-bottom)))]">
+        <div className="max-w-lg lg:max-w-6xl mx-auto lg:grid lg:grid-cols-12 lg:gap-10 lg:items-start pb-8">
             <div className="lg:col-span-6 xl:col-span-5 space-y-6">
             {/* Sticky under the site NavBar so Save never fights the thumb tab bar. */}
             <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-30 -mx-1 px-1 py-2 bg-paper/95 backdrop-blur-xl border-b border-ink/10">
@@ -331,7 +331,7 @@ export const HubEditorClient: React.FC = () => {
                         type="button"
                         onClick={() => { void save(); }}
                         disabled={saving}
-                        className="flex-1 h-11 rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 disabled:opacity-60"
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                     >
                         {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                         {saving ? 'Saving' : saveMsg || 'Save hub'}
@@ -823,7 +823,7 @@ export const HubEditorClient: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setPreviewOpen(false)}
-                            className="h-10 px-4 rounded-xl bg-ink text-paper text-sm font-bold hover:brightness-125"
+                            className="h-10 px-4 rounded-xl bg-ink text-paper text-sm font-semibold hover:bg-ink/90 transition-colors"
                         >
                             Back to editor
                         </button>

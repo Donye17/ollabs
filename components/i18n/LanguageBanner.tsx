@@ -9,7 +9,7 @@ import {
     localeLandingPath,
     type Locale,
 } from '@/lib/i18n/locale';
-import { shouldHideLanguageBanner, shouldShowMobileOrganizerNav } from '@/lib/mobileNav';
+import { shouldHideLanguageBanner, shouldShowMobileOrganizerNav, MOBILE_NAV_H } from '@/lib/mobileNav';
 import { track } from '@/lib/analytics';
 
 const DISMISS_KEY = 'ollabs_locale_banner_dismissed';
@@ -166,10 +166,15 @@ export function LanguageBanner() {
     return (
         <div
             className={`fixed inset-x-0 z-30 px-3 pointer-events-none sm:bottom-4 ${
-                aboveOrganizerNav
-                    ? 'bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))]'
-                    : 'bottom-[calc(1rem+env(safe-area-inset-bottom,0px))]'
+                aboveOrganizerNav ? '' : 'bottom-[calc(1rem+env(safe-area-inset-bottom,0px))]'
             }`}
+            style={
+                aboveOrganizerNav
+                    ? {
+                          bottom: `calc(${MOBILE_NAV_H} + 0.75rem + env(safe-area-inset-bottom, 0px))`,
+                      }
+                    : undefined
+            }
         >
             <div className="pointer-events-auto max-w-lg mx-auto bg-ink text-paper rounded-2xl px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
                 <p className="text-sm flex-1 leading-snug">{copy.suggest}</p>

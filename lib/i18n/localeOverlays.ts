@@ -62,7 +62,7 @@ const ES: DeepPartial<Messages> = {
         opaqueFrameWarning:
             'Esta imagen se ve opaca en el centro. Usa un PNG con un hueco transparente para la foto, o abre la ventana con el control de abajo.',
         createCampaign: 'Crear campaña',
-        nextNameIt: 'Siguiente: nombrar',
+        nextNameIt: 'Continuar',
         stepFrame: 'Marco',
         stepName: 'Nombre',
         stepSend: 'Enviar',
@@ -118,7 +118,7 @@ const TL: DeepPartial<Messages> = {
         opaqueFrameWarning:
             'Mukhang opaque ang gitna ng image. Gumamit ng PNG na may transparent hole para sa photo, o buksan ang photo window sa slider sa baba.',
         createCampaign: 'Gumawa ng campaign',
-        nextNameIt: 'Sunod: pangalanan',
+        nextNameIt: 'Magpatuloy',
         stepFrame: 'Frame',
         stepName: 'Pangalan',
         stepSend: 'Ipadala',

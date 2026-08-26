@@ -1,17 +1,35 @@
-"use client";
+'use client';
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MessageSquare } from 'lucide-react';
 import { BrandMark } from '@/components/BrandMark';
+import { BackControl } from '@/components/BackControl';
 
 export const NavBar: React.FC = () => {
     const pathname = usePathname() || '/';
     const onCreate = pathname === '/create' || pathname.startsWith('/create/');
+    const onHome = pathname === '/';
+    // Phones: logo alone always jumped home and wiped mid-flow work. Back keeps
+    // create / hub / mine / manage reachable without starting over.
+    const showBack = !onHome;
+    const backFallback =
+        onCreate || pathname.startsWith('/hub')
+            ? '/mine'
+            : '/';
+
     return (
         <nav className="fixed top-0 inset-x-0 z-50 border-b border-ink/10 bg-paper/90 pt-[env(safe-area-inset-top,0px)]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
-                <BrandMark size={28} />
+                <div className="flex items-center gap-0.5 min-w-0">
+                    {showBack && (
+                        <BackControl
+                            fallbackHref={backFallback}
+                            className="lg:hidden"
+                        />
+                    )}
+                    <BrandMark size={28} />
+                </div>
 
                 <div className="flex items-center gap-2 sm:gap-5 min-w-0">
                     {/* Desktop only: phones already have Mine · Create · Hub. */}

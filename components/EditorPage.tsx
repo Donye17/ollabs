@@ -8,10 +8,10 @@ import { DEFAULT_FRAME } from '@/lib/constants';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { FrameConfig } from '@/lib/types';
 import { getFlag, resolveFlagFrame } from '@/lib/flags';
-import { AlertCircle, ChevronDown, Loader2, Save, Upload } from 'lucide-react';
+import { AlertCircle, ArrowRight, ChevronDown, Loader2, Save } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
 import { useLocale } from '@/components/i18n/LocaleProvider';
-import { ABOVE_MOBILE_NAV } from '@/lib/mobileNav';
+import { ABOVE_MOBILE_NAV, ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 import { track } from '@/lib/analytics';
 // Loaded on demand (see handleRemoveBackground). This library is ~5.5MB of WASM;
 // importing it statically made every visitor to /create download it whether or
@@ -236,7 +236,8 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     };
 
     return (
-        <div className="min-h-screen bg-paper text-ink font-sans pb-[calc(9.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+        // Bottom pad is for the fixed Continue bar only. MobileNavSpacer owns the tab bar.
+        <div className="min-h-screen bg-paper text-ink font-sans pb-20 lg:pb-0">
             <NavBar />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(3.5rem+env(safe-area-inset-top,0px)+0.5rem)] pb-6 lg:py-24">
@@ -332,30 +333,33 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                         </details>
 
                         <button
+                            type="button"
                             onClick={openPublish}
-                            className="hidden lg:flex w-full min-h-[52px] items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 transition-all"
+                            className={`hidden lg:flex w-full items-center justify-center gap-2 px-4 py-3 ${ORGANIZER_PRIMARY_BTN}`}
                         >
                             {editTarget
-                                ? <><Save size={18} /> {t.saveChanges}</>
-                                : <><Upload size={18} /> {t.nextNameIt}</>}
+                                ? <><Save size={17} strokeWidth={2} /> {t.saveChanges}</>
+                                : <>{t.nextNameIt} <ArrowRight size={17} strokeWidth={2} /></>}
                         </button>
                     </div>
                 </div>
             </main>
 
-            {/* One publish action on phones — not another Create. */}
+            {/* Continues the frame step. z-30 so the thumb nav (z-40) stays
+                tappable; bottom offset must match MOBILE_NAV_H or this sits under it. */}
             <div
-                className="fixed inset-x-0 z-40 lg:hidden border-t border-ink/10 bg-paper px-4 pt-3 pb-3"
+                className="fixed inset-x-0 z-30 lg:hidden border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-2.5 pb-2.5"
                 style={{ bottom: ABOVE_MOBILE_NAV }}
             >
                 <div className="max-w-lg mx-auto">
                     <button
+                        type="button"
                         onClick={openPublish}
-                        className="w-full min-h-[52px] flex items-center justify-center gap-2 bg-brand text-ink px-4 py-3.5 rounded-xl text-base font-bold hover:brightness-105 active:brightness-95 transition-all"
+                        className={`w-full flex items-center justify-center gap-2 px-4 py-3 ${ORGANIZER_PRIMARY_BTN}`}
                     >
                         {editTarget
-                            ? <><Save size={18} /> {t.saveChanges}</>
-                            : <><Upload size={18} /> {t.nextNameIt}</>}
+                            ? <><Save size={17} strokeWidth={2} /> {t.saveChanges}</>
+                            : <>{t.nextNameIt} <ArrowRight size={17} strokeWidth={2} /></>}
                     </button>
                 </div>
             </div>

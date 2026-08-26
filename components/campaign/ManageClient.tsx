@@ -8,6 +8,8 @@ import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck, Palette, Globe } from 'lucide-react';
 import { countryLabel } from '@/lib/geo';
 import { BrandMark } from '@/components/BrandMark';
+import { BackControl } from '@/components/BackControl';
+import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 
 interface ManageData {
     slug: string;
@@ -158,8 +160,11 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     const seriesTotal = series.reduce((a, s) => a + s.n, 0);
 
     return (
-        <div className="min-h-screen bg-paper text-ink flex flex-col items-center px-4 py-8 sm:px-6">
-            <BrandMark className="mb-6" />
+        <div className="min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-6 pb-8 sm:px-6 sm:pt-8">
+            <div className="w-full max-w-lg lg:max-w-3xl flex items-center gap-1 mb-6">
+                <BackControl fallbackHref="/mine" />
+                <BrandMark />
+            </div>
 
             <div className="w-full max-w-lg lg:max-w-3xl">
                 <p className="text-sm font-semibold text-muted mb-1">Campaign</p>
@@ -407,7 +412,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
 
                             <div className="flex items-center gap-3">
                                 <button onClick={save} disabled={saving}
-                                    className="py-2.5 px-5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 transition-all disabled:opacity-50">
+                                    className={`flex items-center justify-center gap-2 px-5 ${ORGANIZER_PRIMARY_BTN}`}>
                                     {saving ? <Loader2 size={15} className="animate-spin" /> : <><Save size={15} /> Save changes</>}
                                 </button>
                                 {saveMsg && <span className="text-sm text-brand-deep font-semibold flex items-center gap-1"><Check size={15} /> {saveMsg}</span>}

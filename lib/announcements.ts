@@ -17,6 +17,18 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-25-mobile-nav',
+        date: '2026-08-25',
+        title: 'Easier mobile create',
+        summary: 'Back control on phones, Continue clear of the tab bar, and a quieter organizer menu.',
+        items: [
+            'Back chevron in the top bar on phones so you can leave Create or Hub without jumping home. Manage has the same back control.',
+            'Create Continue sits above the Mine · Create · Hub bar instead of under it.',
+            'Thumb menu uses the same paper surface and equal tabs instead of a heavy dark plate.',
+            'Organizer primary actions (Continue, Save hub, Publish) share one ink button style.',
+        ],
+    },
+    {
         id: '2026-08-24-guides',
         date: '2026-08-24',
         title: 'Organizer guides',
