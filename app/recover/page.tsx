@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { RecoverClient } from '@/components/RecoverClient';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 
 export const metadata: Metadata = {
     title: 'Find my campaigns',
@@ -13,7 +14,7 @@ export default function RecoverPage() {
     return (
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
-            <section className="pt-32 pb-8 px-6">
+            <section className={`${PAGE_TOP_UNDER_NAV} pb-8 px-6`}>
                 <div className="max-w-md mx-auto text-center">
                     <h1 className="font-display text-4xl font-extrabold mb-3">Find my campaigns</h1>
                     <p className="text-ink/70">

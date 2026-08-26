@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { pool } from '@/lib/neon';
 import { NavBar } from '@/components/NavBar';
 import { BarChart3, ExternalLink, AlertCircle } from 'lucide-react';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +65,7 @@ export default async function RecoverTokenPage({
     return (
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
-            <section className="pt-32 pb-8 px-6">
+            <section className={`${PAGE_TOP_UNDER_NAV} pb-8 px-6`}>
                 <div className="max-w-2xl mx-auto text-center">
                     <h1 className="font-display text-4xl font-extrabold mb-3">
                         {ok ? 'Your campaigns' : 'This link has expired'}

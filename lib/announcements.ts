@@ -17,6 +17,19 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-26-platform-polish',
+        date: '2026-08-26',
+        title: 'Platform polish pass',
+        summary: 'Uniform mobile chrome, clearer campaign save/share, and Guides in more footers.',
+        items: [
+            'Back on phones across organizer pages, including Manage under the shared top bar.',
+            'Create Continue, Save hub, Publish, and Sign in share one ink primary button.',
+            'Campaign save bar no longer covers Copy image; share-photo CTA matches the share sheet.',
+            'Marketing pages use notch-safe top padding and a shared footer with Guides.',
+            'Thumb menu stays off Explore, Guides, About, and other browse pages.',
+        ],
+    },
+    {
         id: '2026-08-25-mobile-nav',
         date: '2026-08-25',
         title: 'Easier mobile create',

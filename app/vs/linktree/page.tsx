@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
+import { SiteFooter } from '@/components/SiteFooter';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import { ArrowRight, Check } from 'lucide-react';
 
 const URL = 'https://ollabs.studio/vs/linktree';
@@ -25,7 +27,7 @@ export default function VsLinktreePage() {
     return (
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
-            <section className="relative pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.5rem)] pb-12 px-4 sm:px-6">
+            <section className={`relative ${PAGE_TOP_UNDER_NAV} pb-12 px-4 sm:px-6`}>
                 <div className="max-w-3xl mx-auto">
                     <h1 className="font-display text-3xl sm:text-4xl font-extrabold mb-4">Ollabs vs Linktree</h1>
                     <p className="text-base sm:text-lg text-ink/70 mb-8 leading-relaxed">
@@ -76,6 +78,8 @@ export default function VsLinktreePage() {
                     </Link>
                 </div>
             </section>
+
+            <SiteFooter />
         </main>
     );
 }

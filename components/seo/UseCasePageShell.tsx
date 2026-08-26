@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
+import { SiteFooter } from '@/components/SiteFooter';
 import { AdSlot } from '@/components/AdSlot';
-import { BrandMark } from '@/components/BrandMark';
 import { SeoCampaignExample } from '@/components/seo/SeoCampaignExample';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import type { UseCase } from '@/lib/useCases';
 import type { SeoExampleCampaign } from '@/lib/seoExampleCampaign';
 
@@ -55,7 +56,7 @@ export function UseCasePageShell({
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
             <NavBar />
 
-            <section className="relative pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.5rem)] pb-12 px-4 sm:px-6">
+            <section className={`relative ${PAGE_TOP_UNDER_NAV} pb-12 px-4 sm:px-6`}>
                 <div className="max-w-3xl mx-auto">
                     <p className="text-sm font-semibold text-muted mb-4">
                         {labels.forPrefix} {uc.audience}
@@ -202,12 +203,7 @@ export function UseCasePageShell({
                 </section>
             )}
 
-            <footer className="border-t border-ink/10 py-10 bg-paper pb-[max(1rem,env(safe-area-inset-bottom))]">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
-                    <BrandMark href="/" size={24} />
-                    <p>{labels.footerCopy}</p>
-                </div>
-            </footer>
+            <SiteFooter />
         </main>
     );
 }

@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { pool } from '@/lib/neon';
 import { NavBar } from '@/components/NavBar';
+import { SiteFooter } from '@/components/SiteFooter';
 import { visibleFrameSql } from '@/lib/frameValidity';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import { ArrowRight, Users } from 'lucide-react';
 
 export const revalidate = 900;
@@ -63,7 +65,7 @@ export default async function IndependentsPage() {
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
 
-            <section className="relative pt-32 pb-12 px-6 overflow-hidden">
+            <section className={`relative ${PAGE_TOP_UNDER_NAV} pb-12 px-6 overflow-hidden`}>
                 <div className="absolute -top-24 -right-24 w-[380px] h-[380px] rounded-full border-[42px] border-brand/15 pointer-events-none" />
                 <div className="max-w-3xl mx-auto relative z-10">
                     <h1 className="font-display text-4xl md:text-6xl font-extrabold leading-[1.03] mb-5">
@@ -175,6 +177,8 @@ export default async function IndependentsPage() {
                     </p>
                 </div>
             </section>
+
+            <SiteFooter />
         </main>
     );
 }

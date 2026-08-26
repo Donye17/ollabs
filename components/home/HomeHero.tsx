@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { HomeCreateCta } from '@/components/home/HomeCreateCta';
 import { SeoCampaignExample } from '@/components/seo/SeoCampaignExample';
 import { getSeoExampleCampaign } from '@/lib/seoExampleCampaign';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 
 /**
  * First viewport: headline, one line, one CTA, and on desktop a real framed
@@ -12,7 +13,7 @@ export async function HomeHero() {
     const example = await getSeoExampleCampaign();
 
     return (
-        <section className="relative pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] sm:pt-28 lg:pt-32 pb-10 sm:pb-14 px-4 sm:px-6">
+        <section className={`relative ${PAGE_TOP_UNDER_NAV} pb-10 sm:pb-14 px-4 sm:px-6`}>
             <div className="max-w-5xl mx-auto lg:grid lg:grid-cols-12 lg:gap-12 lg:items-center">
                 <div className="lg:col-span-6 text-center lg:text-left">
                     <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.02] mb-4 sm:mb-5 text-balance">

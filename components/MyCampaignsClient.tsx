@@ -9,6 +9,7 @@ import { track, withUtm } from '@/lib/analytics';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { CampaignGridThumb } from '@/components/CampaignGridThumb';
 import { hasVisibleFrame } from '@/lib/frameValidity';
+import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 import type { FrameConfig } from '@/lib/types';
 
 interface SavedCampaign {
@@ -292,7 +293,7 @@ export const MyCampaignsClient: React.FC = () => {
                                 Sign in with a code and every campaign you saved to it shows up here, on any device.
                                 New campaigns join your account as you create them. Supporters never sign in.
                             </p>
-                            <Link href="/login" className="inline-flex h-10 px-5 rounded-xl bg-brand text-ink font-bold text-sm items-center hover:brightness-105 transition-all">
+                            <Link href="/login" className={`inline-flex items-center justify-center gap-2 px-5 ${ORGANIZER_PRIMARY_BTN}`}>
                                 Sign in with a code
                             </Link>
                         </div>
@@ -356,7 +357,7 @@ const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRem
                         <ExternalLink size={16} className="text-ink" />
                     </a>
                     {row.manageUrl && (
-                        <a href={row.manageUrl} className="min-h-11 px-4 rounded-lg bg-brand text-ink font-semibold text-sm flex items-center gap-1.5 hover:brightness-105 active:brightness-95 transition-all justify-center" title="Edit this campaign and see its stats">
+                        <a href={row.manageUrl} className={`inline-flex items-center justify-center gap-1.5 px-4 ${ORGANIZER_PRIMARY_BTN}`} title="Edit this campaign and see its stats">
                             <Pencil size={15} /> Manage
                         </a>
                     )}
@@ -379,7 +380,7 @@ const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRem
                     <ExternalLink size={16} className="text-ink" />
                 </a>
                 {row.manageUrl && (
-                    <a href={row.manageUrl} className="min-h-11 px-4 rounded-lg bg-brand text-ink font-semibold text-sm flex items-center gap-1.5 hover:brightness-105 active:brightness-95 transition-all flex-1 justify-center" title="Edit this campaign and see its stats">
+                    <a href={row.manageUrl} className={`flex-1 inline-flex items-center justify-center gap-1.5 px-4 ${ORGANIZER_PRIMARY_BTN}`} title="Edit this campaign and see its stats">
                         <Pencil size={15} /> Manage
                     </a>
                 )}

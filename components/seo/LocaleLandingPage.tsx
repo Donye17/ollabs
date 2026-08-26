@@ -4,6 +4,7 @@ import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { HomeCreateCta } from '@/components/home/HomeCreateCta';
 import { AdSlot } from '@/components/AdSlot';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import type { LandingCopy } from '@/lib/i18n/messages';
 
 type Props = {
@@ -25,7 +26,7 @@ export function LocaleLandingPage({ t, htmlLang, extraFooterLinks }: Props) {
         <main className="min-h-screen bg-paper text-ink" lang={htmlLang}>
             <NavBar />
 
-            <section className="relative pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.5rem)] pb-12 px-4 sm:px-6 overflow-hidden">
+            <section className={`relative ${PAGE_TOP_UNDER_NAV} pb-12 px-4 sm:px-6 overflow-hidden`}>
                 <div className="absolute -top-24 -right-24 w-[380px] h-[380px] rounded-full border-[42px] border-brand/15 pointer-events-none" />
                 <div className="max-w-4xl mx-auto text-center relative z-10">
                     <span className="inline-flex items-center gap-2 rounded-full bg-cream border border-ink/10 px-4 py-1.5 text-xs font-bold text-muted mb-5">
@@ -60,7 +61,7 @@ export function LocaleLandingPage({ t, htmlLang, extraFooterLinks }: Props) {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                         {steps.map((s, i) => (
                             <div key={s.title} className="bg-cream border border-ink/10 rounded-2xl p-6 text-center">
-                                <p className="text-[11px] font-bold text-muted uppercase tracking-wider mb-1">{t.stepLabel(i + 1)}</p>
+                                <p className="text-[11px] font-semibold text-muted mb-1">{t.stepLabel(i + 1)}</p>
                                 <h3 className="font-display text-lg font-bold mb-2">{s.title}</h3>
                                 <p className="text-sm text-ink/70 leading-relaxed">{s.body}</p>
                             </div>

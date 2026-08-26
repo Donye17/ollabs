@@ -91,7 +91,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             {imageObject && (
                 <div className="w-full bg-cream p-5 rounded-2xl border border-ink/10 backdrop-blur-xl space-y-5 animate-in slide-in-from-bottom-4 duration-500">
                     <div className="flex justify-between items-center px-1">
-                        <h4 className="text-xs font-bold font-heading text-muted uppercase tracking-widest">Adjust Base Image</h4>
+                        <h4 className="text-sm font-semibold text-muted">Adjust Base Image</h4>
                     </div>
 
                     {/* Magic Tools */}

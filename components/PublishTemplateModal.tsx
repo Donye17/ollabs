@@ -351,7 +351,11 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                         image people see when your link is shared. Otherwise the old one stays.
                                     </p>
                                 )}
-                                {frameError && <p className="text-sm text-red-600 text-center">{frameError}</p>}
+                                {frameError && (
+                                    <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center">
+                                        {frameError}
+                                    </p>
+                                )}
                             </>
                         )}
                     </div>
@@ -840,7 +844,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                     type="button"
                                     onClick={manualClaimHub}
                                     disabled={hubClaiming}
-                                    className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand text-ink hover:brightness-105 disabled:opacity-60 transition-all"
+                                    className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                                 >
                                     {hubClaiming ? <Loader2 size={16} className="animate-spin" /> : <LayoutGrid size={16} />}
                                     {hubClaiming ? tp.claimingHub : tp.claimHub}
@@ -905,11 +909,15 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                                     className="w-full bg-paper border border-ink/10 rounded-xl pl-10 pr-4 py-3 text-ink tracking-[0.35em] font-semibold placeholder:tracking-normal placeholder:font-normal placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
                                                 />
                                             </div>
-                                            {accountError && <p className="text-xs text-coral">{accountError}</p>}
+                                            {accountError && (
+                                                <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5">
+                                                    {accountError}
+                                                </p>
+                                            )}
                                             <button
                                                 onClick={verifyAccountCode}
                                                 disabled={accountStep === 'verifying' || accountCode.length !== 6}
-                                                className="w-full min-h-[44px] py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
+                                                className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                                             >
                                                 {accountStep === 'verifying' ? <><Loader2 size={15} className="animate-spin" /> …</> : tp.saveMyCampaign}
                                             </button>
@@ -934,11 +942,15 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                                                 placeholder="you@organization.org"
                                                 className="w-full bg-paper border border-ink/10 rounded-xl px-4 py-3 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all"
                                             />
-                                            {accountError && <p className="text-xs text-coral">{accountError}</p>}
+                                            {accountError && (
+                                                <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5">
+                                                    {accountError}
+                                                </p>
+                                            )}
                                             <button
                                                 onClick={sendAccountCode}
                                                 disabled={accountStep === 'sending' || !accountEmail}
-                                                className="w-full min-h-[44px] py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
+                                                className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                                             >
                                                 {accountStep === 'sending' ? <><Loader2 size={15} className="animate-spin" /> …</> : tp.emailCode}
                                             </button>

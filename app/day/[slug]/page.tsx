@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { pool } from '@/lib/neon';
 import { NavBar } from '@/components/NavBar';
+import { SiteFooter } from '@/components/SiteFooter';
 import { DayFrameTool } from '@/components/day/DayFrameTool';
 import { DAYS, getDay, nextOccurrence, formatOccurrence, countdownLabel, resolveFrame } from '@/lib/days';
 import { FrameType } from '@/lib/types';
@@ -10,6 +11,7 @@ import { getUseCase } from '@/lib/useCases';
 import { visibleFrameSql } from '@/lib/frameValidity';
 import { getFrameOverride } from '@/lib/dayFrames';
 import { AdSlot } from '@/components/AdSlot';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import { ArrowRight, CalendarDays, Users } from 'lucide-react';
 import { DayShareButton } from '@/components/day/DayShareButton';
 import { SeoCampaignExample } from '@/components/seo/SeoCampaignExample';
@@ -141,7 +143,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             <NavBar />
 
             {/* Hero */}
-            <section className="relative pt-32 pb-12 px-6">
+            <section className={`relative ${PAGE_TOP_UNDER_NAV} pb-12 px-6`}>
                 <div className="max-w-3xl mx-auto">
                     <div className="flex flex-wrap items-center gap-3 mb-6">
                         <span className="text-sm font-semibold text-muted inline-flex items-center gap-1.5">
@@ -407,6 +409,8 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                     )}
                 </div>
             </section>
+
+            <SiteFooter />
         </main>
     );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { NavBar } from '@/components/NavBar';
 import { ManageClient } from '@/components/campaign/ManageClient';
 
 export const dynamic = 'force-dynamic';
@@ -11,5 +12,10 @@ export const metadata: Metadata = {
 
 export default async function ManagePage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    return <ManageClient slug={slug} />;
+    return (
+        <main className="min-h-screen bg-paper text-ink">
+            <NavBar />
+            <ManageClient slug={slug} />
+        </main>
+    );
 }

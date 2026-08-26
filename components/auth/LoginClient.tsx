@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, KeyRound, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { track } from '@/lib/analytics';
+import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 
 type Step = 'email' | 'code' | 'done';
 
@@ -103,7 +104,7 @@ export const LoginClient: React.FC = () => {
                 <button
                     type="button"
                     onClick={() => { setStep('email'); setError(null); }}
-                    className="text-xs font-bold text-muted hover:text-brand-deep flex items-center gap-1.5 mb-5 transition-colors"
+                    className="text-xs font-semibold text-muted hover:text-brand-deep flex items-center gap-1.5 mb-5 transition-colors"
                 >
                     <ArrowLeft size={14} /> Use a different email
                 </button>
@@ -112,7 +113,7 @@ export const LoginClient: React.FC = () => {
                     Enter the 6 digit code sent to <span className="font-semibold text-ink">{email}</span>.
                 </p>
 
-                <label htmlFor="login-code" className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
+                <label htmlFor="login-code" className="block text-sm font-semibold text-ink mb-2">
                     Your code
                 </label>
                 <div className="relative mb-4">
@@ -133,12 +134,16 @@ export const LoginClient: React.FC = () => {
                     />
                 </div>
 
-                {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
+                {error && (
+                    <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 mb-4">
+                        {error}
+                    </p>
+                )}
 
                 <button
                     type="submit"
                     disabled={busy || code.length !== 6}
-                    className="w-full h-12 rounded-xl bg-brand text-ink font-bold hover:brightness-105 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                    className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                 >
                     {busy && <Loader2 className="w-4 h-4 animate-spin" />}
                     {busy ? 'Checking' : 'Sign in'}
@@ -147,8 +152,9 @@ export const LoginClient: React.FC = () => {
                 <p className="text-xs text-muted mt-4 leading-relaxed">
                     The code expires in 10 minutes. Didn&apos;t get it? Check spam, or{' '}
                     <button type="button" onClick={requestCode} className="text-brand-deep font-semibold hover:underline">
-                        send a new one
-                    </button>.
+                        send a new code
+                    </button>
+                    .
                 </p>
             </form>
         );
@@ -156,8 +162,8 @@ export const LoginClient: React.FC = () => {
 
     return (
         <form onSubmit={requestCode} className="max-w-md mx-auto bg-cream border border-ink/10 rounded-2xl p-8">
-            <label htmlFor="login-email" className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
-                Your email
+            <label htmlFor="login-email" className="block text-sm font-semibold text-ink mb-2">
+                Email
             </label>
             <div className="relative mb-4">
                 <Mail className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -166,6 +172,7 @@ export const LoginClient: React.FC = () => {
                     type="email"
                     required
                     autoComplete="email"
+                    autoFocus
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@organization.org"
@@ -173,21 +180,23 @@ export const LoginClient: React.FC = () => {
                 />
             </div>
 
-            {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
+            {error && (
+                <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 mb-4">
+                    {error}
+                </p>
+            )}
 
             <button
                 type="submit"
                 disabled={busy}
-                className="w-full h-12 rounded-xl bg-brand text-ink font-bold hover:brightness-105 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
             >
                 {busy && <Loader2 className="w-4 h-4 animate-spin" />}
                 {busy ? 'Sending' : 'Email me a code'}
             </button>
 
             <p className="text-xs text-muted mt-4 leading-relaxed">
-                No password to remember. You get a 6 digit code by email and type it back in here, which
-                works even when you opened Ollabs from inside another app. Any campaign you created with
-                this address gets added to your account automatically.
+                We email a 6 digit code. No password. Supporters never sign in.
             </p>
         </form>
     );

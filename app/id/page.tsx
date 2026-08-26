@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { getMessages } from '@/lib/i18n/messages';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 
 export default function IndonesianLandingPage() {
     const t = getMessages('id').landingId;
@@ -18,7 +19,7 @@ export default function IndonesianLandingPage() {
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
 
-            <section className="relative pt-32 pb-16 px-6 overflow-hidden">
+            <section className={`relative ${PAGE_TOP_UNDER_NAV} pb-16 px-6 overflow-hidden`}>
                 <div className="absolute -top-24 -right-24 w-[380px] h-[380px] rounded-full border-[42px] border-brand/15 pointer-events-none" />
                 <div className="absolute top-28 right-24 w-16 h-16 rounded-full bg-coral/80 pointer-events-none hidden sm:block" />
 
@@ -57,7 +58,7 @@ export default function IndonesianLandingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {steps.map((s, i) => (
                             <div key={s.title} className="bg-cream border border-ink/10 rounded-2xl p-7 text-center">
-                                <p className="text-[11px] font-bold text-muted uppercase tracking-wider mb-1">
+                                <p className="text-[11px] font-semibold text-muted mb-1">
                                     {t.stepLabel(i + 1)}
                                 </p>
                                 <h3 className="font-display text-lg font-bold mb-2">{s.title}</h3>

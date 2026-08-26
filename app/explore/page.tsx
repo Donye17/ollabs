@@ -2,13 +2,14 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { NavBar } from '@/components/NavBar';
-import { BrandMark } from '@/components/BrandMark';
+import { SiteFooter } from '@/components/SiteFooter';
 import { ExploreClient, ExploreCampaign } from '@/components/ExploreClient';
 import { FrameConfig } from '@/lib/types';
 import { pool } from '@/lib/neon';
 import { CATEGORIES, CATEGORY_KEYS } from '@/lib/categories';
 import { visibleFrameSql } from '@/lib/frameValidity';
 import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 
 export const revalidate = 300;
 
@@ -119,7 +120,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
 
-            <section className="pt-32 pb-8 px-6">
+            <section className={`${PAGE_TOP_UNDER_NAV} pb-8 px-6`}>
                 <div className="max-w-3xl mx-auto text-center">
                     <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">Explore campaigns</h1>
                     <p className="text-lg text-ink/70 max-w-2xl mx-auto">Real campaigns people are rallying behind right now. Add one to your photo, or start your own.</p>
@@ -177,18 +178,15 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
                 </div>
             </section>
 
-            <section className="px-6 pb-24">
-                <div className="max-w-3xl mx-auto text-center">
-                    <Link href="/create" className="inline-flex h-12 px-8 rounded-xl bg-ink text-paper font-bold items-center hover:brightness-125 transition-all">Start your own campaign</Link>
-                </div>
-            </section>
+            {campaigns.length > 0 && (
+                <section className="px-6 pb-24">
+                    <div className="max-w-3xl mx-auto text-center">
+                        <Link href="/create" className="inline-flex h-12 px-8 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">Start your own campaign</Link>
+                    </div>
+                </section>
+            )}
 
-            <footer className="border-t border-ink/10 py-10 bg-paper">
-                <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
-                    <BrandMark href="/" size={24} />
-                    <p>&copy; 2026 Ollabs. Bring your people together.</p>
-                </div>
-            </footer>
+            <SiteFooter />
         </main>
     );
 }

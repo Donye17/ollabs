@@ -41,7 +41,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     const [pos, setPos] = useState({ x: 0, y: 0 });
     const [count, setCount] = useState(initialCount);
     const [downloading, setDownloading] = useState(false);
-    const [copied, setCopied] = useState(false);
+    const [linkCopied, setLinkCopied] = useState(false);
     const [imgTick, setImgTick] = useState(0);
     const [dragOver, setDragOver] = useState(false);
     // An alert() covers the page and, in an in-app browser, can be dismissed by
@@ -50,7 +50,6 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [justDownloaded, setJustDownloaded] = useState(false);
     const [canNativeShare, setCanNativeShare] = useState(false);
-    const [linkCopied, setLinkCopied] = useState(false);
     const [showQR, setShowQR] = useState(false);
     const [pageUrl, setPageUrl] = useState(`https://ollabs.studio/c/${slug}`);
     const [reportOpen, setReportOpen] = useState(false);
@@ -412,16 +411,18 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         }
         try {
             await navigator.clipboard.writeText(shareUrl());
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
+            setLinkCopied(true);
+            setTimeout(() => setLinkCopied(false), 1500);
         } catch { /* clipboard unavailable */ }
     };
 
     // Adjust = photo loaded, not yet saved. Post-save = viral share screen.
     // Empty = upload. Chrome stays out of the way once they are fitting a face.
     const adjusting = hasImage && !justDownloaded;
+    // Fixed save bar is primary + optional Download + hint + error. Undersizing
+    // this parks Copy image / ads under the thumb zone on Android.
     const bottomPad = adjusting
-        ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))]'
+        ? 'pb-[calc(12rem+env(safe-area-inset-bottom,0px))]'
         : 'pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]';
 
     return (
@@ -521,24 +522,39 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     </button>
                 )}
 
-                {/* A2: post-save. Framed result stays above; WhatsApp leads; story next. */}
+                {/* Post-save: framed result stays above. Share sheet leads when
+                    available (iOS in-app); WhatsApp link is the explicit chat path. */}
                 {justDownloaded && (
                     <div className="w-full space-y-3 animate-fade-in">
+                        {saveError && (
+                            <div role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center space-y-2">
+                                <p>{saveError}</p>
+                                {isIOS() && (
+                                    <a
+                                        href={pageUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex min-h-[40px] items-center rounded-lg bg-ink px-4 text-sm font-semibold text-paper"
+                                    >
+                                        {t.openInSafari}
+                                    </a>
+                                )}
+                            </div>
+                        )}
                         {canSharePhoto ? (
                             <button
                                 onClick={handleSharePhoto}
                                 disabled={sharingPhoto}
-                                className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all disabled:opacity-50"
-                                style={{ backgroundColor: WHATSAPP_GREEN }}
+                                className="w-full min-h-[52px] py-3.5 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2.5 bg-ink text-paper hover:bg-ink/90 active:bg-ink/80 transition-colors disabled:opacity-50"
                             >
                                 {sharingPhoto
                                     ? <Loader2 size={20} className="animate-spin" />
-                                    : <><WhatsAppGlyph size={20} /> {t.sharePhoto}</>}
+                                    : <><ImageDown size={20} /> {t.sharePhoto}</>}
                             </button>
                         ) : (
                             <button
                                 onClick={() => openShare('whatsapp')}
-                                className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
+                                className="w-full min-h-[52px] py-3.5 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
                                 style={{ backgroundColor: WHATSAPP_GREEN }}
                             >
                                 <WhatsAppGlyph size={20} /> {t.shareWhatsApp}
@@ -548,7 +564,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                         <button
                             onClick={handleShareStory}
                             disabled={sharingStory}
-                            className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-all disabled:opacity-50"
+                            className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors disabled:opacity-50"
                         >
                             {sharingStory
                                 ? <Loader2 size={16} className="animate-spin" />
@@ -558,7 +574,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                         {canSharePhoto && (
                             <button
                                 onClick={() => openShare('whatsapp')}
-                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-all"
+                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
                             >
                                 <WhatsAppGlyph size={16} /> {t.shareLinkWhatsApp}
                             </button>
@@ -567,8 +583,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                         {(prefersTagalog() || locale === 'id') && (
                             <button
                                 onClick={() => openShare('messenger')}
-                                className="w-full min-h-[48px] py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white hover:brightness-105 active:brightness-95 transition-all"
-                                style={{ backgroundColor: '#0084FF' }}
+                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-[#0084FF]/40 bg-[#0084FF]/10 text-ink hover:bg-[#0084FF]/15 transition-colors"
                             >
                                 {t.shareMessenger}
                             </button>
@@ -578,7 +593,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                             {canNativeShare && (
                                 <button
                                     onClick={handleShare}
-                                    className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 transition-all"
+                                    className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-ink text-paper hover:bg-ink/90 transition-colors"
                                 >
                                     <Share2 size={15} /> {t.shareAnother}
                                 </button>
@@ -740,9 +755,9 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                                         href={pageUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex min-h-[40px] items-center rounded-lg bg-ink px-4 font-bold text-paper"
+                                        className="inline-flex min-h-[40px] items-center rounded-lg bg-ink px-4 font-semibold text-paper"
                                     >
-                                        Open in Safari
+                                        {t.openInSafari}
                                     </a>
                                 )}
                             </div>

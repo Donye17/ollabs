@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
+import { SiteFooter } from '@/components/SiteFooter';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import { ArrowRight, Check, X } from 'lucide-react';
 
 const URL = 'https://ollabs.studio/vs/twibbonize';
@@ -126,7 +128,7 @@ export default function VsTwibbonizePage() {
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
             <NavBar />
 
-            <section className="relative pt-32 pb-14 px-6 overflow-hidden">
+            <section className={`relative ${PAGE_TOP_UNDER_NAV} pb-14 px-6 overflow-hidden`}>
                 <div className="absolute -top-24 -right-24 w-[380px] h-[380px] rounded-full border-[42px] border-brand/15 pointer-events-none" />
                 <div className="max-w-3xl mx-auto relative z-10">
                     <span className="inline-flex items-center gap-2 rounded-full bg-cream border border-ink/10 px-4 py-1.5 text-xs font-bold text-muted mb-6">
@@ -253,6 +255,8 @@ export default function VsTwibbonizePage() {
                     </Link>
                 </div>
             </section>
+
+            <SiteFooter />
         </main>
     );
 }

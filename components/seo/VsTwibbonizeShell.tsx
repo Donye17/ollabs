@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
+import { SiteFooter } from '@/components/SiteFooter';
 import { AdSlot } from '@/components/AdSlot';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import { ArrowRight, Check, X } from 'lucide-react';
 import type { VsCopy } from '@/lib/vsTwibbonizeCopy';
 
@@ -20,7 +22,7 @@ export function VsTwibbonizeShell({ copy }: { copy: VsCopy; canonical?: string }
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
             <NavBar />
 
-            <section className="relative pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.5rem)] pb-12 px-4 sm:px-6 overflow-hidden">
+            <section className={`relative ${PAGE_TOP_UNDER_NAV} pb-12 px-4 sm:px-6 overflow-hidden`}>
                 <div className="absolute -top-24 -right-24 w-[380px] h-[380px] rounded-full border-[42px] border-brand/15 pointer-events-none" />
                 <div className="max-w-3xl mx-auto relative z-10">
                     <span className="inline-flex items-center gap-2 rounded-full bg-cream border border-ink/10 px-4 py-1.5 text-xs font-bold text-muted mb-5">
@@ -108,7 +110,7 @@ export function VsTwibbonizeShell({ copy }: { copy: VsCopy; canonical?: string }
                 </div>
             </section>
 
-            <section className="px-4 sm:px-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
+            <section className="px-4 sm:px-6 pb-8">
                 <div className="max-w-3xl mx-auto bg-cream border border-ink/10 rounded-3xl p-8 sm:p-10 text-center">
                     <h2 className="font-display text-2xl sm:text-3xl font-extrabold mb-3">{copy.tryTitle}</h2>
                     <p className="text-ink/70 mb-7 max-w-xl mx-auto">{copy.tryBody}</p>
@@ -121,6 +123,8 @@ export function VsTwibbonizeShell({ copy }: { copy: VsCopy; canonical?: string }
                     </Link>
                 </div>
             </section>
+
+            <SiteFooter />
         </main>
     );
 }

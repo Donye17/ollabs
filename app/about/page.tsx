@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 
 export const metadata: Metadata = {
     title: 'About',
@@ -22,8 +23,8 @@ export default function AboutPage() {
     return (
         <div className="min-h-screen bg-paper text-ink font-sans">
             <NavBar />
-            <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.5rem)] pb-[max(4rem,env(safe-area-inset-bottom))]">
-                <p className="text-xs font-bold uppercase tracking-wider text-brand-deep mb-2">
+            <main className={`max-w-3xl mx-auto px-4 sm:px-6 ${PAGE_TOP_UNDER_NAV} pb-[max(4rem,env(safe-area-inset-bottom))]`}>
+                <p className="text-sm font-semibold text-muted mb-2">
                     About
                 </p>
                 <h1 className="font-display text-3xl sm:text-4xl font-extrabold mb-4">

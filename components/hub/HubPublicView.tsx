@@ -246,7 +246,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                     <AdSlot surface="seo" />
                 </div>
 
-                <HubMadeWithFooter className="mt-12 pb-[max(1rem,env(safe-area-inset-bottom))]" />
+                <HubMadeWithFooter className="mt-12" />
             </div>
         </div>
     );

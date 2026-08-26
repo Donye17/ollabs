@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Mail, CheckCircle2, Loader2 } from 'lucide-react';
 import { track } from '@/lib/analytics';
+import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 
 export const RecoverClient: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -48,7 +49,7 @@ export const RecoverClient: React.FC = () => {
 
     return (
         <form onSubmit={submit} className="max-w-md mx-auto bg-cream border border-ink/10 rounded-2xl p-8">
-            <label htmlFor="recover-email" className="block text-xs font-bold uppercase tracking-wider text-muted mb-2">
+            <label htmlFor="recover-email" className="block text-sm font-semibold text-ink mb-2">
                 Your email
             </label>
             <div className="relative mb-4">
@@ -64,11 +65,15 @@ export const RecoverClient: React.FC = () => {
                     className="w-full h-12 pl-10 pr-4 rounded-xl border border-ink/15 bg-paper text-ink placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-brand"
                 />
             </div>
-            {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
+            {error && (
+                <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 mb-4">
+                    {error}
+                </p>
+            )}
             <button
                 type="submit"
                 disabled={state === 'sending'}
-                className="w-full h-12 rounded-xl bg-brand text-ink font-bold hover:brightness-105 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
             >
                 {state === 'sending' && <Loader2 className="w-4 h-4 animate-spin" />}
                 {state === 'sending' ? 'Sending' : 'Email me my campaigns'}

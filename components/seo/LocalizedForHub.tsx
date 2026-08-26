@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
+import { SiteFooter } from '@/components/SiteFooter';
 import { AdSlot } from '@/components/AdSlot';
-import { BrandMark } from '@/components/BrandMark';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import type { UseCase } from '@/lib/useCases';
 
 type LocalizedForHubProps = {
@@ -20,12 +21,11 @@ export function LocalizedForHub({
     title,
     intro,
     linkLabel,
-    footerCopy,
 }: LocalizedForHubProps) {
     return (
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
-            <section className="px-6 pb-10 pt-32">
+            <section className={`${PAGE_TOP_UNDER_NAV} pb-10 px-6`}>
                 <div className="mx-auto max-w-3xl text-center">
                     <h1 className="mb-4 font-display text-4xl font-extrabold md:text-5xl">{title}</h1>
                     <p className="text-lg text-ink/70">{intro}</p>
@@ -56,12 +56,7 @@ export function LocalizedForHub({
                 </div>
             </section>
 
-            <footer className="border-t border-ink/10 bg-paper py-10">
-                <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-xs text-muted sm:flex-row">
-                    <BrandMark href="/" size={24} />
-                    <p>{footerCopy}</p>
-                </div>
-            </footer>
+            <SiteFooter />
         </main>
     );
 }

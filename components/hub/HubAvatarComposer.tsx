@@ -6,6 +6,7 @@ import { FrameRendererFactory } from '@/components/renderer/FrameRendererFactory
 import { FrameConfig } from '@/lib/types';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { Loader2, Upload, X } from 'lucide-react';
+import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 
 const CANVAS = 768;
 
@@ -209,7 +210,7 @@ export function HubAvatarComposer({ open, campaigns, onClose, onDone }: Props) {
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink/50 p-0 sm:p-4">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-ink/50 p-0 sm:p-4">
             <div
                 ref={dialogRef}
                 role="dialog"
@@ -347,7 +348,7 @@ export function HubAvatarComposer({ open, campaigns, onClose, onDone }: Props) {
                             type="button"
                             onClick={() => void usePhoto()}
                             disabled={!hasImage || !frame || busy || campaigns.length === 0}
-                            className="w-full min-h-[52px] rounded-xl bg-brand text-ink font-bold flex items-center justify-center gap-2 hover:brightness-105 disabled:opacity-50"
+                            className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                         >
                             {busy ? <Loader2 size={18} className="animate-spin" /> : 'Use as hub photo'}
                         </button>

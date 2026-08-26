@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
+import { SiteFooter } from '@/components/SiteFooter';
 import { USE_CASES } from '@/lib/useCases';
 import { AdSlot } from '@/components/AdSlot';
-import { BrandMark } from '@/components/BrandMark';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 
 export const metadata: Metadata = {
     title: 'Who uses Ollabs | Profile picture frame campaigns',
@@ -28,7 +29,7 @@ export default function ForHub() {
     return (
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
-            <section className="pt-32 pb-10 px-6">
+            <section className={`${PAGE_TOP_UNDER_NAV} pb-10 px-6`}>
                 <div className="max-w-3xl mx-auto text-center">
                     <h1 className="font-display text-4xl md:text-5xl font-extrabold mb-4">Made for bringing people together</h1>
                     <p className="text-lg text-ink/70">However you rally your people, Ollabs makes it one frame and one link. Pick your world.</p>
@@ -52,12 +53,7 @@ export default function ForHub() {
                 </div>
             </section>
 
-            <footer className="border-t border-ink/10 py-10 bg-paper">
-                <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
-                    <BrandMark href="/" size={24} />
-                    <p>&copy; 2026 Ollabs. Bring your people together.</p>
-                </div>
-            </footer>
+            <SiteFooter />
         </main>
     );
 }

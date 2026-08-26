@@ -20,6 +20,7 @@ export type Messages = {
         saveOrShare: string;
         savePhotoHint: string;
         savePhotoUnavailable: string;
+        openInSafari: string;
         download: string;
         downloadedAgain: string;
         copyImage: string;
@@ -323,6 +324,7 @@ const en: Messages = {
         saveOrShare: 'Save or share photo',
         savePhotoHint: 'In the sheet, tap Save Image to add it to your Photos app.',
         savePhotoUnavailable: 'Could not save here. Open this page in Safari, then try again.',
+        openInSafari: 'Open in Safari',
         download: 'Download',
         downloadedAgain: 'Downloaded, download again',
         copyImage: 'Copy image',
@@ -484,6 +486,7 @@ const pt: Messages = {
         saveOrShare: 'Salvar ou compartilhar foto',
         savePhotoHint: 'Na folha de compartilhamento, toque em Salvar imagem para ir às Fotos.',
         savePhotoUnavailable: 'Não deu para salvar aqui. Abra no Safari e tente de novo.',
+        openInSafari: 'Abrir no Safari',
         download: 'Baixar',
         downloadedAgain: 'Baixado, baixar de novo',
         copyImage: 'Copiar imagem',
@@ -647,6 +650,7 @@ const id: Messages = {
         saveOrShare: 'Simpan atau bagikan foto',
         savePhotoHint: 'Di lembar bagikan, ketuk Simpan Gambar untuk masuk ke Foto.',
         savePhotoUnavailable: 'Tidak bisa simpan di sini. Buka di Safari, lalu coba lagi.',
+        openInSafari: 'Buka di Safari',
         download: 'Unduh',
         downloadedAgain: 'Sudah diunduh, unduh lagi',
         copyImage: 'Salin gambar',

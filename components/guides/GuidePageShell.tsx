@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
+import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import type { Guide } from '@/lib/guides';
 import { GUIDES } from '@/lib/guides';
 
@@ -25,7 +26,7 @@ export function GuidePageShell({ guide }: Props) {
         <div className="min-h-screen bg-paper text-ink font-sans">
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
             <NavBar />
-            <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.5rem)] pb-[max(4rem,env(safe-area-inset-bottom))]">
+            <main className={`max-w-3xl mx-auto px-4 sm:px-6 ${PAGE_TOP_UNDER_NAV} pb-[max(4rem,env(safe-area-inset-bottom))]`}>
                 <p className="text-sm font-semibold text-muted mb-2">Guide</p>
                 <h1 className="font-display text-3xl sm:text-4xl font-extrabold mb-4">{guide.title}</h1>
                 <p className="text-[15px] sm:text-base text-ink/75 leading-relaxed mb-10">{guide.subtitle}</p>

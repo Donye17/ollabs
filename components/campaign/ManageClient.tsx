@@ -7,9 +7,7 @@ import { track, withUtm } from '@/lib/analytics';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck, Palette, Globe } from 'lucide-react';
 import { countryLabel } from '@/lib/geo';
-import { BrandMark } from '@/components/BrandMark';
-import { BackControl } from '@/components/BackControl';
-import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
+import { ORGANIZER_PRIMARY_BTN, PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 
 interface ManageData {
     slug: string;
@@ -160,12 +158,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     const seriesTotal = series.reduce((a, s) => a + s.n, 0);
 
     return (
-        <div className="min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-6 pb-8 sm:px-6 sm:pt-8">
-            <div className="w-full max-w-lg lg:max-w-3xl flex items-center gap-1 mb-6">
-                <BackControl fallbackHref="/mine" />
-                <BrandMark />
-            </div>
-
+        <div className={`flex flex-col items-center px-4 pb-8 sm:px-6 ${PAGE_TOP_UNDER_NAV}`}>
             <div className="w-full max-w-lg lg:max-w-3xl">
                 <p className="text-sm font-semibold text-muted mb-1">Campaign</p>
 
@@ -357,7 +350,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                             </div>
                             <a
                                 href={`/create?edit=${encodeURIComponent(currentSlug)}&k=${encodeURIComponent(token || '')}`}
-                                className="inline-flex min-h-11 px-5 rounded-xl font-semibold text-sm items-center justify-center gap-2 bg-brand text-ink hover:brightness-105 transition-all"
+                                className={`inline-flex items-center justify-center gap-2 px-5 ${ORGANIZER_PRIMARY_BTN}`}
                             >
                                 <Palette size={15} /> Change the frame
                             </a>
@@ -416,7 +409,11 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                     {saving ? <Loader2 size={15} className="animate-spin" /> : <><Save size={15} /> Save changes</>}
                                 </button>
                                 {saveMsg && <span className="text-sm text-brand-deep font-semibold flex items-center gap-1"><Check size={15} /> {saveMsg}</span>}
-                                {saveErr && <span className="text-sm text-coral font-semibold">{saveErr}</span>}
+                                {saveErr && (
+                                    <span role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-lg px-2.5 py-1.5 font-semibold">
+                                        {saveErr}
+                                    </span>
+                                )}
                             </div>
                         </section>
 

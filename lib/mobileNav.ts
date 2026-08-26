@@ -14,16 +14,22 @@ export const ABOVE_MOBILE_NAV =
     `calc(${MOBILE_NAV_H} + env(safe-area-inset-bottom, 0px))` as const;
 
 /**
- * Primary organizer action: Continue, Save hub, Publish.
+ * Primary organizer action: Continue, Save hub, Publish, Sign in.
  * Ink fill, 48px, semibold. Brand stays for marketing CTAs and accents.
  */
 export const ORGANIZER_PRIMARY_BTN =
     'min-h-[48px] rounded-xl bg-ink text-paper text-[15px] font-semibold hover:bg-ink/90 active:bg-ink/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
 
+/**
+ * Top padding under the fixed NavBar (notch-safe). Paste into className.
+ * sm: matches NavBar h-16.
+ */
+export const PAGE_TOP_UNDER_NAV =
+    'pt-[calc(3.5rem+env(safe-area-inset-top,0px)+1.25rem)] sm:pt-[calc(4rem+env(safe-area-inset-top,0px)+1.5rem)]' as const;
 
 /**
  * Organizer thumb nav only. Supporters on /c and visitors on /u or SEO pages
- * should not see Mine · Create · Hub — it steals thumb space from Save/Share
+ * should not see Mine · Create · Hub. It steals thumb space from Save/Share
  * and implies the wrong product job.
  */
 export function shouldShowMobileOrganizerNav(pathname: string): boolean {
@@ -37,11 +43,13 @@ export function shouldShowMobileOrganizerNav(pathname: string): boolean {
     // Public hub pages.
     if (path.startsWith('/u/')) return false;
 
-    // Marketing / SEO surfaces — keep them lean.
+    // Marketing / SEO surfaces. Keep them lean.
     if (path === '/for' || path.startsWith('/for/')) return false;
     if (path === '/day' || path.startsWith('/day/')) return false;
     if (path === '/vs' || path.startsWith('/vs/')) return false;
+    if (path === '/guides' || path.startsWith('/guides/')) return false;
     if (path === '/privacy' || path === '/terms') return false;
+    if (path === '/about' || path === '/updates' || path === '/explore') return false;
 
     const localeRoots = ['/pt', '/id', '/tl', '/hi', '/es'] as const;
     for (const root of localeRoots) {
@@ -54,13 +62,15 @@ export function shouldShowMobileOrganizerNav(pathname: string): boolean {
 /**
  * Language offer must never cover a thumb-zone save/publish bar.
  * Soft offer stays on home and browse; hide wherever a primary bottom CTA lives.
- * Public /c is included so Save/Share stays unobstructed on phones.
+ * All /c routes (public + manage) so Save stays clear.
  */
 export function shouldHideLanguageBanner(pathname: string): boolean {
     const path = pathname || '/';
-    if (path.startsWith('/c/') && !path.includes('/manage')) return true;
+    if (path.startsWith('/c/')) return true;
     if (path === '/create' || path.startsWith('/create/')) return true;
     if (path === '/hub' || path.startsWith('/hub/')) return true;
     if (path.startsWith('/day/')) return true;
+    if (path === '/login' || path.startsWith('/login')) return true;
+    if (path === '/recover' || path.startsWith('/recover')) return true;
     return false;
 }
