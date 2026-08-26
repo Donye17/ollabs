@@ -272,6 +272,55 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         };
     }, [isOpen, handleClose]);
 
+    // Must stay above any early return. Returning null while closed, then
+    // mounting this useCallback on open, crashes React with a client-side
+    // exception (Continue on /create).
+    const claimHubForCampaign = useCallback(async (opts: {
+        campaignId: string;
+        existingHandle: string | null;
+        emailForSuggest: string | null;
+        campaignTitle: string;
+    }) => {
+        const handle =
+            opts.existingHandle
+            || (opts.emailForSuggest ? suggestHandleFromEmail(opts.emailForSuggest) : '');
+        const normalized = normalizeHandle(handle);
+        if (!normalized) return null;
+
+        setHubClaiming(true);
+        setHubClaimError(null);
+        try {
+            const body: Record<string, unknown> = {
+                featuredCampaignId: opts.campaignId,
+            };
+            // Only send handle when claiming for the first time. Re-claiming an
+            // existing hub would overwrite a custom handle they already chose.
+            if (!opts.existingHandle) {
+                body.handle = normalized;
+                body.displayName = opts.campaignTitle.slice(0, 60) || normalized;
+            }
+            const res = await fetch('/api/organizer/hub', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                setHubClaimError(data?.error || 'Could not claim your hub.');
+                return null;
+            }
+            const live = (data?.handle as string | null) || normalized;
+            setHubHandle(live);
+            track('hub_claimed', { handle: live, from: 'publish' });
+            return live;
+        } catch {
+            setHubClaimError('Could not reach the server to claim your hub.');
+            return null;
+        } finally {
+            setHubClaiming(false);
+        }
+    }, []);
+
     if (!isOpen) return null;
 
     // Clicking the dimmed area closes, but only when the press started there:
@@ -379,52 +428,6 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             </div>
         );
     }
-
-    const claimHubForCampaign = useCallback(async (opts: {
-        campaignId: string;
-        existingHandle: string | null;
-        emailForSuggest: string | null;
-        campaignTitle: string;
-    }) => {
-        const handle =
-            opts.existingHandle
-            || (opts.emailForSuggest ? suggestHandleFromEmail(opts.emailForSuggest) : '');
-        const normalized = normalizeHandle(handle);
-        if (!normalized) return null;
-
-        setHubClaiming(true);
-        setHubClaimError(null);
-        try {
-            const body: Record<string, unknown> = {
-                featuredCampaignId: opts.campaignId,
-            };
-            // Only send handle when claiming for the first time. Re-claiming an
-            // existing hub would overwrite a custom handle they already chose.
-            if (!opts.existingHandle) {
-                body.handle = normalized;
-                body.displayName = opts.campaignTitle.slice(0, 60) || normalized;
-            }
-            const res = await fetch('/api/organizer/hub', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) {
-                setHubClaimError(data?.error || 'Could not claim your hub.');
-                return null;
-            }
-            const live = (data?.handle as string | null) || normalized;
-            setHubHandle(live);
-            track('hub_claimed', { handle: live, from: 'publish' });
-            return live;
-        } catch {
-            setHubClaimError('Could not reach the server to claim your hub.');
-            return null;
-        } finally {
-            setHubClaiming(false);
-        }
-    }, []);
 
     const handleCreate = async () => {
         if (!title) return;
