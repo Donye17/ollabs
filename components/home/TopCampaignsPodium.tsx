@@ -4,9 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Users } from 'lucide-react';
 import { CampaignGridThumb } from '@/components/CampaignGridThumb';
-import { prefetchFrameOverlays } from '@/components/renderer/strategies';
 import type { FrameConfig } from '@/lib/types';
-import { FrameType } from '@/lib/types';
 import { HOME_PODIUM_SLOTS } from '@/lib/frameValidity';
 
 export type TopCampaign = {
@@ -18,12 +16,6 @@ export type TopCampaign = {
 };
 
 type Slot = { rank: 1 | 2 | 3; campaign: TopCampaign };
-
-function overlayUrl(frame: FrameConfig): string | null {
-    if (typeof frame.imageUrl === 'string' && frame.imageUrl.trim()) return frame.imageUrl.trim();
-    if (frame.type === FrameType.CUSTOM_IMAGE) return null;
-    return null;
-}
 
 function PodiumLink({
     campaign,
@@ -117,8 +109,9 @@ function DesktopTile({ campaign, rank }: { campaign: TopCampaign; rank: number }
  * shows up to six equal tiles so discovery feels fuller without a carousel.
  */
 export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) {
+    // Prefetch only the small explore JPEGs used as thumbs. Never prefetch
+    // custom frame overlay PNGs here: those are often 0.5–1MB+ and wiped mobile LCP.
     useEffect(() => {
-        prefetchFrameOverlays(campaigns.map((c) => overlayUrl(c.frame)));
         for (const c of campaigns) {
             const url = c.supporterPhotos[0];
             if (url) {

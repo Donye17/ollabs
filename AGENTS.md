@@ -37,8 +37,9 @@ category, country, or politics. Never on the photo; never on `/create`.
 locale landings, `/vs`) carry denser labelled inventory between content blocks.
 **Paid upgrade:** interest waitlist on `/hub` only; billing still deferred until demand is clear.
 
-AdSense: `adsbygoogle.js` loads from root layout (crawler-visible on home); units
-only via `AdSlot` (never on `/create` or the photo). Set
+AdSense: ownership meta in root layout; `adsbygoogle.js` loads via `DeferredAdSense`
+(after interaction or ~5s) so home LCP is not fighting unused ad JS. Units still only
+via `AdSlot` (never on `/create` or the photo). Set
 `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` and `NEXT_PUBLIC_ADSENSE_SLOT_SEO` on Vercel;
 keep Auto ads / anchors / vignettes OFF. See `docs/ADSENSE_SLOTS.md`.
 

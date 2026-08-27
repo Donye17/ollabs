@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import type { StripItem } from '@/components/home/CalendarStrip';
-import { DeferUntilIdle } from '@/components/home/DeferUntilIdle';
+import { DeferUntilVisible } from '@/components/home/DeferUntilVisible';
 
 const CalendarStrip = dynamic(
     () => import('@/components/home/CalendarStrip').then((m) => ({ default: m.CalendarStrip })),
@@ -14,10 +14,10 @@ const CalendarStrip = dynamic(
 
 export function HomeCalendarClient({ items }: { items: StripItem[] }) {
     return (
-        <DeferUntilIdle
+        <DeferUntilVisible
             fallback={<div className="h-[280px] mx-6 rounded-2xl bg-ink/[0.04] animate-pulse" aria-hidden />}
         >
             <CalendarStrip items={items} />
-        </DeferUntilIdle>
+        </DeferUntilVisible>
     );
 }

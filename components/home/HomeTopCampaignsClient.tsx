@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import type { TopCampaign } from '@/components/home/TopCampaignsPodium';
 import { ExamplesSkeleton } from '@/components/home/ExamplesSkeleton';
-import { DeferUntilIdle } from '@/components/home/DeferUntilIdle';
+import { DeferUntilVisible } from '@/components/home/DeferUntilVisible';
 
 const TopCampaignsPodium = dynamic(
     () => import('@/components/home/TopCampaignsPodium').then((m) => ({ default: m.TopCampaignsPodium })),
@@ -12,8 +12,8 @@ const TopCampaignsPodium = dynamic(
 
 export function HomeTopCampaignsClient({ campaigns }: { campaigns: TopCampaign[] }) {
     return (
-        <DeferUntilIdle fallback={<ExamplesSkeleton />}>
+        <DeferUntilVisible fallback={<ExamplesSkeleton />}>
             <TopCampaignsPodium campaigns={campaigns} />
-        </DeferUntilIdle>
+        </DeferUntilVisible>
     );
 }

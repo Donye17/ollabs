@@ -64,6 +64,7 @@ export async function getSeoExampleCampaign(
                    AND c.category = $1
                    AND COALESCE(c.supporter_count, 0) >= $2
                    AND ${visibleFrameSql('c')}
+                   AND cardinality(COALESCE(sp.supporter_photos, ARRAY[]::text[])) > 0
                  ORDER BY c.supporter_count DESC, c.created_at DESC
                  LIMIT 1`,
                 [category, MIN_SUPPORTERS_TO_DISPLAY]
@@ -88,6 +89,7 @@ export async function getSeoExampleCampaign(
              WHERE c.is_public = true AND c.is_hidden IS NOT TRUE
                AND COALESCE(u.real_uses, 0) >= $1
                AND ${visibleFrameSql('c')}
+               AND cardinality(COALESCE(sp.supporter_photos, ARRAY[]::text[])) > 0
              ORDER BY COALESCE(u.real_uses, 0) DESC, c.created_at DESC
              LIMIT 1`,
             [MIN_SUPPORTERS_TO_DISPLAY]

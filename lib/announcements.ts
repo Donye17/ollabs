@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-26-home-perf',
+        date: '2026-08-26',
+        title: 'Faster home on phones',
+        summary: 'Home no longer pulls multi-megabyte frame files before you see the page.',
+        items: [
+            'Top campaign thumbs use small explore photos only, not full frame PNGs.',
+            'The awareness calendar loads when you scroll to it, with light color rings on the home strip.',
+            'AdSense script waits for a tap or a few seconds so first paint stays clear.',
+        ],
+    },
+    {
         id: '2026-08-26-nav-clarity',
         date: '2026-08-26',
         title: 'Clearer paths after you publish',

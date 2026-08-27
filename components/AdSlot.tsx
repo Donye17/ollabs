@@ -21,10 +21,10 @@ import React, { useEffect, useRef } from 'react';
  * the page down as it loads is the most annoying thing a display unit does, and
  * on a phone it moves the button someone is already reaching for.
  *
- * The AdSense loader lives in the root layout so crawlers see it on home and
- * other high-traffic HTML. AdSlot still only pushes units where we place them
- * (never on /create or on the photo). loadAdSenseScript below is a fallback if
- * the layout script is slow or blocked.
+ * The AdSense loader is deferred via DeferredAdSense (interaction or ~5s) so
+ * home LCP is not fighting unused ad JS. AdSlot still pushes units where we
+ * place them (never on /create or on the photo), and will inject the script
+ * itself if the deferred loader has not fired yet.
  *
  * Env: NEXT_PUBLIC_ADSENSE_CLIENT, NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN,
  * NEXT_PUBLIC_ADSENSE_SLOT_SEO (optional fallback NEXT_PUBLIC_ADSENSE_SLOT_INLINE).

@@ -11,12 +11,15 @@ export function SeoCampaignExample({
     size = 200,
     title,
     className = '',
+    priority = false,
 }: {
     campaign: SeoExampleCampaign;
     size?: number;
     /** Optional heading above the thumb. */
     title?: string;
     className?: string;
+    /** Mark as LCP candidate (home hero). */
+    priority?: boolean;
 }) {
     return (
         <div className={className}>
@@ -39,6 +42,7 @@ export function SeoCampaignExample({
                         supporterPhotos={campaign.supporterPhotos}
                         size={size}
                         className="w-full h-full object-cover"
+                        priority={priority}
                     />
                 </div>
                 <div className="text-center min-w-0 max-w-[16rem]">

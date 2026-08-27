@@ -2,12 +2,12 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Bricolage_Grotesque } from 'next/font/google';
-import Script from 'next/script';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 import { LanguageBanner } from '@/components/i18n/LanguageBanner';
 import { MobileOrganizerNav } from '@/components/MobileOrganizerNav';
 import { MobileNavSpacer } from '@/components/MobileNavSpacer';
 import { DeferredAnalytics } from '@/components/DeferredAnalytics';
+import { DeferredAdSense } from '@/components/DeferredAdSense';
 import './globals.css';
 
 const inter = Inter({
@@ -15,7 +15,8 @@ const inter = Inter({
     variable: '--font-inter',
     display: 'swap',
     adjustFontFallback: true,
-    preload: true,
+    // Body copy can swap in after paint. Preloading both faces competed with LCP.
+    preload: false,
 });
 
 const bricolage = Bricolage_Grotesque({
@@ -24,6 +25,7 @@ const bricolage = Bricolage_Grotesque({
     variable: '--font-display',
     display: 'swap',
     adjustFontFallback: true,
+    preload: true,
 });
 
 export const metadata: Metadata = {
@@ -187,15 +189,9 @@ export default function RootLayout({
                     <LanguageBanner />
                 </LocaleProvider>
                 {GA_ID ? <DeferredAnalytics gaId={GA_ID} /> : null}
-                {/* Script only: no Auto ads. Units still render only via AdSlot,
-                    never on /create or on the photo. Keep Auto/anchor/vignette OFF. */}
-                <Script
-                    id="adsense-loader"
-                    async
-                    src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-                    crossOrigin="anonymous"
-                    strategy="afterInteractive"
-                />
+                {/* Meta tag in metadata.other still verifies the site. Script is
+                    deferred so home LCP is not fighting unused AdSense JS. */}
+                <DeferredAdSense client={ADSENSE_CLIENT} />
                 <Analytics />
                 <SpeedInsights />
             </body>

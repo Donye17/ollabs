@@ -11,7 +11,7 @@ function pickSupporterPhoto(photos: string[]): string | null {
 
 /**
  * Explore / podium thumbnail. Supporter saves upload a small framed JPEG (face +
- * overlay baked in). Everything else draws live from frame_config — never
+ * overlay baked in). Everything else draws live from frame_config. Never
  * preview_url, which often captured the default cyan ring before custom art loaded.
  */
 export function CampaignGridThumb({
@@ -19,18 +19,30 @@ export function CampaignGridThumb({
     supporterPhotos,
     size,
     className,
+    priority = false,
 }: {
     frame: FrameConfig;
     supporterPhotos: string[];
     size: number;
     className?: string;
+    /** Hero / LCP thumb: fetch early. Default lazy for grids. */
+    priority?: boolean;
 }) {
     const [supporterPhoto] = useState(() => pickSupporterPhoto(supporterPhotos));
 
     if (supporterPhoto) {
         return (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={supporterPhoto} alt="" className={className ?? 'w-full h-full object-cover'} />
+            <img
+                src={supporterPhoto}
+                alt=""
+                width={size}
+                height={size}
+                className={className ?? 'w-full h-full object-cover'}
+                fetchPriority={priority ? 'high' : 'auto'}
+                decoding={priority ? 'sync' : 'async'}
+                loading={priority ? 'eager' : 'lazy'}
+            />
         );
     }
 

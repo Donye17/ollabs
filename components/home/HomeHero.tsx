@@ -35,7 +35,7 @@ export async function HomeHero() {
 
                 {example && (
                     <div className="lg:col-span-6 mt-10 lg:mt-0 flex justify-center lg:justify-end">
-                        <SeoCampaignExample campaign={example} size={280} />
+                        <SeoCampaignExample campaign={example} size={280} priority />
                     </div>
                 )}
             </div>

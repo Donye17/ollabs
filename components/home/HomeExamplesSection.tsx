@@ -31,12 +31,15 @@ async function getTopCampaigns(): Promise<TopCampaign[]> {
         return res.rows.flatMap((r) => {
             const frame = parseFrameConfig(r.frame_config);
             if (!frame) return [];
+            const supporterPhotos = parseSupporterPhotos(r.supporter_photos);
+            // Home thumbs must use explore JPEGs, not live frame PNG overlays.
+            if (supporterPhotos.length === 0) return [];
             return [{
                 slug: r.slug,
                 title: r.title,
                 supporterCount: r.supporter_count ?? 0,
                 frame,
-                supporterPhotos: parseSupporterPhotos(r.supporter_photos),
+                supporterPhotos,
             }];
         });
     } catch (e) {

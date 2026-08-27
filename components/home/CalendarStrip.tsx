@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { FramePreview } from '@/components/FramePreview';
-import { FrameConfig } from '@/lib/types';
+import { FrameConfig, FrameType } from '@/lib/types';
 import { track } from '@/lib/analytics';
 import { ArrowRight } from 'lucide-react';
 
@@ -14,6 +14,20 @@ export interface StripItem {
     countdown: string;   // "2 days away" | "Today" | "Happening now"
     past: boolean;
     frame: FrameConfig;
+}
+
+/**
+ * Home calendar must not download multi-MB custom frame PNGs. Vector / color
+ * rings stay; CUSTOM_IMAGE becomes a solid ring in the day's color.
+ */
+function thumbFrame(frame: FrameConfig): FrameConfig {
+    if (!frame.imageUrl) return frame;
+    return {
+        ...frame,
+        type: FrameType.SOLID,
+        imageUrl: undefined,
+        color1: frame.color1 || '#01BEF6',
+    };
 }
 
 /**
@@ -65,8 +79,8 @@ export const CalendarStrip: React.FC<{ items: StripItem[] }> = ({ items }) => {
 
             <div className="p-4">
                 <FramePreview
-                    frame={i.frame}
-                    size={272}
+                    frame={thumbFrame(i.frame)}
+                    size={160}
                     className="w-[136px] h-[136px] rounded-full mx-auto mb-3"
                 />
                 <p className="font-display font-bold text-sm leading-snug text-center line-clamp-2 mb-1">
