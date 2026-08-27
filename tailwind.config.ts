@@ -19,7 +19,9 @@ const config: Config = {
                 cream: '#FFFFFF',
                 brand: {
                     DEFAULT: '#01BEF6',
-                    deep: '#0288B8',
+                    // Deep enough for body/link text on paper (WCAG AA 4.5:1).
+                    // Prior #0288B8 sat at ~3.8:1 and failed PageSpeed contrast.
+                    deep: '#026D94',
                     wash: '#E4F7FE',
                 },
                 coral: '#FF5C39',

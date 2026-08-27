@@ -17,9 +17,16 @@ export async function HomeHero() {
     return (
         <section className={`relative ${PAGE_TOP_UNDER_NAV} pb-10 sm:pb-14 px-4 sm:px-6`}>
             {lcpPhoto && (
-                // Early discoverability for desktop LCP (hidden on phones via CSS below).
+                // Desktop-only: phones hide this image, so a global preload
+                // just steals bandwidth from LCP on mobile lab audits.
                 // eslint-disable-next-line @next/next/no-head-element
-                <link rel="preload" as="image" href={lcpPhoto} fetchPriority="high" />
+                <link
+                    rel="preload"
+                    as="image"
+                    href={lcpPhoto}
+                    fetchPriority="high"
+                    media="(min-width: 1024px)"
+                />
             )}
             <div className="max-w-5xl mx-auto lg:grid lg:grid-cols-12 lg:gap-12 lg:items-center">
                 <div className="lg:col-span-6 text-center lg:text-left">

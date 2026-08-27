@@ -70,23 +70,21 @@ export const metadata: Metadata = {
         images: ['https://ollabs.studio/og.png'],
     },
     icons: {
+        // Google Search picks a square PNG >= ~48px. Lead with that (stable
+        // filename google-site-icon.png so a re-crawl can leave blurry SVG /
+        // 16px upscales behind). SVG stays for sharp browser tabs. Root
+        // /favicon.ico exists too: many crawlers still request that path first.
         icon: [
-            { url: '/favicon/mark.svg', type: 'image/svg+xml' },
-            { url: '/favicon/favicon.ico' },
-            { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-            { url: '/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-            // Google chooses the search result icon from rel="icon" and wants a
-            // square at least 48px and a multiple of 48. With only 16 and 32
-            // declared it was upscaling one of them, which is why the icon
-            // looked rough in results.
+            { url: '/favicon/google-site-icon.png', sizes: '192x192', type: 'image/png' },
             { url: '/favicon/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+            { url: '/favicon/mark.svg', type: 'image/svg+xml' },
+            { url: '/favicon.ico', sizes: 'any' },
+            { url: '/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+            { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
         ],
         apple: [
             { url: '/favicon/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
         ],
-        // The android-chrome files are declared in site.webmanifest, which is
-        // where Android actually reads them. They used to be listed here too
-        // under invented rel values that no browser recognises.
     },
     manifest: '/favicon/site.webmanifest',
     other: {

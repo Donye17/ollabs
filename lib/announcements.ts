@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-27-contrast-thumbs',
+        date: '2026-08-27',
+        title: 'Clearer links, lighter home on phones',
+        summary: 'Brand blue text is easier to read, and phones stop downloading desktop-only campaign thumbs.',
+        items: [
+            'Accent text and links use a deeper brand blue that meets contrast guidelines on the page background.',
+            'Home on phones loads the three podium faces only, not the wider desktop grid.',
+        ],
+    },
+    {
         id: '2026-08-26-home-hydration',
         date: '2026-08-26',
         title: 'Smoother home load',

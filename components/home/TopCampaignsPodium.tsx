@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Users } from 'lucide-react';
 import { CampaignGridThumb } from '@/components/CampaignGridThumb';
@@ -26,6 +26,8 @@ function PodiumLink({
     rank: 1 | 2 | 3;
     first: boolean;
 }) {
+    // CSS box vs file pixels: 2x DPR. Side slots stay at 176 so we do not
+    // pull a larger JPEG than the circle can show on phones.
     const framePx = first ? 128 : 88;
     const canvasPx = first ? 256 : 176;
 
@@ -85,7 +87,7 @@ function DesktopTile({ campaign, rank }: { campaign: TopCampaign; rank: number }
                     <CampaignGridThumb
                         frame={campaign.frame}
                         supporterPhotos={campaign.supporterPhotos}
-                        size={256}
+                        size={192}
                         className="w-full h-full"
                     />
                 </div>
@@ -109,10 +111,27 @@ function DesktopTile({ campaign, rank }: { campaign: TopCampaign; rank: number }
  * shows up to six equal tiles so discovery feels fuller without a carousel.
  */
 export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) {
-    // Prefetch only the small explore JPEGs used as thumbs. Never prefetch
+    // Desktop grid is display:none on phones but browsers still download those
+    // <img>s. Mount it only at md+ so mobile lab audits stop counting six
+    // offscreen explore JPEGs.
+    const [isDesktop, setIsDesktop] = useState(() =>
+        typeof window !== 'undefined' ? window.matchMedia('(min-width: 768px)').matches : false
+    );
+    useEffect(() => {
+        const mq = window.matchMedia('(min-width: 768px)');
+        const apply = () => setIsDesktop(mq.matches);
+        apply();
+        mq.addEventListener('change', apply);
+        return () => mq.removeEventListener('change', apply);
+    }, []);
+
+    // Prefetch only the thumbs that will actually paint. Never prefetch
     // custom frame overlay PNGs here: those are often 0.5–1MB+ and wiped mobile LCP.
     useEffect(() => {
-        for (const c of campaigns) {
+        const targets = isDesktop
+            ? campaigns
+            : [campaigns[1], campaigns[0], campaigns[2]].filter(Boolean) as TopCampaign[];
+        for (const c of targets) {
             const url = c.supporterPhotos[0];
             if (url) {
                 const img = new Image();
@@ -120,7 +139,7 @@ export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) 
                 img.src = url;
             }
         }
-    }, [campaigns]);
+    }, [campaigns, isDesktop]);
 
     const podium: Slot[] = [];
     if (campaigns[1]) podium.push({ rank: 2, campaign: campaigns[1] });
@@ -150,11 +169,13 @@ export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) 
             )}
 
             {/* Desktop: up to six live tiles */}
-            <div className="hidden md:grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-6 max-w-5xl lg:max-w-6xl mx-auto px-2">
-                {desktop.map((campaign, i) => (
-                    <DesktopTile key={campaign.slug} campaign={campaign} rank={i + 1} />
-                ))}
-            </div>
+            {isDesktop && (
+                <div className="hidden md:grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-6 max-w-5xl lg:max-w-6xl mx-auto px-2">
+                    {desktop.map((campaign, i) => (
+                        <DesktopTile key={campaign.slug} campaign={campaign} rank={i + 1} />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

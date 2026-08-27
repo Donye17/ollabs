@@ -1,5 +1,7 @@
 # Real-phone QA checklist (Phase 0 / P0.1 + Lane A)
 
+**Go-live gate:** automated Playwright and SEO checks passed on 2026-08-26. This checklist is the remaining step that needs a physical phone, ideally WhatsApp in-app on iOS. See sections below before calling the platform fully verified on device.
+
 Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on iOS. Desktop Chrome alone is not enough.
 
 ## Campaign save (`/c/[slug]`) — Lane A
