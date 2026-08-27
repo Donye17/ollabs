@@ -11,7 +11,6 @@ import { HomeHowItWorks } from "@/components/home/HomeHowItWorks";
 import { HomeHero } from "@/components/home/HomeHero";
 import { BrandMark } from "@/components/BrandMark";
 import { HOME_FAQS } from "@/lib/faqs";
-import { PAGE_TOP_UNDER_NAV } from "@/lib/mobileNav";
 
 export const revalidate = 600;
 
@@ -67,13 +66,7 @@ export default function Home() {
             />
             <NavBar />
 
-            <Suspense fallback={
-                <section className={`${PAGE_TOP_UNDER_NAV} pb-10 px-4`}>
-                    <div className="max-w-5xl mx-auto h-64 animate-pulse rounded-2xl bg-ink/5" aria-hidden />
-                </section>
-            }>
-                <HomeHero />
-            </Suspense>
+            <HomeHero />
 
             <section className="px-4 sm:px-6 pb-12 sm:pb-16">
                 <Suspense fallback={
