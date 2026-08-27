@@ -25,15 +25,26 @@ function backFallbackFor(pathname: string, onCreate: boolean): string {
     return '/';
 }
 
-export const NavBar: React.FC = () => {
+type NavBarProps = {
+    /**
+     * Set from the home page server tree. On Vercel ISR, usePathname() during
+     * SSR of `/` has been observed to return a non-home path, so the Back
+     * control was painted into the HTML and then removed on hydrate (React #418).
+     */
+    isHome?: boolean;
+};
+
+export const NavBar: React.FC<NavBarProps> = ({ isHome = false }) => {
     const pathname = usePathname() || '/';
     const onCreate = pathname === '/create' || pathname.startsWith('/create/');
-    const onHome = pathname === '/';
+    const onHome = isHome || pathname === '/';
     // Phones: logo alone always jumped home and wiped mid-flow work. Back keeps
     // create / hub / mine / manage reachable without starting over.
     const showBack = !onHome;
     const backFallback = backFallbackFor(pathname, onCreate);
-    const title = chromeTitle(pathname);
+    // On a forced-home document, never paint a chrome title from a stale
+    // usePathname() during SSR (same ISR glitch as showBack).
+    const title = onHome ? null : chromeTitle(pathname);
 
     return (
         <nav className="fixed top-0 inset-x-0 z-50 border-b border-ink/10 bg-paper/90 pt-[env(safe-area-inset-top,0px)]">

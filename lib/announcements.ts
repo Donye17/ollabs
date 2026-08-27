@@ -17,6 +17,15 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-26-home-hydration',
+        date: '2026-08-26',
+        title: 'Smoother home load',
+        summary: 'Cold opens of the home page no longer fight a brief nav flicker on phones.',
+        items: [
+            'The top bar on home stays logo-only on first paint, matching what you see after the page settles.',
+        ],
+    },
+    {
         id: '2026-08-26-home-perf',
         date: '2026-08-26',
         title: 'Faster home on phones',
