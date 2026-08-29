@@ -8,13 +8,13 @@ import { GUIDES, formatGuideDate } from '@/lib/guides';
 export const metadata: Metadata = {
     title: 'Guides',
     description:
-        'Short guides for organizers: how to start a profile-picture campaign, and what a campaign hub is for.',
+        'Guides for organizers: custom frames, WhatsApp, saving a photo on iPhone, the manage dashboard, hubs, and keeping access when you switch phones.',
     alternates: { canonical: 'https://ollabs.studio/guides' },
     openGraph: {
         type: 'website',
         url: 'https://ollabs.studio/guides',
         title: 'Guides',
-        description: 'How to start a campaign and use your hub on Ollabs.',
+        description: 'How to run a campaign, save a framed photo, and keep access on Ollabs.',
         siteName: 'Ollabs',
         images: ['/og.png'],
     },
@@ -28,7 +28,7 @@ export default function GuidesIndexPage() {
                 <p className="text-sm font-semibold text-muted mb-2">Help</p>
                 <h1 className="font-display text-3xl sm:text-4xl font-extrabold mb-4">Guides</h1>
                 <p className="text-[15px] sm:text-base text-ink/75 leading-relaxed mb-10">
-                    Short explainers for organizers. Supporters just open your link and add a photo. No guide needed.
+                    Explainers for organizers. Supporters just open your link and add a photo. No guide needed.
                 </p>
 
                 <ul className="space-y-4">

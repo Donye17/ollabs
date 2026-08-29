@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-28-guides-four-more',
+        date: '2026-08-28',
+        title: 'Four more guides: saving on iPhone, custom frames, manage, and keeping access',
+        summary: 'Same Guides index. New pieces on the share sheet, the photo window, the dashboard, and recover.',
+        items: [
+            'New guides for saving a framed photo on iPhone, making a PNG that leaves room for the face, reading manage stats, and keeping a campaign when you switch phones.',
+            'The longer campaign guide and the short hub and start pieces are unchanged.',
+        ],
+    },
+    {
         id: '2026-08-28-guides-article',
         date: '2026-08-28',
         title: 'A longer guide for running a campaign people join',
