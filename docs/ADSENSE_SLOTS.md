@@ -4,8 +4,8 @@ Code in `components/AdSlot.tsx` already branches on surface:
 
 | Surface | Env var | Used on |
 |---------|---------|---------|
-| `campaign` | `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` | `/c` lean units |
-| `seo` | `NEXT_PUBLIC_ADSENSE_SLOT_SEO` | `/for`, `/day`, hubs, locale SEO |
+| `campaign` | `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` | unused after 2026-08-28 (no units on `/c` or `/u`) |
+| `seo` | `NEXT_PUBLIC_ADSENSE_SLOT_SEO` | `/for`, `/day`, locale SEO, guides |
 
 Fallback order per surface: dedicated slot → `NEXT_PUBLIC_ADSENSE_SLOT_INLINE` → hardcoded default.
 

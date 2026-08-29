@@ -31,10 +31,11 @@ metadata, share text, OG, announcements, SEO pages, day taglines, mocks that
 mirror product copy. Use a period, comma, colon, or rewrite the sentence. Hub
 Join CTA is two lines (`Join` / campaign title), never `Join` + em dash + title.
 
-**Ads:** same quiet in-flow units on every campaign — no special rules by
-category, country, or politics. Never on the photo; never on `/create`.
-`/c` stays lean (1 before save, 2 after). SEO pages (`/for`, `/day`, hubs,
-locale landings, `/vs`) carry denser labelled inventory between content blocks.
+**Ads:** quiet labelled in-flow units. Never on the photo; never on `/create`;
+never on `/c` or `/u` (those pages are user-generated and almost empty of
+publisher text, which AdSense treats as low-value inventory). SEO pages
+(`/for`, `/day`, locale landings, `/vs`, guides) carry labelled inventory
+between content blocks.
 **Paid upgrade:** interest waitlist on `/hub` only; billing still deferred until demand is clear.
 
 AdSense: ownership meta in root layout; `adsbygoogle.js` loads via `DeferredAdSense`

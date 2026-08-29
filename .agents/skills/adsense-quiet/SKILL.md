@@ -9,11 +9,11 @@ description: >-
 
 ## Product rules
 
-- Same quiet in-flow units on every campaign — no special rules by category, country, or politics.
+- Same quiet labelled units. No special rules by category, country, or politics.
 - Never on the photo / canvas.
 - Never on `/create`.
-- `/c` stays lean: ~1 unit before save, ~2 after.
-- SEO pages (`/for`, `/day`, hubs) may carry denser labelled inventory between content blocks.
+- Never on `/c` or `/u` (user-generated pages with almost no publisher content).
+- SEO pages (`/for`, `/day`, locale landings, `/vs`, guides) may carry denser labelled inventory between content blocks.
 - Auto ads, anchors, and vignettes stay OFF in the AdSense dashboard.
 
 ## Implementation

@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { HubMadeWithFooter } from '@/components/hub/HubMadeWithFooter';
 import { HubAvatarComposer, type HubFrameCampaign } from '@/components/hub/HubAvatarComposer';
-import { AdSlot } from '@/components/AdSlot';
 import { upload } from '@vercel/blob/client';
 import {
     ChevronDown,
@@ -805,10 +804,6 @@ export const HubEditorClient: React.FC = () => {
             )}
 
             <HubMadeWithFooter className="pt-2" />
-
-            {/* Below the fold: only people who scroll past the editor see it.
-                SEO surface matches public hubs; never near the save controls. */}
-            <AdSlot surface="seo" className="pt-2 pb-4" />
             </div>
 
             {/* Desktop: live /u beside the form. Phone keeps the full-screen overlay. */}

@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Users } from 'lucide-react';
 import type { PublicHub } from '@/lib/hub';
-import { AdSlot } from '@/components/AdSlot';
 import { HubMadeWithFooter } from '@/components/hub/HubMadeWithFooter';
 import { resolveHubTheme } from '@/lib/hubThemes';
 import { detectSocial } from '@/lib/hubSocial';
@@ -240,10 +239,6 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                             This hub is not ready yet.
                         </p>
                     )}
-                </div>
-
-                <div className="mt-8">
-                    <AdSlot surface="seo" />
                 </div>
 
                 <HubMadeWithFooter className="mt-12" />

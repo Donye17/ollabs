@@ -72,6 +72,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return {
         title: c.title,
         description,
+        // Campaign pages are user-generated and carry almost no publisher text:
+        // 55% have an empty description. AdSense inventory-value policy does not
+        // allow ads on screens like this, and Search should not index them
+        // either. follow:true so links out still count. This must stay
+        // crawlable in robots.ts or Google never reads this tag.
+        robots: { index: false, follow: true },
         openGraph: {
             title: c.title,
             description,

@@ -30,6 +30,12 @@ export function SiteFooter({ className = '' }: Props) {
                     <span aria-hidden className="text-ink/20">
                         ·
                     </span>
+                    <Link href="/contact" className="hover:text-brand-deep transition-colors">
+                        Contact
+                    </Link>
+                    <span aria-hidden className="text-ink/20">
+                        ·
+                    </span>
                     <Link href="/for" className="hover:text-brand-deep transition-colors">
                         Use cases
                     </Link>

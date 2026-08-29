@@ -49,7 +49,7 @@ export function shouldShowMobileOrganizerNav(pathname: string): boolean {
     if (path === '/vs' || path.startsWith('/vs/')) return false;
     if (path === '/guides' || path.startsWith('/guides/')) return false;
     if (path === '/privacy' || path === '/terms') return false;
-    if (path === '/about' || path === '/updates' || path === '/explore') return false;
+    if (path === '/about' || path === '/contact' || path === '/updates' || path === '/explore') return false;
 
     const localeRoots = ['/pt', '/id', '/tl', '/hi', '/es'] as const;
     for (const root of localeRoots) {

@@ -134,6 +134,10 @@ export default function AboutPage() {
                         Home
                     </Link>
                     {' · '}
+                    <Link href="/contact" className="hover:text-brand-deep transition-colors">
+                        Contact
+                    </Link>
+                    {' · '}
                     <Link href="/privacy" className="hover:text-brand-deep transition-colors">
                         Privacy
                     </Link>

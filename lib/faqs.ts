@@ -5,7 +5,7 @@ export const HOME_FAQS = [
     },
     {
         question: "Do supporters see ads?",
-        answer: "Never on the photo, and never covering Save or Share. On a campaign page a single labelled ad can appear after they have already saved their framed picture. Auto ads and pop-ups stay off.",
+        answer: "Never on the photo, never covering Save or Share, and never on the campaign page itself. Quiet labelled ads can appear on guides and other informational pages. Auto ads and pop-ups stay off.",
     },
     {
         question: "Do I need an account?",

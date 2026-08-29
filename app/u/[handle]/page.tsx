@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { HubPublicView } from '@/components/hub/HubPublicView';
 import { getPublicHub } from '@/lib/getPublicHub';
-import { hubIsIndexable } from '@/lib/hub';
 
 export const revalidate = 60;
 
@@ -20,14 +19,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             ? `Support ${hub.featured.title}. Add the frame to your profile picture.`
             : `Campaigns and links from ${hub.displayName}.`);
 
-    const index = hubIsIndexable(hub);
     // Prefer featured frame art for WhatsApp unfurls; avatar is a weaker signal.
     const ogImage = hub.featured?.preview_url || hub.avatarUrl || null;
 
     return {
         title,
         description,
-        robots: index ? { index: true, follow: true } : { index: false, follow: false },
+        // 17 hubs exist and one has a bio over 80 characters. Not enough
+        // publisher content to index or to carry ads. See docs/ADSENSE_REMEDIATION.md.
+        robots: { index: false, follow: true },
         openGraph: {
             title,
             description,

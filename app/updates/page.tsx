@@ -44,6 +44,10 @@ export default function UpdatesPage() {
                             Privacy
                         </Link>
                         {' · '}
+                        <Link href="/contact" className="hover:text-brand-deep transition-colors">
+                            Contact
+                        </Link>
+                        {' · '}
                         <Link href="/about" className="hover:text-brand-deep transition-colors">
                             About
                         </Link>

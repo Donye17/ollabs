@@ -11,7 +11,6 @@ import { supporterShareText, whatsappUrl, messengerShareUrl, prefersTagalog } fr
 import { saveFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome } from '@/lib/savePhoto';
 import { framedCircleToStoryBlob } from '@/lib/storyExport';
 import { uploadExploreThumb } from '@/lib/exploreThumb';
-import { AdSlot } from '@/components/AdSlot';
 import { BrandMark } from '@/components/BrandMark';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles, ArrowRight } from 'lucide-react';
@@ -499,9 +498,6 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     </p>
                 )}
 
-                {/* Before save only: under fit controls, above sticky bar. Never on photo. */}
-                {adjusting && <AdSlot surface="campaign" className="w-full mt-1" />}
-
                 <input
                     ref={fileRef}
                     type="file"
@@ -637,8 +633,6 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                             </button>
                         </div>
 
-                        <AdSlot surface="campaign" className="mt-1" />
-
                         <div className="w-full text-center space-y-3 pt-2">
                             <p className="font-display font-bold text-lg leading-tight flex items-center justify-center gap-1.5">
                                 <Sparkles size={17} className="text-brand-deep" /> {t.wantOwn}
@@ -717,8 +711,6 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                         {t.makeOwnFooter}
                     </a>
                 )}
-
-                {justDownloaded && <AdSlot surface="campaign" className="mt-2" />}
 
                 {!adjusting && (
                     reportDone ? (

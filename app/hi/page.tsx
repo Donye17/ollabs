@@ -16,6 +16,11 @@ export const metadata: Metadata = {
         url: 'https://ollabs.studio/hi',
         title: 'Ollabs: मुफ़्त twibbon और profile frame',
     },
+    // TODO: remove this and re-add /hi to the sitemap once landingHi is
+    // genuinely translated and reviewed by a Hindi speaker. Right now the page
+    // serves the English message bundle under a Hindi title, which reads as
+    // thin/duplicate content to a reviewer.
+    robots: { index: false, follow: true },
 };
 
 export default function HindiLandingPage() {

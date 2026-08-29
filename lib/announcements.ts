@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-28-contact-quiet-c',
+        date: '2026-08-28',
+        title: 'A Contact page, and quieter campaign pages',
+        summary: 'Ads no longer sit on the frame tool. There is a public Contact page in the footer.',
+        items: [
+            'Campaign and hub pages no longer show ads. The frame, save, and share controls are unchanged.',
+            'Footer now includes Contact, with email for support, press, bugs, and reporting a campaign.',
+        ],
+    },
+    {
         id: '2026-08-27-contrast-thumbs',
         date: '2026-08-27',
         title: 'Clearer links, lighter home on phones',

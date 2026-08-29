@@ -127,6 +127,9 @@ export function suggestHandleFromEmail(email: string): string {
     return '';
 }
 
+// Currently unused. Public hubs are unconditionally noindex after the 2026-08-28
+// AdSense low-value-content review (inventory-value policy: almost no publisher
+// text). Kept so we can restore a threshold later without reinventing the rule.
 export function hubIsIndexable(hub: {
     featured: unknown;
     campaigns: unknown[];

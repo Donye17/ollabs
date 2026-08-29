@@ -79,6 +79,10 @@ export default function GuidesIndexPage() {
                         About
                     </Link>
                     {' · '}
+                    <Link href="/contact" className="hover:text-brand-deep transition-colors">
+                        Contact
+                    </Link>
+                    {' · '}
                     <Link href="/create" className="hover:text-brand-deep transition-colors">
                         Create
                     </Link>
