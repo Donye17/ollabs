@@ -100,6 +100,10 @@ export default function ContactPage() {
                         Home
                     </Link>
                     {' · '}
+                    <Link href="/guides" className="hover:text-brand-deep transition-colors">
+                        Guides
+                    </Link>
+                    {' · '}
                     <Link href="/about" className="hover:text-brand-deep transition-colors">
                         About
                     </Link>

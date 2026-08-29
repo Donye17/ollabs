@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
-import { GUIDES } from '@/lib/guides';
+import { GUIDES, formatGuideDate } from '@/lib/guides';
 
 export const metadata: Metadata = {
     title: 'Guides',
@@ -42,7 +42,14 @@ export default function GuidesIndexPage() {
                                     <p className="font-display text-lg font-bold text-ink group-hover:text-brand-deep transition-colors">
                                         {g.title}
                                     </p>
-                                    <p className="mt-1 text-sm text-ink/70 leading-relaxed">{g.subtitle}</p>
+                                    <p className="mt-1 text-sm text-ink/70 leading-relaxed">{g.description}</p>
+                                    <p className="mt-2 text-xs text-muted">
+                                        {g.author.name}, {g.author.role}
+                                        {' · '}
+                                        {formatGuideDate(g.publishedAt)}
+                                        {' · '}
+                                        {g.readingMinutes} min read
+                                    </p>
                                 </div>
                                 <ArrowRight
                                     size={18}
@@ -73,6 +80,10 @@ export default function GuidesIndexPage() {
                 <p className="text-center text-xs text-muted mt-12">
                     <Link href="/" className="hover:text-brand-deep transition-colors">
                         Home
+                    </Link>
+                    {' · '}
+                    <Link href="/guides" className="hover:text-brand-deep transition-colors">
+                        Guides
                     </Link>
                     {' · '}
                     <Link href="/about" className="hover:text-brand-deep transition-colors">

@@ -11,6 +11,7 @@ import { HomeHowItWorks } from "@/components/home/HomeHowItWorks";
 import { HomeHero } from "@/components/home/HomeHero";
 import { BrandMark } from "@/components/BrandMark";
 import { HOME_FAQS } from "@/lib/faqs";
+import { GuidesReadNext } from "@/components/guides/GuidesReadNext";
 
 export const revalidate = 600;
 
@@ -113,6 +114,8 @@ export default function Home() {
 
             <FAQSection />
 
+            <GuidesReadNext />
+
             <section className="px-6 py-20 border-t border-ink/10">
                 <div className="max-w-3xl mx-auto text-center">
                     <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3">Make a frame</h2>
@@ -149,6 +152,7 @@ export default function Home() {
                                     <Link href="/guides" className="hover:text-brand-deep transition-colors">Guides</Link>
                                 </h5>
                                 <ul className="space-y-2 text-sm text-muted">
+                                    <li><Link href="/guides/run-a-campaign-people-join" className="hover:text-brand-deep transition-colors">Campaigns people join</Link></li>
                                     <li><Link href="/guides/start-a-campaign" className="hover:text-brand-deep transition-colors">Start a campaign</Link></li>
                                     <li><Link href="/guides/hub" className="hover:text-brand-deep transition-colors">What is a hub?</Link></li>
                                     <li><Link href="/guides" className="hover:text-brand-deep transition-colors">All guides</Link></li>

@@ -6,6 +6,7 @@ import { SiteFooter } from '@/components/SiteFooter';
 import { USE_CASES } from '@/lib/useCases';
 import { AdSlot } from '@/components/AdSlot';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
+import { GuidesReadNext } from '@/components/guides/GuidesReadNext';
 
 export const metadata: Metadata = {
     title: 'Who uses Ollabs | Profile picture frame campaigns',
@@ -65,6 +66,8 @@ export default function ForHub() {
                     </div>
                 </div>
             </section>
+
+            <GuidesReadNext />
 
             <SiteFooter />
         </main>

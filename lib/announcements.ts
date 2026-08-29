@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-28-guides-article',
+        date: '2026-08-28',
+        title: 'A longer guide for running a campaign people join',
+        summary: 'New explainer on frames, the first hour on WhatsApp, and when to use a hub.',
+        items: [
+            'New guide: How to run a profile-picture campaign that people actually join, under Guides in the nav.',
+            'Guides index now shows the author, date, and reading time for each piece.',
+        ],
+    },
+    {
         id: '2026-08-28-locale-trees',
         date: '2026-08-28',
         title: 'Spanish, Indonesian, and Tagalog marketing pages retired',

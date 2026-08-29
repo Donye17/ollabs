@@ -6,6 +6,7 @@ import { daysByUpcoming, formatOccurrence, countdownLabel } from '@/lib/days';
 import { AdSlot } from '@/components/AdSlot';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import { ArrowRight, CalendarDays } from 'lucide-react';
+import { GuidesReadNext } from '@/components/guides/GuidesReadNext';
 
 const URL = 'https://ollabs.studio/day';
 
@@ -90,6 +91,8 @@ export default function DayIndexPage() {
                     </div>
                 </div>
             </section>
+
+            <GuidesReadNext />
 
             <SiteFooter />
         </main>

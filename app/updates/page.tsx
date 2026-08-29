@@ -40,6 +40,10 @@ export default function UpdatesPage() {
                             Back to home
                         </Link>
                         {' · '}
+                        <Link href="/guides" className="hover:text-brand-deep transition-colors">
+                            Guides
+                        </Link>
+                        {' · '}
                         <Link href="/privacy" className="hover:text-brand-deep transition-colors">
                             Privacy
                         </Link>

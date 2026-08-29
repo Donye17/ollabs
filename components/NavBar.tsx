@@ -75,6 +75,9 @@ export const NavBar: React.FC<NavBarProps> = ({ isHome = false }) => {
                     <Link href="/explore" className="text-sm font-semibold text-muted hover:text-brand-deep hidden md:block transition-colors">
                         Explore
                     </Link>
+                    <Link href="/guides" className="text-sm font-semibold text-muted hover:text-brand-deep hidden md:block transition-colors">
+                        Guides
+                    </Link>
                     <a
                         href="mailto:feedback@ollabs.studio?subject=Ollabs%20Feedback"
                         className="text-sm font-semibold text-muted hover:text-brand-deep hidden lg:flex items-center gap-1.5 transition-colors"

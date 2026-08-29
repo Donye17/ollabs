@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { USE_CASES } from '@/lib/useCases';
 import { USE_CASES_PT } from '@/lib/useCasesPt';
+import { GUIDES } from '@/lib/guides';
 import {
     englishSlugFromPt,
     useCaseLanguageAlternates,
@@ -75,8 +76,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.55 },
         { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.4 },
         { url: `${baseUrl}/guides`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-        { url: `${baseUrl}/guides/hub`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-        { url: `${baseUrl}/guides/start-a-campaign`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
+        ...GUIDES.map((g) => ({
+            url: `${baseUrl}/guides/${g.slug}`,
+            lastModified: g.updatedAt ? new Date(g.updatedAt) : new Date(g.publishedAt),
+            changeFrequency: 'monthly' as const,
+            priority: 0.7,
+        })),
         { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
         { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
     ];

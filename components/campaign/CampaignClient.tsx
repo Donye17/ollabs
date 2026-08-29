@@ -711,6 +711,12 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                         {t.makeOwnFooter}
                     </a>
                 )}
+                <a
+                    href="/guides"
+                    className="text-xs text-muted hover:text-brand-deep transition-colors mt-1"
+                >
+                    Guides
+                </a>
 
                 {!adjusting && (
                     reportDone ? (

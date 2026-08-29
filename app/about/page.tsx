@@ -134,6 +134,10 @@ export default function AboutPage() {
                         Home
                     </Link>
                     {' · '}
+                    <Link href="/guides" className="hover:text-brand-deep transition-colors">
+                        Guides
+                    </Link>
+                    {' · '}
                     <Link href="/contact" className="hover:text-brand-deep transition-colors">
                         Contact
                     </Link>
