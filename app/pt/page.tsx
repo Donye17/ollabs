@@ -87,10 +87,6 @@ export default function PortugueseLandingPage() {
                 <Link href="/" hrefLang="en" className="font-semibold text-brand-deep hover:underline">
                     {t.englishSite}
                 </Link>
-                {' · '}
-                <Link href="/id" hrefLang="id" className="font-semibold text-brand-deep hover:underline">
-                    Bahasa Indonesia
-                </Link>
             </footer>
         </main>
     );

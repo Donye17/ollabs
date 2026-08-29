@@ -24,6 +24,8 @@ const labels = {
     alsoGreat: 'Também serve para',
     footerCopy: '© 2026 Ollabs. Reúna a sua galera.',
     exampleTitle: 'Exemplo de campanha',
+    scenariosTitle: 'Quando isso faz sentido',
+    readNext: 'Leia em seguida:',
 };
 
 export function generateStaticParams() {

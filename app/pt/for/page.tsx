@@ -12,9 +12,6 @@ export const metadata: Metadata = {
         languages: {
             en: 'https://ollabs.studio/for',
             'pt-BR': URL,
-            id: 'https://ollabs.studio/id/for',
-            es: 'https://ollabs.studio/es/for',
-            tl: 'https://ollabs.studio/tl/for',
             'x-default': 'https://ollabs.studio/for',
         },
     },

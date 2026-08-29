@@ -21,10 +21,6 @@ export const metadata: Metadata = {
         languages: {
             en: "https://ollabs.studio",
             "pt-BR": "https://ollabs.studio/pt",
-            id: "https://ollabs.studio/id",
-            tl: "https://ollabs.studio/tl",
-            hi: "https://ollabs.studio/hi",
-            es: "https://ollabs.studio/es",
             "x-default": "https://ollabs.studio",
         },
     },
@@ -166,9 +162,6 @@ export default function Home() {
                                     <li><Link href="/for" className="hover:text-brand-deep transition-colors">Use cases</Link></li>
                                     <li className="flex flex-wrap gap-x-2 gap-y-1 pt-1">
                                         <Link href="/pt" className="hover:text-brand-deep transition-colors">Português</Link>
-                                        <Link href="/id" className="hover:text-brand-deep transition-colors">Bahasa</Link>
-                                        <Link href="/es" className="hover:text-brand-deep transition-colors">Español</Link>
-                                        <Link href="/tl" className="hover:text-brand-deep transition-colors">Tagalog</Link>
                                         <Link href="/hi" className="hover:text-brand-deep transition-colors">हिन्दी</Link>
                                     </li>
                                 </ul>

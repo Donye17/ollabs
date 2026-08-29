@@ -17,13 +17,11 @@ const DISMISS_KEY = 'ollabs_locale_banner_dismissed';
 type MarketingLocale = Locale | 'tl' | 'hi' | 'es';
 
 function marketingLandingPath(locale: MarketingLocale): string | null {
-    if (locale === 'tl') return '/tl';
     if (locale === 'hi') return '/hi';
-    if (locale === 'es') return '/es';
     return localeLandingPath(locale);
 }
 
-/** Browser-first locale for soft banner offers (includes TL/HI/ES landings). */
+/** Browser-first locale for soft banner offers (product locales plus /hi). */
 function resolveMarketingLocale(languages: readonly string[]): MarketingLocale {
     for (const l of languages) {
         if (typeof l !== 'string') continue;
@@ -39,16 +37,14 @@ function resolveMarketingLocale(languages: readonly string[]): MarketingLocale {
 
 function onMarketingLanding(pathname: string): MarketingLocale | null {
     if (pathname === '/pt' || pathname.startsWith('/pt/')) return 'pt';
-    if (pathname === '/id' || pathname.startsWith('/id/')) return 'id';
-    if (pathname === '/tl' || pathname.startsWith('/tl/')) return 'tl';
     if (pathname === '/hi' || pathname.startsWith('/hi/')) return 'hi';
-    if (pathname === '/es' || pathname.startsWith('/es/')) return 'es';
     return null;
 }
 
 /**
- * Soft language offer. Never hard-redirects on first paint — that fights
- * WhatsApp WebViews. Choosing PT/ID can navigate to /pt or /id for SEO entry.
+ * Soft language offer. Never hard-redirects on first paint, that fights
+ * WhatsApp WebViews. Portuguese can still open /pt. Spanish, Indonesian, and
+ * Tagalog set the product-locale cookie and stay on the current page.
  */
 export function LanguageBanner() {
     const pathname = usePathname() || '/';
@@ -85,12 +81,7 @@ export function LanguageBanner() {
             setVisible(true);
             return;
         }
-        if (landingLocale === 'id' && nav === 'en' && locale === 'id') {
-            setSuggested('en');
-            setVisible(true);
-            return;
-        }
-        if ((landingLocale === 'tl' || landingLocale === 'hi' || landingLocale === 'es') && nav === 'en') {
+        if (landingLocale === 'hi' && nav === 'en') {
             setSuggested('en');
             setVisible(true);
         }
@@ -197,10 +188,7 @@ export function LanguageBanner() {
             </div>
             <span className="sr-only">
                 <Link href="/pt">Português</Link>
-                <Link href="/id">Bahasa Indonesia</Link>
-                <Link href="/tl">Filipino</Link>
                 <Link href="/hi">Hindi</Link>
-                <Link href="/es">Español</Link>
             </span>
         </div>
     );

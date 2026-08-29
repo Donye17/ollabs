@@ -1,7 +1,7 @@
 /**
  * Product locale overlays for ES / TL.
  *
- * Full marketing landings already exist at /es and /tl. These overlays deepen
+ * Spanish and Tagalog have no marketing landings. These overlays deepen
  * create / campaign / publish chrome so those visitors are not stuck in English
  * once they enter the product.
  */

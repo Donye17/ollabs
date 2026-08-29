@@ -13,9 +13,6 @@ export const metadata: Metadata = {
         languages: {
             en: 'https://ollabs.studio/vs/twibbonize',
             'pt-BR': URL,
-            id: 'https://ollabs.studio/id/vs/twibbonize',
-            es: 'https://ollabs.studio/es/vs/twibbonize',
-            tl: 'https://ollabs.studio/tl/vs/twibbonize',
             'x-default': 'https://ollabs.studio/vs/twibbonize',
         },
     },

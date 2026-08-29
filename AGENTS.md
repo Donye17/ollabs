@@ -17,9 +17,9 @@ slice (P0 conversion, hub H1–H10, P1 growth, P2 polish, owner-token hash + man
 designer, Stripe billing.
 
 Mobile shell, custom-frame create (Frame → Name → Send), organizer save + slug 301s, quiet ads, PT-BR,
-organizer hubs (themes, reorder, social icons, click counts, hide campaigns, one-tap claim), Bahasa,
-Tagalog/Hindi/Spanish landings (`/tl`, `/hi`, `/es`), product UI overlays for ES/TL, localized `/pt/for`,
-`/id/for`, and `/es/for` pages, `/pt/vs/twibbonize` and `/id/vs/twibbonize`, top-market `/day` pages
+organizer hubs (themes, reorder, social icons, click counts, hide campaigns, one-tap claim), Bahasa /
+Tagalog / Spanish product UI (no `/es` `/id` `/tl` marketing landings; those 301 to `/`), Hindi stub
+`/hi`, localized `/pt/for` and `/pt/vs/twibbonize`, top-market `/day` pages
 (NG, MX, MY, PH, TH) with WhatsApp share + frame OG, geo-biased Explore, starter frame packs,
 geo tracking, first-supporter + zero-supporter organizer email (cron), country breakdown on manage,
 Messenger+WhatsApp parity on publish for ID/TL, funnel `track()` events, report auto-hide.

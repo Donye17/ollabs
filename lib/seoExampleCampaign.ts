@@ -13,7 +13,8 @@ export type SeoExampleCampaign = {
     supporterPhotos: string[];
 };
 
-/** Use-case slug → campaign category for a matching live example. */
+/** Use-case slug → campaign category for a matching live example.
+ *  Birthdays share the event pool; universities share the school pool. */
 export const USE_CASE_CATEGORY: Record<string, CategoryKey> = {
     fundraisers: 'fundraiser',
     nonprofits: 'cause',

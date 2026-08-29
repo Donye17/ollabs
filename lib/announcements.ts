@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-28-locale-trees',
+        date: '2026-08-28',
+        title: 'Spanish, Indonesian, and Tagalog marketing pages retired',
+        summary: 'Those language landings now send you to the English home. Product UI in those languages is unchanged.',
+        items: [
+            'Links to /es, /id, and /tl now redirect home. Portuguese at /pt is unchanged. Hindi at /hi stays as a small stub.',
+            'Choosing Spanish, Indonesian, or Filipino in the language offer still switches the campaign and create screens. It no longer opens a separate marketing site.',
+        ],
+    },
+    {
         id: '2026-08-28-contact-quiet-c',
         date: '2026-08-28',
         title: 'A Contact page, and quieter campaign pages',

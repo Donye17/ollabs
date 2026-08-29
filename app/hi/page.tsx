@@ -35,10 +35,6 @@ export default function HindiLandingPage() {
                     <Link href="/pt" hrefLang="pt-BR" className="font-semibold text-brand-deep hover:underline">
                         Português
                     </Link>
-                    {' · '}
-                    <Link href="/id" hrefLang="id" className="font-semibold text-brand-deep hover:underline">
-                        Bahasa Indonesia
-                    </Link>
                 </>
             }
         />

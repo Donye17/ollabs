@@ -2,8 +2,9 @@
  * Lightweight locale for Ollabs.
  *
  * Not a full i18n framework. A cookie, dictionaries for converting surfaces
- * (campaign, create/publish), and SEO landings at /pt, /id, /es, /tl. Marketing
- * English stays the default site.
+ * (campaign, create/publish), and an SEO landing at /pt. /hi is a noindexed
+ * stub. Product UI in Spanish, Indonesian, and Tagalog still works via the
+ * locale cookie. Those languages no longer have marketing landings.
  */
 
 export type Locale = 'en' | 'pt' | 'id' | 'es' | 'tl';
@@ -52,11 +53,8 @@ export function ogLocale(locale: Locale): string {
     return 'en_US';
 }
 
-/** Path for a locale's SEO landing, or null for English (home). */
+/** Path for a locale's SEO landing, or null to stay on the current page. */
 export function localeLandingPath(locale: Locale): string | null {
     if (locale === 'pt') return '/pt';
-    if (locale === 'id') return '/id';
-    if (locale === 'es') return '/es';
-    if (locale === 'tl') return '/tl';
     return null;
 }

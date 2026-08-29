@@ -45,6 +45,8 @@ const labels = {
     alsoGreat: 'Also great for',
     footerCopy: '© 2026 Ollabs. Bring your people together.',
     exampleTitle: 'Example campaign',
+    scenariosTitle: 'When this is the right tool',
+    readNext: 'Read next:',
 };
 
 export default async function UseCasePage({ params }: { params: Promise<{ use: string }> }) {

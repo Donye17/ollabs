@@ -23,6 +23,10 @@ export type UseCaseLabels = {
     exampleTitle?: string;
     /** Secondary exit next to Create on the ready block. */
     exploreCampaigns?: string;
+    /** Heading above audience-specific scenes. */
+    scenariosTitle: string;
+    /** Small label before the guide link. */
+    readNext: string;
 };
 
 type Props = {
@@ -34,7 +38,7 @@ type Props = {
     example?: SeoExampleCampaign | null;
 };
 
-/** Shared layout for /for and localized /pt/for, /id/for SEO pages. */
+/** Shared layout for /for and localized /pt/for SEO pages. */
 export function UseCasePageShell({
     uc,
     labels,
@@ -93,12 +97,48 @@ export function UseCasePageShell({
 
             {example && (
                 <section className="px-4 sm:px-6 pb-10">
-                    <div className="max-w-3xl mx-auto flex justify-center">
+                    <div className="max-w-3xl mx-auto flex flex-col items-center">
                         <SeoCampaignExample
                             campaign={example}
                             size={220}
                             title={labels.exampleTitle || 'Example campaign'}
                         />
+                        {uc.exampleNote && (
+                            <p className="mt-4 max-w-xl text-center text-sm text-ink/60 leading-relaxed">
+                                {uc.exampleNote}
+                            </p>
+                        )}
+                    </div>
+                </section>
+            )}
+
+            {uc.scenarios.length > 0 && (
+                <section className="px-4 sm:px-6 pb-12 sm:pb-16">
+                    <div className="max-w-3xl mx-auto">
+                        <h2 className="font-display text-2xl sm:text-3xl font-bold mb-8">
+                            {labels.scenariosTitle}
+                        </h2>
+                        <div className="space-y-8">
+                            {uc.scenarios.map((s) => (
+                                <article key={s.title}>
+                                    <h3 className="font-display text-xl font-bold mb-3">{s.title}</h3>
+                                    <div className="space-y-3">
+                                        {s.paragraphs.map((p, i) => (
+                                            <p key={i} className="text-base text-ink/75 leading-relaxed">{p}</p>
+                                        ))}
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                        <p className="mt-8 text-sm text-ink/70">
+                            {labels.readNext}{' '}
+                            <Link
+                                href={uc.guide.href}
+                                className="font-semibold text-brand-deep hover:underline"
+                            >
+                                {uc.guide.label}
+                            </Link>
+                        </p>
                     </div>
                 </section>
             )}
