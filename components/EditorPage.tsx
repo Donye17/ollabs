@@ -74,7 +74,10 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
         const key = token;
         setEditLoading(true);
-        fetch(`/api/campaigns/${slug}/manage?token=${encodeURIComponent(key)}`)
+        fetch(`/api/campaigns/${slug}/manage`, {
+            credentials: 'include',
+            headers: { 'x-owner-token': key },
+        })
             .then(async (r) => {
                 if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Could not open this campaign');
                 return r.json();

@@ -57,10 +57,9 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
             } catch { /* private mode */ }
         }
         setToken(k);
-        const url = k
-            ? `/api/campaigns/${slug}/manage?token=${encodeURIComponent(k)}`
-            : `/api/campaigns/${slug}/manage`;
-        fetch(url, { credentials: 'include' })
+        const headers: HeadersInit = {};
+        if (k) headers['x-owner-token'] = k;
+        fetch(`/api/campaigns/${slug}/manage`, { credentials: 'include', headers })
             .then(async (r) => {
                 if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Could not load this campaign');
                 return r.json();

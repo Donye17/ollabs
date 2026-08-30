@@ -51,9 +51,12 @@ Turn off issue emails for `development`.
 
 ## PII
 
-`sendDefaultPii` is false. `beforeSend` in `lib/sentryScrub.ts` strips emails,
-`data:image` payloads, photo/frame fields, cookies, and Authorization headers.
-Supporter photos must never reach Sentry.
+`sendDefaultPii` is false. `beforeSend` and `beforeSendTransaction` in
+`lib/sentryScrub.ts` strip emails, `data:image` payloads, photo/frame fields,
+cookies, Authorization / owner-token / admin-key headers, and secrets that
+otherwise travel in URLs (`token`, `k`, `key`, recovery paths). Manage keys
+and `ADMIN_KEY` must never reach Sentry. Supporter photos must never reach
+Sentry either.
 
 ## Sampling
 
