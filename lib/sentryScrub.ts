@@ -1,20 +1,13 @@
 /**
  * Shared Sentry beforeSend. Supporter photos and emails must never leave the
  * process. Keep this isomorphic so server and edge configs stay identical.
+ *
+ * Typed as Sentry's ErrorEvent (not the DOM one) so next build accepts the
+ * beforeSend callback. A looser local type dropped `type: undefined` and
+ * failed production TypeScript.
  */
 
-type SentryLikeEvent = {
-    request?: {
-        data?: unknown;
-        headers?: Record<string, string>;
-        cookies?: Record<string, string>;
-        query_string?: unknown;
-    };
-    extra?: Record<string, unknown>;
-    contexts?: Record<string, unknown>;
-    user?: { email?: string; ip_address?: string; [k: string]: unknown };
-    breadcrumbs?: Array<{ data?: Record<string, unknown>; message?: string }>;
-};
+import type { ErrorEvent as SentryErrorEvent } from '@sentry/core';
 
 const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
 const DATA_URL = /data:image\/[a-z0-9+.-]+;base64,[a-z0-9+/=]+/gi;
@@ -50,32 +43,33 @@ function scrubUnknown(value: unknown, depth = 0): unknown {
     return value;
 }
 
-export function scrubSentryEvent<T extends SentryLikeEvent>(event: T): T {
+export function scrubSentryEvent(event: SentryErrorEvent): SentryErrorEvent {
     if (event.user) {
         event.user = { ...event.user, email: undefined, ip_address: undefined };
     }
     if (event.request) {
+        const headers = event.request.headers;
         event.request = {
             ...event.request,
             data: event.request.data ? scrubUnknown(event.request.data) : undefined,
             cookies: undefined,
-            headers: event.request.headers
+            headers: headers
                 ? Object.fromEntries(
-                    Object.entries(event.request.headers).map(([k, v]) =>
+                    Object.entries(headers).map(([k, v]) =>
                         k.toLowerCase() === 'cookie' || k.toLowerCase() === 'authorization'
                             ? [k, '[redacted]']
-                            : [k, typeof v === 'string' ? scrubString(v) : v]
+                            : [k, scrubString(v)]
                     )
                 )
                 : undefined,
         };
     }
-    if (event.extra) event.extra = scrubUnknown(event.extra) as Record<string, unknown>;
+    if (event.extra) event.extra = scrubUnknown(event.extra) as typeof event.extra;
     if (event.breadcrumbs) {
         event.breadcrumbs = event.breadcrumbs.map((b) => ({
             ...b,
             message: b.message ? scrubString(b.message) : b.message,
-            data: b.data ? (scrubUnknown(b.data) as Record<string, unknown>) : b.data,
+            data: b.data ? (scrubUnknown(b.data) as typeof b.data) : b.data,
         }));
     }
     return event;
