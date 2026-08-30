@@ -65,12 +65,18 @@ async function withOptionalManageCookie(
     return response;
 }
 
-// GET /api/campaigns/[slug]/manage?token=XXX
-// Returns real stats for the owner. Accepts owner token or manage session cookie.
+// GET /api/campaigns/[slug]/manage
+// Returns real stats for the owner. Accepts x-owner-token (or legacy ?token=)
+// or a manage session cookie.
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
     try {
         const { slug } = await params;
-        const token = new URL(request.url).searchParams.get('token') || '';
+        // Prefer the header so the manage key does not land in server logs,
+        // traces, or Sentry via ?token=. Query still works for old clients.
+        const token =
+            request.headers.get('x-owner-token')
+            || new URL(request.url).searchParams.get('token')
+            || '';
 
         const resolved = await resolveOwned(request, slug, token);
         if (!resolved) {

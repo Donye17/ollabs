@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:sentry-scrub": "tsx lib/sentryScrub.test.ts"
   },
   "repository": {
     "type": "git",
