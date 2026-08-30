@@ -6,12 +6,10 @@ import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 import { ExamplesSkeleton } from "@/components/home/ExamplesSkeleton";
 import { HomeExamplesSection } from "@/components/home/HomeExamplesSection";
-import { HomeCalendarSection } from "@/components/home/HomeCalendarSection";
 import { HomeHowItWorks } from "@/components/home/HomeHowItWorks";
 import { HomeHero } from "@/components/home/HomeHero";
 import { BrandMark } from "@/components/BrandMark";
 import { HOME_FAQS } from "@/lib/faqs";
-import { GuidesReadNext } from "@/components/guides/GuidesReadNext";
 
 export const revalidate = 600;
 
@@ -76,16 +74,12 @@ export default function Home() {
                 </Suspense>
             </section>
 
-            <Suspense fallback={<div className="h-[360px]" aria-hidden />}>
-                <HomeCalendarSection />
-            </Suspense>
-
             <HomeHowItWorks />
 
             <section className="px-6 py-14 border-t border-ink/10">
-                <div className="max-w-4xl mx-auto text-center">
-                    <p className="text-sm text-muted font-semibold mb-4">Made for</p>
-                    <p className="text-[15px] text-ink/80 leading-relaxed">
+                <div className="max-w-4xl mx-auto">
+                    <p className="text-sm text-muted font-semibold mb-4 text-center">Made for</p>
+                    <p className="text-[15px] text-ink/80 leading-relaxed text-left">
                         {audiences.map((a, i) => (
                             <span key={a.href}>
                                 {i > 0 && <span className="text-muted/50 mx-1.5">·</span>}
@@ -104,9 +98,9 @@ export default function Home() {
             </section>
 
             <section className="px-6 py-16 border-t border-ink/10">
-                <div className="max-w-2xl mx-auto text-center">
-                    <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3">Free for supporters</h2>
-                    <p className="text-ink/70 leading-relaxed">
+                <div className="max-w-2xl mx-auto">
+                    <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3 text-center">Free for supporters</h2>
+                    <p className="text-ink/70 leading-relaxed text-left">
                         No signup, no watermark, no paywall. Upload your own frame art, share one link, and watch the counter climb.
                     </p>
                 </div>
@@ -114,12 +108,10 @@ export default function Home() {
 
             <FAQSection />
 
-            <GuidesReadNext />
-
             <section className="px-6 py-20 border-t border-ink/10">
-                <div className="max-w-3xl mx-auto text-center">
-                    <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3">Make a frame</h2>
-                    <p className="text-ink/70 mb-8">Takes under a minute. No account needed.</p>
+                <div className="max-w-3xl mx-auto">
+                    <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3 text-center">Make a frame</h2>
+                    <p className="text-ink/70 mb-8 text-left">Takes under a minute. No account needed.</p>
                     <Link href="/create" className="inline-flex h-12 px-8 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all">
                         Create a campaign
                         <ArrowRight className="w-4 h-4" />

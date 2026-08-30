@@ -43,6 +43,10 @@ export function shouldShowMobileOrganizerNav(pathname: string): boolean {
     // Public hub pages.
     if (path.startsWith('/u/')) return false;
 
+    // Marketing homepage. Mine · Create · Hub is organizer chrome; a first
+    // visit should not lose the thumb zone to it.
+    if (path === '/') return false;
+
     // Marketing / SEO surfaces. Keep them lean.
     if (path === '/for' || path.startsWith('/for/')) return false;
     if (path === '/day' || path.startsWith('/day/')) return false;

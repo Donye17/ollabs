@@ -16,7 +16,7 @@ export function HomeHowItWorks() {
                 <ol className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr_auto_1fr] gap-6 sm:gap-4 items-start list-none">
                     {flow.map((step, i) => (
                         <React.Fragment key={step.n}>
-                            <li className="text-center sm:text-left px-2">
+                            <li className="text-left px-2">
                                 <p className="text-sm font-semibold text-muted mb-1">{step.n}. {step.title}</p>
                                 <p className="text-[15px] text-ink/70 leading-relaxed">{step.body}</p>
                             </li>

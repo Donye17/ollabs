@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-30-home-tool',
+        date: '2026-08-30',
+        title: 'Homepage is the tool now',
+        summary: 'Type a campaign name on the first screen and the link updates. Colour rings moved into create.',
+        items: [
+            'The first screen is a live slug, one field, and Criar campanha. No second button, no colour swatches.',
+            'The Mine Create Hub bar is gone from the marketing homepage so the thumb zone stays free.',
+            'Guide cards live on /guides. Day pages stay at /day, linked from the homepage in one line.',
+        ],
+    },
+    {
         id: '2026-08-29-campaign-path',
         date: '2026-08-29',
         title: 'Portuguese campaign pages, a working homepage demo, and a safer save',

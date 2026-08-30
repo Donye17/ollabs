@@ -44,13 +44,18 @@ function thumbFrame(frame: FrameConfig): FrameConfig {
  */
 export const CalendarStrip: React.FC<{ items: StripItem[] }> = ({ items }) => {
     const scroller = useRef<HTMLDivElement>(null);
-    const marker = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const el = scroller.current, m = marker.current;
-        if (!el || !m) return;
-        if (el.scrollWidth <= el.clientWidth) return;   // fits, nothing to centre
-        el.scrollLeft = m.offsetLeft - el.clientWidth / 2 + m.clientWidth / 2;
+        const el = scroller.current;
+        if (!el) return;
+        if (el.scrollWidth <= el.clientWidth) return;
+        // Scroll the first upcoming card into view, not the Today marker.
+        // Centering the marker used to push every tile off a 375px screen when
+        // the strip was all past dates, which looked like an empty section.
+        const upcoming = el.querySelector('[data-upcoming="true"]') as HTMLElement | null;
+        const target = upcoming ?? (el.querySelector('[data-day-card="true"]') as HTMLElement | null);
+        if (!target) return;
+        el.scrollLeft = Math.max(0, target.offsetLeft - 16);
     }, [items.length]);
 
     if (items.length === 0) return null;
@@ -63,6 +68,8 @@ export const CalendarStrip: React.FC<{ items: StripItem[] }> = ({ items }) => {
             key={`${i.slug}-${i.dateTop}-${i.dateMain}`}
             href={`/day/${i.slug}`}
             onClick={() => track('calendar_strip_click', { day: i.slug, past: i.past })}
+            data-day-card="true"
+            data-upcoming={i.past ? undefined : 'true'}
             className={`group shrink-0 w-[190px] snap-center rounded-2xl border border-ink/10 bg-cream
                         overflow-hidden transition-all hover:border-brand/50
                         ${i.past ? 'opacity-50 hover:opacity-90' : ''}`}
@@ -100,7 +107,7 @@ export const CalendarStrip: React.FC<{ items: StripItem[] }> = ({ items }) => {
             {items.slice(0, markerAt).map(card)}
 
             {/* today marker, sitting in the run rather than floating over it */}
-            <div ref={marker} className="shrink-0 flex flex-col items-center justify-center gap-2 px-1 snap-center">
+            <div className="shrink-0 flex flex-col items-center justify-center gap-2 px-1 snap-center">
                 <span className="w-2.5 h-2.5 rounded-full bg-brand ring-4 ring-brand/25" />
                 <span className="w-px flex-1 bg-ink/15" />
                 <span className="text-[10px] font-bold uppercase tracking-wider text-brand-deep whitespace-nowrap [writing-mode:vertical-rl]">
