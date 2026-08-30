@@ -4,6 +4,11 @@ import { notFound, redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { CampaignClient } from '@/components/campaign/CampaignClient';
 import { parseFrameConfig } from '@/lib/parseFrameConfig';
+import {
+    ogLocale,
+    resolveSupporterLocale,
+    type Locale,
+} from '@/lib/i18n/locale';
 
 // Cache the rendered page for 60s per slug. Repeat visits and crawler hits are
 // served from cache instead of querying Postgres every time, which keeps Neon
@@ -14,7 +19,8 @@ export const revalidate = 60;
 const getCampaign = cache(async (slug: string) => {
     try {
         const res = await pool.query(
-            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, goal, preview_url, is_public, is_hidden
+            `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, goal, preview_url, is_public, is_hidden,
+                    publisher_country, first_supporter_country
              FROM campaigns WHERE slug = $1 LIMIT 1`,
             [slug]
         );
@@ -48,6 +54,15 @@ const resolveRedirectSlug = cache(async (slug: string): Promise<string | null> =
     }
 });
 
+function campaignCountry(c: { publisher_country?: string | null; first_supporter_country?: string | null }): string | null {
+    return c.publisher_country || c.first_supporter_country || null;
+}
+
+function fallbackDescription(title: string, locale: Locale): string {
+    if (locale === 'pt') return `Coloque a moldura ${title} na sua foto de perfil e mostre seu apoio.`;
+    return `Add the ${title} frame to your profile picture and show your support.`;
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
     let c = await getCampaign(slug);
@@ -56,7 +71,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         if (dest) c = await getCampaign(dest);
     }
     if (!c) return { title: 'Campaign not found' };
-    const description = c.description || `Add the ${c.title} frame to your profile picture and show your support.`;
+    const locale = resolveSupporterLocale({ campaignCountry: campaignCountry(c) });
+    const description = c.description || fallbackDescription(c.title, locale);
 
     // Prefer a stored face-in-frame composite when present (WhatsApp unfurls
     // read better with a real face). Fall back to custom frame artwork, then
@@ -81,6 +97,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         openGraph: {
             title: c.title,
             description,
+            locale: ogLocale(locale),
             url: `https://ollabs.studio/c/${c.slug}`,
             images: [{ url: shareImage, width: 1024, height: 1024, alt: c.title }],
         },
@@ -102,6 +119,11 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
     const frame = parseFrameConfig(campaign.frame_config);
     if (!frame) notFound();
 
+    const country = campaignCountry(campaign);
+    // ISR caches this HTML per slug. Reading Accept-Language here would make
+    // every campaign page dynamic, which we cannot do before the October spike.
+    // Untagged and Brazilian campaigns are Portuguese from resolveSupporterLocale.
+
     return (
         <CampaignClient
             slug={campaign.slug}
@@ -111,6 +133,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
             initialCount={campaign.supporter_count ?? 0}
             goal={campaign.goal ?? null}
             frame={frame}
+            campaignCountry={country}
         />
     );
 }

@@ -12,6 +12,7 @@ export type Messages = {
         eyebrow: string;
         tapHint: string;
         uploadPhoto: string;
+        uploadFailed: string;
         stepAdd: string;
         stepFit: string;
         stepShare: string;
@@ -48,11 +49,30 @@ export type Messages = {
         makeOwnFooter: string;
         setupHub: string;
         report: string;
+        guides: string;
         reportTitle: string;
         reportPlaceholder: string;
         submitReport: string;
         cancel: string;
         reportThanks: string;
+        inAppWhatsApp: string;
+        inAppInstagram: string;
+        inAppFacebook: string;
+        inAppOpenBrowser: string;
+        inAppCopyLink: string;
+        inAppDismiss: string;
+        inAppSaveFailed: string;
+        setPhotoTitle: string;
+        setPhotoWhatsApp: string;
+        setPhotoInstagram: string;
+        setPhotoFacebook: string;
+        setPhotoGeneric: string;
+        setPhotoProof: string;
+        formatProfile: string;
+        formatProfileSize: string;
+        formatStory: string;
+        formatStorySize: string;
+        canvasLabel: string;
     };
     create: {
         title: string;
@@ -317,6 +337,7 @@ const en: Messages = {
         eyebrow: 'Ollabs campaign',
         tapHint: 'Tap the circle or drag a photo onto it.',
         uploadPhoto: 'Upload your photo',
+        uploadFailed: 'That image could not be opened. Try a JPG or PNG.',
         stepAdd: 'Add your photo',
         stepFit: 'Adjust the fit',
         stepShare: 'Download & share',
@@ -326,7 +347,7 @@ const en: Messages = {
         savePhotoHint: 'In the sheet, tap Save Image to add it to your Photos app.',
         savePhotoUnavailable: 'Could not save here. Open this page in Safari, then try again.',
         openInSafari: 'Open in Safari',
-        download: 'Download',
+        download: 'Download photo',
         downloadedAgain: 'Downloaded, download again',
         copyImage: 'Copy image',
         imageCopied: 'Image copied',
@@ -354,11 +375,30 @@ const en: Messages = {
         makeOwnFooter: 'Make your own with Ollabs',
         setupHub: 'Set up your campaign hub',
         report: 'Report this campaign',
+        guides: 'Guides',
         reportTitle: 'Report this campaign',
         reportPlaceholder: "What's wrong with it? (optional)",
         submitReport: 'Submit report',
         cancel: 'Cancel',
         reportThanks: 'Thanks, we will review this campaign.',
+        inAppWhatsApp: 'You are in the WhatsApp browser.',
+        inAppInstagram: 'You are in the Instagram browser.',
+        inAppFacebook: 'You are in the Facebook browser.',
+        inAppOpenBrowser: 'Open in browser',
+        inAppCopyLink: 'Copy link',
+        inAppDismiss: 'Continue here',
+        inAppSaveFailed: 'The image did not save. This in-app browser sometimes blocks downloads.',
+        setPhotoTitle: 'Now set it as your profile picture',
+        setPhotoWhatsApp: 'WhatsApp: Settings > tap your photo > Gallery',
+        setPhotoInstagram: 'Instagram: Profile > Edit profile > Change photo',
+        setPhotoFacebook: 'Facebook: tap your photo > Choose profile picture',
+        setPhotoGeneric: 'Open the app and change your profile photo. The file is in your gallery.',
+        setPhotoProof: 'How it looks',
+        formatProfile: 'Profile photo',
+        formatProfileSize: '1080 × 1080',
+        formatStory: 'Story',
+        formatStorySize: '1080 × 1920',
+        canvasLabel: 'Campaign frame. Add your photo here.',
     },
     create: {
         title: 'Campaign builder',
@@ -479,7 +519,8 @@ const pt: Messages = {
     campaign: {
         eyebrow: 'Campanha Ollabs',
         tapHint: 'Toque no círculo ou arraste uma foto.',
-        uploadPhoto: 'Enviar sua foto',
+        uploadPhoto: 'Selecionar sua foto',
+        uploadFailed: 'Não foi possível abrir essa imagem. Tente um JPG ou PNG.',
         stepAdd: 'Adicione sua foto',
         stepFit: 'Ajuste o enquadramento',
         stepShare: 'Baixe e compartilhe',
@@ -489,14 +530,14 @@ const pt: Messages = {
         savePhotoHint: 'Na folha de compartilhamento, toque em Salvar imagem para ir às Fotos.',
         savePhotoUnavailable: 'Não deu para salvar aqui. Abra no Safari e tente de novo.',
         openInSafari: 'Abrir no Safari',
-        download: 'Baixar',
+        download: 'Baixar foto',
         downloadedAgain: 'Baixado, baixar de novo',
         copyImage: 'Copiar imagem',
         imageCopied: 'Imagem copiada',
         newPhoto: 'Nova foto',
         share: 'Compartilhar',
         copied: 'Copiado',
-        peopleSupporting: 'pessoas apoiando',
+        peopleSupporting: 'apoiadores',
         of: 'de',
         ofSupporters: 'apoiadores',
         goalReached: 'meta atingida',
@@ -518,11 +559,30 @@ const pt: Messages = {
         makeOwnFooter: 'Crie a sua no Ollabs',
         setupHub: 'Configure seu hub de campanhas',
         report: 'Denunciar esta campanha',
+        guides: 'Guias',
         reportTitle: 'Denunciar esta campanha',
         reportPlaceholder: 'O que está errado? (opcional)',
         submitReport: 'Enviar denúncia',
         cancel: 'Cancelar',
         reportThanks: 'Obrigado, vamos analisar esta campanha.',
+        inAppWhatsApp: 'Você está no navegador do WhatsApp.',
+        inAppInstagram: 'Você está no navegador do Instagram.',
+        inAppFacebook: 'Você está no navegador do Facebook.',
+        inAppOpenBrowser: 'Abrir no navegador',
+        inAppCopyLink: 'Copiar link',
+        inAppDismiss: 'Continuar aqui',
+        inAppSaveFailed: 'A imagem não baixou. Este navegador às vezes bloqueia o salvamento.',
+        setPhotoTitle: 'Agora use como foto de perfil',
+        setPhotoWhatsApp: 'WhatsApp: Configurações > toque na sua foto > Galeria',
+        setPhotoInstagram: 'Instagram: Perfil > Editar perfil > Alterar foto',
+        setPhotoFacebook: 'Facebook: toque na sua foto > Escolher foto do perfil',
+        setPhotoGeneric: 'Abra o app e altere a foto de perfil. O arquivo já está na galeria.',
+        setPhotoProof: 'Veja como fica',
+        formatProfile: 'Foto de perfil',
+        formatProfileSize: '1080 × 1080',
+        formatStory: 'Story',
+        formatStorySize: '1080 × 1920',
+        canvasLabel: 'Moldura da campanha. Adicione sua foto aqui.',
     },
     create: {
         title: 'Criar campanha',
@@ -645,6 +705,7 @@ const id: Messages = {
         eyebrow: 'Kampanye Ollabs',
         tapHint: 'Ketuk lingkaran atau seret foto ke situ.',
         uploadPhoto: 'Unggah fotomu',
+        uploadFailed: 'Gambar itu tidak bisa dibuka. Coba JPG atau PNG.',
         stepAdd: 'Tambahkan fotomu',
         stepFit: 'Sesuaikan posisi',
         stepShare: 'Unduh & bagikan',
@@ -654,7 +715,7 @@ const id: Messages = {
         savePhotoHint: 'Di lembar bagikan, ketuk Simpan Gambar untuk masuk ke Foto.',
         savePhotoUnavailable: 'Tidak bisa simpan di sini. Buka di Safari, lalu coba lagi.',
         openInSafari: 'Buka di Safari',
-        download: 'Unduh',
+        download: 'Unduh foto',
         downloadedAgain: 'Sudah diunduh, unduh lagi',
         copyImage: 'Salin gambar',
         imageCopied: 'Gambar disalin',
@@ -683,11 +744,30 @@ const id: Messages = {
         makeOwnFooter: 'Buat sendiri di Ollabs',
         setupHub: 'Atur hub kampanyemu',
         report: 'Laporkan kampanye ini',
+        guides: 'Panduan',
         reportTitle: 'Laporkan kampanye ini',
         reportPlaceholder: 'Ada apa yang salah? (opsional)',
         submitReport: 'Kirim laporan',
         cancel: 'Batal',
         reportThanks: 'Terima kasih, kami akan meninjau kampanye ini.',
+        inAppWhatsApp: 'Kamu sedang di browser WhatsApp.',
+        inAppInstagram: 'Kamu sedang di browser Instagram.',
+        inAppFacebook: 'Kamu sedang di browser Facebook.',
+        inAppOpenBrowser: 'Buka di browser',
+        inAppCopyLink: 'Salin link',
+        inAppDismiss: 'Lanjut di sini',
+        inAppSaveFailed: 'Gambar tidak tersimpan. Browser dalam aplikasi kadang memblokir unduhan.',
+        setPhotoTitle: 'Sekarang pasang sebagai foto profil',
+        setPhotoWhatsApp: 'WhatsApp: Pengaturan > ketuk fotomu > Galeri',
+        setPhotoInstagram: 'Instagram: Profil > Edit profil > Ganti foto',
+        setPhotoFacebook: 'Facebook: ketuk fotomu > Pilih foto profil',
+        setPhotoGeneric: 'Buka aplikasinya dan ganti foto profil. Filenya sudah di galeri.',
+        setPhotoProof: 'Begini tampilannya',
+        formatProfile: 'Foto profil',
+        formatProfileSize: '1080 × 1080',
+        formatStory: 'Story',
+        formatStorySize: '1080 × 1920',
+        canvasLabel: 'Bingkai kampanye. Tambahkan fotomu di sini.',
     },
     create: {
         title: 'Pembuat kampanye',

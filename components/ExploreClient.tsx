@@ -38,10 +38,11 @@ function frameOverlayUrl(frame: FrameConfig): string | null {
     return null;
 }
 
-const LazyPreview: React.FC<{ frame: FrameConfig; supporterPhotos: string[]; eager: boolean }> = ({
+const LazyPreview: React.FC<{ frame: FrameConfig; supporterPhotos: string[]; eager: boolean; title: string }> = ({
     frame,
     supporterPhotos,
     eager,
+    title,
 }) => {
     const holder = useRef<HTMLDivElement>(null);
     const [show, setShow] = useState(eager);
@@ -80,6 +81,7 @@ const LazyPreview: React.FC<{ frame: FrameConfig; supporterPhotos: string[]; eag
                     supporterPhotos={supporterPhotos}
                     size={THUMB_RESOLUTION}
                     className="w-full h-full"
+                    title={title}
                 />
             ) : (
                 <div className="w-full h-full rounded-full bg-ink/10 animate-pulse" aria-hidden />
@@ -120,7 +122,7 @@ export const ExploreClient: React.FC<{ campaigns: ExploreCampaign[] }> = ({ camp
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
                         placeholder="Search campaigns"
-                        className="flex-1 bg-transparent py-3 text-ink placeholder-muted outline-none"
+                        className="flex-1 min-h-[44px] bg-transparent py-3 text-ink placeholder-muted outline-none"
                     />
                 </div>
             </div>
@@ -130,17 +132,18 @@ export const ExploreClient: React.FC<{ campaigns: ExploreCampaign[] }> = ({ camp
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 md:gap-8">
                     {filtered.map((c, i) => (
-                        <Link key={c.slug} href={`/c/${c.slug}`} className="group flex flex-col items-center gap-3">
+                        <Link key={c.slug} href={`/c/${c.slug}`} className="group flex flex-col items-center gap-3" aria-label={`${c.title}. ${c.supporterCount.toLocaleString()} supporting`}>
                             <LazyPreview
                                 frame={c.frame}
                                 supporterPhotos={c.supporterPhotos}
                                 eager={i < INITIAL_WINDOW}
+                                title={c.title}
                             />
-                            <div className="text-center max-w-[11rem]">
-                                <p className="text-sm font-semibold text-ink group-hover:text-brand-deep transition-colors line-clamp-2">
+                            <div className="text-center w-full min-w-0">
+                                <p className="text-sm font-semibold text-ink group-hover:text-brand-deep transition-colors line-clamp-2 break-words">
                                     {c.title}
                                 </p>
-                                <p className="text-xs text-muted mt-0.5">
+                                <p className="block text-xs text-muted mt-1 tabular-nums">
                                     {c.supporterCount.toLocaleString()} supporting
                                 </p>
                             </div>

@@ -1,19 +1,10 @@
 "use client";
 
-import dynamic from 'next/dynamic';
 import type { TopCampaign } from '@/components/home/TopCampaignsPodium';
-import { ExamplesSkeleton } from '@/components/home/ExamplesSkeleton';
-import { DeferUntilVisible } from '@/components/home/DeferUntilVisible';
+import { TopCampaignsPodium } from '@/components/home/TopCampaignsPodium';
 
-const TopCampaignsPodium = dynamic(
-    () => import('@/components/home/TopCampaignsPodium').then((m) => ({ default: m.TopCampaignsPodium })),
-    { ssr: false, loading: () => <ExamplesSkeleton /> }
-);
-
+/** Server-renders the podium. The old ssr:false + DeferUntilVisible path left
+ *  "Top campaigns" as a heading with nothing under it on a cold mobile load. */
 export function HomeTopCampaignsClient({ campaigns }: { campaigns: TopCampaign[] }) {
-    return (
-        <DeferUntilVisible fallback={<ExamplesSkeleton />}>
-            <TopCampaignsPodium campaigns={campaigns} />
-        </DeferUntilVisible>
-    );
+    return <TopCampaignsPodium campaigns={campaigns} />;
 }

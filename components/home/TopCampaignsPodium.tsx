@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Users } from 'lucide-react';
 import { CampaignGridThumb } from '@/components/CampaignGridThumb';
@@ -34,9 +34,10 @@ function PodiumLink({
     return (
         <Link
             href={`/c/${campaign.slug}`}
-            className={`group flex flex-col items-center text-center outline-none ${
+            className={`group flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-xl ${
                 first ? 'pt-0' : 'pt-6'
             }`}
+            aria-label={`${campaign.title}. ${campaign.supporterCount.toLocaleString()} supporting`}
         >
             <span
                 className={`mb-2 inline-flex items-center justify-center rounded-full font-display font-bold tabular-nums ${
@@ -59,18 +60,19 @@ function PodiumLink({
                     supporterPhotos={campaign.supporterPhotos}
                     size={canvasPx}
                     className="w-full h-full"
+                    title={campaign.title}
                 />
             </div>
             <p
-                className={`mt-3 font-display font-bold leading-snug line-clamp-2 text-balance group-hover:text-brand-deep transition-colors ${
+                className={`mt-3 font-display font-bold leading-snug line-clamp-2 break-words text-balance group-hover:text-brand-deep transition-colors ${
                     first ? 'text-[15px] sm:text-base' : 'text-sm'
                 }`}
             >
                 {campaign.title}
             </p>
-            <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted tabular-nums">
-                <Users size={12} className="shrink-0" aria-hidden />
-                {campaign.supporterCount.toLocaleString()}
+            <p className="mt-1 block text-xs text-muted tabular-nums">
+                <Users size={12} className="inline shrink-0 mr-1" aria-hidden />
+                {campaign.supporterCount.toLocaleString()} supporting
             </p>
         </Link>
     );
@@ -89,18 +91,19 @@ function DesktopTile({ campaign, rank }: { campaign: TopCampaign; rank: number }
                         supporterPhotos={campaign.supporterPhotos}
                         size={192}
                         className="w-full h-full"
+                        title={campaign.title}
                     />
                 </div>
                 <span className="absolute -top-1 -left-1 h-7 min-w-7 px-1.5 inline-flex items-center justify-center rounded-full bg-ink text-paper text-xs font-bold tabular-nums">
                     {rank}
                 </span>
             </div>
-            <p className="mt-3 font-display font-bold text-sm leading-snug line-clamp-2 text-balance group-hover:text-brand-deep transition-colors max-w-[10rem]">
+            <p className="mt-3 font-display font-bold text-sm leading-snug line-clamp-2 break-words text-balance group-hover:text-brand-deep transition-colors max-w-[10rem]">
                 {campaign.title}
             </p>
-            <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted tabular-nums">
-                <Users size={12} className="shrink-0" aria-hidden />
-                {campaign.supporterCount.toLocaleString()}
+            <p className="mt-1 block text-xs text-muted tabular-nums">
+                <Users size={12} className="inline shrink-0 mr-1" aria-hidden />
+                {campaign.supporterCount.toLocaleString()} supporting
             </p>
         </Link>
     );
@@ -111,26 +114,8 @@ function DesktopTile({ campaign, rank }: { campaign: TopCampaign; rank: number }
  * shows up to six equal tiles so discovery feels fuller without a carousel.
  */
 export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) {
-    // Desktop grid is display:none on phones but browsers still download those
-    // <img>s. Mount it only at md+ so mobile lab audits stop counting six
-    // offscreen explore JPEGs.
-    const [isDesktop, setIsDesktop] = useState(() =>
-        typeof window !== 'undefined' ? window.matchMedia('(min-width: 768px)').matches : false
-    );
     useEffect(() => {
-        const mq = window.matchMedia('(min-width: 768px)');
-        const apply = () => setIsDesktop(mq.matches);
-        apply();
-        mq.addEventListener('change', apply);
-        return () => mq.removeEventListener('change', apply);
-    }, []);
-
-    // Prefetch only the thumbs that will actually paint. Never prefetch
-    // custom frame overlay PNGs here: those are often 0.5–1MB+ and wiped mobile LCP.
-    useEffect(() => {
-        const targets = isDesktop
-            ? campaigns
-            : [campaigns[1], campaigns[0], campaigns[2]].filter(Boolean) as TopCampaign[];
+        const targets = [campaigns[1], campaigns[0], campaigns[2]].filter(Boolean) as TopCampaign[];
         for (const c of targets) {
             const url = c.supporterPhotos[0];
             if (url) {
@@ -139,7 +124,7 @@ export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) 
                 img.src = url;
             }
         }
-    }, [campaigns, isDesktop]);
+    }, [campaigns]);
 
     const podium: Slot[] = [];
     if (campaigns[1]) podium.push({ rank: 2, campaign: campaigns[1] });
@@ -168,14 +153,12 @@ export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) 
                 </div>
             )}
 
-            {/* Desktop: up to six live tiles */}
-            {isDesktop && (
-                <div className="hidden md:grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-6 max-w-5xl lg:max-w-6xl mx-auto px-2">
-                    {desktop.map((campaign, i) => (
-                        <DesktopTile key={campaign.slug} campaign={campaign} rank={i + 1} />
-                    ))}
-                </div>
-            )}
+            {/* Desktop: up to six live tiles. loading=lazy so phones skip them. */}
+            <div className="hidden md:grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-6 max-w-5xl lg:max-w-6xl mx-auto px-2">
+                {desktop.map((campaign, i) => (
+                    <DesktopTile key={campaign.slug} campaign={campaign} rank={i + 1} />
+                ))}
+            </div>
         </div>
     );
 }

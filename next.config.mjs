@@ -1,3 +1,5 @@
+import { withSentryConfig } from '@sentry/nextjs';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
@@ -48,4 +50,11 @@ const nextConfig = {
     },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+    // No auth token on this box. Skip source maps so the build does not stall
+    // waiting for Sentry. Errors still group by minified frames until we add
+    // SENTRY_AUTH_TOKEN, documented in docs/SENTRY.md.
+    silent: true,
+    sourcemaps: { disable: true },
+    widenClientFileUpload: false,
+});

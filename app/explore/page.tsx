@@ -41,7 +41,7 @@ async function getCampaigns(
     // Soft geo boost: same-country publishers float slightly without hiding others.
     const geoBoost = visitorCountry
         ? `CASE WHEN c.publisher_country = '${visitorCountry.replace(/[^A-Z]/g, '')}' THEN 1 ELSE 0 END`
-        : '0';
+        : '0::int';
     let query: string;
     if (sort === 'newest') {
         query = `SELECT ${EXPLORE_SELECT}, c.supporter_count

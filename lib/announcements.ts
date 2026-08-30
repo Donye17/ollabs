@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-08-29-campaign-path',
+        date: '2026-08-29',
+        title: 'Portuguese campaign pages, a working homepage demo, and a safer save',
+        summary: 'Brazilian campaigns speak Portuguese. After a save you get profile-picture steps. WhatsApp in-app browsers get a way out if the download fails.',
+        items: [
+            'A supporter opening a Brazilian campaign sees Portuguese on the first paint, with counts as 1.926.',
+            'Pick profile photo or story before you upload, then get one instruction for setting the picture after you save.',
+            'Type a name on the homepage to see a live ollabs.studio/c link and carry it into Create.',
+        ],
+    },
+    {
         id: '2026-08-28-guides-four-more',
         date: '2026-08-28',
         title: 'Four more guides: saving on iPhone, custom frames, manage, and keeping access',

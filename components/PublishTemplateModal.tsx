@@ -49,8 +49,10 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             const params = new URLSearchParams(window.location.search);
             const d = params.get('day');
             const from = params.get('from');
+            const name = params.get('name');
             if (d) setDaySlug(d);
             if (from) setReferrerSlug(from);
+            if (name) setTitle(name.slice(0, 80));
         } catch { /* ignore */ }
     }, []);
 

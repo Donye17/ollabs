@@ -12,7 +12,13 @@ import { saveFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome 
 import { framedCircleToStoryBlob } from '@/lib/storyExport';
 import { uploadExploreThumb } from '@/lib/exploreThumb';
 import { BrandMark } from '@/components/BrandMark';
+import { getMessages } from '@/lib/i18n/messages';
+import { formatCount, htmlLang, resolveSupporterLocale } from '@/lib/i18n/locale';
 import { useLocale } from '@/components/i18n/LocaleProvider';
+import { InAppRescueBar } from '@/components/campaign/InAppRescueBar';
+import { ProfileSetHint } from '@/components/campaign/ProfileSetHint';
+import { FormatCards, type ExportFormat } from '@/components/campaign/FormatCards';
+import { arrivalPlatform, detectInAppBrowser, INAPP_RECOVERY_KEY, sessionFlag, setSessionFlag } from '@/lib/inAppBrowser';
 import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles, ArrowRight } from 'lucide-react';
 
 const CANVAS = 1024;
@@ -25,11 +31,20 @@ interface CampaignClientProps {
     initialCount: number;
     goal?: number | null;
     frame: FrameConfig;
+    campaignCountry?: string | null;
 }
 
-export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, description, initialCount, goal, frame }) => {
-    const { messages, locale } = useLocale();
-    const t = messages.campaign;
+export const CampaignClient: React.FC<CampaignClientProps> = ({
+    slug, title, description, initialCount, goal, frame, campaignCountry,
+}) => {
+    const { locale: browserLocale } = useLocale();
+    // Country (or untagged → pt) wins over the browser so WhatsApp's English
+    // UA cannot put a Brazilian supporter back on English copy.
+    const locale = resolveSupporterLocale({
+        campaignCountry,
+        languages: [browserLocale],
+    });
+    const t = getMessages(locale).campaign;
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const imgRef = useRef<HTMLImageElement | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
@@ -60,6 +75,11 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
     const [sharingPhoto, setSharingPhoto] = useState(false);
     const [sharingStory, setSharingStory] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
+    const [exportFormat, setExportFormat] = useState<ExportFormat>('square');
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [setPhotoPlatform, setSetPhotoPlatform] = useState<ReturnType<typeof arrivalPlatform>>('whatsapp');
+    const [showSaveRecovery, setShowSaveRecovery] = useState(false);
+    const reportBoxRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setCanCopyImage(
@@ -68,7 +88,20 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
             !!navigator.clipboard && typeof navigator.clipboard.write === 'function'
         );
         setCanSharePhoto(preferShareSheetForSave());
+        setSetPhotoPlatform(arrivalPlatform());
     }, []);
+
+    useEffect(() => {
+        if (!reportOpen) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setReportOpen(false);
+        };
+        window.addEventListener('keydown', onKey);
+        const root = reportBoxRef.current;
+        const focusable = root?.querySelector<HTMLElement>('textarea, button');
+        focusable?.focus();
+        return () => window.removeEventListener('keydown', onKey);
+    }, [reportOpen]);
 
     const handleCopyImage = async () => {
         const canvas = canvasRef.current;
@@ -209,10 +242,10 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 track('photo_uploaded', { campaign: slug });
                 draw();
             };
-            img.onerror = () => { track('photo_upload_failed', { campaign: slug }); setUploadError('That image could not be opened. Try a JPG or PNG.'); };
+            img.onerror = () => { track('photo_upload_failed', { campaign: slug }); setUploadError(t.uploadFailed); };
             img.src = dataUrl;
         } catch {
-            setUploadError('That image could not be opened. Try a JPG or PNG.');
+            setUploadError(t.uploadFailed);
         }
     };
 
@@ -303,15 +336,37 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         }
     };
 
+    const exportBlob = async (): Promise<{ blob: Blob; filename: string } | null> => {
+        const canvas = canvasRef.current;
+        if (!canvas) return null;
+        if (exportFormat === 'story') {
+            const story = await framedCircleToStoryBlob(canvas);
+            if (!story) return null;
+            return { blob: story, filename: `ollabs-${slug}-story.png` };
+        }
+        const blob = await taggedBlob();
+        if (!blob) return null;
+        return { blob, filename: `ollabs-${slug}.png` };
+    };
+
     const applySaveOutcome = (outcome: SavePhotoOutcome) => {
         if (outcome === 'shared' || outcome === 'downloaded') {
             recordSupporterUse();
             setJustDownloaded(true);
             setSaveError(null);
+            setShowSaveRecovery(false);
+            const canvas = canvasRef.current;
+            if (canvas) {
+                try { setPreviewUrl(canvas.toDataURL('image/png')); } catch { /* ignore */ }
+            }
             return true;
         }
         if (outcome === 'unavailable') {
-            setSaveError(t.savePhotoUnavailable);
+            setSaveError(detectInAppBrowser() ? t.inAppSaveFailed : t.savePhotoUnavailable);
+            if (!sessionFlag(INAPP_RECOVERY_KEY)) {
+                setShowSaveRecovery(true);
+                setSessionFlag(INAPP_RECOVERY_KEY);
+            }
         }
         return false;
     };
@@ -322,16 +377,16 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         setDownloading(true);
         setSaveError(null);
         try {
-            const blob = await taggedBlob();
-            if (!blob) return;
+            const exported = await exportBlob();
+            if (!exported) return;
             const outcome = await saveFramedPhoto({
-                blob,
-                filename: `ollabs-${slug}.png`,
+                blob: exported.blob,
+                filename: exported.filename,
                 title,
                 forceDownload: true,
             });
             if (applySaveOutcome(outcome)) {
-                track('frame_download', { campaign: slug });
+                track('frame_download', { campaign: slug, format: exportFormat });
             }
         } finally {
             setDownloading(false);
@@ -353,17 +408,17 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         setSharingPhoto(true);
         setSaveError(null);
         try {
-            const blob = await taggedBlob();
-            if (!blob) return;
+            const exported = await exportBlob();
+            if (!exported) return;
             const outcome = await saveFramedPhoto({
-                blob,
-                filename: `ollabs-${slug}.png`,
+                blob: exported.blob,
+                filename: exported.filename,
                 title,
             });
             if (outcome === 'shared' && applySaveOutcome(outcome)) {
-                track('frame_share_photo', { campaign: slug });
+                track('frame_share_photo', { campaign: slug, format: exportFormat });
             } else if (outcome === 'downloaded' && applySaveOutcome(outcome)) {
-                track('frame_download', { campaign: slug });
+                track('frame_download', { campaign: slug, format: exportFormat });
             } else {
                 applySaveOutcome(outcome);
             }
@@ -425,17 +480,12 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
         : 'pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]';
 
     return (
-        <div className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-[max(0.75rem,env(safe-area-inset-top,0px))] ${bottomPad}`}>
+        <div lang={htmlLang(locale)} className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-[max(0.75rem,env(safe-area-inset-top,0px))] ${bottomPad}`}>
             {/* A3: mark only on empty / post-save. During adjust the frame is the UI. */}
             {!adjusting && <BrandMark className="mb-4 mt-2" size={24} />}
 
             <div className="w-full max-w-sm flex flex-col items-center gap-3">
-                {justDownloaded ? (
-                    <div className="text-center animate-fade-in px-1">
-                        <p className="font-display text-xl font-bold leading-tight">{t.youreIn}</p>
-                        <p className="text-sm text-muted mt-1.5 leading-relaxed">{t.bringPeople}</p>
-                    </div>
-                ) : (
+                {!justDownloaded && (
                     <div className="text-center">
                         {!hasImage && (
                             <p className="text-sm font-semibold text-muted">{t.eyebrow}</p>
@@ -449,12 +499,50 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     </div>
                 )}
 
+                {!hasImage && (
+                    <InAppRescueBar
+                        pageUrl={pageUrl}
+                        onCopy={copyLink}
+                        copy={{
+                            whatsapp: t.inAppWhatsApp,
+                            instagram: t.inAppInstagram,
+                            facebook: t.inAppFacebook,
+                            openBrowser: t.inAppOpenBrowser,
+                            copyLink: t.inAppCopyLink,
+                            dismiss: t.inAppDismiss,
+                            copied: t.copied,
+                        }}
+                    />
+                )}
+
+                {!hasImage && (
+                    <FormatCards
+                        value={exportFormat}
+                        onChange={setExportFormat}
+                        copy={{
+                            profile: t.formatProfile,
+                            profileSize: t.formatProfileSize,
+                            story: t.formatStory,
+                            storySize: t.formatStorySize,
+                        }}
+                    />
+                )}
+
                 {/* A1: canvas ~60dvh on phones so the face fills the first viewport.
                     Cap for desktop so the circle does not dominate a wide screen. */}
+                <div
+                    className={
+                        exportFormat === 'story' && (hasImage || justDownloaded)
+                            ? 'w-[min(52vw,42dvh)] max-w-[220px] aspect-[9/16] rounded-2xl bg-ink flex items-center justify-center p-3'
+                            : ''
+                    }
+                >
                 <canvas
                     ref={canvasRef}
                     width={CANVAS}
                     height={CANVAS}
+                    role="img"
+                    aria-label={t.canvasLabel}
                     onPointerDown={onPointerDown}
                     onPointerMove={onPointerMove}
                     onPointerUp={onPointerUp}
@@ -464,12 +552,15 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     onDrop={onDrop}
                     onClick={() => { if (!hasImage) fileRef.current?.click(); }}
                     className={`rounded-full touch-none frame-shadow ${
-                        hasImage
+                        exportFormat === 'story' && (hasImage || justDownloaded)
+                            ? 'w-full h-auto aspect-square cursor-grab active:cursor-grabbing'
+                            : hasImage
                             ? 'w-[min(88vw,58dvh)] h-[min(88vw,58dvh)] max-w-[400px] max-h-[400px] cursor-grab active:cursor-grabbing'
                             : 'w-[min(82vw,52dvh)] h-[min(82vw,52dvh)] max-w-[320px] max-h-[320px] cursor-pointer'
                     } ${dragOver ? 'ring-4 ring-brand/70' : ''}`}
-                    style={{ background: 'transparent' }}
+                    style={{ background: 'transparent', touchAction: 'none' }}
                 />
+                </div>
 
                 {adjusting && (
                     <div className="w-full space-y-2 animate-fade-in">
@@ -484,7 +575,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                                 value={zoom}
                                 onChange={(e) => setZoom(parseFloat(e.target.value))}
                                 aria-label={t.size}
-                                className="flex-1 h-8 accent-brand cursor-pointer"
+                                className="flex-1 h-11 accent-brand cursor-pointer"
                             />
                         </div>
                     </div>
@@ -522,19 +613,38 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     available (iOS in-app); WhatsApp link is the explicit chat path. */}
                 {justDownloaded && (
                     <div className="w-full space-y-3 animate-fade-in">
-                        {saveError && (
+                        <ProfileSetHint
+                            platform={setPhotoPlatform}
+                            previewUrl={previewUrl}
+                            copy={{
+                                title: t.setPhotoTitle,
+                                whatsapp: t.setPhotoWhatsApp,
+                                instagram: t.setPhotoInstagram,
+                                facebook: t.setPhotoFacebook,
+                                generic: t.setPhotoGeneric,
+                                proof: t.setPhotoProof,
+                            }}
+                        />
+                        {(saveError || showSaveRecovery) && (
                             <div role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center space-y-2">
-                                <p>{saveError}</p>
-                                {isIOS() && (
+                                <p>{saveError || t.inAppSaveFailed}</p>
+                                <div className="flex flex-wrap justify-center gap-2">
                                     <a
                                         href={pageUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex min-h-[40px] items-center rounded-lg bg-ink px-4 text-sm font-semibold text-paper"
+                                        className="inline-flex min-h-[44px] items-center rounded-lg bg-ink px-4 text-sm font-semibold text-paper"
                                     >
-                                        {t.openInSafari}
+                                        {t.inAppOpenBrowser}
                                     </a>
-                                )}
+                                    <button
+                                        type="button"
+                                        onClick={copyLink}
+                                        className="inline-flex min-h-[44px] items-center rounded-lg border border-coral/30 px-4 text-sm font-semibold"
+                                    >
+                                        {linkCopied ? t.copied : t.inAppCopyLink}
+                                    </button>
+                                </div>
                             </div>
                         )}
                         {canSharePhoto ? (
@@ -557,6 +667,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                             </button>
                         )}
 
+                        {exportFormat === 'square' && (
                         <button
                             onClick={handleShareStory}
                             disabled={sharingStory}
@@ -566,6 +677,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                                 ? <Loader2 size={16} className="animate-spin" />
                                 : t.shareStory}
                         </button>
+                        )}
 
                         {canSharePhoto && (
                             <button
@@ -681,7 +793,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                 {!adjusting && (
                     <div className="w-full border-t border-ink/10 pt-5 mt-2 text-center">
                         <div className="font-display flex items-center justify-center gap-2 text-2xl font-bold">
-                            <span className="w-2.5 h-2.5 rounded-full bg-coral" /> {count.toLocaleString()}
+                            <span className="w-2.5 h-2.5 rounded-full bg-coral" /> {formatCount(count, locale)}
                         </div>
                         {goal && goal > 0 ? (
                             <>
@@ -692,7 +804,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                                     />
                                 </div>
                                 <p className="text-xs text-muted mt-1.5">
-                                    {count.toLocaleString()} {t.of} {goal.toLocaleString()} {t.ofSupporters}
+                                    {formatCount(count, locale)} {t.of} {formatCount(goal, locale)} {t.ofSupporters}
                                     {count >= goal ? ` · ${t.goalReached}` : ''}
                                 </p>
                             </>
@@ -715,14 +827,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                     href="/guides"
                     className="text-xs text-muted hover:text-brand-deep transition-colors mt-1"
                 >
-                    Guides
+                    {t.guides}
                 </a>
 
                 {!adjusting && (
                     reportDone ? (
                         <p className="text-[11px] text-muted/70">{t.reportThanks}</p>
                     ) : reportOpen ? (
-                        <div className="w-full max-w-xs bg-cream border border-ink/10 rounded-xl p-3 space-y-2">
+                        <div ref={reportBoxRef} className="w-full max-w-xs bg-cream border border-ink/10 rounded-xl p-3 space-y-2">
                             <p className="text-xs font-semibold text-ink">{t.reportTitle}</p>
                             <textarea
                                 value={reportReason}
@@ -748,16 +860,23 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({ slug, title, des
                         {saveError && (
                             <div role="alert" className="text-xs text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center space-y-2">
                                 <p>{saveError}</p>
-                                {isIOS() && (
+                                <div className="flex flex-wrap justify-center gap-2">
                                     <a
                                         href={pageUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex min-h-[40px] items-center rounded-lg bg-ink px-4 font-semibold text-paper"
+                                        className="inline-flex min-h-[44px] items-center rounded-lg bg-ink px-4 font-semibold text-paper"
                                     >
-                                        {t.openInSafari}
+                                        {t.inAppOpenBrowser}
                                     </a>
-                                )}
+                                    <button
+                                        type="button"
+                                        onClick={copyLink}
+                                        className="inline-flex min-h-[44px] items-center rounded-lg border border-coral/30 px-3 font-semibold"
+                                    >
+                                        {linkCopied ? t.copied : t.inAppCopyLink}
+                                    </button>
+                                </div>
                             </div>
                         )}
                         {canSharePhoto ? (
