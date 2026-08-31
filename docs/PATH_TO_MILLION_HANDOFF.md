@@ -1,12 +1,15 @@
 # Path to 1M — agent handoff brief
 
 **Audience:** a coding agent picking this up cold.  
-**Date:** 2026-08-22  
+**Date:** 2026-08-22 (status checked 2026-08-31)  
 **Repo:** Ollabs (`c:\Users\josh\Desktop\Ollab`)  
 **Owner intent:** Execute the audit backlog. Ship P0 first, then hubs (Linktree wedge), then P1. Do not wander into P3 or rebuild the product.
 
+**Status 2026-08-31:** Phases A–E in this brief are shipped on `main` (including owner-token hash, story export, and hub upgrade interest). Hub public CTA is **Join**, not Support. Ads and Search indexing are off `/c` and `/u`. Homepage is the tool. Remaining owner work is real-phone QA (`docs/REAL_PHONE_QA.md`) and AdSense review. How the code works now: `docs/ENGINEERING.md`. Do not re-implement the tables below as if they were still open.
+
 **Related artifacts (read these):**
 - `AGENTS.md` — hard mobile / ads / copy rules (do not regress)
+- `docs/ENGINEERING.md` — current auth, env, APIs, indexing, migrations
 - Cursor canvas: `path-to-million.canvas.tsx` (full audit tables)
 - Skills under `.agents/skills/`: `platform-docs`, `mobile-share-download`, `adsense-quiet`, `seo-locales`, `drizzle-neon`, `campaign-canvas`, `organizer-email`, `ollab-analytics`
 - Docs mirrors: `docs/reference/` (optional deep API; prefer skills + code)
