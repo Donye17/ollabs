@@ -1,6 +1,6 @@
 # Ollab Studio hub — tester setup
 
-Organizer hubs are the Linktree-style page at **`/u/[handle]`**. The frame tool stays on **`/c/[slug]`**; the hub is the one bio link that lists campaigns and a Support button.
+Organizer hubs are the Linktree-style page at **`/u/[handle]`**. The frame tool stays on **`/c/[slug]`**; the hub is the one bio link that lists campaigns and a Join button.
 
 ## URLs
 
@@ -17,16 +17,17 @@ Organizer hubs are the Linktree-style page at **`/u/[handle]`**. The frame tool 
 3. Open **`/hub`** (also linked from `/mine` and the campaign manage dashboard).
 4. **Claim a handle** — e.g. `ollabstudio` → public URL `https://ollabs.studio/u/ollabstudio`.
 5. Set **display name**, **bio**, optional **avatar**.
-6. Pick a **featured campaign** (Support button goes to `/c/[slug]`).
+6. Pick a **featured campaign** (Join button goes to `/c/[slug]`).
 7. Add **extra links** (Instagram, donate page, etc.).
-8. **Save** → open the public hub in a private window and tap Support.
+8. **Save** → open the public hub in a private window and tap Join.
 
 ## What to verify
 
-- Support button opens the framed campaign on a phone.
-- More campaigns list below if you have several.
-- Hub with no content stays `noindex`; hub with bio + campaign indexes (sitemap).
-- Share the hub link in WhatsApp — page loads, no horizontal scroll, thumb-friendly taps.
+- Join opens the framed campaign on a phone and records a hub click.
+- More campaigns list below if you have several. Hide on the editor keeps old frames off the public list.
+- Public hubs are **unconditionally noindex** (crawlable so Google can read the tag; not in `sitemap.xml`). Same policy as `/c/` pages. Do not expect a filled bio to make `/u/` indexable.
+- Share the hub link in WhatsApp. Page loads, no horizontal scroll, thumb-friendly taps.
+- Explore will not list a brand-new campaign until it has **five supporters**. Direct `/c` and hub Join still work at zero.
 
 ## If handle is taken
 
