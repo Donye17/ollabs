@@ -19,11 +19,11 @@ description: >-
 ## Implementation
 
 - Use `components/AdSlot.tsx` only — do not invent a second ad loader.
-- Surfaces: `campaign` | `seo`.
-- Env: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN`, `NEXT_PUBLIC_ADSENSE_SLOT_SEO` (optional fallback `NEXT_PUBLIC_ADSENSE_SLOT_INLINE`).
-- Script loads on first `AdSlot` mount, not in the root layout (keeps `/create` clean).
+- Surfaces: `campaign` | `seo`. The `campaign` surface is unused; do not mount it on `/c` or `/u`.
+- Env: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_ADSENSE_SLOT_SEO` (optional fallback `NEXT_PUBLIC_ADSENSE_SLOT_INLINE`). `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` is leftover.
+- `adsbygoogle.js` loads via `DeferredAdSense` in the root layout (first interaction or ~5s) so home LCP is not fighting unused ad JS. `AdSlot` can inject the script itself if a unit mounts before the deferred loader fires.
 - Unfilled units must collapse; filled units reserve height to avoid layout shift under thumb buttons.
 
 ## Dig deeper
 
-`docs/reference/tier-2/adsense/` (start with `OLLABS.md` if present)
+`docs/ENGINEERING.md`, `docs/ADSENSE_SLOTS.md`, `docs/reference/tier-2/adsense/` (start with `OLLABS.md` if present)

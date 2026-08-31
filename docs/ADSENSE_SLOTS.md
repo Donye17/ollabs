@@ -17,4 +17,7 @@ The `adsbygoogle.js` loader is deferred via `DeferredAdSense` (interaction or ~5
 
 **Also on SEO surfaces:** locale landings (`LocaleLandingPage`) and Twibbonize comparison pages (`VsTwibbonizeShell`) use `surface="seo"`. Keep `/create` ad-free.
 
-**Human action:** In AdSense, create two display units (Campaign inline + SEO inline), set the two env vars on Vercel production (and preview if desired). Keep Auto ads, anchors, and vignettes **OFF**.
+**Human action:** In AdSense, keep a labelled SEO display unit and set
+`NEXT_PUBLIC_ADSENSE_SLOT_SEO` on Vercel production (and preview if desired).
+The campaign slot env can stay unset; nothing mounts it. Keep Auto ads, anchors,
+and vignettes **OFF**.

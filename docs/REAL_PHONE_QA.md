@@ -11,6 +11,7 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 2. Confirm the circle fills most of the first viewport (roughly half the screen height).
 3. Confirm **Upload your photo** is the only primary CTA (no three step cards).
 4. Confirm **no** Mine · Create · Hub tab bar.
+5. Confirm first paint is Portuguese for Brazilian (or untagged) campaigns: buttons, counts as 1.926, not English leftover chrome.
 
 ### Adjust (after photo)
 1. Upload a photo.
@@ -18,7 +19,7 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 3. Confirm **Drag to move** + Size slider are visible under the circle.
 4. Finger-drag the photo. Confirm the **page does not scroll** under the drag.
 5. Confirm the fixed **Save or share photo** bar sits above the home indicator.
-6. Confirm ads sit under the fit controls, not on the photo, and are not covered by the bar.
+6. Confirm **no ads** on this page (inventory lives on SEO pages only). The bar must not cover fit controls.
 
 ### Save / share sheet
 1. Tap **Save or share photo**.
@@ -32,6 +33,12 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 3. Confirm **Share photo** (WhatsApp green) is the first / largest button.
 4. Confirm **Share as story** is the clear second action.
 5. Confirm supporter count and report sit below the share stack (not competing with WhatsApp).
+
+## Homepage tool (`/`)
+
+1. First viewport is headline, live slug, one name field, **Criar campanha**. No colour rings.
+2. Confirm **no** Mine · Create · Hub tab bar on `/`.
+3. Type a name. Confirm the `/c/` slug preview updates, then Criar campanha lands on `/create?name=...`.
 
 ## Hub public (`/u/[handle]`) — Lane A4
 
@@ -59,7 +66,7 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 
 1. On public `/c/...`, confirm **no** Mine · Create · Hub tab bar.
 2. On `/create`, `/mine`, `/hub`, confirm the tab bar is present.
-3. On `/u/[handle]`, confirm no organizer tab bar.
+3. On `/` and `/u/[handle]`, confirm no organizer tab bar.
 4. Confirm a language banner never covers the sticky save bar on `/c`.
 
 ## Owner follow-ups (cannot be fully automated)
@@ -67,5 +74,5 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 - [ ] iPhone + WhatsApp: Save Image path verified on production or a preview URL.
 - [ ] iPhone + WhatsApp: post-save Share photo opens the sheet with the framed PNG.
 - [ ] Hub Join CTA above the fold on a real handset (not only desktop DevTools).
-- [ ] AdSense: create Campaign + SEO display units; set `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` and `NEXT_PUBLIC_ADSENSE_SLOT_SEO` on Vercel; keep Auto ads / anchors / vignettes OFF.
+- [ ] AdSense: SEO display unit env `NEXT_PUBLIC_ADSENSE_SLOT_SEO` on Vercel; keep Auto ads / anchors / vignettes OFF. Do not put units back on `/c` or `/u`.
 - [ ] Optional cron: set `CRON_SECRET` and confirm `/api/cron/zero-supporter` runs (see `vercel.json`).
