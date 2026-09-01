@@ -8,6 +8,7 @@ import { getDay } from '@/lib/days';
 import { getSessionOrganizer } from '@/lib/auth';
 import { publisherCountry } from '@/lib/geo';
 import { hashOwnerToken } from '@/lib/ownerToken';
+import { isPublicBlobUrl } from '@/lib/publicBlobUrl';
 
 export const dynamic = 'force-dynamic';
 
@@ -118,6 +119,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Frame data is too large.' }, { status: 400 });
         }
 
+        // WhatsApp unfurls this as the campaign card. Only blob uploads, so a
+        // raw POST cannot point the OG image at an arbitrary host.
+        let previewValue: string | null = null;
+        if (previewUrl != null && previewUrl !== '') {
+            if (!isPublicBlobUrl(previewUrl)) {
+                return NextResponse.json({ error: 'Preview image must be an uploaded file.' }, { status: 400 });
+            }
+            previewValue = previewUrl.trim();
+        }
+
         // Anonymous-first: campaigns are created without an account. creator_id
         // is set only when the creator already had a session open.
         const creatorId = organizer?.id ?? null;
@@ -138,7 +149,7 @@ export async function POST(request: NextRequest) {
                     `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, owner_token_hash, goal, category, organizer_email, day_slug, publisher_country, referrer_slug, created_at)
                      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW())
                      RETURNING id, slug, title, supporter_count, owner_token, created_at, publisher_country`,
-                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, tokenHash, goalValue, categoryValue, emailValue, dayValue, country, referrerValue]
+                    [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewValue, token, tokenHash, goalValue, categoryValue, emailValue, dayValue, country, referrerValue]
                 );
                 campaign = result.rows[0];
                 break;
@@ -151,7 +162,7 @@ export async function POST(request: NextRequest) {
                         `INSERT INTO campaigns (slug, title, description, frame_config, creator_id, creator_name, is_public, preview_url, owner_token, goal, category, organizer_email, day_slug, publisher_country, referrer_slug, created_at)
                          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())
                          RETURNING id, slug, title, supporter_count, owner_token, created_at, publisher_country`,
-                        [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewUrl ?? null, token, goalValue, categoryValue, emailValue, dayValue, country, referrerValue]
+                        [slug, title, description ?? null, frameJson, creatorId, creatorName, isPublic !== false, previewValue, token, goalValue, categoryValue, emailValue, dayValue, country, referrerValue]
                     );
                     campaign = result.rows[0];
                     break;

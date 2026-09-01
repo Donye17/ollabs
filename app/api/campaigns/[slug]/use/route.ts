@@ -2,6 +2,7 @@ import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse, after } from 'next/server';
 import { firstSupporterEmail, milestoneEmail, sendEmail } from '@/lib/email';
 import { countryLabel, publisherCountry } from '@/lib/geo';
+import { isPublicBlobUrl } from '@/lib/publicBlobUrl';
 import { clientIp, rateLimit } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -51,7 +52,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         let imageUrl: string | null = null;
         try {
             const body = await request.json();
-            if (body && typeof body.imageUrl === 'string') imageUrl = body.imageUrl;
+            // Only Vercel Blob URLs from uploadExploreThumb. An arbitrary https
+            // host would render on Explore / the home podium as if it were ours.
+            if (body && isPublicBlobUrl(body.imageUrl)) imageUrl = body.imageUrl.trim();
         } catch {
             // no body is fine
         }

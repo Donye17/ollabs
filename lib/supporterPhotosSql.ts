@@ -1,3 +1,5 @@
+import { isPublicBlobUrl } from '@/lib/publicBlobUrl';
+
 /**
  * Random supporter thumbnails for Explore and home podium. Explore picks one
  * photo client-side on each mount; home does the same per podium slot.
@@ -18,5 +20,7 @@ LEFT JOIN LATERAL (
 
 export function parseSupporterPhotos(raw: unknown): string[] {
     if (!Array.isArray(raw)) return [];
-    return raw.filter((u): u is string => typeof u === 'string' && u.trim().length > 0);
+    // Drop rows written before imageUrl was host-checked, or injected by
+    // calling POST /use with an off-site URL. Those must never paint on Explore.
+    return raw.filter((u): u is string => isPublicBlobUrl(u));
 }
