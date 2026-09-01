@@ -10,6 +10,7 @@ import {
     manageSessionCookieOptions,
     type OwnedCampaign,
 } from '@/lib/ownerToken';
+import { isPublicBlobUrl } from '@/lib/publicBlobUrl';
 
 export const dynamic = 'force-dynamic';
 
@@ -194,8 +195,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         // Preview thumbnail travels with the frame, so it can be refreshed alongside it.
         if ('previewUrl' in body) {
             const preview = typeof body.previewUrl === 'string' && body.previewUrl.trim() ? body.previewUrl.trim() : null;
-            if (preview && !/^https:\/\//i.test(preview)) {
-                return NextResponse.json({ error: 'Preview URL must be https.' }, { status: 400 });
+            if (preview && !isPublicBlobUrl(preview)) {
+                return NextResponse.json({ error: 'Preview image must be an uploaded file.' }, { status: 400 });
             }
             sets.push(`preview_url = $${i++}`);
             values.push(preview);
