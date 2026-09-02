@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-09-02-manage-rename',
+        date: '2026-09-02',
+        title: 'Dashboard links survive a custom URL',
+        summary: 'The manage link in your welcome email still opens after you change the campaign slug.',
+        items: [
+            'Renaming ollabs.studio/c/… used to 404 the dashboard URL from the welcome email, because only the public campaign page followed the redirect.',
+            'The emailed /manage?k= link, a bookmarked dashboard, and Change the frame now follow the old slug the same way WhatsApp shares already did.',
+        ],
+    },
+    {
         id: '2026-08-30-home-tool',
         date: '2026-08-30',
         title: 'Homepage is the tool now',
