@@ -398,8 +398,8 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                         className="flex-1 bg-transparent py-2.5 text-ink outline-none min-w-0" />
                                 </div>
                                 <p className="text-xs text-muted">
-                                    Letters and numbers become dashes. Changing this updates your share link;
-                                    older links redirect automatically so WhatsApp shares keep working.
+                                    Letters and numbers become dashes. Changing this updates your share link.
+                                    Older campaign links and the dashboard link in your email keep working.
                                 </p>
                             </div>
 
