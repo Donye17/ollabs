@@ -5,6 +5,7 @@ import { countryLabel } from '@/lib/geo';
 import { DayFramesPanel } from './DayFramesPanel';
 
 interface ReportRow {
+    id: string;
     slug: string;
     title: string;
     is_hidden: boolean;
@@ -170,17 +171,17 @@ export const AdminClient: React.FC = () => {
         load(k);
     }, []);
 
-    const moderate = async (slug: string, hidden: boolean) => {
+    const moderate = async (id: string, hidden: boolean) => {
         if (!key) return;
-        setBusy(slug);
+        setBusy(id);
         try {
             const res = await fetch('/api/admin/moderate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key, slug, hidden }),
+                body: JSON.stringify({ key, id, hidden }),
             });
             if (res.ok) {
-                setRows((prev) => prev.map((r) => (r.slug === slug ? { ...r, is_hidden: hidden } : r)));
+                setRows((prev) => prev.map((r) => (r.id === id ? { ...r, is_hidden: hidden } : r)));
             }
         } catch { /* ignore */ } finally {
             setBusy(null);
@@ -230,7 +231,7 @@ export const AdminClient: React.FC = () => {
                 {!loading && rows.length > 0 && (
                     <div className="space-y-3">
                         {rows.map((r) => (
-                            <div key={r.slug} className={`bg-cream border rounded-2xl p-4 ${r.is_hidden ? 'border-coral/40' : 'border-ink/10'}`}>
+                            <div key={r.id} className={`bg-cream border rounded-2xl p-4 ${r.is_hidden ? 'border-coral/40' : 'border-ink/10'}`}>
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0">
                                         <div className="flex items-center gap-2">
@@ -253,14 +254,14 @@ export const AdminClient: React.FC = () => {
                                             <ExternalLink size={13} /> View
                                         </a>
                                         {r.is_hidden ? (
-                                            <button onClick={() => moderate(r.slug, false)} disabled={busy === r.slug}
+                                            <button onClick={() => moderate(r.id, false)} disabled={busy === r.id}
                                                 className="text-xs font-bold flex items-center gap-1.5 bg-paper border border-ink/10 rounded-lg px-3 py-1.5 hover:bg-ink/5 transition-colors disabled:opacity-50">
-                                                {busy === r.slug ? <Loader2 size={13} className="animate-spin" /> : <Eye size={13} />} Unhide
+                                                {busy === r.id ? <Loader2 size={13} className="animate-spin" /> : <Eye size={13} />} Unhide
                                             </button>
                                         ) : (
-                                            <button onClick={() => moderate(r.slug, true)} disabled={busy === r.slug}
+                                            <button onClick={() => moderate(r.id, true)} disabled={busy === r.id}
                                                 className="text-xs font-bold flex items-center gap-1.5 bg-coral text-white rounded-lg px-3 py-1.5 hover:brightness-105 transition-all disabled:opacity-50">
-                                                {busy === r.slug ? <Loader2 size={13} className="animate-spin" /> : <EyeOff size={13} />} Hide
+                                                {busy === r.id ? <Loader2 size={13} className="animate-spin" /> : <EyeOff size={13} />} Hide
                                             </button>
                                         )}
                                     </div>
