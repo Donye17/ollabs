@@ -13,6 +13,7 @@ import { PublishTemplateModal } from './PublishTemplateModal';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import { ABOVE_MOBILE_NAV, ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 import { track } from '@/lib/analytics';
+import { manageApiHref, readStoredManageKey } from '@/lib/editCampaign';
 // Loaded on demand (see handleRemoveBackground). This library is ~5.5MB of WASM;
 // importing it statically made every visitor to /create download it whether or
 // not they ever removed a background.
@@ -62,6 +63,9 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const [imageSrc, setImageSrc] = useState<string | null>(null);
 
     // Editing an existing campaign: load its saved frame into the editor.
+    // Cookie-only manage visits have no k= (it was stripped after the session
+    // cookie was minted). Skipping bootstrap here used to open Create as a
+    // new campaign, so "Change the frame" published a second link.
     useEffect(() => {
         let slug: string | null = null;
         let token: string | null = null;
@@ -69,12 +73,13 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             const params = new URLSearchParams(window.location.search);
             slug = params.get('edit');
             token = params.get('k');
+            if (slug && !token) token = readStoredManageKey(slug);
         } catch { /* ignore */ }
-        if (!slug || !token) return;
+        if (!slug) return;
 
-        const key = token;
+        const key = token || '';
         setEditLoading(true);
-        fetch(`/api/campaigns/${slug}/manage?token=${encodeURIComponent(key)}`)
+        fetch(manageApiHref(slug, key || null), { credentials: 'include' })
             .then(async (r) => {
                 if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Could not open this campaign');
                 return r.json();

@@ -13,6 +13,7 @@ import { organizerShareText, whatsappUrl, messengerShareUrl, prefersTagalog, hub
 import { normalizeHandle, suggestHandleFromEmail } from '@/lib/hub';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
+import { manageDashboardHref } from '@/lib/editCampaign';
 
 interface EditTarget {
     slug: string;
@@ -147,12 +148,14 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 }
             }
 
-            const payload: Record<string, unknown> = { token: editTarget.token, frameConfig: config };
+            const payload: Record<string, unknown> = { frameConfig: config };
+            if (editTarget.token) payload.token = editTarget.token;
             if (previewUrl) payload.previewUrl = previewUrl;
 
             const res = await fetch(`/api/campaigns/${editTarget.slug}/manage`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(payload),
             });
             const data = await res.json().catch(() => ({}));
@@ -342,7 +345,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
     // an email, or writes to localStorage: the campaign already exists and this
     // only swaps its frame, so the link and the supporters are untouched.
     if (editTarget) {
-        const manageUrlForEdit = `/c/${editTarget.slug}/manage?k=${editTarget.token}`;
+        const manageUrlForEdit = manageDashboardHref(editTarget.slug, editTarget.token);
         return (
             <div
                 onMouseDown={onBackdropMouseDown}

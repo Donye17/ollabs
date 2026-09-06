@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-09-06-edit-frame-cookie',
+        date: '2026-09-06',
+        title: 'Change the frame works when you come back',
+        summary: 'A bookmarked manage page no longer starts a second campaign when you update the frame.',
+        items: [
+            'Manage drops the secret key from the address bar and keeps you signed in with a short cookie.',
+            'Change the frame used to require that key in the URL, so a later visit opened Create as a brand new campaign.',
+            'The editor now uses the same cookie. Your live link and supporter count stay put.',
+        ],
+    },
+    {
         id: '2026-08-30-home-tool',
         date: '2026-08-30',
         title: 'Homepage is the tool now',

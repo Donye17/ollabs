@@ -8,6 +8,7 @@ import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck, Palette, Globe } from 'lucide-react';
 import { countryLabel } from '@/lib/geo';
 import { ORGANIZER_PRIMARY_BTN, PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
+import { editFrameHref } from '@/lib/editCampaign';
 
 interface ManageData {
     slug: string;
@@ -349,7 +350,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                 </p>
                             </div>
                             <a
-                                href={`/create?edit=${encodeURIComponent(currentSlug)}&k=${encodeURIComponent(token || '')}`}
+                                href={editFrameHref(currentSlug, token)}
                                 className={`inline-flex items-center justify-center gap-2 px-5 ${ORGANIZER_PRIMARY_BTN}`}
                             >
                                 <Palette size={15} /> Change the frame
