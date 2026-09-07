@@ -28,6 +28,7 @@ Organizer hubs are the Linktree-style page at **`/u/[handle]`**. The frame tool 
 - Public hubs are **unconditionally noindex** (crawlable so Google can read the tag; not in `sitemap.xml`). Same policy as `/c/` pages. Do not expect a filled bio to make `/u/` indexable.
 - Share the hub link in WhatsApp. Page loads, no horizontal scroll, thumb-friendly taps.
 - Explore will not list a brand-new campaign until it has **five supporters**. Direct `/c` and hub Join still work at zero.
+- If you change the campaign custom URL, WhatsApp `/c/[old]` still redirects. The manage link from the welcome email (`/c/[old]/manage?k=`) does not. Bookmark `/c/[live-slug]/manage` after a rename, or use Mine while signed in.
 
 ## If handle is taken
 

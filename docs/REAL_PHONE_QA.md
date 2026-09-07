@@ -69,6 +69,12 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 3. On `/` and `/u/[handle]`, confirm no organizer tab bar.
 4. Confirm a language banner never covers the sticky save bar on `/c`.
 
+## Manage / Change the frame
+
+1. Open `/c/[slug]/manage?k=...` once, then bookmark the URL **after** `k=` disappears.
+2. From that bookmarked (cookie-only) page, tap **Change the frame**. Confirm Create loads the live frame, not a blank new campaign. If it publishes a second slug, that is the current cookie-only gap (`docs/ENGINEERING.md`).
+3. Change the custom link on manage. Confirm old WhatsApp `/c/[old]` still opens the campaign. Confirm the welcome-email `/manage?k=` URL: today it 404s after rename.
+
 ## Owner follow-ups (cannot be fully automated)
 
 - [ ] iPhone + WhatsApp: Save Image path verified on production or a preview URL.

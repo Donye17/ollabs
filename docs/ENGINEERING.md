@@ -163,9 +163,13 @@ Anonymous create is the default. Email on publish is optional recovery.
    Never a hand-rolled `<a download>`.
 4. `POST /api/campaigns/[slug]/use` increments supporters (40/IP/10 min and
    20/IP+slug/10 min). First save can mail the organizer.
+   Optional body `{ imageUrl }` is stored on `campaign_uses` and can show on
+   Explore. Any string is accepted today. Day-frame admin already requires a
+   Vercel Blob host (`app/api/admin/day-frames`); keep campaign thumbs equally
+   strict if you tighten this.
 
-Slug changes write `campaign_slug_redirects`. Old `/c/` URLs 301 to the current
-slug.
+Slug changes write `campaign_slug_redirects`. Old **public** `/c/` URLs 301 to
+the current slug. Manage URLs do **not** follow that table. See Manage access.
 
 ### Organizer login (not OAuth)
 
@@ -191,6 +195,39 @@ goes to `/c/[slug]` and records a click via `POST /api/hub/click`.
 
 Handles: 3–30 chars, `a-z`, digits, hyphens. Reserved names in `lib/hub.ts`.
 
+### Manage access (`k=` vs cookie)
+
+The dashboard is `/c/[slug]/manage`. Proof of ownership is the campaign manage
+key, not the organizer login cookie (`ollabs_org`).
+
+| Proof | Where | Lifetime |
+|-------|--------|----------|
+| Plaintext `k=` / `token` | URL, welcome email, sessionStorage `ollabs_manage_k:${slug}` | Forever (hashed at rest as `owner_token_hash`) |
+| Cookie `ollabs_manage` | httpOnly, set after a successful `k=` GET | 72 hours (`lib/ownerToken.ts`) |
+
+`ManageClient` strips `k=` from the address bar after the cookie is minted so
+screenshots and refreshes do not keep leaking the key. That is why a later
+bookmark is often cookie-only.
+
+Lookups in `findCampaignByOwnerToken` and `findCampaignByManageSession` require
+the **live** slug. Public `/c/[old]` follows `campaign_slug_redirects`; manage
+does not.
+
+Consequences on current `main`:
+
+1. **Welcome-email dashboard after a custom URL.** `lib/email.ts` bakes
+   `/c/[slug]/manage?k=` at send time. The dashboard invites a slug rename.
+   After rename, the emailed URL 404s even though WhatsApp `/c/[old]` still
+   301s.
+2. **Change the frame.** Manage links to
+   `/create?edit=SLUG&k=TOKEN`. `EditorPage` bails unless both `edit` and `k`
+   are present, so a cookie-only visit (empty `k=`) skips bootstrap and
+   **publishes a second campaign**. Use sessionStorage or the manage cookie
+   (`credentials: 'include'`) if you fix this. Do not teach organizers to
+   create a second slug to "fix the art."
+3. **PATCH manage** (`frameConfig`, title, slug, `previewUrl`) accepts the
+   cookie. Only the Create bootstrap is the gap.
+
 ### Explore
 
 `app/explore/page.tsx` lists public, not-hidden campaigns with a visible frame
@@ -210,18 +247,19 @@ Write paths that change product behaviour. All of these are in `app/api/`.
 
 | Method | Path | Notes |
 |--------|------|--------|
-| POST | `/api/campaigns` | Create. Returns slug + manage key. |
-| GET | `/api/campaigns` | Public list helper. |
-| GET/PATCH | `/api/campaigns/[slug]` | Public read / owner update. |
-| GET | `/api/campaigns/[slug]/manage` | Dashboard payload. `k=` or manage session. |
-| POST | `/api/campaigns/[slug]/use` | Save counted. |
+| POST | `/api/campaigns` | Create. Returns slug + manage key. `previewUrl` is stored as given (https not required at insert). |
+| GET | `/api/campaigns` | Public list helper. No 5-supporter floor (Explore and home apply that). |
+| GET | `/api/campaigns/[slug]` | Public read. Hidden/private → 404. No PATCH on this route. |
+| GET/PATCH | `/api/campaigns/[slug]/manage` | Dashboard + owner edits. `token` query/body or `ollabs_manage` cookie. Live slug only. |
+| POST | `/api/campaigns/[slug]/use` | Save counted. Optional `imageUrl` stored unvalidated. |
 | POST | `/api/campaigns/[slug]/view` | View bump, 120/IP/10 min. |
-| POST | `/api/campaigns/[slug]/report` | 5 distinct IPs auto-hide (`is_hidden`). |
+| POST | `/api/campaigns/[slug]/report` | 5 distinct IPs auto-hide **by `campaign_id`**. |
 | POST | `/api/campaigns/[slug]/claim` | Attach to signed-in organizer via owner token. |
-| POST | `/api/upload` | Blob client token. |
+| POST | `/api/upload` | Blob client token. JPEG/PNG/GIF/WebP, 8 MB. |
 | GET/PATCH | `/api/organizer/hub` | Hub editor. |
-| GET | `/api/organizer/campaigns` | Signed-in Mine list. |
+| GET | `/api/organizer/campaigns` | Signed-in Mine list (includes plaintext `owner_token`). |
 | GET | `/api/cron/zero-supporter` | Every 15 min (`vercel.json`). Claims 20–90 min old zero-supporter campaigns that have an organizer email. |
+| POST | `/api/admin/moderate` | Hide/unhide. Body `{ key, slug, hidden }` keys off **current slug**. |
 
 Rate limiter is an in-memory `Map` per serverless isolate. It blunts a burst on
 one instance. It is not a global quota. Do not add Redis until abuse needs it.
@@ -232,8 +270,9 @@ one instance. It is not a global quota. Do not add Redis until abuse needs it.
 
 Source of truth: `lib/guides.ts` (`GUIDES` array, newest first).
 
-Routed by `app/guides/page.tsx` and `app/guides/[slug]/page.tsx`. Sitemap and
-footer pick the array up automatically. Ads on guide pages use `surface="seo"`.
+Routed by `app/guides/page.tsx` and `app/guides/[slug]/page.tsx`. `app/sitemap.ts`
+maps the array. Footer links the `/guides` index, not each article. Ads on
+guide pages use `surface="seo"`.
 
 To add a guide:
 
@@ -305,13 +344,40 @@ Share paste uses `prefersPortuguese()` in `lib/share.ts` for WhatsApp text.
 
 `/admin?key=ADMIN_KEY` (query param; robots disallow `/admin`).
 
-- Reports list, hide/unhide (`POST /api/admin/moderate`).
+- Reports list (`GET /api/admin/reports`), hide/unhide (`POST /api/admin/moderate`).
 - Geo breakdown (`GET /api/admin/geo`).
-- Day-frame overrides (`/api/admin/day-frames`).
+- Day-frame overrides (`/api/admin/day-frames`). Override `imageUrl` must match
+  `https://[store].public.blob.vercel-storage.com/...`.
 
-Public report button: 5 distinct reporter IPs sets `is_hidden`, which drops the
-campaign from Explore and public lists. WhatsApp `/c` links still work unless
-you add a stronger block later.
+Public report button: 5 distinct reporter IPs sets `is_hidden` **on that
+`campaign_id`**, which drops the campaign from Explore and public lists.
+WhatsApp `/c` links still work unless you add a stronger block later.
+
+Admin hide is a different path. `campaign_reports.slug` is the URL at report
+time. After a custom-link rename that string can be missing, or reused by a
+new campaign. `GET /api/admin/reports` groups by `r.slug`.
+`POST /api/admin/moderate` updates `WHERE slug = $2`. Hide from a stale report
+row can 404, or set `is_hidden` on whoever now owns the old name. Public
+auto-hide is already by id; admin hide should be too.
+
+---
+
+## Preview, OG, and Explore image URLs
+
+Uploads go through `POST /api/upload` (Vercel Blob). Stored URLs then reappear
+as WhatsApp cards and grid thumbs.
+
+| Path | Check today |
+|------|-------------|
+| Day-frame admin POST | Vercel Blob host regex |
+| PATCH `/manage` `previewUrl` | `https://` prefix only |
+| POST `/api/campaigns` `previewUrl` | stored as given |
+| POST `/use` `imageUrl` | any string |
+| Campaign OG (`app/c/[slug]/page.tsx`) | `preview_url` as stored, else `frame_config.imageUrl` if it starts with `https://` |
+
+An off-site `https` URL in `preview_url` or `campaign_uses.image_url` can become
+the WhatsApp unfurl or an Explore face. Do not relax the day-frame check. If
+you add a shared allowlist, use it on create, manage preview, `/use`, and OG.
 
 ---
 
@@ -331,17 +397,28 @@ you add a stronger block later.
 6. **`vh` on modals, `alert()`, missing `touch-action: none`.** See
    `AGENTS.md`. Copy the scroll lock from `PublishTemplateModal.tsx`.
 7. **Organizer tab bar on home, `/c`, `/u`, SEO.** `shouldShowMobileOrganizerNav`
-   in `lib/mobileNav.ts` already hides these. Home is marketing; do not put
+   in `lib/mobileNav.ts` already hides these. Home is the tool; do not put
    Mine · Create · Hub back on `/`.
 8. **Em dashes** in UI, emails, OG, announcements, SEO, guides. Hard rule.
-9. **Second campaign to "fix" art.** Manage has Change the frame. New slugs
-   split the group.
-10. **Incomplete migration script.** See schema section above.
-11. **Sentry in the browser.** `/create` already fights `@imgly`. Client SDK
+9. **Second campaign to "fix" art.** Manage has Change the frame. Cookie-only
+   manage visits currently omit `k=`, so Create may publish a new slug instead.
+   See Manage access.
+10. **Custom URL then emailed `/manage?k=`.** Public `/c` 301s. Manage lookup
+    still requires the live slug.
+11. **Admin hide by report-time slug.** Public auto-hide uses `campaign_id`.
+    `/api/admin/moderate` uses current slug. See Admin.
+12. **Incomplete migration script.** See schema section above.
+13. **Sentry in the browser.** `/create` already fights `@imgly`. Client SDK
     stays off (`docs/SENTRY.md`).
-12. **Explore as discovery for a brand-new campaign.** Floor is 5 supporters
+14. **Manage keys in Sentry.** `lib/sentryScrub.ts` redacts emails, `data:image`,
+    photo/frame fields, cookies, and `Authorization`. It does **not** strip
+    `k`, `token`, or `owner_token` from query strings or JSON bodies. Do not
+    log those fields. Do not set `sendDefaultPii`.
+15. **Explore as discovery for a brand-new campaign.** Floor is 5 supporters
     (`app/explore/page.tsx` and `MIN_SUPPORTERS_TO_DISPLAY`). Growth is WhatsApp
     in the first hour, not the grid.
+16. **Off-site preview / Explore thumbs.** Only day-frame admin pins Blob
+    hosts. See Preview URLs.
 
 ---
 

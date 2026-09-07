@@ -9,7 +9,7 @@ link. Supporters open that link, drop in a photo, and download the framed result
 
 ---
 
-## Where things stand (2026-08-31)
+## Where things stand (2026-09-07)
 
 **On `main`:** Phases 1–8 plus Path A–E thesis-safe slice (P0 conversion, hub H1–H10, P1 growth,
 P2 polish, owner-token hash + manage sessions, 9:16 story export, hub upgrade interest waitlist).
@@ -21,6 +21,12 @@ BR/PT or untagged; `/guides` (seven organizer articles in `lib/guides.ts`); ads 
 indexing off `/c` and `/u` (crawlable + noindex); `/es` `/id` `/tl` 301 to `/`; Explore hides
 campaigns with fewer than five supporters; Contact page; quieter campaign last-mile (profile vs
 story, Open in Safari).
+
+**Do not regress while editing manage / reports / thumbs:** public `/c` slug 301s
+do not apply to `/manage`; Change the frame needs `k=` today (cookie-only manage
+opens Create as a new campaign); admin hide keys off current slug, not
+`campaign_id`; only day-frame admin pins Vercel Blob hosts. Details:
+`docs/ENGINEERING.md`.
 
 Mobile shell, custom-frame create (Frame → Name → Send), organizer save + slug 301s, quiet ads,
 organizer hubs (themes, reorder, social icons, click counts, hide campaigns, one-tap claim),
