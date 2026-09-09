@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-09-09-recover-confirm',
+        date: '2026-09-09',
+        title: 'Recovery links wait for a tap',
+        summary: 'Email previews no longer use up the one-time dashboard link.',
+        items: [
+            'Opening the recovery email no longer burns the link. Tap Open my campaigns on the page.',
+            'Outlook, Slack, and WhatsApp previews used to load the URL first and leave the real tap on an expired screen.',
+        ],
+    },
+    {
         id: '2026-08-30-home-tool',
         date: '2026-08-30',
         title: 'Homepage is the tool now',
