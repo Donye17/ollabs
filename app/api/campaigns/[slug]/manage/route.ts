@@ -10,6 +10,7 @@ import {
     manageSessionCookieOptions,
     type OwnedCampaign,
 } from '@/lib/ownerToken';
+import { slugRedirectBlocksRename } from '@/lib/slugRedirects';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,6 +64,99 @@ async function withOptionalManageCookie(
         console.error('manage session mint failed', e);
     }
     return response;
+}
+
+type CampaignPatchRow = {
+    slug: string;
+    title: string;
+    description: string | null;
+    frame_config: unknown;
+    preview_url: string | null;
+};
+
+/**
+ * Rename inside one transaction so a custom-link change cannot steal another
+ * campaign's still-shared /c/[old] URL.
+ *
+ * /c/[slug] resolves a live slug first, then a redirect. The old code deleted
+ * any redirect for the target name ("new owner wins") after the live UPDATE,
+ * so this sequence broke printed and WhatsApp links:
+ *
+ *   1. A lives at save-the-whales, then renames to whales-2026.
+ *      Redirect remains: save-the-whales → A.
+ *   2. B renames onto save-the-whales. Live row is now B, and the redirect
+ *      row for A is gone.
+ *   3. Anyone still opening /c/save-the-whales (A's previous custom link)
+ *      gets B's frame.
+ *
+ * A name that exists only as someone else's redirect is still taken. Taking
+ * back a name we ourselves redirected is fine: delete our self-redirect and
+ * become live on it again.
+ */
+async function renameCampaignSlug(opts: {
+    id: string;
+    currentSlug: string;
+    newSlug: string;
+    sets: string[];
+    values: unknown[];
+    idPlaceholder: number;
+}): Promise<{ rows: CampaignPatchRow[] } | 'taken'> {
+    const updateSql = `UPDATE campaigns SET ${opts.sets.join(', ')} WHERE id = $${opts.idPlaceholder} RETURNING slug, title, description, frame_config, preview_url`;
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        let redirectOwner: string | null = null;
+        try {
+            const held = await client.query(
+                `SELECT campaign_id FROM campaign_slug_redirects
+                 WHERE old_slug = $1
+                 FOR UPDATE`,
+                [opts.newSlug]
+            );
+            redirectOwner = held.rows[0]?.campaign_id ? String(held.rows[0].campaign_id) : null;
+        } catch (e: unknown) {
+            const code = typeof e === 'object' && e && 'code' in e ? (e as { code?: string }).code : undefined;
+            if (code !== '42P01') throw e;
+            // Redirect table missing on a stale preview. Ship the rename
+            // without it, same as the pre-transaction fallback.
+            await client.query('ROLLBACK');
+            return await pool.query(updateSql, opts.values);
+        }
+
+        if (slugRedirectBlocksRename(redirectOwner, opts.id)) {
+            await client.query('ROLLBACK');
+            return 'taken';
+        }
+
+        const result = await client.query(updateSql, opts.values);
+
+        // We used to live here, then left. Drop the self-redirect so we do
+        // not redirect /c/[new] to ourselves.
+        if (redirectOwner === String(opts.id)) {
+            await client.query(
+                `DELETE FROM campaign_slug_redirects WHERE old_slug = $1 AND campaign_id = $2`,
+                [opts.newSlug, opts.id]
+            );
+        }
+
+        // Keep every previously shared /c/[old] working. Resolve redirects by
+        // campaign id so a second rename (a→b→c) still sends a→c.
+        await client.query(
+            `INSERT INTO campaign_slug_redirects (old_slug, campaign_id)
+             VALUES ($1, $2)
+             ON CONFLICT (old_slug) DO UPDATE SET campaign_id = EXCLUDED.campaign_id`,
+            [opts.currentSlug, opts.id]
+        );
+
+        await client.query('COMMIT');
+        return result;
+    } catch (e) {
+        await client.query('ROLLBACK').catch(() => undefined);
+        throw e;
+    } finally {
+        client.release();
+    }
 }
 
 // GET /api/campaigns/[slug]/manage?token=XXX
@@ -221,32 +315,21 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
         values.push(id);
         try {
-            const result = await pool.query(
-                `UPDATE campaigns SET ${sets.join(', ')} WHERE id = $${i} RETURNING slug, title, description, frame_config, preview_url`,
-                values
-            );
-
-            // Keep every previously shared /c/[old] working. Resolve redirects by
-            // campaign id so a second rename (a→b→c) still sends a→c.
-            if (newSlug) {
-                try {
-                    // If this slug was someone else's old name, the new owner wins.
-                    await pool.query(
-                        `DELETE FROM campaign_slug_redirects WHERE old_slug = $1`,
-                        [newSlug]
-                    );
-                    await pool.query(
-                        `INSERT INTO campaign_slug_redirects (old_slug, campaign_id)
-                         VALUES ($1, $2)
-                         ON CONFLICT (old_slug) DO UPDATE SET campaign_id = EXCLUDED.campaign_id`,
-                        [currentSlug, id]
-                    );
-                } catch (redirErr) {
-                    // Table may not exist yet on a deploy that raced the migration.
-                    // The slug update already succeeded; failing closed on redirects
-                    // is worse than logging and shipping the rename.
-                    console.error('slug redirect write failed', redirErr);
-                }
+            const result = newSlug
+                ? await renameCampaignSlug({
+                    id,
+                    currentSlug,
+                    newSlug,
+                    sets,
+                    values,
+                    idPlaceholder: i,
+                })
+                : await pool.query(
+                    `UPDATE campaigns SET ${sets.join(', ')} WHERE id = $${i} RETURNING slug, title, description, frame_config, preview_url`,
+                    values
+                );
+            if (result === 'taken') {
+                return NextResponse.json({ error: 'That link name is taken. Try another.' }, { status: 409 });
             }
 
             const response = NextResponse.json(result.rows[0]);
