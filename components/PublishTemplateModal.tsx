@@ -10,7 +10,7 @@ import { QRCode } from './QRCode';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from './ShareGlyphs';
 import { track, withUtm } from '@/lib/analytics';
 import { organizerShareText, whatsappUrl, messengerShareUrl, prefersTagalog, hubShareText } from '@/lib/share';
-import { normalizeHandle, suggestHandleFromEmail } from '@/lib/hub';
+import { handleError, normalizeHandle, suggestHandleFromEmail } from '@/lib/hub';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 
@@ -286,13 +286,11 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
         campaignId: string;
         existingHandle: string | null;
         emailForSuggest: string | null;
-        campaignTitle: string;
     }) => {
         const handle =
             opts.existingHandle
             || (opts.emailForSuggest ? suggestHandleFromEmail(opts.emailForSuggest) : '');
         const normalized = normalizeHandle(handle);
-        if (!normalized) return null;
 
         setHubClaiming(true);
         setHubClaimError(null);
@@ -300,11 +298,11 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             const body: Record<string, unknown> = {
                 featuredCampaignId: opts.campaignId,
             };
-            // Only send handle when claiming for the first time. Re-claiming an
-            // existing hub would overwrite a custom handle they already chose.
-            if (!opts.existingHandle) {
-                body.handle = normalized;
-                body.displayName = opts.campaignTitle.slice(0, 60) || normalized;
+            // claimHandle only fills a blank handle on the server (COALESCE).
+            // Sending `handle` here used to replace /u/coolbrand when this
+            // ran before GET /api/organizer/hub returned, or when that GET failed.
+            if (normalized && !handleError(normalized)) {
+                body.claimHandle = normalized;
             }
             const res = await fetch('/api/organizer/hub', {
                 method: 'PATCH',
@@ -316,9 +314,11 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                 setHubClaimError(data?.error || 'Could not claim your hub.');
                 return null;
             }
-            const live = (data?.handle as string | null) || normalized;
-            setHubHandle(live);
-            track('hub_claimed', { handle: live, from: 'publish' });
+            const live = (data?.handle as string | null) || null;
+            if (live) {
+                setHubHandle(live);
+                track('hub_claimed', { handle: live, from: 'publish' });
+            }
             return live;
         } catch {
             setHubClaimError('Could not reach the server to claim your hub.');
@@ -505,7 +505,6 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                         campaignId: campaign.id,
                         existingHandle: hubHandle,
                         emailForSuggest: sessionEmail,
-                        campaignTitle: title,
                     });
                 }
             } else {
@@ -585,7 +584,6 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
                     campaignId,
                     existingHandle: hubHandle,
                     emailForSuggest: accountEmail,
-                    campaignTitle: title,
                 });
             }
         } catch {
@@ -667,7 +665,6 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             campaignId,
             existingHandle: hubHandle,
             emailForSuggest: sessionEmail || publishEmail,
-            campaignTitle: title,
         });
     };
 

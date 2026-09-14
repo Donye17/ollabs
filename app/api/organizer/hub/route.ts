@@ -7,6 +7,7 @@ import {
     HUB_DISPLAY_NAME_MAX,
     HUB_LINK_TITLE_MAX,
     HUB_LINKS_MAX,
+    firstTimeHandleClaim,
     handleError,
     isSafeHttpUrl,
     normalizeHandle,
@@ -180,6 +181,13 @@ export async function PATCH(request: NextRequest) {
             }
         }
 
+        // First-time claim from publish. Never sent by the hub editor.
+        // COALESCE on write, so a stale publish client cannot replace /u/coolbrand.
+        let claimHandle: string | undefined;
+        if (nextHandle === undefined && 'claimHandle' in body) {
+            claimHandle = firstTimeHandleClaim(null, body.claimHandle) ?? undefined;
+        }
+
         // ---- display name / bio / avatar ----------------------------------
         let displayName: string | null | undefined;
         if ('displayName' in body) {
@@ -314,6 +322,18 @@ export async function PATCH(request: NextRequest) {
                 }
             }
 
+            let applyClaimHandle: string | undefined;
+            if (claimHandle && nextHandle === undefined) {
+                const clash = await client.query(
+                    `SELECT id FROM organizers
+                     WHERE handle = $1 AND id <> $2
+                     LIMIT 1`,
+                    [claimHandle, organizer.id]
+                );
+                // Taken by someone else: skip the claim, still save featured/etc.
+                if (!clash.rows[0]) applyClaimHandle = claimHandle;
+            }
+
             const sets: string[] = ['hub_updated_at = NOW()'];
             const vals: unknown[] = [];
             const push = (col: string, value: unknown) => {
@@ -322,6 +342,11 @@ export async function PATCH(request: NextRequest) {
             };
 
             if (nextHandle !== undefined) push('handle', nextHandle);
+            else if (applyClaimHandle) {
+                vals.push(applyClaimHandle);
+                // Atomic: a concurrent publish cannot replace a handle that landed first.
+                sets.push(`handle = COALESCE(handle, $${vals.length})`);
+            }
             if (displayName !== undefined) push('display_name', displayName);
             if (bio !== undefined) push('bio', bio);
             if (avatarUrl !== undefined) push('avatar_url', avatarUrl);
