@@ -42,6 +42,7 @@ Before inventing APIs or SEO/ad behavior, read the local reference tree:
 
 ## Hard project facts
 
+- Canonical developer map: `docs/ENGINEERING.md` (auth, manage, recover, slugs, hub claim, indexing).
 - Tailwind **v3.4**, not v4 syntax.
 - Mobile WhatsApp/Instagram in-app browsers: use `saveFramedPhoto` / `downloadBlob` + `canShareFiles`; share-first on iPhone.
 - Draggable canvases need `touchAction: 'none'`.

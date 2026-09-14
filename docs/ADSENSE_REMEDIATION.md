@@ -1,5 +1,27 @@
 # AdSense "Low value content" remediation plan
 
+**Shipped (code, as of 2026-08-31).** Treat the Tier 1 / inventory sections
+below as history, not a todo list.
+
+Already in production:
+
+- No `AdSlot` on `/c`, `/u`, or the hub editor. SEO surfaces only
+  (`docs/ADSENSE_SLOTS.md`).
+- `/c` and `/u` are crawlable + `noindex,follow`. They are not in `sitemap.xml`.
+  Do not `disallow` them in `robots.ts` or the noindex tag is never read.
+- `/contact` exists and is footer-linked.
+- `/es` `/id` `/tl` (and children) 301 to `/`. `/pt` kept. `/hi` stays noindex.
+- Guides: seven articles in `lib/guides.ts`, index at `/guides`, sitemap + footer.
+- Homepage is the tool (not a thin brochure). Campaign UI defaults to Portuguese.
+
+Still human: AdSense dashboard review request (only after Search has recrawled
+the new shape), physical-phone QA, SEO slot env on Vercel. Do not put ads back
+on campaign or hub pages to "recover inventory."
+
+The rest of this file is the Aug 28 analysis that justified those decisions.
+
+---
+
 Status as of Aug 28, 2026: ollabs.studio is **Needs attention / Low value content**.
 Ads.txt is Authorized, so the seller file is not the problem. This is a
 human-ish content review of the site as a whole.

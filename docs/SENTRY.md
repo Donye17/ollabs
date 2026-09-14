@@ -55,6 +55,11 @@ Turn off issue emails for `development`.
 `data:image` payloads, photo/frame fields, cookies, and Authorization headers.
 Supporter photos must never reach Sentry.
 
+It does **not** redact campaign manage keys. Query `k=`, JSON `token` /
+`owner_token`, and similar fields still travel if they appear in the event URL
+or body. Do not `console.error` those values. If you extend the scrubber, match
+on key names (`token`, `owner_token`, `k`) and on `/manage?k=` in URLs.
+
 ## Sampling
 
 `tracesSampleRate` is **0.1** on server and edge. Do not set it to 1 in
