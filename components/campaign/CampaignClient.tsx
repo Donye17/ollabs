@@ -307,6 +307,10 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 if (d && typeof d.supporter_count === 'number') {
                     setCount(d.supporter_count);
                     track('supporter_joined', { campaign: slug, count: d.supporter_count });
+                } else {
+                    // 404/429/5xx must not burn the one-save guard: a rename race or
+                    // a blip would otherwise permanently skip this supporter's count.
+                    countedRef.current = false;
                 }
             } catch {
                 countedRef.current = false;

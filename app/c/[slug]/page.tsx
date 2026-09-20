@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { pool } from '@/lib/neon';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { CampaignClient } from '@/components/campaign/CampaignClient';
 import { parseFrameConfig } from '@/lib/parseFrameConfig';
@@ -111,8 +111,8 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
     const campaign = await getCampaign(slug);
     if (!campaign) {
         const dest = await resolveRedirectSlug(slug);
-        // Permanent: WhatsApp and search should retire the old slug.
-        if (dest && dest !== slug) redirect(`/c/${dest}`);
+        // 308, not redirect()'s 307: WhatsApp and search should retire the old slug.
+        if (dest && dest !== slug) permanentRedirect(`/c/${dest}`);
         notFound();
     }
 

@@ -15,12 +15,25 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             [slug]
         );
 
-        if (result.rows.length === 0) {
-            return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
+        let campaign = result.rows[0];
+        if (!campaign) {
+            try {
+                const redirected = await pool.query(
+                    `SELECT c.id, c.slug, c.title, c.description, c.frame_config, c.creator_name,
+                            c.supporter_count, c.is_public, c.is_hidden, c.created_at
+                     FROM campaign_slug_redirects r
+                     JOIN campaigns c ON c.id = r.campaign_id
+                     WHERE r.old_slug = $1
+                     LIMIT 1`,
+                    [slug]
+                );
+                campaign = redirected.rows[0];
+            } catch (e) {
+                console.error('slug redirect lookup failed', e);
+            }
         }
 
-        const campaign = result.rows[0];
-        if (campaign.is_public === false || campaign.is_hidden === true) {
+        if (!campaign || campaign.is_public === false || campaign.is_hidden === true) {
             return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
         }
 

@@ -1,6 +1,7 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { clientIp, rateLimit } from '@/lib/rateLimit';
+import { findVisibleCampaignBySlugOrRedirect } from '@/lib/findPublicCampaign';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,12 +22,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                 { status: 429 }
             );
         }
+        const campaign = await findVisibleCampaignBySlugOrRedirect(slug);
+        if (!campaign) {
+            return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
+        }
         const result = await pool.query(
             `UPDATE campaigns
              SET view_count = COALESCE(view_count, 0) + 1
-             WHERE slug = $1 AND is_public = true
+             WHERE id = $1 AND is_public = true AND is_hidden IS NOT TRUE
              RETURNING view_count`,
-            [slug]
+            [campaign.id]
         );
         if (result.rows.length === 0) {
             return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
