@@ -1,6 +1,7 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, clientIp } from '@/lib/rateLimit';
+import { findCampaignIdBySlugOrRedirect } from '@/lib/findPublicCampaign';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,15 +20,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             return NextResponse.json({ error: 'Too many reports. Please wait a bit.' }, { status: 429 });
         }
 
-        const campaignRes = await pool.query(
-            `SELECT id, is_hidden FROM campaigns WHERE slug = $1 LIMIT 1`,
-            [slug]
-        );
-        if (campaignRes.rows.length === 0) {
+        const found = await findCampaignIdBySlugOrRedirect(slug);
+        if (!found) {
             return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
         }
-        const campaignId = campaignRes.rows[0].id;
-        const alreadyHidden = !!campaignRes.rows[0].is_hidden;
+        const campaignId = found.id;
+        const alreadyHidden = found.is_hidden;
 
         let reason: string | null = null;
         try {

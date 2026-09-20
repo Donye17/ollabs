@@ -3,6 +3,7 @@ import { NextRequest, NextResponse, after } from 'next/server';
 import { firstSupporterEmail, milestoneEmail, sendEmail } from '@/lib/email';
 import { countryLabel, publisherCountry } from '@/lib/geo';
 import { clientIp, rateLimit } from '@/lib/rateLimit';
+import { findVisibleCampaignBySlugOrRedirect } from '@/lib/findPublicCampaign';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,17 +36,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             );
         }
 
-        const campaignRes = await pool.query(
-            `SELECT id, title, owner_token, organizer_email, goal,
-                    COALESCE(milestone_notified, 0) AS milestone_notified
-             FROM campaigns WHERE slug = $1 AND is_public = true AND is_hidden IS NOT TRUE LIMIT 1`,
-            [slug]
-        );
-        if (campaignRes.rows.length === 0) {
+        const campaign = await findVisibleCampaignBySlugOrRedirect(slug);
+        if (!campaign) {
             return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
         }
-        const campaign = campaignRes.rows[0];
         const campaignId = campaign.id;
+        // Emails and manage links must use the live slug. The request slug may be
+        // an old custom link that only exists in campaign_slug_redirects.
+        const liveSlug = campaign.slug;
         const supporterCountry = publisherCountry(request);
 
         let imageUrl: string | null = null;
@@ -84,9 +82,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             );
         }
 
+        const organizerEmail = campaign.organizer_email;
+        const ownerToken = campaign.owner_token ?? '';
+
         // First supporter is the highest-leverage nudge: median first join is 4.5
         // minutes after publish. Guard with first_supporter_emailed_at like milestones.
-        if (prevCount === 0 && count === 1 && campaign.organizer_email) {
+        if (prevCount === 0 && count === 1 && organizerEmail) {
             after(async () => {
                 try {
                     const claim = await pool.query(
@@ -98,12 +99,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                     if (claim.rowCount === 0) return;
                     const msg = firstSupporterEmail({
                         title: campaign.title,
-                        slug,
-                        ownerToken: campaign.owner_token,
+                        slug: liveSlug,
+                        ownerToken,
                         country: supporterCountry,
                         countryName: countryLabel(supporterCountry),
                     });
-                    await sendEmail({ to: campaign.organizer_email, ...msg, tag: 'first_supporter' });
+                    await sendEmail({ to: organizerEmail, ...msg, tag: 'first_supporter' });
                 } catch (e) {
                     console.error('[use] first supporter email failed', e);
                 }
@@ -112,13 +113,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
         // Milestone nudge. Guarded by milestone_notified so a burst of traffic
         // cannot send the same email twice, and never blocks the response.
-        const hit = campaign.organizer_email
+        const hit = organizerEmail
             ? milestoneReached(count, campaign.milestone_notified)
             : null;
         // Runs through after() for the same reason as the welcome email: a
         // floating promise would be killed when the function freezes on
         // returning the response.
-        if (hit != null) {
+        if (hit != null && organizerEmail) {
             after(async () => {
                 try {
                     const claim = await pool.query(
@@ -130,12 +131,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                     if (claim.rowCount === 0) return; // another request already sent it
                     const msg = milestoneEmail({
                         title: campaign.title,
-                        slug,
-                        ownerToken: campaign.owner_token,
+                        slug: liveSlug,
+                        ownerToken,
                         count,
                         goal: campaign.goal,
                     });
-                    await sendEmail({ to: campaign.organizer_email, ...msg, tag: 'milestone' });
+                    await sendEmail({ to: organizerEmail, ...msg, tag: 'milestone' });
                 } catch (e) {
                     console.error('[use] milestone email failed', e);
                 }
