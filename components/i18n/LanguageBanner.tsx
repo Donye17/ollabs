@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import {
     LOCALE_COOKIE,
-    localeLandingPath,
     type Locale,
 } from '@/lib/i18n/locale';
 import { shouldHideLanguageBanner, shouldShowMobileOrganizerNav, MOBILE_NAV_H } from '@/lib/mobileNav';
@@ -15,11 +14,6 @@ import { track } from '@/lib/analytics';
 const DISMISS_KEY = 'ollabs_locale_banner_dismissed';
 
 type MarketingLocale = Locale | 'tl' | 'hi' | 'es';
-
-function marketingLandingPath(locale: MarketingLocale): string | null {
-    if (locale === 'hi') return '/hi';
-    return localeLandingPath(locale);
-}
 
 /** Browser-first locale for soft banner offers (product locales plus /hi). */
 function resolveMarketingLocale(languages: readonly string[]): MarketingLocale {
@@ -43,8 +37,9 @@ function onMarketingLanding(pathname: string): MarketingLocale | null {
 
 /**
  * Soft language offer. Never hard-redirects on first paint, that fights
- * WhatsApp WebViews. Portuguese can still open /pt. Spanish, Indonesian, and
- * Tagalog set the product-locale cookie and stay on the current page.
+ * WhatsApp WebViews. Portuguese and English stay on the current page; `/pt`
+ * is SEO only. Hindi still opens /hi. Spanish, Indonesian, and Tagalog set
+ * the product-locale cookie and stay put.
  */
 export function LanguageBanner() {
     const pathname = usePathname() || '/';
@@ -111,9 +106,9 @@ export function LanguageBanner() {
             setLocale(suggested);
         }
         dismiss();
-        const landing = marketingLandingPath(suggested);
-        if (landing && !onLocaleLanding) {
-            window.location.href = landing;
+        // Product PT/EN live on `/`. Only Hindi still has a dedicated landing.
+        if (suggested === 'hi' && !onLocaleLanding) {
+            window.location.href = '/hi';
             return;
         }
         if (suggested === 'en' && onLocaleLanding) {
@@ -173,14 +168,14 @@ export function LanguageBanner() {
                     <button
                         type="button"
                         onClick={accept}
-                        className="flex-1 sm:flex-none min-h-[40px] px-3 rounded-xl bg-brand text-ink text-xs font-bold"
+                        className="flex-1 sm:flex-none min-h-11 px-3 rounded-xl bg-brand text-ink font-sans text-xs font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                     >
                         {copy.switchTo}
                     </button>
                     <button
                         type="button"
                         onClick={dismiss}
-                        className="flex-1 sm:flex-none min-h-[40px] px-3 rounded-xl border border-paper/20 text-xs font-semibold text-paper/80"
+                        className="flex-1 sm:flex-none min-h-11 px-3 rounded-xl border border-paper/20 font-sans text-xs font-semibold text-paper/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper"
                     >
                         {copy.dismiss}
                     </button>

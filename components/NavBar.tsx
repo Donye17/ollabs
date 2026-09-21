@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 import { MessageSquare } from 'lucide-react';
 import { BrandMark } from '@/components/BrandMark';
 import { BackControl } from '@/components/BackControl';
+import { LocaleSwitch } from '@/components/i18n/LocaleSwitch';
+import { useLocale } from '@/components/i18n/LocaleProvider';
 
 /** Short label so phones know where they are without reading the page H1. */
 function chromeTitle(pathname: string): string | null {
@@ -36,6 +38,7 @@ type NavBarProps = {
 
 export const NavBar: React.FC<NavBarProps> = ({ isHome = false }) => {
     const pathname = usePathname() || '/';
+    const { messages } = useLocale();
     const onCreate = pathname === '/create' || pathname.startsWith('/create/');
     const onHome = isHome || pathname === '/';
     // Phones: logo alone always jumped home and wiped mid-flow work. Back keeps
@@ -69,35 +72,36 @@ export const NavBar: React.FC<NavBarProps> = ({ isHome = false }) => {
                         <>
                             <Link
                                 href="/explore"
-                                className="text-sm font-semibold text-muted hover:text-brand-deep min-h-11 inline-flex items-center"
+                                className="font-sans text-sm font-semibold text-muted hover:text-brand-deep min-h-11 hidden sm:inline-flex items-center"
                             >
-                                Explorar
+                                {messages.nav.explore}
                             </Link>
                             <Link
                                 href="/guides"
-                                className="text-sm font-semibold text-muted hover:text-brand-deep min-h-11 inline-flex items-center"
+                                className="font-sans text-sm font-semibold text-muted hover:text-brand-deep min-h-11 hidden sm:inline-flex items-center"
                             >
-                                Guias
+                                {messages.nav.guides}
                             </Link>
+                            <LocaleSwitch />
                         </>
                     ) : (
                         <>
                             {/* Desktop only: phones already have Mine · Create · Hub. */}
                             <Link
                                 href="/mine"
-                                className="hidden lg:inline-flex text-sm font-semibold text-muted hover:text-brand-deep transition-colors min-h-11 items-center"
+                                className="hidden lg:inline-flex font-sans text-sm font-semibold text-muted hover:text-brand-deep transition-colors min-h-11 items-center"
                             >
-                                My campaigns
+                                {messages.nav.myCampaigns}
                             </Link>
-                            <Link href="/explore" className="text-sm font-semibold text-muted hover:text-brand-deep hidden md:inline-flex min-h-11 items-center transition-colors">
-                                Explore
+                            <Link href="/explore" className="font-sans text-sm font-semibold text-muted hover:text-brand-deep hidden md:inline-flex min-h-11 items-center transition-colors">
+                                {messages.nav.explore}
                             </Link>
-                            <Link href="/guides" className="text-sm font-semibold text-muted hover:text-brand-deep hidden md:inline-flex min-h-11 items-center transition-colors">
-                                Guides
+                            <Link href="/guides" className="font-sans text-sm font-semibold text-muted hover:text-brand-deep hidden md:inline-flex min-h-11 items-center transition-colors">
+                                {messages.nav.guides}
                             </Link>
                             <a
                                 href="mailto:feedback@ollabs.studio?subject=Ollabs%20Feedback"
-                                className="text-sm font-semibold text-muted hover:text-brand-deep hidden lg:flex items-center gap-1.5 min-h-11 transition-colors"
+                                className="font-sans text-sm font-semibold text-muted hover:text-brand-deep hidden lg:flex items-center gap-1.5 min-h-11 transition-colors"
                             >
                                 <MessageSquare size={14} />
                                 Feedback
@@ -105,11 +109,12 @@ export const NavBar: React.FC<NavBarProps> = ({ isHome = false }) => {
                             {!onCreate && (
                                 <Link
                                     href="/create"
-                                    className="hidden lg:inline-flex bg-brand hover:brightness-105 text-ink px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:brightness-95 min-h-11 items-center shrink-0"
+                                    className="hidden lg:inline-flex bg-brand hover:brightness-105 text-ink px-5 py-2.5 rounded-xl font-sans text-sm font-bold transition-all active:brightness-95 min-h-11 items-center shrink-0"
                                 >
-                                    Create a campaign
+                                    {messages.nav.create}
                                 </Link>
                             )}
+                            <LocaleSwitch />
                         </>
                     )}
                 </div>

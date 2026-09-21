@@ -2,7 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { getMessages, type Messages } from '@/lib/i18n/messages';
-import { DEFAULT_LOCALE, LOCALE_COOKIE, isLocale, resolveLocale, type Locale } from '@/lib/i18n/locale';
+import { DEFAULT_LOCALE, LOCALE_COOKIE, htmlLang, isLocale, resolveLocale, type Locale } from '@/lib/i18n/locale';
 
 type LocaleContextValue = {
     locale: Locale;
@@ -44,6 +44,10 @@ export function LocaleProvider({
         });
         setLocaleState(next);
     }, [initialLocale]);
+
+    useEffect(() => {
+        document.documentElement.lang = htmlLang(locale);
+    }, [locale]);
 
     const setLocale = useCallback((next: Locale) => {
         if (!isLocale(next)) return;

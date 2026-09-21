@@ -4,6 +4,8 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Users } from 'lucide-react';
 import { CampaignGridThumb } from '@/components/CampaignGridThumb';
+import { useLocale } from '@/components/i18n/LocaleProvider';
+import { formatCount, type Locale } from '@/lib/i18n/locale';
 import type { FrameConfig } from '@/lib/types';
 import { HOME_PODIUM_SLOTS } from '@/lib/frameValidity';
 
@@ -21,15 +23,20 @@ function PodiumLink({
     campaign,
     rank,
     first,
+    supportingLabel,
+    locale,
 }: {
     campaign: TopCampaign;
     rank: 1 | 2 | 3;
     first: boolean;
+    supportingLabel: string;
+    locale: Locale;
 }) {
     // CSS box vs file pixels: 2x DPR. Side slots stay at 176 so we do not
     // pull a larger JPEG than the circle can show on phones.
     const framePx = first ? 128 : 88;
     const canvasPx = first ? 256 : 176;
+    const count = formatCount(campaign.supporterCount, locale);
 
     return (
         <Link
@@ -37,7 +44,7 @@ function PodiumLink({
             className={`group flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-xl ${
                 first ? 'pt-0' : 'pt-6'
             }`}
-            aria-label={`${campaign.title}. ${campaign.supporterCount.toLocaleString()} supporting`}
+            aria-label={`${campaign.title}. ${count} ${supportingLabel}`}
         >
             <span
                 className={`mb-2 inline-flex items-center justify-center rounded-full font-display font-bold tabular-nums ${
@@ -70,15 +77,26 @@ function PodiumLink({
             >
                 {campaign.title}
             </p>
-            <p className="mt-1 block text-xs text-muted tabular-nums">
+            <p className="mt-1 block font-sans text-xs text-muted tabular-nums">
                 <Users size={12} className="inline shrink-0 mr-1" aria-hidden />
-                {campaign.supporterCount.toLocaleString()} supporting
+                {count} {supportingLabel}
             </p>
         </Link>
     );
 }
 
-function DesktopTile({ campaign, rank }: { campaign: TopCampaign; rank: number }) {
+function DesktopTile({
+    campaign,
+    rank,
+    supportingLabel,
+    locale,
+}: {
+    campaign: TopCampaign;
+    rank: number;
+    supportingLabel: string;
+    locale: Locale;
+}) {
+    const count = formatCount(campaign.supporterCount, locale);
     return (
         <Link
             href={`/c/${campaign.slug}`}
@@ -101,9 +119,9 @@ function DesktopTile({ campaign, rank }: { campaign: TopCampaign; rank: number }
             <p className="mt-3 font-display font-bold text-sm leading-snug line-clamp-2 break-words text-balance group-hover:text-brand-deep transition-colors max-w-[10rem]">
                 {campaign.title}
             </p>
-            <p className="mt-1 block text-xs text-muted tabular-nums">
+            <p className="mt-1 block font-sans text-xs text-muted tabular-nums">
                 <Users size={12} className="inline shrink-0 mr-1" aria-hidden />
-                {campaign.supporterCount.toLocaleString()} supporting
+                {count} {supportingLabel}
             </p>
         </Link>
     );
@@ -114,6 +132,9 @@ function DesktopTile({ campaign, rank }: { campaign: TopCampaign; rank: number }
  * shows up to six equal tiles so discovery feels fuller without a carousel.
  */
 export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) {
+    const { locale, messages } = useLocale();
+    const supportingLabel = messages.campaign.peopleSupporting;
+
     useEffect(() => {
         const targets = [campaigns[1], campaigns[0], campaigns[2]].filter(Boolean) as TopCampaign[];
         for (const c of targets) {
@@ -146,7 +167,13 @@ export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) 
                                 key={campaign.slug}
                                 className={`flex-1 min-w-0 max-w-[140px] sm:max-w-[160px] ${rank === 1 ? 'z-10' : ''}`}
                             >
-                                <PodiumLink campaign={campaign} rank={rank} first={rank === 1} />
+                                <PodiumLink
+                                    campaign={campaign}
+                                    rank={rank}
+                                    first={rank === 1}
+                                    supportingLabel={supportingLabel}
+                                    locale={locale}
+                                />
                             </li>
                         ))}
                     </ol>
@@ -156,7 +183,13 @@ export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) 
             {/* Desktop: up to six live tiles. loading=lazy so phones skip them. */}
             <div className="hidden md:grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-6 max-w-5xl lg:max-w-6xl mx-auto px-2">
                 {desktop.map((campaign, i) => (
-                    <DesktopTile key={campaign.slug} campaign={campaign} rank={i + 1} />
+                    <DesktopTile
+                        key={campaign.slug}
+                        campaign={campaign}
+                        rank={i + 1}
+                        supportingLabel={supportingLabel}
+                        locale={locale}
+                    />
                 ))}
             </div>
         </div>

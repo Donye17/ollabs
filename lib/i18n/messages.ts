@@ -8,6 +8,42 @@ export type Messages = {
         switchTo: string;
         dismiss: string;
     };
+    nav: {
+        explore: string;
+        guides: string;
+        myCampaigns: string;
+        create: string;
+        language: string;
+        english: string;
+        portuguese: string;
+    };
+    home: {
+        headlineBefore: string;
+        headlineAccent: string;
+        lede: string;
+        nameLabel: string;
+        namePlaceholder: string;
+        create: string;
+        free: string;
+        exampleAlt: string;
+        slugFallback: string;
+        topCampaigns: string;
+        topCampaignsBody: string;
+        calendarLink: string;
+        howTitle: string;
+        how1Title: string;
+        how1Body: string;
+        how2Title: string;
+        how2Body: string;
+        how3Title: string;
+        how3Body: string;
+        madeFor: string;
+        seeAllUseCases: string;
+        freeTitle: string;
+        freeBody: string;
+        ctaTitle: string;
+        ctaBody: string;
+    };
     campaign: {
         eyebrow: string;
         tapHint: string;
@@ -333,6 +369,43 @@ const en: Messages = {
         switchTo: 'Usar português',
         dismiss: 'Manter inglês',
     },
+    nav: {
+        explore: 'Explore',
+        guides: 'Guides',
+        myCampaigns: 'My campaigns',
+        create: 'Create a campaign',
+        language: 'Language',
+        english: 'EN',
+        portuguese: 'PT',
+    },
+    home: {
+        headlineBefore: 'Your cause on ',
+        headlineAccent: 'every profile',
+        lede: 'One link. Under a minute. No signup and no watermark for supporters.',
+        nameLabel: 'Campaign name',
+        namePlaceholder: 'Your cause, team, or candidate',
+        create: 'Create a campaign',
+        free: 'Free. No account.',
+        exampleAlt: 'Example profile photo with a frame',
+        slugFallback: 'your-campaign',
+        topCampaigns: 'Top campaigns',
+        topCampaignsBody: 'Real frames people are using right now, ranked by supporters.',
+        calendarLink: 'Calendar moments',
+        howTitle: 'How it works',
+        how1Title: 'Upload your frame',
+        how1Body: 'Your logo, colors, and slogan on a transparent PNG.',
+        how2Title: 'Share one link',
+        how2Body: 'WhatsApp, Instagram, email. One URL for everyone.',
+        how3Title: 'They save the photo',
+        how3Body: 'Drop in a picture, download it framed, counter goes up.',
+        madeFor: 'Made for',
+        seeAllUseCases: 'See all use cases',
+        freeTitle: 'Free for supporters',
+        freeBody:
+            'No signup, no watermark, no paywall. Upload your own frame art, share one link, and watch the counter climb.',
+        ctaTitle: 'Make a frame',
+        ctaBody: 'Takes under a minute. No account needed.',
+    },
     campaign: {
         eyebrow: 'Ollabs campaign',
         tapHint: 'Tap the circle or drag a photo onto it.',
@@ -515,6 +588,43 @@ const pt: Messages = {
         suggest: 'Looking for English? Switch language anytime.',
         switchTo: 'Use English',
         dismiss: 'Keep Portuguese',
+    },
+    nav: {
+        explore: 'Explorar',
+        guides: 'Guias',
+        myCampaigns: 'Minhas campanhas',
+        create: 'Criar campanha',
+        language: 'Idioma',
+        english: 'EN',
+        portuguese: 'PT',
+    },
+    home: {
+        headlineBefore: 'Sua causa em ',
+        headlineAccent: 'cada perfil',
+        lede: 'Um link. Menos de um minuto. Sem cadastro e sem marca d\'água para quem apoia.',
+        nameLabel: 'Nome da sua campanha',
+        namePlaceholder: 'Sua causa, time ou candidato',
+        create: 'Criar campanha',
+        free: 'Grátis. Sem conta.',
+        exampleAlt: 'Exemplo de foto de perfil com moldura',
+        slugFallback: 'sua-campanha',
+        topCampaigns: 'Campanhas em alta',
+        topCampaignsBody: 'Molduras que as pessoas estão usando agora, por número de apoiadores.',
+        calendarLink: 'Datas para marcar',
+        howTitle: 'Como funciona',
+        how1Title: 'Envie sua moldura',
+        how1Body: 'Logo, cores e slogan num PNG transparente.',
+        how2Title: 'Compartilhe um link',
+        how2Body: 'WhatsApp, Instagram, e-mail. Um URL para todo mundo.',
+        how3Title: 'Elas salvam a foto',
+        how3Body: 'Entram com a foto, baixam emoldurada, o contador sobe.',
+        madeFor: 'Feito para',
+        seeAllUseCases: 'Ver todos os usos',
+        freeTitle: 'Grátis para quem apoia',
+        freeBody:
+            'Sem cadastro, sem marca d\'água, sem paywall. Envie a arte da moldura, compartilhe um link e veja o contador subir.',
+        ctaTitle: 'Faça uma moldura',
+        ctaBody: 'Leva menos de um minuto. Sem conta.',
     },
     campaign: {
         eyebrow: 'Campanha Ollabs',
@@ -700,6 +810,43 @@ const id: Messages = {
         suggest: 'Looking for English? Switch language anytime.',
         switchTo: 'Use English',
         dismiss: 'Keep Indonesian',
+    },
+    nav: {
+        explore: 'Explore',
+        guides: 'Guides',
+        myCampaigns: 'My campaigns',
+        create: 'Create a campaign',
+        language: 'Language',
+        english: 'EN',
+        portuguese: 'PT',
+    },
+    home: {
+        headlineBefore: 'Your cause on ',
+        headlineAccent: 'every profile',
+        lede: 'One link. Under a minute. No signup and no watermark for supporters.',
+        nameLabel: 'Campaign name',
+        namePlaceholder: 'Your cause, team, or candidate',
+        create: 'Create a campaign',
+        free: 'Free. No account.',
+        exampleAlt: 'Example profile photo with a frame',
+        slugFallback: 'your-campaign',
+        topCampaigns: 'Top campaigns',
+        topCampaignsBody: 'Real frames people are using right now, ranked by supporters.',
+        calendarLink: 'Calendar moments',
+        howTitle: 'How it works',
+        how1Title: 'Upload your frame',
+        how1Body: 'Your logo, colors, and slogan on a transparent PNG.',
+        how2Title: 'Share one link',
+        how2Body: 'WhatsApp, Instagram, email. One URL for everyone.',
+        how3Title: 'They save the photo',
+        how3Body: 'Drop in a picture, download it framed, counter goes up.',
+        madeFor: 'Made for',
+        seeAllUseCases: 'See all use cases',
+        freeTitle: 'Free for supporters',
+        freeBody:
+            'No signup, no watermark, no paywall. Upload your own frame art, share one link, and watch the counter climb.',
+        ctaTitle: 'Make a frame',
+        ctaBody: 'Takes under a minute. No account needed.',
     },
     campaign: {
         eyebrow: 'Kampanye Ollabs',

@@ -1,9 +1,9 @@
 import { pool } from '@/lib/neon';
-import Link from 'next/link';
 import { visibleFrameSql, HOME_TOP_CAMPAIGNS, MIN_SUPPORTERS_TO_DISPLAY } from '@/lib/frameValidity';
 import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
 import type { TopCampaign } from '@/components/home/TopCampaignsPodium';
 import { HomeTopCampaignsClient } from '@/components/home/HomeTopCampaignsClient';
+import { HomeCalendarLink, HomeExamplesCopy } from '@/components/home/HomeExamplesCopy';
 import { parseFrameConfig } from '@/lib/parseFrameConfig';
 
 async function getTopCampaigns(): Promise<TopCampaign[]> {
@@ -60,18 +60,9 @@ export async function HomeExamplesSection() {
 
     return (
         <div className="relative z-10">
-            <p className="text-center text-sm text-muted font-semibold mb-2">
-                Top campaigns
-            </p>
-            <p className="text-left text-sm text-ink/65 mb-8 max-w-md mx-auto leading-relaxed">
-                Real frames people are using right now, ranked by supporters.
-            </p>
+            <HomeExamplesCopy />
             <HomeTopCampaignsClient campaigns={campaigns} />
-            <p className="mt-8 text-left max-w-md mx-auto text-sm">
-                <Link href="/day" className="font-semibold text-brand-deep hover:underline">
-                    Calendar moments
-                </Link>
-            </p>
+            <HomeCalendarLink />
         </div>
     );
 }
