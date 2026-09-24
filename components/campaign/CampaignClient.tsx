@@ -285,32 +285,54 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
         countedRef.current = true;
 
         void (async () => {
-            let imageUrl: string | null = null;
-            const canvas = canvasRef.current;
-            // Wait two frames so the last drag/zoom paint is on the canvas before
-            // we snapshot. Failures stay silent; the join still counts.
-            if (canvas && imgRef.current) {
-                await new Promise<void>((resolve) => {
-                    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-                });
-                imageUrl = await uploadExploreThumb(canvas);
-                track('explore_thumb', { campaign: slug, ok: imageUrl ? 1 : 0 });
-            }
-
+            // Count first, then snapshot a thumb. The post-save screen opens
+            // WhatsApp immediately, which freezes this WebView (especially
+            // iOS in-app browsers). Awaiting the blob upload first meant the
+            // increment never left the phone, so organizers saw a dead campaign
+            // after a real save. keepalive lets /use finish after the tab yields.
+            // The Explore grid already falls back to live frame art when a use
+            // has no photo, so a missing thumb is cheaper than a missing join.
+            let useId: string | null = null;
             try {
                 const res = await fetch(`/api/campaigns/${slug}/use`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(imageUrl ? { imageUrl } : {}),
+                    body: '{}',
+                    keepalive: true,
                 });
-                const d = res.ok ? await res.json() : null;
+                if (!res.ok) {
+                    // 429 / 404 / 500: the server did not record this save.
+                    // Allow a later tap in this tab to try again. A 200 with a
+                    // broken body must not reset, or the next tap would double-count.
+                    countedRef.current = false;
+                    return;
+                }
+                const d = await res.json().catch(() => null);
                 if (d && typeof d.supporter_count === 'number') {
                     setCount(d.supporter_count);
                     track('supporter_joined', { campaign: slug, count: d.supporter_count });
                 }
+                useId = typeof d?.use_id === 'string' ? d.use_id : null;
             } catch {
                 countedRef.current = false;
+                return;
             }
+
+            if (!useId) return;
+            const canvas = canvasRef.current;
+            if (!canvas || !imgRef.current) return;
+            await new Promise<void>((resolve) => {
+                requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+            });
+            const imageUrl = await uploadExploreThumb(canvas);
+            track('explore_thumb', { campaign: slug, ok: imageUrl ? 1 : 0 });
+            if (!imageUrl) return;
+            await fetch(`/api/campaigns/${slug}/use`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ imageUrl, useId }),
+                keepalive: true,
+            }).catch(() => { /* thumb is optional; the join already counted */ });
         })();
     };
 

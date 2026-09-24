@@ -19,7 +19,8 @@ function milestoneReached(count: number, alreadyNotified: number): number | null
 }
 
 // POST /api/campaigns/[slug]/use, a supporter applied the frame; bump the counter.
-// Body (optional): { imageUrl } — a small public JPEG for Explore thumbnails.
+// Body (optional): { imageUrl } for a new join, or { imageUrl, useId } to attach
+// a thumb to a join that already counted (no second increment).
 //
 // Rate limit is per-instance (see lib/rateLimit.ts). Limits are generous for a
 // real supporter saving once; they blunt scripted counter inflation.
@@ -49,11 +50,32 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const supporterCountry = publisherCountry(request);
 
         let imageUrl: string | null = null;
+        let attachUseId: string | null = null;
         try {
             const body = await request.json();
             if (body && typeof body.imageUrl === 'string') imageUrl = body.imageUrl;
+            if (body && typeof body.useId === 'string' && body.useId) attachUseId = body.useId;
         } catch {
             // no body is fine
+        }
+
+        // Client counts the join first, then uploads a thumb after. A second
+        // increment here would double-count; this only fills in the photo on
+        // the use that just landed.
+        if (attachUseId) {
+            if (!imageUrl) {
+                return NextResponse.json({ error: 'Missing imageUrl' }, { status: 400 });
+            }
+            if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(attachUseId)) {
+                return NextResponse.json({ error: 'Bad useId' }, { status: 400 });
+            }
+            await pool.query(
+                `UPDATE campaign_uses SET image_url = $3
+                 WHERE id = $1::uuid AND campaign_id = $2
+                   AND (image_url IS NULL OR btrim(image_url) = '')`,
+                [attachUseId, campaignId, imageUrl]
+            );
+            return NextResponse.json({ ok: true });
         }
 
         const prevCountRes = await pool.query(
@@ -62,11 +84,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         );
         const prevCount: number = prevCountRes.rows[0]?.supporter_count ?? 0;
 
-        await pool.query(
+        const inserted = await pool.query(
             `INSERT INTO campaign_uses (campaign_id, user_id, image_url, supporter_country, created_at)
-             VALUES ($1, $2, $3, $4, NOW())`,
+             VALUES ($1, $2, $3, $4, NOW())
+             RETURNING id`,
             [campaignId, null, imageUrl, supporterCountry]
         );
+        const useId: string | undefined = inserted.rows[0]?.id;
 
         const updated = await pool.query(
             `UPDATE campaigns SET supporter_count = supporter_count + 1
@@ -142,7 +166,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             });
         }
 
-        return NextResponse.json({ supporter_count: count });
+        return NextResponse.json({ supporter_count: count, use_id: useId ?? null });
     } catch (error) {
         console.error('Failed to record campaign use:', error);
         return NextResponse.json({ error: 'Failed to record campaign use' }, { status: 500 });
