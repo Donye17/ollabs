@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-09-24-count-before-thumb',
+        date: '2026-09-24',
+        title: 'Saves count even if you leave for WhatsApp',
+        summary: 'The join is recorded as soon as the picture is ready, so opening WhatsApp no longer drops the supporter.',
+        items: [
+            'A save now increments the campaign before the Explore thumbnail upload, so leaving for WhatsApp still counts.',
+            'If the first count request fails, a later save in the same tab can try again instead of staying stuck at zero.',
+        ],
+    },
+    {
         id: '2026-08-30-home-tool',
         date: '2026-08-30',
         title: 'Homepage is the tool now',
