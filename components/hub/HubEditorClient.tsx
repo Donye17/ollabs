@@ -44,7 +44,7 @@ type CampaignOpt = {
     frameConfig?: FrameConfig | null;
 };
 
-type LinkDraft = { key: string; title: string; url: string; clickCount?: number; urlPlaceholder?: string };
+type LinkDraft = { key: string; id?: string; title: string; url: string; clickCount?: number; urlPlaceholder?: string };
 
 type HubPayload = {
     email: string;
@@ -142,6 +142,7 @@ export const HubEditorClient: React.FC = () => {
             setLinks(
                 (data.links || []).map((l) => ({
                     key: l.id,
+                    id: l.id,
                     title: l.title,
                     url: l.url,
                     clickCount: l.clickCount || 0,
@@ -199,7 +200,7 @@ export const HubEditorClient: React.FC = () => {
                     featuredCampaignId: featuredId || null,
                     hubTheme,
                     hiddenCampaignIds: hiddenIds,
-                    links: links.map((l) => ({ title: l.title, url: l.url })),
+                    links: links.map((l) => ({ id: l.id, title: l.title, url: l.url })),
                 }),
             });
             const body = await res.json().catch(() => ({}));
@@ -216,6 +217,7 @@ export const HubEditorClient: React.FC = () => {
                 setLinks(
                     body.links.map((l: { id: string; title: string; url: string; clickCount?: number }) => ({
                         key: l.id,
+                        id: l.id,
                         title: l.title,
                         url: l.url,
                         clickCount: l.clickCount || 0,

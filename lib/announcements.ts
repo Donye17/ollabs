@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-09-26-hub-clicks',
+        date: '2026-09-26',
+        title: 'Hub link taps survive a save',
+        summary: 'Editing your hub no longer wipes the tap counts on Instagram and other links.',
+        items: [
+            'Save after changing your bio, theme, or handle keeps the tap count on each link.',
+            'Removing a link still drops that count. Changing the URL on the same row keeps it.',
+        ],
+    },
+    {
         id: '2026-08-30-home-tool',
         date: '2026-08-30',
         title: 'Homepage is the tool now',
