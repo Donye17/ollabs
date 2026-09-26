@@ -41,9 +41,89 @@ export const RESERVED_HANDLES = new Set([
 ]);
 
 export type HubLinkInput = {
+    /** Existing row id. Omitted for a newly added link. */
+    id?: string;
     title: string;
     url: string;
 };
+
+const HUB_LINK_UUID =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function isHubLinkId(raw: unknown): raw is string {
+    return typeof raw === 'string' && HUB_LINK_UUID.test(raw);
+}
+
+export type ExistingHubLink = {
+    id: string;
+    title: string;
+    url: string;
+};
+
+export type HubLinkReplaceOp =
+    | { kind: 'update'; id: string; title: string; url: string; sortOrder: number }
+    | { kind: 'insert'; title: string; url: string; sortOrder: number };
+
+/**
+ * Plan a hub-link save that keeps row identity.
+ *
+ * The editor used to DELETE every link and INSERT the new list. That reset
+ * click_count to 0 on any save (even a bio-only edit) and minted new UUIDs,
+ * so a public /u page that was already open sent taps at deleted rows.
+ * Match by id when the client sends one we own; otherwise reuse an unused
+ * row with the same title+url so a stale tab without ids still keeps counts.
+ */
+export function planHubLinkReplace(
+    incoming: HubLinkInput[],
+    existing: ExistingHubLink[]
+): { ops: HubLinkReplaceOp[]; deleteIds: string[] } {
+    const unused = new Map(existing.map((row) => [row.id, row]));
+    const ops: HubLinkReplaceOp[] = [];
+
+    for (let i = 0; i < incoming.length; i++) {
+        const link = incoming[i];
+        const byId = link.id && unused.get(link.id);
+        if (byId) {
+            unused.delete(byId.id);
+            ops.push({
+                kind: 'update',
+                id: byId.id,
+                title: link.title,
+                url: link.url,
+                sortOrder: i,
+            });
+            continue;
+        }
+
+        let byFields: ExistingHubLink | undefined;
+        for (const row of unused.values()) {
+            if (row.title === link.title && row.url === link.url) {
+                byFields = row;
+                break;
+            }
+        }
+        if (byFields) {
+            unused.delete(byFields.id);
+            ops.push({
+                kind: 'update',
+                id: byFields.id,
+                title: link.title,
+                url: link.url,
+                sortOrder: i,
+            });
+            continue;
+        }
+
+        ops.push({
+            kind: 'insert',
+            title: link.title,
+            url: link.url,
+            sortOrder: i,
+        });
+    }
+
+    return { ops, deleteIds: [...unused.keys()] };
+}
 
 export type HubCampaignSummary = {
     slug: string;

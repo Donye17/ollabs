@@ -8,8 +8,10 @@ import {
     HUB_LINK_TITLE_MAX,
     HUB_LINKS_MAX,
     handleError,
+    isHubLinkId,
     isSafeHttpUrl,
     normalizeHandle,
+    planHubLinkReplace,
     type HubLinkInput,
 } from '@/lib/hub';
 import { isHubThemeId } from '@/lib/hubThemes';
@@ -287,7 +289,11 @@ export async function PATCH(request: NextRequest) {
                         { status: 400 }
                     );
                 }
-                cleaned.push({ title, url });
+                cleaned.push({
+                    id: isHubLinkId(raw?.id) ? raw.id : undefined,
+                    title,
+                    url,
+                });
             }
             links = cleaned;
         }
@@ -344,16 +350,42 @@ export async function PATCH(request: NextRequest) {
             );
 
             if (links !== undefined) {
-                await client.query(
-                    `DELETE FROM organizer_hub_links WHERE organizer_id = $1`,
+                // Keep the same rows so click_count and public-page link ids survive
+                // a bio/theme/handle save. Full DELETE+INSERT reset both to zero.
+                const existing = await client.query(
+                    `SELECT id, title, url FROM organizer_hub_links WHERE organizer_id = $1`,
                     [organizer.id]
                 );
-                for (let i = 0; i < links.length; i++) {
+                const plan = planHubLinkReplace(
+                    links,
+                    existing.rows.map((row: { id: string; title: string; url: string }) => ({
+                        id: row.id,
+                        title: row.title,
+                        url: row.url,
+                    }))
+                );
+                if (plan.deleteIds.length > 0) {
                     await client.query(
-                        `INSERT INTO organizer_hub_links (organizer_id, title, url, sort_order)
-                         VALUES ($1, $2, $3, $4)`,
-                        [organizer.id, links[i].title, links[i].url, i]
+                        `DELETE FROM organizer_hub_links
+                         WHERE organizer_id = $1 AND id = ANY($2::uuid[])`,
+                        [organizer.id, plan.deleteIds]
                     );
+                }
+                for (const op of plan.ops) {
+                    if (op.kind === 'update') {
+                        await client.query(
+                            `UPDATE organizer_hub_links
+                             SET title = $1, url = $2, sort_order = $3
+                             WHERE id = $4 AND organizer_id = $5`,
+                            [op.title, op.url, op.sortOrder, op.id, organizer.id]
+                        );
+                    } else {
+                        await client.query(
+                            `INSERT INTO organizer_hub_links (organizer_id, title, url, sort_order)
+                             VALUES ($1, $2, $3, $4)`,
+                            [organizer.id, op.title, op.url, op.sortOrder]
+                        );
+                    }
                 }
             }
 
