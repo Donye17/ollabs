@@ -12,7 +12,9 @@ description: >-
 
 - App Router metadata API + sitemap / robots conventions.
 - Campaign + day pages use ISR-style revalidate where freshness matters without hammering Neon.
-- Locales in play: PT, ID, TL, HI, ES landings and localized `/for` where they exist.
+- Marketing default is English (`DEFAULT_LOCALE`). `/pt` is the SEO landing. `/es` `/id` `/tl` 301 to `/`. `/hi` is a noindex stub. Product cookie UI still exists for pt/id/es/tl.
+- Campaign pages use `resolveSupporterLocale` (BR/PT or untagged → Portuguese). Do not use the marketing cookie for `/c` copy.
+- `/c` and `/u` are crawlable + noindex. Do not add them to `disallow` in `robots.ts`.
 - No em dashes in user-facing hub/create/mine copy.
 
 ## When changing pages
@@ -21,7 +23,7 @@ description: >-
 2. Keep OG images accurate to the frame/campaign; use existing OG routes when present.
 3. Ensure new public routes appear in the sitemap when they should be indexed.
 4. For locale variants, keep hreflang / alternates consistent.
-5. `/c` and supporter flows stay lean; put denser SEO content on `/for`, `/day`, hubs — not on the save path.
+5. `/c` and `/u` stay lean and noindex. Put denser SEO content on `/for`, `/day`, `/guides`, `/pt`, `/vs`, not on the save path or public hubs.
 
 ## Dig deeper
 
