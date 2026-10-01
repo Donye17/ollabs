@@ -62,15 +62,33 @@ export function resolveLocale(opts: {
 }
 
 /**
+ * Publisher country for supporter UI language.
+ *
+ * Pass publisher_country only. first_supporter_country is a stats field written
+ * on the first save, often by the organizer testing the link from another
+ * country. Feeding it to resolveSupporterLocale treated that save as a
+ * publisher tag, so untagged campaigns left Portuguese-first after one US
+ * download.
+ */
+export function supporterLocaleCountry(
+    publisherCountry: string | null | undefined
+): string | null {
+    if (publisherCountry == null) return null;
+    const code = String(publisherCountry).trim();
+    return code || null;
+}
+
+/**
  * Locale for a public campaign page.
  *
- * 1. Stored country: BR or PT → Portuguese, even if WhatsApp reports English.
- * 2. No stored country → Portuguese. 97% of frame uses are Brazil, and most
+ * 1. Stored publisher country: BR or PT → Portuguese, even if WhatsApp reports English.
+ * 2. No publisher country → Portuguese. 97% of frame uses are Brazil, and most
  *    live campaigns were never tagged. Defaulting to English was the bug.
  * 3. Tagged some other country → cookie / Accept-Language, else English.
  *
  * Cookie never overrides (1) or (2). A supporter in WhatsApp should not
  * inherit an organizer's English cookie from a previous visit on the same phone.
+ * Do not pass first_supporter_country as campaignCountry. That is stats, not a tag.
  */
 export function resolveSupporterLocale(opts: {
     campaignCountry?: string | null;

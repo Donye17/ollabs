@@ -7,6 +7,7 @@ import { parseFrameConfig } from '@/lib/parseFrameConfig';
 import {
     ogLocale,
     resolveSupporterLocale,
+    supporterLocaleCountry,
     type Locale,
 } from '@/lib/i18n/locale';
 
@@ -20,7 +21,7 @@ const getCampaign = cache(async (slug: string) => {
     try {
         const res = await pool.query(
             `SELECT id, slug, title, description, frame_config, creator_name, supporter_count, goal, preview_url, is_public, is_hidden,
-                    publisher_country, first_supporter_country
+                    publisher_country
              FROM campaigns WHERE slug = $1 LIMIT 1`,
             [slug]
         );
@@ -54,8 +55,8 @@ const resolveRedirectSlug = cache(async (slug: string): Promise<string | null> =
     }
 });
 
-function campaignCountry(c: { publisher_country?: string | null; first_supporter_country?: string | null }): string | null {
-    return c.publisher_country || c.first_supporter_country || null;
+function campaignCountry(c: { publisher_country?: string | null }): string | null {
+    return supporterLocaleCountry(c.publisher_country);
 }
 
 function fallbackDescription(title: string, locale: Locale): string {
@@ -123,6 +124,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
     // ISR caches this HTML per slug. Reading Accept-Language here would make
     // every campaign page dynamic, which we cannot do before the October spike.
     // Untagged and Brazilian campaigns are Portuguese from resolveSupporterLocale.
+    // Publisher country only: first-supporter geo is stats, not a language tag.
 
     return (
         <CampaignClient

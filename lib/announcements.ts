@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-01-untagged-pt',
+        date: '2026-10-01',
+        title: 'Untagged campaigns stay in Portuguese',
+        summary: 'A first save from another country no longer switches the campaign page to English.',
+        items: [
+            'Campaign pages without a publisher country stay Portuguese-first, including share text and the WhatsApp preview.',
+            'First-supporter location is still stored for the organizer dashboard. It is not a language tag.',
+        ],
+    },
+    {
         id: '2026-08-30-home-tool',
         date: '2026-08-30',
         title: 'Homepage is the tool now',
