@@ -1,6 +1,6 @@
 # Ollabs — Project Report
 
-*Prepared July 14, 2026*
+*Prepared July 14, 2026. Historical snapshot of an earlier product shape (gallery, social login, GIF export). Do not use it as a setup or architecture guide. Current map: `docs/ENGINEERING.md` and `AGENTS.md`.*
 
 ## What it is
 
