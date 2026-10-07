@@ -17,6 +17,15 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-07-share-preview',
+        date: '2026-10-07',
+        title: 'Share previews wait for your frame art',
+        summary: 'A custom frame that appeared on the canvas could still publish with a blank share image. The snapshot now waits until the artwork has loaded.',
+        items: [
+            'Publishing or saving a custom frame after it shows on the canvas now captures that artwork for WhatsApp and Explore, not the empty cream circle from before the PNG decoded.',
+        ],
+    },
+    {
         id: '2026-08-30-home-tool',
         date: '2026-08-30',
         title: 'Homepage is the tool now',
