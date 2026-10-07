@@ -108,16 +108,27 @@ export const Editor: React.FC<EditorProps> = ({
   // selectedFrame was missing from the deps, which meant changing the frame
   // never re-read the canvas: whatever frame happened to be selected the last
   // time the photo moved got published as the share image. imageObject is here
-  // for the same reason — the first paint after a photo loads has to be picked
-  // up. Both repaint the canvas, so both have to re-read it.
+  // for the same reason: the first paint after a photo loads has to be picked
+  // up. textureVersion is the same idea for custom artwork. The overlay PNG
+  // finishes decoding after selectedFrame already changed, so a 500ms snapshot
+  // taken on the config update is still the empty cream circle. Organizers wait
+  // for the live canvas to show the frame, then publish without panning, and
+  // WhatsApp unfurls the blank donut because preview_url wins over the real
+  // overlay URL in campaign OG.
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (logic.canvasRef.current) {
-        onPreviewUpdate(logic.canvasRef.current.toDataURL('image/png', 0.5));
+      const canvas = logic.canvasRef.current;
+      if (!canvas) return;
+      try {
+        onPreviewUpdate(canvas.toDataURL('image/png', 0.5));
+      } catch (e) {
+        // Tainted canvas (cross-origin overlay without CORS) throws. Leave the
+        // last good snapshot rather than killing the publish path.
+        console.error('preview snapshot failed', e);
       }
     }, 500);
     return () => clearTimeout(timeout);
-  }, [logic.canvasRef, logic.imageObject, logic.position, logic.scale, logic.rotation, selectedFrame, onPreviewUpdate]);
+  }, [logic.canvasRef, logic.imageObject, logic.position, logic.scale, logic.rotation, logic.textureVersion, selectedFrame, onPreviewUpdate]);
 
 
   return (
