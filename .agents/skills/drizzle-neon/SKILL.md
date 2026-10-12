@@ -9,18 +9,25 @@ description: >-
 
 ## Source of truth
 
-- Schema: `lib/db/schema.ts` (campaign-centric tables).
-- SQL migrations: `drizzle/*.sql` — never hand-edit production.
+- Schema (readable TypeScript map): `lib/db/schema.ts`. Excluded from `tsc`.
+- SQL migrations: `drizzle/*.sql` — never hand-edit production. These files are
+  the authority. App code queries with parameterized SQL through `lib/neon.ts`.
+  `drizzle-orm` is **not** a runtime dependency.
 - Connection: Neon serverless pool used by API routes.
 
 ## Rules
 
-1. Change TypeScript schema first, then add a numbered migration — never invent columns only in ad-hoc SQL on prod.
+1. Change the TypeScript map and add a numbered migration together. Never invent columns only in ad-hoc SQL on prod.
 2. Keep serverless in mind: short-lived queries; avoid long transactions and huge joins on request paths.
 3. Add indexes in migrations when filtering by slug, email, country, or created_at (follow existing `idx_*` patterns).
-4. Organizer email is optional on create; supporters do not have accounts — do not add auth tables without an explicit product decision.
+4. Organizer email is optional on create; supporters do not have accounts — do not add auth tables without an explicit product decision. Login is 6-digit codes (`lib/auth.ts`), not better-auth.
 5. Refresh `DATABASE_URL` in Vercel + local together when Neon rotates credentials.
+6. `scripts/apply-migrations.mjs` is a partial helper (0014–0016 only). Later files must be applied explicitly.
+7. Public HTML `/c/[slug]` follows `campaign_slug_redirects`. `/use`, `/view`, `/report`, and `GET /api/campaigns/[slug]` do not (live `campaigns.slug` only). If you add a lookup helper, use it on those four write/read routes together. See `docs/ENGINEERING.md`.
+8. Hub PATCH currently deletes and reinserts `organizer_hub_links` when `links` is sent, which drops `click_count`. Prefer in-place updates. See `docs/ENGINEERING.md`.
+9. `publisher_country` is the organizer tag (create-time geo). `first_supporter_country` is first-save stats. On current `main`, `/c` locale ORs them. Do not feed the stats column into `resolveSupporterLocale`. See `docs/ENGINEERING.md`.
+10. `preview_url` is a client canvas snapshot, not a server render. Create/manage store it as given (https prefix on PATCH only). Campaign OG and hub cards trust it; Explore does not. See `docs/ENGINEERING.md`.
 
 ## Dig deeper
 
-`docs/reference/tier-1/drizzle/`, `docs/reference/tier-1/neon/`
+`docs/ENGINEERING.md`, `docs/reference/tier-1/drizzle/`, `docs/reference/tier-1/neon/`

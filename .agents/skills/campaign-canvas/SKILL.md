@@ -15,6 +15,7 @@ description: >-
 3. Cap canvas work — do not re-render at full export resolution on every pointer move.
 4. Export through `saveFramedPhoto` / shared blob helpers, not one-off canvas download code.
 5. Modals over the editor: `dvh` + scroll lock with restore (see existing publish modal pattern).
+6. Share/manage preview is `Editor.tsx` `toDataURL` after 500 ms. Live canvas already repaints on overlay `onload` (`CanvasArea` `imgTick`, `useEditorLogic` `textureVersion`). The snapshot deps on current `main` omit `textureVersion`, so publish without a pan stores the cream circle. Wrap `toDataURL` (tainted canvas throws). Campaign OG and hub cards prefer `preview_url`; Explore does not. See `docs/ENGINEERING.md`.
 
 ## UX
 
@@ -23,4 +24,4 @@ description: >-
 
 ## Dig deeper
 
-`docs/reference/tier-4/canvas/`, `docs/reference/tier-1/mdn-mobile/`
+`docs/ENGINEERING.md`, `docs/reference/tier-4/canvas/`, `docs/reference/tier-1/mdn-mobile/`
