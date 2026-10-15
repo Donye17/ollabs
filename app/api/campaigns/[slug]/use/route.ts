@@ -37,7 +37,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
         const campaignRes = await pool.query(
             `SELECT id, title, owner_token, organizer_email, goal,
-                    COALESCE(milestone_notified, 0) AS milestone_notified
+                    COALESCE(milestone_notified, 0) AS milestone_notified,
+                    first_supporter_emailed_at
              FROM campaigns WHERE slug = $1 AND is_public = true AND is_hidden IS NOT TRUE LIMIT 1`,
             [slug]
         );
@@ -86,26 +87,51 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
         // First supporter is the highest-leverage nudge: median first join is 4.5
         // minutes after publish. Guard with first_supporter_emailed_at like milestones.
-        if (prevCount === 0 && count === 1 && campaign.organizer_email) {
+        // Fire on any join until the mail actually goes out so a Resend blip on
+        // the first save can still be retried by the second, matching campaign
+        // create which only stamps email_sent_at after sendEmail returns true.
+        if (count >= 1 && campaign.organizer_email && !campaign.first_supporter_emailed_at) {
             after(async () => {
                 try {
                     const claim = await pool.query(
                         `UPDATE campaigns SET first_supporter_emailed_at = NOW()
                          WHERE id = $1 AND first_supporter_emailed_at IS NULL
-                         RETURNING id`,
+                         RETURNING id, first_supporter_country`,
                         [campaignId]
                     );
                     if (claim.rowCount === 0) return;
+                    const country =
+                        (claim.rows[0].first_supporter_country as string | null) || supporterCountry;
                     const msg = firstSupporterEmail({
                         title: campaign.title,
                         slug,
                         ownerToken: campaign.owner_token,
-                        country: supporterCountry,
-                        countryName: countryLabel(supporterCountry),
+                        country,
+                        countryName: countryLabel(country),
                     });
-                    await sendEmail({ to: campaign.organizer_email, ...msg, tag: 'first_supporter' });
+                    const okSend = await sendEmail({
+                        to: campaign.organizer_email,
+                        ...msg,
+                        tag: 'first_supporter',
+                    });
+                    if (!okSend) {
+                        await pool.query(
+                            `UPDATE campaigns SET first_supporter_emailed_at = NULL
+                             WHERE id = $1 AND first_supporter_emailed_at IS NOT NULL`,
+                            [campaignId]
+                        );
+                    }
                 } catch (e) {
                     console.error('[use] first supporter email failed', e);
+                    try {
+                        await pool.query(
+                            `UPDATE campaigns SET first_supporter_emailed_at = NULL
+                             WHERE id = $1 AND first_supporter_emailed_at IS NOT NULL`,
+                            [campaignId]
+                        );
+                    } catch (revertErr) {
+                        console.error('[use] first supporter revert failed', revertErr);
+                    }
                 }
             });
         }
@@ -119,6 +145,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         // floating promise would be killed when the function freezes on
         // returning the response.
         if (hit != null) {
+            const previousMilestone: number = campaign.milestone_notified;
             after(async () => {
                 try {
                     const claim = await pool.query(
@@ -135,9 +162,29 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                         count,
                         goal: campaign.goal,
                     });
-                    await sendEmail({ to: campaign.organizer_email, ...msg, tag: 'milestone' });
+                    const okSend = await sendEmail({
+                        to: campaign.organizer_email,
+                        ...msg,
+                        tag: 'milestone',
+                    });
+                    if (!okSend) {
+                        await pool.query(
+                            `UPDATE campaigns SET milestone_notified = $2
+                             WHERE id = $1 AND milestone_notified = $3`,
+                            [campaignId, previousMilestone, hit]
+                        );
+                    }
                 } catch (e) {
                     console.error('[use] milestone email failed', e);
+                    try {
+                        await pool.query(
+                            `UPDATE campaigns SET milestone_notified = $2
+                             WHERE id = $1 AND milestone_notified = $3`,
+                            [campaignId, previousMilestone, hit]
+                        );
+                    } catch (revertErr) {
+                        console.error('[use] milestone revert failed', revertErr);
+                    }
                 }
             });
         }

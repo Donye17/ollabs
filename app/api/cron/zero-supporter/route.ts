@@ -64,9 +64,29 @@ export async function GET(request: NextRequest) {
                     ...msg,
                     tag: 'zero_supporter',
                 });
-                if (okSend) sent += 1;
+                if (okSend) {
+                    sent += 1;
+                } else {
+                    // Create stamps email_sent_at only after Resend succeeds.
+                    // Claiming first prevents double-sends across overlapping
+                    // 15-minute ticks; leaving the stamp on a failed send would
+                    // permanently skip the only nudge that fits the 20-90 minute
+                    // window.
+                    await pool.query(
+                        `UPDATE campaigns SET zero_supporter_emailed_at = NULL WHERE id = $1`,
+                        [row.id]
+                    );
+                }
             } catch (e) {
                 console.error('[cron/zero-supporter] send failed', row.slug, e);
+                try {
+                    await pool.query(
+                        `UPDATE campaigns SET zero_supporter_emailed_at = NULL WHERE id = $1`,
+                        [row.id]
+                    );
+                } catch (revertErr) {
+                    console.error('[cron/zero-supporter] revert failed', row.slug, revertErr);
+                }
             }
         }
 
