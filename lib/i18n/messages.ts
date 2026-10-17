@@ -251,6 +251,65 @@ export type Messages = {
         firstJoinIn: (place: string) => string;
         shareNow: string;
     };
+    manage: {
+        eyebrow: string;
+        loading: string;
+        cantOpen: string;
+        needsKey: string;
+        couldNotLoad: string;
+        copied: string;
+        copy: string;
+        openCampaign: string;
+        showQr: string;
+        scanQr: string;
+        hub: string;
+        hubBody: string;
+        setUp: string;
+        noSupporters: string;
+        noSupportersBody: string;
+        shareWhatsApp: string;
+        views: string;
+        supporters: string;
+        conversion: string;
+        newSupporters: string;
+        total: (n: string) => string;
+        noneInWindow: string;
+        byCountry: string;
+        frame: string;
+        frameBody: string;
+        changeFrame: string;
+        details: string;
+        title: string;
+        description: string;
+        goal: string;
+        noGoal: string;
+        category: string;
+        none: string;
+        catCause: string;
+        catSports: string;
+        catEvent: string;
+        catFundraiser: string;
+        catCommunity: string;
+        catFaith: string;
+        catSchool: string;
+        catAwareness: string;
+        catBusiness: string;
+        catOther: string;
+        customLink: string;
+        slugHint: string;
+        save: string;
+        saved: string;
+        couldNotSave: string;
+        nothingToUpdate: string;
+        linkTaken: string;
+        linkInvalid: string;
+        goalRange: string;
+        frameTooLarge: string;
+        previewHttps: string;
+        frameInvisible: string;
+        privateBefore: string;
+        privateAfter: string;
+    };
     landingPt: LandingCopy;
     landingId: LandingCopy;
     landingTl: LandingCopy;
@@ -676,6 +735,65 @@ const en: Messages = {
         firstJoinIn: (place) => `First join ${place}`,
         shareNow: 'Share now on WhatsApp',
     },
+    manage: {
+        eyebrow: 'Campaign',
+        loading: 'Loading your stats...',
+        cantOpen: "Can't open this dashboard",
+        needsKey: 'This page needs your private manage key. Use the link you saved when you created the campaign.',
+        couldNotLoad: 'Could not load this campaign',
+        copied: 'Copied',
+        copy: 'Copy',
+        openCampaign: 'Open campaign',
+        showQr: 'Show QR code',
+        scanQr: 'Scan to open, or screenshot to print',
+        hub: 'Campaign hub',
+        hubBody: 'Bio, Join button, and other links at /u/…',
+        setUp: 'Set up',
+        noSupporters: 'No supporters yet. Share now.',
+        noSupportersBody: 'Most campaigns that take off get their first person in the first hour. Open WhatsApp and send the link to one group.',
+        shareWhatsApp: 'Share on WhatsApp',
+        views: 'Views',
+        supporters: 'Supporters',
+        conversion: 'Conversion',
+        newSupporters: 'New supporters, last 14 days',
+        total: (n) => `${n} total`,
+        noneInWindow: 'No supporters yet in this window. Share your link to get started.',
+        byCountry: 'Supporters by country',
+        frame: 'Frame',
+        frameBody: 'Change the design without starting over. Your link, your supporter count, and everyone who already has the link stay exactly as they are.',
+        changeFrame: 'Change the frame',
+        details: 'Campaign details',
+        title: 'Title',
+        description: 'Description',
+        goal: 'Supporter goal',
+        noGoal: 'No goal',
+        category: 'Category',
+        none: 'None',
+        catCause: 'Causes',
+        catSports: 'Sports',
+        catEvent: 'Events',
+        catFundraiser: 'Fundraisers',
+        catCommunity: 'Community',
+        catFaith: 'Faith',
+        catSchool: 'Schools',
+        catAwareness: 'Awareness',
+        catBusiness: 'Business',
+        catOther: 'Other',
+        customLink: 'Custom link',
+        slugHint: 'Letters and numbers become dashes. Changing this updates your share link. Older links redirect automatically so WhatsApp shares keep working.',
+        save: 'Save changes',
+        saved: 'Saved',
+        couldNotSave: 'Could not save',
+        nothingToUpdate: 'Nothing to update',
+        linkTaken: 'That link name is taken. Try another.',
+        linkInvalid: 'That link name is not valid. Use letters and numbers.',
+        goalRange: 'Goal must be a number between 1 and 100,000,000.',
+        frameTooLarge: 'Frame data is too large.',
+        previewHttps: 'Preview URL must be https.',
+        frameInvisible: "That frame would not show up on anyone's photo. Pick a border style or upload a frame image.",
+        privateBefore: 'This dashboard is private to whoever has this link. Bookmark it, and do not share the part after',
+        privateAfter: '.',
+    },
     landingPt,
     landingId,
     landingTl,
@@ -948,6 +1066,65 @@ const pt: Messages = {
         firstJoinIn: (place) => `Primeiro apoio em ${place}`,
         shareNow: 'Compartilhar agora no WhatsApp',
     },
+    manage: {
+        eyebrow: 'Campanha',
+        loading: 'Carregando os números...',
+        cantOpen: 'Não dá para abrir este painel',
+        needsKey: 'Esta página precisa da chave privada do painel. Use o link que você salvou ao criar a campanha.',
+        couldNotLoad: 'Não foi possível carregar esta campanha',
+        copied: 'Copiado',
+        copy: 'Copiar',
+        openCampaign: 'Abrir campanha',
+        showQr: 'Mostrar QR',
+        scanQr: 'Escaneie para abrir, ou tire um print para imprimir',
+        hub: 'Hub de campanhas',
+        hubBody: 'Bio, botão Participar e outros links em /u/…',
+        setUp: 'Configurar',
+        noSupporters: 'Ainda sem apoiadores. Compartilhe agora.',
+        noSupportersBody: 'A maioria das campanhas que decolam recebe a primeira pessoa na primeira hora. Abra o WhatsApp e envie o link para um grupo.',
+        shareWhatsApp: 'Compartilhar no WhatsApp',
+        views: 'Visitas',
+        supporters: 'Apoiadores',
+        conversion: 'Conversão',
+        newSupporters: 'Novos apoiadores, últimos 14 dias',
+        total: (n) => `${n} no total`,
+        noneInWindow: 'Nenhum apoiador neste período. Compartilhe o link para começar.',
+        byCountry: 'Apoiadores por país',
+        frame: 'Moldura',
+        frameBody: 'Troque o desenho sem começar de novo. Seu link, a contagem de apoiadores e quem já tem o link continuam iguais.',
+        changeFrame: 'Trocar a moldura',
+        details: 'Detalhes da campanha',
+        title: 'Título',
+        description: 'Descrição',
+        goal: 'Meta de apoiadores',
+        noGoal: 'Sem meta',
+        category: 'Categoria',
+        none: 'Nenhuma',
+        catCause: 'Causas',
+        catSports: 'Esportes',
+        catEvent: 'Eventos',
+        catFundraiser: 'Arrecadações',
+        catCommunity: 'Comunidade',
+        catFaith: 'Fé',
+        catSchool: 'Escolas',
+        catAwareness: 'Conscientização',
+        catBusiness: 'Negócios',
+        catOther: 'Outro',
+        customLink: 'Link personalizado',
+        slugHint: 'Letras e números viram traços. Mudar isto atualiza o link de compartilhamento. Links antigos redirecionam sozinhos, então o WhatsApp continua funcionando.',
+        save: 'Salvar alterações',
+        saved: 'Salvo',
+        couldNotSave: 'Não foi possível salvar',
+        nothingToUpdate: 'Nada para atualizar',
+        linkTaken: 'Esse nome de link já está em uso. Tente outro.',
+        linkInvalid: 'Esse nome de link não é válido. Use letras e números.',
+        goalRange: 'A meta precisa ser um número entre 1 e 100.000.000.',
+        frameTooLarge: 'Os dados da moldura são grandes demais.',
+        previewHttps: 'A URL de preview precisa ser https.',
+        frameInvisible: 'Essa moldura não aparece na foto de ninguém. Escolha uma borda ou envie uma imagem de moldura.',
+        privateBefore: 'Este painel é privado para quem tem este link. Salve nos favoritos e não compartilhe a parte depois de',
+        privateAfter: '.',
+    },
     landingPt,
     landingId,
     landingTl,
@@ -1219,6 +1396,65 @@ const id: Messages = {
         publishedIn: (place) => `Diterbitkan di ${place}`,
         firstJoinIn: (place) => `Dukungan pertama di ${place}`,
         shareNow: 'Bagikan sekarang di WhatsApp',
+    },
+    manage: {
+        eyebrow: 'Kampanye',
+        loading: 'Memuat angkamu...',
+        cantOpen: 'Dasbor ini tidak bisa dibuka',
+        needsKey: 'Halaman ini butuh kunci privat dasbor. Pakai link yang kamu simpan saat membuat kampanye.',
+        couldNotLoad: 'Kampanye ini tidak bisa dimuat',
+        copied: 'Tersalin',
+        copy: 'Salin',
+        openCampaign: 'Buka kampanye',
+        showQr: 'Tampilkan QR',
+        scanQr: 'Pindai untuk membuka, atau screenshot untuk dicetak',
+        hub: 'Hub kampanye',
+        hubBody: 'Bio, tombol Gabung, dan tautan lain di /u/…',
+        setUp: 'Siapkan',
+        noSupporters: 'Belum ada pendukung. Bagikan sekarang.',
+        noSupportersBody: 'Sebagian besar kampanye yang jalan mendapat orang pertama di jam pertama. Buka WhatsApp dan kirim link ke satu grup.',
+        shareWhatsApp: 'Bagikan di WhatsApp',
+        views: 'Tayangan',
+        supporters: 'Pendukung',
+        conversion: 'Konversi',
+        newSupporters: 'Pendukung baru, 14 hari terakhir',
+        total: (n) => `${n} total`,
+        noneInWindow: 'Belum ada pendukung di periode ini. Bagikan linkmu untuk mulai.',
+        byCountry: 'Pendukung menurut negara',
+        frame: 'Bingkai',
+        frameBody: 'Ganti desain tanpa mulai dari awal. Linkmu, jumlah pendukung, dan siapa pun yang sudah punya link tetap sama.',
+        changeFrame: 'Ganti bingkai',
+        details: 'Detail kampanye',
+        title: 'Judul',
+        description: 'Deskripsi',
+        goal: 'Target pendukung',
+        noGoal: 'Tanpa target',
+        category: 'Kategori',
+        none: 'Tidak ada',
+        catCause: 'Gerakan',
+        catSports: 'Olahraga',
+        catEvent: 'Acara',
+        catFundraiser: 'Penggalangan dana',
+        catCommunity: 'Komunitas',
+        catFaith: 'Kepercayaan',
+        catSchool: 'Sekolah',
+        catAwareness: 'Kesadaran',
+        catBusiness: 'Bisnis',
+        catOther: 'Lainnya',
+        customLink: 'Link khusus',
+        slugHint: 'Huruf dan angka jadi tanda hubung. Mengubah ini memperbarui link berbagi. Link lama dialihkan otomatis, jadi WhatsApp tetap jalan.',
+        save: 'Simpan perubahan',
+        saved: 'Tersimpan',
+        couldNotSave: 'Tidak bisa menyimpan',
+        nothingToUpdate: 'Tidak ada yang diubah',
+        linkTaken: 'Nama link itu sudah dipakai. Coba yang lain.',
+        linkInvalid: 'Nama link itu tidak valid. Pakai huruf dan angka.',
+        goalRange: 'Target harus angka antara 1 dan 100.000.000.',
+        frameTooLarge: 'Data bingkai terlalu besar.',
+        previewHttps: 'URL pratinjau harus https.',
+        frameInvisible: 'Bingkai itu tidak akan terlihat di foto siapa pun. Pilih gaya tepi atau unggah gambar bingkai.',
+        privateBefore: 'Dasbor ini privat bagi siapa pun yang punya link ini. Simpan bookmark, dan jangan bagikan bagian setelah',
+        privateAfter: '.',
     },
     landingPt,
     landingId,

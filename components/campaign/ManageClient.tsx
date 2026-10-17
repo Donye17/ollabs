@@ -8,6 +8,54 @@ import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode, ShieldCheck, Palette, Globe } from 'lucide-react';
 import { countryLabel } from '@/lib/geo';
 import { ORGANIZER_PRIMARY_BTN, PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
+import { useLocale } from '@/components/i18n/LocaleProvider';
+import { formatCount, htmlLang } from '@/lib/i18n/locale';
+import type { Messages } from '@/lib/i18n/messages';
+
+function manageError(raw: string, t: Messages['manage']): string {
+    switch (raw) {
+        case 'Not found or wrong key':
+            return t.needsKey;
+        case 'Could not load this campaign':
+        case 'Failed to load':
+            return t.couldNotLoad;
+        case 'Could not save':
+        case 'Failed to update':
+            return t.couldNotSave;
+        case 'Nothing to update':
+            return t.nothingToUpdate;
+        case 'That link name is taken. Try another.':
+            return t.linkTaken;
+        case 'That link name is not valid. Use letters and numbers.':
+            return t.linkInvalid;
+        case 'Goal must be a number between 1 and 100,000,000.':
+            return t.goalRange;
+        case 'Frame data is too large.':
+            return t.frameTooLarge;
+        case 'Preview URL must be https.':
+            return t.previewHttps;
+        case "That frame would not show up on anyone's photo. Pick a border style or upload a frame image.":
+            return t.frameInvisible;
+        default:
+            return raw;
+    }
+}
+
+function categoryName(key: string, t: Messages['manage'], fallback: string): string {
+    const labels: Record<string, string> = {
+        cause: t.catCause,
+        sports: t.catSports,
+        event: t.catEvent,
+        fundraiser: t.catFundraiser,
+        community: t.catCommunity,
+        faith: t.catFaith,
+        school: t.catSchool,
+        awareness: t.catAwareness,
+        business: t.catBusiness,
+        other: t.catOther,
+    };
+    return labels[key] || fallback;
+}
 
 interface ManageData {
     slug: string;
@@ -24,6 +72,8 @@ interface ManageData {
 }
 
 export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
+    const { locale, messages } = useLocale();
+    const t = messages.manage;
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -84,10 +134,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                     }
                 }
             })
-            .catch((e) => setError(
-                e.message ||
-                'This page needs your private manage key. Use the link you saved when you created the campaign.'
-            ))
+            .catch((e) => setError(e instanceof Error && e.message ? e.message : 'Not found or wrong key'))
             .finally(() => setLoading(false));
     }, [slug]);
 
@@ -149,10 +196,10 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
         for (let i = 13; i >= 0; i--) {
             const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - i));
             const key = d.toISOString().slice(0, 10);
-            out.push({ key, label: d.toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' }), n: map.get(key) || 0 });
+            out.push({ key, label: d.toLocaleDateString(htmlLang(locale), { month: 'numeric', day: 'numeric' }), n: map.get(key) || 0 });
         }
         return out;
-    }, [data]);
+    }, [data, locale]);
 
     const seriesMax = Math.max(1, ...series.map((s) => s.n));
     const seriesTotal = series.reduce((a, s) => a + s.n, 0);
@@ -160,16 +207,16 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     return (
         <div className={`flex flex-col items-center px-4 pb-8 sm:px-6 ${PAGE_TOP_UNDER_NAV}`}>
             <div className="w-full max-w-lg lg:max-w-3xl">
-                <p className="text-sm font-semibold text-muted mb-1">Campaign</p>
+                <p className="text-sm font-semibold text-muted mb-1">{t.eyebrow}</p>
 
                 {loading && (
-                    <div className="flex items-center gap-2 text-muted mt-8"><Loader2 size={18} className="animate-spin" /> Loading your stats...</div>
+                    <div className="flex items-center gap-2 text-muted mt-8"><Loader2 size={18} className="animate-spin" /> {t.loading}</div>
                 )}
 
                 {!loading && error && (
                     <div className="mt-6 border-y border-ink/10 py-8 text-center">
-                        <p className="font-display font-bold text-lg mb-1">Can&apos;t open this dashboard</p>
-                        <p className="text-sm text-ink/70">{error}</p>
+                        <p className="font-display font-bold text-lg mb-1">{t.cantOpen}</p>
+                        <p className="text-sm text-ink/70">{manageError(error, t)}</p>
                     </div>
                 )}
 
@@ -182,11 +229,11 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                             <p className="text-sm text-ink truncate flex-1 min-w-0 font-medium">{shareUrl}</p>
                             <div className="flex items-center gap-2 shrink-0">
                                 <a
-                                    href={whatsappUrl(organizerShareText(title || data.title), withUtm(shareUrl, 'whatsapp'))}
+                                    href={whatsappUrl(organizerShareText(title || data.title, locale), withUtm(shareUrl, 'whatsapp'))}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={() => track('campaign_share', { campaign: currentSlug, method: 'whatsapp', from: 'manage' })}
-                                    className="min-h-10 px-3 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-all"
+                                    className="min-h-11 px-3 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-all"
                                     style={{ backgroundColor: WHATSAPP_GREEN }}
                                 >
                                     <WhatsAppGlyph size={15} /> WhatsApp
@@ -194,24 +241,24 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                 <button
                                     type="button"
                                     onClick={copyLink}
-                                    className="min-h-10 px-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
+                                    className="min-h-11 px-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
                                 >
-                                    {copied ? <><Check size={15} /> Copied</> : <><Copy size={15} /> Copy</>}
+                                    {copied ? <><Check size={15} /> {t.copied}</> : <><Copy size={15} /> {t.copy}</>}
                                 </button>
                                 <a
                                     href={shareUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="min-h-10 w-10 rounded-xl border border-ink/15 bg-cream flex items-center justify-center hover:bg-ink/5 transition-colors"
-                                    aria-label="Open campaign"
+                                    className="min-h-11 min-w-11 rounded-xl border border-ink/15 bg-cream flex items-center justify-center hover:bg-ink/5 transition-colors"
+                                    aria-label={t.openCampaign}
                                 >
                                     <ExternalLink size={15} />
                                 </a>
                                 <button
                                     type="button"
                                     onClick={() => setShowQR((v) => !v)}
-                                    className="min-h-10 w-10 rounded-xl border border-ink/15 bg-cream flex items-center justify-center hover:bg-ink/5 transition-colors"
-                                    aria-label="Show QR code"
+                                    className="min-h-11 min-w-11 rounded-xl border border-ink/15 bg-cream flex items-center justify-center hover:bg-ink/5 transition-colors"
+                                    aria-label={t.showQr}
                                 >
                                     <QrCode size={15} />
                                 </button>
@@ -220,7 +267,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                         {showQR && (
                             <div className="flex flex-col items-center gap-2 py-4 mb-2 border-b border-ink/10">
                                 <QRCode value={shareUrl} size={180} className="border border-ink/10" />
-                                <p className="text-xs text-muted">Scan to open, or screenshot to print</p>
+                                <p className="text-xs text-muted">{t.scanQr}</p>
                             </div>
                         )}
 
@@ -229,56 +276,56 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                             className="mb-6 flex items-center justify-between gap-3 py-3 border-b border-ink/10 hover:text-brand-deep transition-colors"
                         >
                             <div className="min-w-0">
-                                <p className="font-semibold text-[15px]">Campaign hub</p>
+                                <p className="font-semibold text-[15px]">{t.hub}</p>
                                 <p className="text-xs text-ink/70">
-                                    Bio, Join button, and other links at /u/…
+                                    {t.hubBody}
                                 </p>
                             </div>
-                            <span className="text-sm font-bold text-brand-deep shrink-0">Set up</span>
+                            <span className="text-sm font-bold text-brand-deep shrink-0">{t.setUp}</span>
                         </a>
 
                         {data.supporter_count === 0 && (
                             <div className="mb-6 rounded-xl border border-coral/30 bg-coral/10 p-4 space-y-3">
-                                <p className="font-display font-bold text-ink">No supporters yet. Share now.</p>
+                                <p className="font-display font-bold text-ink">{t.noSupporters}</p>
                                 <p className="text-sm text-ink/75 leading-relaxed">
-                                    Most campaigns that take off get their first person in the first hour. Open WhatsApp and send the link to one group.
+                                    {t.noSupportersBody}
                                 </p>
                                 <a
-                                    href={whatsappUrl(organizerShareText(title || data.title), withUtm(shareUrl, 'whatsapp'))}
+                                    href={whatsappUrl(organizerShareText(title || data.title, locale), withUtm(shareUrl, 'whatsapp'))}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={() => track('campaign_share', { campaign: currentSlug, method: 'whatsapp', from: 'manage_zero_nudge' })}
                                     className="w-full min-h-[48px] py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white hover:brightness-105 transition-all"
                                     style={{ backgroundColor: WHATSAPP_GREEN }}
                                 >
-                                    <WhatsAppGlyph size={16} /> Share on WhatsApp
+                                    <WhatsAppGlyph size={16} /> {t.shareWhatsApp}
                                 </a>
                             </div>
                         )}
 
                         <dl className="mb-8 divide-y divide-ink/10 border-y border-ink/10">
                             <div className="flex items-center justify-between gap-4 py-3.5">
-                                <dt className="text-sm text-muted flex items-center gap-2"><Eye size={15} /> Views</dt>
-                                <dd className="font-display text-2xl font-bold tabular-nums">{(data.view_count ?? 0).toLocaleString()}</dd>
+                                <dt className="text-sm text-muted flex items-center gap-2"><Eye size={15} /> {t.views}</dt>
+                                <dd className="font-display text-2xl font-bold tabular-nums">{formatCount(data.view_count ?? 0, locale)}</dd>
                             </div>
                             <div className="flex items-center justify-between gap-4 py-3.5">
-                                <dt className="text-sm text-muted flex items-center gap-2"><Users size={15} /> Supporters</dt>
-                                <dd className="font-display text-2xl font-bold tabular-nums">{(data.supporter_count ?? 0).toLocaleString()}</dd>
+                                <dt className="text-sm text-muted flex items-center gap-2"><Users size={15} /> {t.supporters}</dt>
+                                <dd className="font-display text-2xl font-bold tabular-nums">{formatCount(data.supporter_count ?? 0, locale)}</dd>
                             </div>
                             <div className="flex items-center justify-between gap-4 py-3.5">
-                                <dt className="text-sm text-muted flex items-center gap-2"><BarChart3 size={15} /> Conversion</dt>
+                                <dt className="text-sm text-muted flex items-center gap-2"><BarChart3 size={15} /> {t.conversion}</dt>
                                 <dd className="font-display text-2xl font-bold tabular-nums">{conversion === null ? '0%' : `${conversion}%`}</dd>
                             </div>
                         </dl>
 
                         <section className="mb-8">
                             <div className="flex items-center justify-between mb-3">
-                                <h2 className="text-sm font-semibold text-muted">New supporters, last 14 days</h2>
-                                <span className="text-xs font-semibold text-ink">{seriesTotal.toLocaleString()} total</span>
+                                <h2 className="text-sm font-semibold text-muted">{t.newSupporters}</h2>
+                                <span className="text-xs font-semibold text-ink">{t.total(formatCount(seriesTotal, locale))}</span>
                             </div>
                             {seriesTotal === 0 ? (
                                 <p className="text-sm text-muted py-6 text-center border border-dashed border-ink/15 rounded-xl">
-                                    No supporters yet in this window. Share your link to get started.
+                                    {t.noneInWindow}
                                 </p>
                             ) : (
                                 <>
@@ -303,7 +350,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                         {data.countries && data.countries.length > 0 && (
                             <section className="mb-8">
                                 <h2 className="text-sm font-semibold text-muted mb-3 flex items-center gap-2">
-                                    <Globe size={14} /> Supporters by country
+                                    <Globe size={14} /> {t.byCountry}
                                 </h2>
                                 <ul className="space-y-2.5">
                                     {data.countries.map((c) => {
@@ -318,7 +365,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                                         style={{ width: `${Math.max(8, Math.round((c.n / max) * 100))}%` }}
                                                     />
                                                 </div>
-                                                <span className="text-sm font-bold tabular-nums w-8 text-right">{c.n}</span>
+                                                <span className="text-sm font-bold tabular-nums w-8 text-right">{formatCount(c.n, locale)}</span>
                                             </li>
                                         );
                                     })}
@@ -331,7 +378,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                             frame built an entire second campaign and left the first one and its
                             supporters behind. */}
                         <section className="mb-8 pb-8 border-b border-ink/10 space-y-3">
-                            <h2 className="text-sm font-semibold text-muted">Frame</h2>
+                            <h2 className="text-sm font-semibold text-muted">{t.frame}</h2>
                             <div className="flex items-center gap-4">
                                 {data.preview_url ? (
                                     // eslint-disable-next-line @next/next/no-img-element
@@ -344,74 +391,72 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                     <div className="w-16 h-16 rounded-full bg-cream border border-ink/10 shrink-0" />
                                 )}
                                 <p className="text-sm text-ink/70 flex-1 leading-relaxed">
-                                    Change the design without starting over. Your link, your supporter count, and
-                                    everyone who already has the link stay exactly as they are.
+                                    {t.frameBody}
                                 </p>
                             </div>
                             <a
                                 href={`/create?edit=${encodeURIComponent(currentSlug)}&k=${encodeURIComponent(token || '')}`}
                                 className={`inline-flex items-center justify-center gap-2 px-5 ${ORGANIZER_PRIMARY_BTN}`}
                             >
-                                <Palette size={15} /> Change the frame
+                                <Palette size={15} /> {t.changeFrame}
                             </a>
                         </section>
 
                         <section className="space-y-4">
-                            <h2 className="text-sm font-semibold text-muted">Campaign details</h2>
+                            <h2 className="text-sm font-semibold text-muted">{t.details}</h2>
 
                             <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-ink/70">Title</label>
+                                <label className="text-xs font-semibold text-ink/70">{t.title}</label>
                                 <input value={title} onChange={(e) => setTitle(e.target.value)}
                                     className="w-full bg-cream border border-ink/10 rounded-xl px-3 py-2.5 text-ink focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all" />
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-ink/70">Description</label>
+                                <label className="text-xs font-semibold text-ink/70">{t.description}</label>
                                 <textarea value={description} onChange={(e) => setDescription(e.target.value)}
                                     className="w-full bg-cream border border-ink/10 rounded-xl px-3 py-2.5 text-ink focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all min-h-[70px] resize-none" />
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-ink/70">Supporter goal</label>
+                                    <label className="text-xs font-semibold text-ink/70">{t.goal}</label>
                                     <input type="number" min={1} inputMode="numeric" value={goalInput} onChange={(e) => setGoalInput(e.target.value)}
-                                        placeholder="No goal"
+                                        placeholder={t.noGoal}
                                         className="w-full bg-cream border border-ink/10 rounded-xl px-3 py-2.5 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all" />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-ink/70">Category</label>
+                                    <label className="text-xs font-semibold text-ink/70">{t.category}</label>
                                     <select value={categoryInput} onChange={(e) => setCategoryInput(e.target.value)}
                                         className="w-full bg-cream border border-ink/10 rounded-xl px-3 py-2.5 text-ink focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all">
-                                        <option value="">None</option>
+                                        <option value="">{t.none}</option>
                                         {CATEGORIES.map((c) => (
-                                            <option key={c.key} value={c.key}>{c.label}</option>
+                                            <option key={c.key} value={c.key}>{categoryName(c.key, t, c.label)}</option>
                                         ))}
                                     </select>
                                 </div>
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-ink/70">Custom link</label>
+                                <label className="text-xs font-semibold text-ink/70">{t.customLink}</label>
                                 <div className="flex items-center bg-cream border border-ink/10 rounded-xl px-3 focus-within:ring-2 focus-within:ring-brand/50 focus-within:border-brand transition-all">
                                     <span className="text-sm text-muted whitespace-nowrap">ollabs.studio/c/</span>
                                     <input value={slugInput} onChange={(e) => setSlugInput(e.target.value)}
                                         className="flex-1 bg-transparent py-2.5 text-ink outline-none min-w-0" />
                                 </div>
                                 <p className="text-xs text-muted">
-                                    Letters and numbers become dashes. Changing this updates your share link;
-                                    older links redirect automatically so WhatsApp shares keep working.
+                                    {t.slugHint}
                                 </p>
                             </div>
 
                             <div className="flex items-center gap-3">
                                 <button onClick={save} disabled={saving}
                                     className={`flex items-center justify-center gap-2 px-5 ${ORGANIZER_PRIMARY_BTN}`}>
-                                    {saving ? <Loader2 size={15} className="animate-spin" /> : <><Save size={15} /> Save changes</>}
+                                    {saving ? <Loader2 size={15} className="animate-spin" /> : <><Save size={15} /> {t.save}</>}
                                 </button>
-                                {saveMsg && <span className="text-sm text-brand-deep font-semibold flex items-center gap-1"><Check size={15} /> {saveMsg}</span>}
+                                {saveMsg && <span className="text-sm text-brand-deep font-semibold flex items-center gap-1"><Check size={15} /> {t.saved}</span>}
                                 {saveErr && (
                                     <span role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-lg px-2.5 py-1.5 font-semibold">
-                                        {saveErr}
+                                        {manageError(saveErr, t)}
                                     </span>
                                 )}
                             </div>
@@ -419,7 +464,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
 
                         <div className="mt-8 flex items-start gap-2 text-xs text-muted">
                             <ShieldCheck size={14} className="text-brand-deep mt-0.5 shrink-0" />
-                            <p>This dashboard is private to whoever has this link. Bookmark it, and do not share the part after <span className="font-mono">?k=</span>.</p>
+                            <p>{t.privateBefore} <span className="font-mono">?k=</span>{t.privateAfter}</p>
                         </div>
                     </>
                 )}
