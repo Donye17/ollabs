@@ -666,12 +666,10 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             </div>
                         )}
                         {pasteHint && (
-                            <p role="status" className="text-sm text-ink bg-brand/10 border border-brand/25 rounded-xl px-3 py-2.5 text-center">
-                                {pasteHint === 'copied' ? t.linkCopiedPaste : t.copyCaptionFailed}
-                                {pasteHint === 'manual' && (
-                                    <span className="mt-1 block text-xs break-all select-all">{shareCaption}</span>
-                                )}
-                            </p>
+                            <div role="status" className="text-sm text-ink bg-brand/10 border border-brand/25 rounded-xl px-3 py-2.5 text-center">
+                                <p>{pasteHint === 'copied' ? t.linkCopiedPaste : t.copyCaptionFailed}</p>
+                                <p className="mt-2 text-left text-xs leading-relaxed break-all select-all">{shareCaption}</p>
+                            </div>
                         )}
                         {canSharePhoto ? (
                             <button
