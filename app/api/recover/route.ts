@@ -1,7 +1,8 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, clientIp } from '@/lib/rateLimit';
-import { isValidEmail, normalizeEmail, recoveryEmail, sendEmail } from '@/lib/email';
+import { isValidEmail, normalizeEmail, recoveryEmail, sendEmail, type MailLang } from '@/lib/email';
+import { LOCALE_COOKIE, parseAcceptLanguage, resolveLocale } from '@/lib/i18n/locale';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +45,12 @@ export async function POST(request: NextRequest) {
             [token, email]
         );
 
-        const msg = recoveryEmail({ token, count });
+        const locale = resolveLocale({
+            cookie: request.cookies.get(LOCALE_COOKIE)?.value ?? null,
+            languages: parseAcceptLanguage(request.headers.get('accept-language')),
+        });
+        const lang: MailLang = locale === 'pt' ? 'pt' : 'en';
+        const msg = recoveryEmail({ token, count, lang });
         await sendEmail({ to: email, ...msg, tag: 'recover' });
         return generic;
     } catch (error) {

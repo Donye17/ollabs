@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { pool } from '@/lib/neon';
-import { sendEmail, zeroSupporterEmail } from '@/lib/email';
+import { campaignMailLang, sendEmail, zeroSupporterEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
                  LIMIT 40
                  FOR UPDATE SKIP LOCKED
              )
-             RETURNING id, title, slug, owner_token, organizer_email`
+             RETURNING id, title, slug, owner_token, organizer_email, publisher_country`
         );
 
         let sent = 0;
@@ -58,6 +58,7 @@ export async function GET(request: NextRequest) {
                     title: row.title,
                     slug: row.slug,
                     ownerToken: row.owner_token,
+                    lang: campaignMailLang(row.publisher_country),
                 });
                 const okSend = await sendEmail({
                     to: row.organizer_email,

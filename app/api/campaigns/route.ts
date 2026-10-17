@@ -3,7 +3,7 @@ import { NextRequest, NextResponse, after } from 'next/server';
 import { rateLimit, clientIp } from '@/lib/rateLimit';
 import { CATEGORY_KEYS } from '@/lib/categories';
 import { hasVisibleFrame, visibleFrameSql } from '@/lib/frameValidity';
-import { campaignLiveEmail, isValidEmail, normalizeEmail, sendEmail } from '@/lib/email';
+import { campaignLiveEmail, campaignMailLang, isValidEmail, normalizeEmail, sendEmail } from '@/lib/email';
 import { getDay } from '@/lib/days';
 import { getSessionOrganizer } from '@/lib/auth';
 import { publisherCountry } from '@/lib/geo';
@@ -177,6 +177,7 @@ export async function POST(request: NextRequest) {
                         title: campaign.title,
                         slug: campaign.slug,
                         ownerToken: campaign.owner_token,
+                        lang: campaignMailLang(campaign.publisher_country),
                     });
                     const ok = await sendEmail({ to, ...msg, tag: 'campaign_live' });
                     if (ok) {

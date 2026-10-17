@@ -1,6 +1,6 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse, after } from 'next/server';
-import { firstSupporterEmail, milestoneEmail, sendEmail } from '@/lib/email';
+import { campaignMailLang, firstSupporterEmail, milestoneEmail, sendEmail } from '@/lib/email';
 import { countryLabel, publisherCountry } from '@/lib/geo';
 import { clientIp, rateLimit } from '@/lib/rateLimit';
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         }
 
         const campaignRes = await pool.query(
-            `SELECT id, title, owner_token, organizer_email, goal,
+            `SELECT id, title, owner_token, organizer_email, goal, publisher_country,
                     COALESCE(milestone_notified, 0) AS milestone_notified
              FROM campaigns WHERE slug = $1 AND is_public = true AND is_hidden IS NOT TRUE LIMIT 1`,
             [slug]
@@ -102,6 +102,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                         ownerToken: campaign.owner_token,
                         country: supporterCountry,
                         countryName: countryLabel(supporterCountry),
+                        lang: campaignMailLang(campaign.publisher_country),
                     });
                     await sendEmail({ to: campaign.organizer_email, ...msg, tag: 'first_supporter' });
                 } catch (e) {
@@ -134,6 +135,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                         ownerToken: campaign.owner_token,
                         count,
                         goal: campaign.goal,
+                        lang: campaignMailLang(campaign.publisher_country),
                     });
                     await sendEmail({ to: campaign.organizer_email, ...msg, tag: 'milestone' });
                 } catch (e) {

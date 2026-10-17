@@ -1,8 +1,9 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, clientIp } from '@/lib/rateLimit';
-import { isValidEmail, normalizeEmail, loginCodeEmail, sendEmail } from '@/lib/email';
+import { isValidEmail, normalizeEmail, loginCodeEmail, sendEmail, type MailLang } from '@/lib/email';
 import { newLoginCode, sha256Hex, CODE_TTL_MINUTES } from '@/lib/auth';
+import { LOCALE_COOKIE, parseAcceptLanguage, resolveLocale } from '@/lib/i18n/locale';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,7 +55,12 @@ export async function POST(request: NextRequest) {
             [email, codeHash, String(CODE_TTL_MINUTES)]
         );
 
-        const msg = loginCodeEmail({ code, minutes: CODE_TTL_MINUTES });
+        const locale = resolveLocale({
+            cookie: request.cookies.get(LOCALE_COOKIE)?.value ?? null,
+            languages: parseAcceptLanguage(request.headers.get('accept-language')),
+        });
+        const lang: MailLang = locale === 'pt' ? 'pt' : 'en';
+        const msg = loginCodeEmail({ code, minutes: CODE_TTL_MINUTES, lang });
         await sendEmail({ to: email, ...msg, tag: 'login_code' });
         return generic;
     } catch (error) {
