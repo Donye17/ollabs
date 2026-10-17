@@ -8,7 +8,7 @@ import { addPngMetadata } from '@/lib/pngMeta';
 import { track, withUtm } from '@/lib/analytics';
 import { XGlyph, WhatsAppGlyph, FacebookGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { supporterShareText, whatsappUrl, messengerShareUrl, prefersTagalog } from '@/lib/share';
-import { saveFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome } from '@/lib/savePhoto';
+import { saveFramedPhoto, shareFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome } from '@/lib/savePhoto';
 import { framedCircleToStoryBlob } from '@/lib/storyExport';
 import { uploadExploreThumb } from '@/lib/exploreThumb';
 import { BrandMark } from '@/components/BrandMark';
@@ -79,6 +79,8 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [setPhotoPlatform, setSetPhotoPlatform] = useState<ReturnType<typeof arrivalPlatform>>('whatsapp');
     const [showSaveRecovery, setShowSaveRecovery] = useState(false);
+    const [pasteHint, setPasteHint] = useState<'copied' | 'manual' | null>(null);
+    const [shareCaption, setShareCaption] = useState('');
     const reportBoxRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -153,14 +155,21 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     // between the server render and the browser, so it must not touch render.
     // Spanish and Tagalog share copy is browser-detected until those languages
     // have full client UI dictionaries.
-    const shareText = () => supporterShareText(title, locale === 'en' ? undefined : locale);
+    const shareText = (source: string) =>
+        supporterShareText(title, withUtm(shareUrl(), source), locale === 'en' ? undefined : locale);
+
+    const noteCaption = (text: string, captionCopied: boolean) => {
+        setShareCaption(text);
+        setPasteHint(captionCopied ? 'copied' : 'manual');
+    };
 
     const openShare = (platform: 'x' | 'whatsapp' | 'facebook' | 'messenger') => {
-        const url = withUtm(shareUrl(), platform === 'messenger' ? 'messenger' : platform);
-        const text = shareText();
+        const source = platform === 'messenger' ? 'messenger' : platform;
+        const url = withUtm(shareUrl(), source);
+        const text = shareText(source);
         const map: Record<string, string> = {
-            x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-            whatsapp: whatsappUrl(text, url),
+            x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
+            whatsapp: whatsappUrl(text),
             facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
             messenger: messengerShareUrl(url),
         };
@@ -238,6 +247,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 setZoom(1);
                 setPos({ x: 0, y: 0 });
                 setJustDownloaded(false);
+                setPasteHint(null);
                 setUploadError(null);
                 track('photo_uploaded', { campaign: slug });
                 draw();
@@ -410,17 +420,18 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
         try {
             const exported = await exportBlob();
             if (!exported) return;
-            const outcome = await saveFramedPhoto({
+            const text = shareText('share_photo');
+            const result = await shareFramedPhoto({
                 blob: exported.blob,
                 filename: exported.filename,
                 title,
+                text,
             });
-            if (outcome === 'shared' && applySaveOutcome(outcome)) {
-                track('frame_share_photo', { campaign: slug, format: exportFormat });
-            } else if (outcome === 'downloaded' && applySaveOutcome(outcome)) {
-                track('frame_download', { campaign: slug, format: exportFormat });
+            if ((result.outcome === 'shared' || result.outcome === 'downloaded') && applySaveOutcome(result.outcome)) {
+                noteCaption(text, result.captionCopied);
+                track(result.outcome === 'shared' ? 'frame_share_photo' : 'frame_download', { campaign: slug, format: exportFormat });
             } else {
-                applySaveOutcome(outcome);
+                applySaveOutcome(result.outcome);
             }
         } finally {
             setSharingPhoto(false);
@@ -436,17 +447,20 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
         try {
             const story = await framedCircleToStoryBlob(canvas);
             if (!story) return;
-            const outcome = await saveFramedPhoto({
+            const text = shareText('share_story');
+            const result = await shareFramedPhoto({
                 blob: story,
                 filename: `ollabs-${slug}-story.png`,
                 title,
+                text,
             });
-            if (outcome === 'shared' || outcome === 'downloaded') {
+            if (result.outcome === 'shared' || result.outcome === 'downloaded') {
                 recordSupporterUse();
                 setJustDownloaded(true);
                 setSaveError(null);
-                track('frame_share_story', { campaign: slug, outcome });
-            } else if (outcome === 'unavailable') {
+                noteCaption(text, result.captionCopied);
+                track('frame_share_story', { campaign: slug, outcome: result.outcome });
+            } else if (result.outcome === 'unavailable') {
                 setSaveError(t.savePhotoUnavailable);
             }
         } finally {
@@ -455,10 +469,12 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     };
 
     const handleShare = async () => {
-        const url = withUtm(shareUrl(), 'native');
+        const text = shareText('native');
         if (navigator.share) {
             try {
-                await navigator.share({ title, text: shareText(), url });
+                // The URL is already inside the sentence. A separate url field
+                // makes some targets append it a second time.
+                await navigator.share({ title, text });
                 track('frame_share', { campaign: slug, platform: 'native' });
                 return;
             } catch { /* cancelled */ }
@@ -646,6 +662,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                     </button>
                                 </div>
                             </div>
+                        )}
+                        {pasteHint && (
+                            <p role="status" className="text-sm text-ink bg-brand/10 border border-brand/25 rounded-xl px-3 py-2.5 text-center">
+                                {pasteHint === 'copied' ? t.linkCopiedPaste : t.copyCaptionFailed}
+                                {pasteHint === 'manual' && (
+                                    <span className="mt-1 block text-xs break-all select-all">{shareCaption}</span>
+                                )}
+                            </p>
                         )}
                         {canSharePhoto ? (
                             <button

@@ -2,13 +2,19 @@
  * Save a framed PNG where the person expects it.
  *
  * On iPhone (including WhatsApp's in-app browser), an <a download> lands in
- * Files as a generic document — not the Photos library. The share sheet's
+ * Files as a generic document, not the Photos library. The share sheet's
  * Save Image path is the only reliable way into Photos, so iOS always prefers
  * share when the browser allows it.
  */
 
 import { downloadBlob } from '@/lib/download';
 import { canShareFiles } from '@/lib/share';
+
+export type FramedShareResult = {
+    outcome: SavePhotoOutcome;
+    /** The caption reached the clipboard, so the person can paste it under the photo. */
+    captionCopied: boolean;
+};
 
 export type SavePhotoOutcome = 'shared' | 'downloaded' | 'cancelled' | 'unavailable';
 
@@ -70,10 +76,81 @@ export async function saveFramedPhoto(opts: {
     }
 
     if (isIOS()) {
-        // Never anchor-download on iOS — it becomes a stray Files entry, not Photos.
+        // Never anchor-download on iOS. It becomes a stray Files entry, not Photos.
         return 'unavailable';
     }
 
     downloadBlob(opts.blob, file.name);
     return 'downloaded';
+}
+
+function canShareData(data: ShareData): boolean {
+    if (typeof navigator === 'undefined') return false;
+    const n = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+    if (typeof n.share !== 'function' || typeof n.canShare !== 'function') return false;
+    try {
+        return n.canShare(data);
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Share the framed PNG and keep the campaign sentence with it.
+ *
+ * iOS in-app browsers reject a share that mixes files with text, so those
+ * stay files-only. Everywhere else we try files plus text first. Either way
+ * the caption is copied before the sheet opens: WhatsApp often keeps the
+ * picture and throws the sentence away, and a bare image has no link back.
+ * The clipboard write is started in the same turn as share(), not awaited
+ * first, because an await here drops the user gesture and Safari refuses
+ * the sheet.
+ */
+export async function shareFramedPhoto(opts: {
+    blob: Blob;
+    filename: string;
+    title?: string;
+    text: string;
+}): Promise<FramedShareResult> {
+    const file = pngFile(opts.blob, opts.filename);
+    const copyPromise: Promise<boolean> =
+        typeof navigator !== 'undefined' && navigator.clipboard?.writeText
+            ? navigator.clipboard.writeText(opts.text).then(() => true, () => false)
+            : Promise.resolve(false);
+
+    const finish = async (outcome: SavePhotoOutcome): Promise<FramedShareResult> => ({
+        outcome,
+        captionCopied: await copyPromise,
+    });
+
+    const canShare = canShareFiles([file]);
+    if (!canShare) {
+        if (isIOS()) return finish('unavailable');
+        downloadBlob(opts.blob, file.name);
+        return finish('downloaded');
+    }
+
+    if (!isIOS()) {
+        const withText: ShareData = { files: [file], text: opts.text, title: opts.title };
+        if (canShareData(withText)) {
+            try {
+                await navigator.share(withText);
+                return finish('shared');
+            } catch (e) {
+                if (e instanceof Error && e.name === 'AbortError') return finish('cancelled');
+            }
+        }
+    }
+
+    try {
+        await navigator.share({ files: [file], title: opts.title });
+        return finish('shared');
+    } catch (e) {
+        if (e instanceof Error && e.name === 'AbortError') return finish('cancelled');
+        if (!isIOS()) {
+            downloadBlob(opts.blob, file.name);
+            return finish('downloaded');
+        }
+        return finish('unavailable');
+    }
 }

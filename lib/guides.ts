@@ -112,7 +112,7 @@ export const GUIDES: Guide[] = [
                 title: 'After you have the picture, send the link',
                 paragraphs: [
                     'Changing your own profile picture does not add anyone else. The next person still needs the campaign URL. Paste it under the photo, or use Share link on WhatsApp so the message is already written.',
-                    'The supporter paste is one line plus the URL: I just added this frame to my photo on Ollabs. Add yours. When the phone looks Brazilian, that sentence is already in Portuguese, because that is where almost all real campaigns run. You do not have to rewrite it.',
+                    'The supporter paste is one sentence: I just joined {campaign}, add the frame to your photo: {link} (via Ollabs). When the phone looks Brazilian, that sentence is already in Portuguese. You do not have to rewrite it.',
                     'Do not start a second campaign because the first download failed. The organizer already has a link. If the PNG never arrived, the fix is Share photo or Safari, not a new slug. A new URL splits the group and the counter.',
                     'If you are the organizer reading this so you can coach a group: say Share photo, then Save Image. Do not say download the frame. That phrase is how iPhone users end up in Files, or with nothing. If someone insists the button did nothing, send them Open in Safari.',
                     'Want a frame of your own after you join someone else\'s? Make your own frame at the bottom of the campaign page. That is a new campaign with a new link. It does not replace the one you just saved.',

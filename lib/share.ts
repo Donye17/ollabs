@@ -69,14 +69,27 @@ export function organizerShareText(title: string, locale?: Locale | 'es' | 'tl' 
     return `Add the "${title}" frame to your profile picture:`;
 }
 
-/** What a supporter sends after adding the frame to their own photo. */
-export function supporterShareText(title: string, locale?: Locale | 'es' | 'tl' | null): string {
+/**
+ * What a supporter sends after adding the frame to their own photo.
+ *
+ * The PNG has no watermark on purpose, so this sentence is the only
+ * attribution that travels with the picture. The campaign URL has to live
+ * inside the text: several share targets drop a separate `url` field, and
+ * WhatsApp drops text entirely when the payload is a file.
+ */
+export function supporterShareText(
+    title: string,
+    url: string,
+    locale?: Locale | 'es' | 'tl' | null,
+): string {
+    const name = title.trim();
+    const link = url.trim();
     const lang = shareLocale(locale);
-    if (lang === 'pt') return `Adicionei a moldura "${title}" na minha foto. Adicione a sua:`;
-    if (lang === 'id') return `Aku sudah pasang bingkai "${title}" di fotoku. Pasang juga:`;
-    if (lang === 'es') return `Añadí el marco "${title}" a mi foto. Añade el tuyo:`;
-    if (lang === 'tl') return `Nilagyan ko ng frame na "${title}" ang photo ko. Lagyan din ang iyo:`;
-    return `I just added the "${title}" frame to my photo on Ollabs. Add yours:`;
+    if (lang === 'pt') return `Acabei de participar de ${name}, coloque a moldura na sua foto: ${link} (via Ollabs)`;
+    if (lang === 'id') return `Saya baru bergabung dengan ${name}, pasang bingkainya di fotomu: ${link} (via Ollabs)`;
+    if (lang === 'es') return `Acabo de unirme a ${name}, añade el marco a tu foto: ${link} (via Ollabs)`;
+    if (lang === 'tl') return `Kasasali ko lang sa ${name}, ilagay ang frame sa photo mo: ${link} (via Ollabs)`;
+    return `I just joined ${name}, add the frame to your photo: ${link} (via Ollabs)`;
 }
 
 /**
@@ -86,8 +99,12 @@ export function supporterShareText(title: string, locale?: Locale | 'es' | 'tl' 
  * exactly right here: the organizer chooses the group, and the message is
  * already composed so there is nothing to type.
  */
-export function whatsappUrl(text: string, url: string): string {
-    return `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`;
+export function whatsappUrl(text: string, url?: string): string {
+    const body = text.trim();
+    // Supporter paste already contains the campaign URL. Appending it again
+    // makes WhatsApp show the link twice, which reads like a broken message.
+    const message = url && !body.includes(url) ? `${body} ${url}` : body;
+    return `https://wa.me/?text=${encodeURIComponent(message)}`;
 }
 
 /** Opens Messenger share on phones that have the app installed. */

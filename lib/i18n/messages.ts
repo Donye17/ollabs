@@ -78,6 +78,8 @@ export type Messages = {
         shareMessenger: string;
         shareAnother: string;
         copyLink: string;
+        linkCopiedPaste: string;
+        copyCaptionFailed: string;
         scanCampaign: string;
         wantOwn: string;
         wantOwnBody: string;
@@ -440,6 +442,8 @@ const en: Messages = {
         shareMessenger: 'Share on Messenger',
         shareAnother: 'Share another way',
         copyLink: 'Copy link',
+        linkCopiedPaste: 'Link copied, paste it with your photo',
+        copyCaptionFailed: 'Could not copy the link. Select this and paste it with your photo:',
         scanCampaign: 'Scan to open this campaign',
         wantOwn: 'Want one of your own?',
         wantOwnBody:
@@ -661,6 +665,8 @@ const pt: Messages = {
         shareMessenger: 'Compartilhar no Messenger',
         shareAnother: 'Compartilhar de outro jeito',
         copyLink: 'Copiar link',
+        linkCopiedPaste: 'Link copiado, cole junto com a sua foto',
+        copyCaptionFailed: 'Não deu para copiar o link. Selecione isto e cole junto com a sua foto:',
         scanCampaign: 'Escaneie para abrir esta campanha',
         wantOwn: 'Quer uma moldura sua?',
         wantOwnBody:
@@ -883,6 +889,8 @@ const id: Messages = {
         shareMessenger: 'Bagikan di Messenger',
         shareAnother: 'Bagikan cara lain',
         copyLink: 'Salin link',
+        linkCopiedPaste: 'Link disalin, tempel bersama fotomu',
+        copyCaptionFailed: 'Link tidak tersalin. Pilih teks ini dan tempel bersama fotomu:',
         scanCampaign: 'Pindai untuk buka kampanye ini',
         wantOwn: 'Mau buat sendiri?',
         wantOwnBody:
