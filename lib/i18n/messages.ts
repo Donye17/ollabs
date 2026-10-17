@@ -1073,7 +1073,7 @@ const pt: Messages = {
         dragZoom: 'Arraste para mover. Role ou belisque para ampliar.',
         uploadFrameBelow: 'Envie a moldura abaixo',
         tapToAdd: 'Toque para adicionar uma foto',
-        tagline: 'Junte a sua gente.',
+        tagline: 'Reúna sua galera.',
     },
     publish: {
         createTitle: 'Dê um nome',

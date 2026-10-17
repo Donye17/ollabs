@@ -22,7 +22,7 @@ const labels = {
     readyBody: 'Leva menos de um minuto. Sem conta.',
     exploreCampaigns: 'Explorar campanhas',
     alsoGreat: 'Também serve para',
-    footerCopy: '© 2026 Ollabs. Reúna a sua galera.',
+    footerCopy: '© 2026 Ollabs. Reúna sua galera.',
     exampleTitle: 'Exemplo de campanha',
     scenariosTitle: 'Quando isso faz sentido',
     readNext: 'Leia em seguida:',

@@ -83,7 +83,8 @@ export default function PortugueseLandingPage() {
                 </div>
             </section>
 
-            <footer className="py-10 text-center text-sm text-muted border-t border-ink/10">
+            <footer className="py-10 text-center text-sm text-muted border-t border-ink/10 space-y-2">
+                <p>{getMessages('pt').create.tagline}</p>
                 <Link href="/" hrefLang="en" className="font-semibold text-brand-deep hover:underline">
                     {t.englishSite}
                 </Link>

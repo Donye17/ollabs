@@ -26,7 +26,7 @@ export default function ForPtHub() {
             title="Feito para reunir pessoas"
             intro="Seja qual for a sua comunidade, o Ollabs transforma a ideia em uma moldura e um link."
             linkLabel="Ver como funciona"
-            footerCopy="© 2026 Ollabs. Reúna a sua galera."
+            footerCopy="© 2026 Ollabs. Reúna sua galera."
         />
     );
 }
