@@ -203,6 +203,22 @@ const ES: DeepPartial<Messages> = {
         privateBefore: 'Este panel es privado para quien tiene este enlace. Guárdalo en favoritos y no compartas la parte después de',
         privateAfter: '.',
     },
+    explore: {
+        title: 'Explorar campañas',
+        lede: 'Campañas reales que la gente está usando ahora. Pon una en tu foto, o crea la tuya.',
+        popular: 'Populares',
+        trending: 'En alza',
+        newest: 'Nuevas',
+        all: 'Todas',
+        search: 'Buscar campañas',
+        noMatch: 'Ninguna campaña coincide con esa búsqueda.',
+        emptyCategory: 'Aún no hay campañas con 5 o más apoyos en esta categoría.',
+        emptyGrid: 'Explorar solo muestra campañas con 5 o más apoyos, para que los marcos quietos no salgan en la grilla.',
+        emptyShare: 'Comparte la tuya en la primera hora. Cuando pase de cinco apoyos, puede aparecer aquí.',
+        create: 'Crear campaña',
+        browseUses: 'Ver para quién es',
+        startOwn: 'Crea tu campaña',
+    },
 };
 
 const TL: DeepPartial<Messages> = {
@@ -379,6 +395,22 @@ const TL: DeepPartial<Messages> = {
         frameInvisible: 'Hindi lalabas ang frame na iyan sa photo ng kahit sino. Pumili ng border o mag-upload ng frame image.',
         privateBefore: 'Pribado ang dashboard na ito sa may hawak ng link. I-bookmark, at huwag i-share ang bahagi pagkatapos ng',
         privateAfter: '.',
+    },
+    explore: {
+        title: 'I-explore ang mga campaign',
+        lede: 'Mga totoong campaign na ginagamit ngayon. Ilagay sa photo mo, o gumawa ng sarili mo.',
+        popular: 'Sikat',
+        trending: 'Umuusbong',
+        newest: 'Bago',
+        all: 'Lahat',
+        search: 'Maghanap ng campaign',
+        noMatch: 'Walang campaign na tumugma sa hanap.',
+        emptyCategory: 'Wala pang campaign na may 5 o higit na supporters sa kategoryang ito.',
+        emptyGrid: 'Ang explore ay naglilista lang ng campaign na may 5 o higit na supporters, para hindi lumabas ang tahimik na frame.',
+        emptyShare: 'I-share ang iyo sa unang oras. Kapag lumampas sa limang supporters, puwede itong lumabas dito.',
+        create: 'Gumawa ng campaign',
+        browseUses: 'Tingnan ang mga halimbawa',
+        startOwn: 'Gumawa ng campaign mo',
     },
 };
 

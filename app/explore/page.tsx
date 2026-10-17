@@ -1,25 +1,30 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { NavBar } from '@/components/NavBar';
 import { SiteFooter } from '@/components/SiteFooter';
-import { ExploreClient, ExploreCampaign } from '@/components/ExploreClient';
+import { ExploreClient, ExploreCampaign, ExploreSort } from '@/components/ExploreClient';
 import { pool } from '@/lib/neon';
-import { CATEGORIES, CATEGORY_KEYS } from '@/lib/categories';
+import { CATEGORY_KEYS } from '@/lib/categories';
 import { visibleFrameSql } from '@/lib/frameValidity';
 import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
-import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import { parseFrameConfig } from '@/lib/parseFrameConfig';
+import { getMessages } from '@/lib/i18n/messages';
+import { LOCALE_COOKIE, resolveLocale } from '@/lib/i18n/locale';
 
 export const revalidate = 300;
 
-export const metadata: Metadata = {
-    title: 'Explore campaigns',
-    description: 'Browse live profile-picture frame campaigns for causes, teams, events, and more. Add one to your photo, or make your own for free.',
-    alternates: { canonical: 'https://ollabs.studio/explore' },
-    openGraph: { type: 'website', url: 'https://ollabs.studio/explore', title: 'Explore campaigns', description: 'Browse live profile-picture frame campaigns and add one to your photo.', siteName: 'Ollabs', images: ['/og.png'] },
-    twitter: { card: 'summary_large_image', images: ['/og.png'] },
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const jar = await cookies();
+    const locale = resolveLocale({ cookie: jar.get(LOCALE_COOKIE)?.value ?? null });
+    const title = getMessages(locale).explore.title;
+    return {
+        title,
+        description: 'Browse live profile-picture frame campaigns for causes, teams, events, and more. Add one to your photo, or make your own for free.',
+        alternates: { canonical: 'https://ollabs.studio/explore' },
+        openGraph: { type: 'website', url: 'https://ollabs.studio/explore', title, description: 'Browse live profile-picture frame campaigns and add one to your photo.', siteName: 'Ollabs', images: ['/og.png'] },
+        twitter: { card: 'summary_large_image', images: ['/og.png'] },
+    };
+}
 
 type Sort = 'popular' | 'trending' | 'newest';
 
@@ -97,23 +102,9 @@ async function getCampaigns(
     }
 }
 
-const SORTS: { key: Sort; label: string }[] = [
-    { key: 'popular', label: 'Popular' },
-    { key: 'trending', label: 'Trending' },
-    { key: 'newest', label: 'Newest' },
-];
-
-function buildHref(sort: Sort, category: string | null): string {
-    const params = new URLSearchParams();
-    if (sort !== 'popular') params.set('sort', sort);
-    if (category) params.set('category', category);
-    const qs = params.toString();
-    return qs ? `/explore?${qs}` : '/explore';
-}
-
 export default async function ExplorePage({ searchParams }: { searchParams: Promise<{ sort?: string; category?: string }> }) {
     const sp = await searchParams;
-    const sort: Sort = sp.sort === 'newest' ? 'newest' : sp.sort === 'trending' ? 'trending' : 'popular';
+    const sort: ExploreSort = sp.sort === 'newest' ? 'newest' : sp.sort === 'trending' ? 'trending' : 'popular';
     const category = sp.category && CATEGORY_KEYS.includes(sp.category) ? sp.category : null;
     const hdrs = await headers();
     const rawCountry = (hdrs.get('x-vercel-ip-country') || hdrs.get('cf-ipcountry') || '').toUpperCase();
@@ -123,80 +114,9 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
     return (
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
-
-            <section className={`${PAGE_TOP_UNDER_NAV} pb-8 px-6`}>
-                <div className="max-w-3xl mx-auto text-center">
-                    <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">Explore campaigns</h1>
-                    <p className="text-lg text-ink/70 max-w-2xl mx-auto">Real campaigns people are rallying behind right now. Add one to your photo, or start your own.</p>
-                </div>
-            </section>
-
-            <section className="px-6 pb-4">
-                <div className="max-w-5xl mx-auto flex flex-col items-center gap-4">
-                    <div className="inline-flex p-1 bg-cream border border-ink/10 rounded-full">
-                        {SORTS.map((s) => (
-                            <Link
-                                key={s.key}
-                                href={buildHref(s.key, category)}
-                                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${sort === s.key ? 'bg-ink text-paper' : 'text-muted hover:text-ink'}`}
-                            >
-                                {s.label}
-                            </Link>
-                        ))}
-                    </div>
-
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                        <Link
-                            href={buildHref(sort, null)}
-                            className={`px-3.5 py-1.5 rounded-full text-sm font-medium border transition-all ${category === null ? 'bg-brand/15 border-brand/40 text-brand-deep' : 'bg-cream border-ink/10 text-muted hover:text-ink'}`}
-                        >
-                            All
-                        </Link>
-                        {CATEGORIES.map((c) => (
-                            <Link
-                                key={c.key}
-                                href={buildHref(sort, c.key)}
-                                className={`px-3.5 py-1.5 rounded-full text-sm font-medium border transition-all ${category === c.key ? 'bg-brand/15 border-brand/40 text-brand-deep' : 'bg-cream border-ink/10 text-muted hover:text-ink'}`}
-                            >
-                                {c.label}
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            <section className="px-6 pb-20">
-                <div className="max-w-6xl xl:max-w-7xl mx-auto">
-                    {campaigns.length === 0 ? (
-                        <div className="text-center">
-                            <p className="text-muted mb-2 max-w-md mx-auto">
-                                {category
-                                    ? 'No campaigns with 5 or more supporters in this category yet.'
-                                    : 'Explore only lists campaigns with 5 or more supporters, so quiet frames stay off the public grid.'}
-                            </p>
-                            <p className="text-sm text-ink/70 mb-6 max-w-md mx-auto">
-                                Share yours in the first hour. When it crosses five supporters, it can show up here.
-                            </p>
-                            <div className="flex flex-wrap items-center justify-center gap-3">
-                                <Link href="/create" className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">Create a campaign</Link>
-                                <Link href="/for" className="inline-flex min-h-[48px] px-5 rounded-xl border border-ink/15 text-ink font-bold items-center hover:bg-ink/5 transition-all">Browse use cases</Link>
-                            </div>
-                        </div>
-                    ) : (
-                        <ExploreClient campaigns={campaigns} />
-                    )}
-                </div>
-            </section>
-
-            {campaigns.length > 0 && (
-                <section className="px-6 pb-24">
-                    <div className="max-w-3xl mx-auto text-center">
-                        <Link href="/create" className="inline-flex h-12 px-8 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">Start your own campaign</Link>
-                    </div>
-                </section>
-            )}
-
+            <ExploreClient campaigns={campaigns} sort={sort} category={category} />
             <SiteFooter />
         </main>
     );
 }
+

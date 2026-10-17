@@ -310,6 +310,22 @@ export type Messages = {
         privateBefore: string;
         privateAfter: string;
     };
+    explore: {
+        title: string;
+        lede: string;
+        popular: string;
+        trending: string;
+        newest: string;
+        all: string;
+        search: string;
+        noMatch: string;
+        emptyCategory: string;
+        emptyGrid: string;
+        emptyShare: string;
+        create: string;
+        browseUses: string;
+        startOwn: string;
+    };
     landingPt: LandingCopy;
     landingId: LandingCopy;
     landingTl: LandingCopy;
@@ -794,6 +810,22 @@ const en: Messages = {
         privateBefore: 'This dashboard is private to whoever has this link. Bookmark it, and do not share the part after',
         privateAfter: '.',
     },
+    explore: {
+        title: 'Explore campaigns',
+        lede: 'Real campaigns people are rallying behind right now. Add one to your photo, or start your own.',
+        popular: 'Popular',
+        trending: 'Trending',
+        newest: 'Newest',
+        all: 'All',
+        search: 'Search campaigns',
+        noMatch: 'No campaigns match that search.',
+        emptyCategory: 'No campaigns with 5 or more supporters in this category yet.',
+        emptyGrid: 'Explore only lists campaigns with 5 or more supporters, so quiet frames stay off the public grid.',
+        emptyShare: 'Share yours in the first hour. When it crosses five supporters, it can show up here.',
+        create: 'Create a campaign',
+        browseUses: 'Browse use cases',
+        startOwn: 'Start your own campaign',
+    },
     landingPt,
     landingId,
     landingTl,
@@ -1125,6 +1157,22 @@ const pt: Messages = {
         privateBefore: 'Este painel é privado para quem tem este link. Salve nos favoritos e não compartilhe a parte depois de',
         privateAfter: '.',
     },
+    explore: {
+        title: 'Explorar campanhas',
+        lede: 'Campanhas reais que as pessoas estão usando agora. Coloque uma na sua foto, ou crie a sua.',
+        popular: 'Populares',
+        trending: 'Em alta',
+        newest: 'Novas',
+        all: 'Todas',
+        search: 'Buscar campanhas',
+        noMatch: 'Nenhuma campanha combina com essa busca.',
+        emptyCategory: 'Ainda não há campanhas com 5 ou mais apoiadores nesta categoria.',
+        emptyGrid: 'Explorar só mostra campanhas com 5 ou mais apoiadores, para molduras paradas ficarem fora da grade.',
+        emptyShare: 'Compartilhe a sua na primeira hora. Quando passar de cinco apoiadores, ela pode aparecer aqui.',
+        create: 'Criar campanha',
+        browseUses: 'Ver para quem é',
+        startOwn: 'Criar sua campanha',
+    },
     landingPt,
     landingId,
     landingTl,
@@ -1455,6 +1503,22 @@ const id: Messages = {
         frameInvisible: 'Bingkai itu tidak akan terlihat di foto siapa pun. Pilih gaya tepi atau unggah gambar bingkai.',
         privateBefore: 'Dasbor ini privat bagi siapa pun yang punya link ini. Simpan bookmark, dan jangan bagikan bagian setelah',
         privateAfter: '.',
+    },
+    explore: {
+        title: 'Jelajahi kampanye',
+        lede: 'Kampanye nyata yang sedang dipakai orang. Pasang di fotomu, atau buat sendiri.',
+        popular: 'Populer',
+        trending: 'Sedang naik',
+        newest: 'Terbaru',
+        all: 'Semua',
+        search: 'Cari kampanye',
+        noMatch: 'Tidak ada kampanye yang cocok.',
+        emptyCategory: 'Belum ada kampanye dengan 5 pendukung atau lebih di kategori ini.',
+        emptyGrid: 'Jelajah hanya menampilkan kampanye dengan 5 pendukung atau lebih, supaya bingkai yang sepi tidak masuk grid.',
+        emptyShare: 'Bagikan milikmu di jam pertama. Setelah lewat lima pendukung, kampanye itu bisa muncul di sini.',
+        create: 'Buat kampanye',
+        browseUses: 'Lihat contoh',
+        startOwn: 'Buat kampanyemu',
     },
     landingPt,
     landingId,
