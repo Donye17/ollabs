@@ -1,25 +1,38 @@
 "use client";
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AVAILABLE_FRAMES } from '@/lib/constants';
 import { FRAME_PACKS, type FramePackId } from '@/lib/framePacks';
 import { FrameConfig, FrameType } from '@/lib/types';
-import { prefersIndonesian, prefersPortuguese, prefersSpanish, prefersTagalog } from '@/lib/share';
+import { useLocale } from '@/components/i18n/LocaleProvider';
+import type { Locale } from '@/lib/i18n/locale';
 
 interface FrameSelectorProps {
   selectedFrameId: string;
   onSelect: (frame: FrameConfig) => void;
 }
 
-function defaultPackId(): FramePackId | 'rings' {
-  if (prefersPortuguese()) return 'br';
-  if (prefersIndonesian()) return 'id';
-  if (prefersTagalog()) return 'ph';
-  if (prefersSpanish()) return 'mx';
+function defaultPackId(locale: Locale): FramePackId | 'rings' {
+  if (locale === 'pt') return 'br';
+  if (locale === 'id') return 'id';
+  if (locale === 'tl') return 'ph';
+  if (locale === 'es') return 'mx';
   return 'rings';
 }
 
 export const FrameSelector: React.FC<FrameSelectorProps> = ({ selectedFrameId, onSelect }) => {
-  const [tab, setTab] = useState<FramePackId | 'rings'>(() => defaultPackId());
+  const { locale, messages } = useLocale();
+  // Follow the UI language, not the browser. WhatsApp's in-app browser often
+  // reports English while the campaign page has already switched to Portuguese.
+  const [tab, setTab] = useState<FramePackId | 'rings'>(() => defaultPackId(locale));
+  const pickedTab = useRef(false);
+  useEffect(() => {
+    if (pickedTab.current) return;
+    setTab(defaultPackId(locale));
+  }, [locale]);
+  const chooseTab = (next: FramePackId | 'rings') => {
+    pickedTab.current = true;
+    setTab(next);
+  };
 
   const frames = useMemo(() => {
     if (tab === 'rings') return AVAILABLE_FRAMES;
@@ -31,19 +44,19 @@ export const FrameSelector: React.FC<FrameSelectorProps> = ({ selectedFrameId, o
       <div className="flex flex-wrap gap-1.5">
         <button
           type="button"
-          onClick={() => setTab('rings')}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors ${
+          onClick={() => chooseTab('rings')}
+          className={`min-h-[44px] px-3 rounded-lg text-xs font-bold border transition-colors ${
             tab === 'rings' ? 'bg-brand/20 border-brand/40 text-brand-deep' : 'bg-paper border-ink/10 text-muted'
           }`}
         >
-          Colour rings
+          {messages.create.colourRings}
         </button>
         {FRAME_PACKS.map((p) => (
           <button
             key={p.id}
             type="button"
-            onClick={() => setTab(p.id)}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors ${
+            onClick={() => chooseTab(p.id)}
+            className={`min-h-[44px] px-3 rounded-lg text-xs font-bold border transition-colors ${
               tab === p.id ? 'bg-brand/20 border-brand/40 text-brand-deep' : 'bg-paper border-ink/10 text-muted'
             }`}
           >

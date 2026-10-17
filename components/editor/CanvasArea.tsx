@@ -3,6 +3,7 @@ import { Upload, ImageIcon } from 'lucide-react';
 import { FrameRendererFactory } from '../renderer/FrameRendererFactory';
 import { CANVAS_SIZE, DISPLAY_SIZE } from '@/lib/constants';
 import { FrameConfig, FrameType, Position } from '@/lib/types';
+import { useLocale } from '@/components/i18n/LocaleProvider';
 
 interface CanvasAreaProps {
     canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -47,6 +48,8 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
     onTouchStart, onTouchMove, onTouchEnd, onTouchCancel,
     onDragOver, onDragLeave, onDrop
 }) => {
+    const { messages } = useLocale();
+    const copy = messages.create;
     const [imgTick, setImgTick] = useState(0);
 
     // Drawing Logic (Copied from original Editor.tsx but scoped)
@@ -140,8 +143,8 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-muted pointer-events-none p-4 text-center">
                     {frameFirst ? (
                         <>
-                            <span className={`font-bold text-ink/80 tracking-wide mb-0.5 ${compact ? "text-[11px]" : "text-base"}`}>Frame</span>
-                            {!compact && (<span className="text-xs text-muted max-w-[14rem]">Upload your artwork below. Try a photo after if you want.</span>)}
+                            <span className={`font-bold text-ink/80 tracking-wide mb-0.5 ${compact ? "text-[11px]" : "text-base"}`}>{copy.stepFrame}</span>
+                            {!compact && (<span className="text-xs text-muted max-w-[14rem]">{copy.canvasFrameHint}</span>)}
                         </>
                     ) : (
                         <>

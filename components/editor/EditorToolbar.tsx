@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocale } from '@/components/i18n/LocaleProvider';
 import { Download, Upload, ZoomIn, ZoomOut, RefreshCcw, RotateCw, Loader2, Sparkles, Maximize, ImageDown } from 'lucide-react';
 
 interface EditorToolbarProps {
@@ -41,6 +42,8 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     isSharingPhoto,
     frameFirst = false,
 }) => {
+    const { messages } = useLocale();
+    const copy = messages.create;
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) onImageSelect(file);
@@ -54,7 +57,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                     <label className="block">
                         <input type="file" accept="image/*" className="hidden" onChange={handleFileInput} />
                         <div className="flex items-center justify-center gap-2 bg-cream hover:bg-ink/5 text-ink py-3 px-4 rounded-xl cursor-pointer transition-all border border-ink/10 font-semibold text-sm select-none">
-                            <Upload size={18} /> <span>{imageObject ? 'Change preview photo' : 'Try with a photo (optional)'}</span>
+                            <Upload size={18} /> <span>{imageObject ? copy.changePreviewPhoto : copy.tryPhotoOptional}</span>
                         </div>
                     </label>
                 </div>

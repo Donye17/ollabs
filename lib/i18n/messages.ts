@@ -77,6 +77,7 @@ export type Messages = {
         shareLinkWhatsApp: string;
         shareMessenger: string;
         shareAnother: string;
+        moreWays: string;
         copyLink: string;
         linkCopiedPaste: string;
         copyCaptionFailed: string;
@@ -135,6 +136,8 @@ export type Messages = {
         tipLogo: string;
         simpleStyles: string;
         simpleStylesHint: string;
+        colourRings: string;
+        canvasFrameHint: string;
         fineTune: string;
         previewContacts: string;
         createCampaign: string;
@@ -440,6 +443,7 @@ const en: Messages = {
         shareLinkWhatsApp: 'Share link on WhatsApp',
         shareMessenger: 'Share on Messenger',
         shareAnother: 'Share another way',
+        moreWays: 'More ways to share',
         copyLink: 'Copy link',
         linkCopiedPaste: 'Link copied, paste it with your photo',
         copyCaptionFailed: 'Could not copy the link. Select this and paste it with your photo:',
@@ -503,6 +507,8 @@ const en: Messages = {
             "A square logo or round badge works great. Ollabs keeps the outer design and opens a window in the center for each supporter's photo.",
         simpleStyles: 'No design? Start here',
         simpleStylesHint: 'No artwork yet? Pick a colour ring to start.',
+        colourRings: 'Colour rings',
+        canvasFrameHint: 'Upload your artwork below. Try a photo after if you want.',
         fineTune: 'Fine tune colours',
         previewContacts: 'Preview in contacts',
         createCampaign: 'Create campaign',
@@ -662,6 +668,7 @@ const pt: Messages = {
         shareLinkWhatsApp: 'Compartilhar link no WhatsApp',
         shareMessenger: 'Compartilhar no Messenger',
         shareAnother: 'Compartilhar de outro jeito',
+        moreWays: 'Outras formas de compartilhar',
         copyLink: 'Copiar link',
         linkCopiedPaste: 'Link copiado, cole junto com a sua foto',
         copyCaptionFailed: 'Não deu para copiar o link. Selecione isto e cole junto com a sua foto:',
@@ -725,6 +732,8 @@ const pt: Messages = {
             'Um logo quadrado ou emblema redondo funciona bem. O Ollabs mantém o desenho de fora e abre uma janela no centro para a foto de cada pessoa.',
         simpleStyles: 'Sem arte? Comece aqui',
         simpleStylesHint: 'Ainda sem arte? Escolha um anel de cor para começar.',
+        colourRings: 'Anéis de cor',
+        canvasFrameHint: 'Envie a arte abaixo. Se quiser, teste com uma foto depois.',
         fineTune: 'Ajustar cores',
         previewContacts: 'Prévia nos contatos',
         createCampaign: 'Criar campanha',
@@ -885,6 +894,7 @@ const id: Messages = {
         shareLinkWhatsApp: 'Bagikan link di WhatsApp',
         shareMessenger: 'Bagikan di Messenger',
         shareAnother: 'Bagikan cara lain',
+        moreWays: 'Cara lain untuk berbagi',
         copyLink: 'Salin link',
         linkCopiedPaste: 'Link disalin, tempel bersama fotomu',
         copyCaptionFailed: 'Link tidak tersalin. Pilih teks ini dan tempel bersama fotomu:',
@@ -948,6 +958,8 @@ const id: Messages = {
             'Logo persegi atau lencana bulat cocok. Ollabs menjaga desain luar dan membuka jendela di tengah untuk foto setiap pendukung.',
         simpleStyles: 'Belum ada desain? Mulai di sini',
         simpleStylesHint: 'Belum ada desain? Pilih cincin warna untuk mulai.',
+        colourRings: 'Cincin warna',
+        canvasFrameHint: 'Unggah desain di bawah. Kalau mau, coba dengan foto setelahnya.',
         fineTune: 'Sesuaikan warna',
         previewContacts: 'Pratinjau di kontak',
         createCampaign: 'Buat kampanye',
