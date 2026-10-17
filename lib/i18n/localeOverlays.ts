@@ -219,6 +219,15 @@ const ES: DeepPartial<Messages> = {
         browseUses: 'Ver para quién es',
         startOwn: 'Crea tu campaña',
     },
+    footer: {
+        guides: 'Guías',
+        about: 'Acerca de',
+        contact: 'Contacto',
+        useCases: 'Para quién es',
+        privacy: 'Privacidad',
+        terms: 'Términos',
+        label: 'Pie de página',
+    },
 };
 
 const TL: DeepPartial<Messages> = {
@@ -411,6 +420,15 @@ const TL: DeepPartial<Messages> = {
         create: 'Gumawa ng campaign',
         browseUses: 'Tingnan ang mga halimbawa',
         startOwn: 'Gumawa ng campaign mo',
+    },
+    footer: {
+        guides: 'Mga gabay',
+        about: 'Tungkol',
+        contact: 'Kontak',
+        useCases: 'Para kanino',
+        privacy: 'Pribasiya',
+        terms: 'Mga tuntunin',
+        label: 'Footer',
     },
 };
 

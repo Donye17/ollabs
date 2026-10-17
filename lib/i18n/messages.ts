@@ -20,6 +20,15 @@ export type Messages = {
         english: string;
         portuguese: string;
     };
+    footer: {
+        guides: string;
+        about: string;
+        contact: string;
+        useCases: string;
+        privacy: string;
+        terms: string;
+        label: string;
+    };
     home: {
         headlineBefore: string;
         headlineAccent: string;
@@ -506,6 +515,15 @@ const en: Messages = {
         english: 'EN',
         portuguese: 'PT',
     },
+    footer: {
+        guides: 'Guides',
+        about: 'About',
+        contact: 'Contact',
+        useCases: 'Use cases',
+        privacy: 'Privacy',
+        terms: 'Terms',
+        label: 'Footer',
+    },
     home: {
         headlineBefore: 'Your cause on ',
         headlineAccent: 'every profile',
@@ -850,6 +868,15 @@ const pt: Messages = {
         language: 'Idioma',
         english: 'EN',
         portuguese: 'PT',
+    },
+    footer: {
+        guides: 'Guias',
+        about: 'Sobre',
+        contact: 'Contato',
+        useCases: 'Para quem é',
+        privacy: 'Privacidade',
+        terms: 'Termos',
+        label: 'Rodapé',
     },
     home: {
         headlineBefore: 'Sua causa em ',
@@ -1197,6 +1224,15 @@ const id: Messages = {
         language: 'Language',
         english: 'EN',
         portuguese: 'PT',
+    },
+    footer: {
+        guides: 'Panduan',
+        about: 'Tentang',
+        contact: 'Kontak',
+        useCases: 'Untuk siapa',
+        privacy: 'Privasi',
+        terms: 'Ketentuan',
+        label: 'Footer',
     },
     home: {
         headlineBefore: 'Your cause on ',
