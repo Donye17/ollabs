@@ -223,6 +223,33 @@ export type Messages = {
         recoveryEmail: string;
         haveAccount: string;
         haveAccountBody: string;
+        loading: string;
+        signedInAs: (email: string) => string;
+        signOut: string;
+        travel: string;
+        publishedFrom: string;
+        firstFrom: string;
+        hubYours: string;
+        hubPut: string;
+        hubClaim: string;
+        hubSetup: (handle: string) => string;
+        hubOneLink: string;
+        hubSuggested: (handle: string) => string;
+        hubClaimLinks: string;
+        view: string;
+        edit: string;
+        onlyBrowser: string;
+        browserOnlyNote: string;
+        openCampaign: string;
+        manage: string;
+        manageHint: string;
+        reuseFrame: string;
+        reuse: string;
+        reuseHint: string;
+        removeHint: string;
+        publishedIn: (place: string) => string;
+        firstJoinIn: (place: string) => string;
+        shareNow: string;
     };
     landingPt: LandingCopy;
     landingId: LandingCopy;
@@ -621,6 +648,33 @@ const en: Messages = {
         recoveryEmail: 'get a recovery link by email',
         haveAccount: 'Already have an account?',
         haveAccountBody: 'Sign in with a code and every campaign you saved to it shows up here, on any device. New campaigns join your account as you create them. Supporters never sign in.',
+        loading: 'Loading your campaigns...',
+        signedInAs: (email) => `Signed in as ${email}`,
+        signOut: 'Sign out',
+        travel: 'Where your campaigns travel',
+        publishedFrom: 'Published from:',
+        firstFrom: 'First supporters from:',
+        hubYours: 'Your campaign hub',
+        hubPut: 'Put these on one public page',
+        hubClaim: 'Claim your campaign hub',
+        hubSetup: (handle) => `Set up /u/${handle} with a Join button for your campaigns`,
+        hubOneLink: 'One bio link with a Join button for the campaigns you run',
+        hubSuggested: (handle) => `Suggested: /u/${handle} with Join button, bio, and links`,
+        hubClaimLinks: 'Claim /u/… with Join button, bio, and other links',
+        view: 'View',
+        edit: 'Edit',
+        onlyBrowser: 'Only in this browser',
+        browserOnlyNote: 'Campaigns in this section live only in this browser. Keep their dashboard links saved somewhere safe.',
+        openCampaign: 'Open campaign',
+        manage: 'Manage',
+        manageHint: 'Edit this campaign and see its stats',
+        reuseFrame: 'Reuse frame',
+        reuse: 'Reuse',
+        reuseHint: 'Start a new campaign with this frame',
+        removeHint: 'Remove from this list',
+        publishedIn: (place) => `Published ${place}`,
+        firstJoinIn: (place) => `First join ${place}`,
+        shareNow: 'Share now on WhatsApp',
     },
     landingPt,
     landingId,
@@ -866,6 +920,33 @@ const pt: Messages = {
         recoveryEmail: 'receber um link de recuperação por e-mail',
         haveAccount: 'Já tem uma conta?',
         haveAccountBody: 'Entre com um código e todas as campanhas salvas nela aparecem aqui, em qualquer aparelho. Campanhas novas entram na sua conta quando você cria. Quem apoia nunca entra.',
+        loading: 'Carregando suas campanhas...',
+        signedInAs: (email) => `Conectado como ${email}`,
+        signOut: 'Sair',
+        travel: 'Para onde suas campanhas viajam',
+        publishedFrom: 'Publicado em:',
+        firstFrom: 'Primeiros apoiadores em:',
+        hubYours: 'Seu hub de campanhas',
+        hubPut: 'Coloque tudo em uma página pública',
+        hubClaim: 'Crie seu hub de campanhas',
+        hubSetup: (handle) => `Monte /u/${handle} com um botão Participar para suas campanhas`,
+        hubOneLink: 'Um link de bio com botão Participar para as campanhas que você conduz',
+        hubSuggested: (handle) => `Sugestão: /u/${handle} com botão Participar, bio e links`,
+        hubClaimLinks: 'Crie /u/… com botão Participar, bio e outros links',
+        view: 'Ver',
+        edit: 'Editar',
+        onlyBrowser: 'Só neste navegador',
+        browserOnlyNote: 'As campanhas desta seção existem só neste navegador. Guarde os links do painel em um lugar seguro.',
+        openCampaign: 'Abrir campanha',
+        manage: 'Gerenciar',
+        manageHint: 'Editar esta campanha e ver os números',
+        reuseFrame: 'Reusar moldura',
+        reuse: 'Reusar',
+        reuseHint: 'Começar uma campanha nova com esta moldura',
+        removeHint: 'Tirar desta lista',
+        publishedIn: (place) => `Publicado em ${place}`,
+        firstJoinIn: (place) => `Primeiro apoio em ${place}`,
+        shareNow: 'Compartilhar agora no WhatsApp',
     },
     landingPt,
     landingId,
@@ -1111,6 +1192,33 @@ const id: Messages = {
         recoveryEmail: 'dapatkan link pemulihan lewat email',
         haveAccount: 'Sudah punya akun?',
         haveAccountBody: 'Masuk dengan kode dan setiap kampanye yang kamu simpan muncul di sini, di perangkat mana saja. Kampanye baru masuk ke akunmu saat kamu membuatnya. Pendukung tidak pernah masuk.',
+        loading: 'Memuat kampanyemu...',
+        signedInAs: (email) => `Masuk sebagai ${email}`,
+        signOut: 'Keluar',
+        travel: 'Ke mana kampanyemu pergi',
+        publishedFrom: 'Diterbitkan dari:',
+        firstFrom: 'Pendukung pertama dari:',
+        hubYours: 'Hub kampanyemu',
+        hubPut: 'Satukan di satu halaman publik',
+        hubClaim: 'Klaim hub kampanyemu',
+        hubSetup: (handle) => `Siapkan /u/${handle} dengan tombol Gabung untuk kampanyemu`,
+        hubOneLink: 'Satu link bio dengan tombol Gabung untuk kampanye yang kamu jalankan',
+        hubSuggested: (handle) => `Saran: /u/${handle} dengan tombol Gabung, bio, dan tautan`,
+        hubClaimLinks: 'Klaim /u/… dengan tombol Gabung, bio, dan tautan lain',
+        view: 'Lihat',
+        edit: 'Edit',
+        onlyBrowser: 'Hanya di browser ini',
+        browserOnlyNote: 'Kampanye di bagian ini hanya ada di browser ini. Simpan link dasbornya di tempat yang aman.',
+        openCampaign: 'Buka kampanye',
+        manage: 'Kelola',
+        manageHint: 'Edit kampanye ini dan lihat angkanya',
+        reuseFrame: 'Pakai lagi bingkai',
+        reuse: 'Pakai lagi',
+        reuseHint: 'Mulai kampanye baru dengan bingkai ini',
+        removeHint: 'Hapus dari daftar ini',
+        publishedIn: (place) => `Diterbitkan di ${place}`,
+        firstJoinIn: (place) => `Dukungan pertama di ${place}`,
+        shareNow: 'Bagikan sekarang di WhatsApp',
     },
     landingPt,
     landingId,

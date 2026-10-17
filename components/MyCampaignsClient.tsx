@@ -12,6 +12,7 @@ import { hasVisibleFrame } from '@/lib/frameValidity';
 import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 import type { FrameConfig } from '@/lib/types';
 import { useLocale } from '@/components/i18n/LocaleProvider';
+import { formatCount } from '@/lib/i18n/locale';
 
 interface SavedCampaign {
     slug: string;
@@ -56,6 +57,7 @@ function countryChip(code: string | null): string | null {
 }
 
 export const MyCampaignsClient: React.FC = () => {
+    const t = useLocale().messages.mine;
     const [local, setLocal] = useState<SavedCampaign[]>([]);
     const [account, setAccount] = useState<AccountCampaign[] | null>(null);
     const [email, setEmail] = useState<string | null>(null);
@@ -171,7 +173,7 @@ export const MyCampaignsClient: React.FC = () => {
     if (!loaded) {
         return (
             <div className="max-w-2xl lg:max-w-3xl mx-auto flex items-center justify-center gap-2 text-muted py-10">
-                <Loader2 size={18} className="animate-spin" /> Loading your campaigns...
+                <Loader2 size={18} className="animate-spin" /> {t.loading}
             </div>
         );
     }
@@ -183,10 +185,10 @@ export const MyCampaignsClient: React.FC = () => {
             {signedIn && (
                 <div className="flex items-center justify-between gap-3 mb-4 px-1">
                     <p className="text-xs text-muted truncate">
-                        Signed in as <span className="font-semibold text-ink">{email}</span>
+                        {t.signedInAs(email || '')}
                     </p>
                     <button onClick={signOut} className="text-xs font-bold text-muted hover:text-brand-deep flex items-center gap-1.5 shrink-0 transition-colors">
-                        <LogOut size={13} /> Sign out
+                        <LogOut size={13} /> {t.signOut}
                     </button>
                 </div>
             )}
@@ -194,12 +196,12 @@ export const MyCampaignsClient: React.FC = () => {
             {signedIn && countrySummary && (
                 <div className="mb-4 border-y border-ink/10 py-3 px-1">
                     <div className="flex items-center gap-2 text-xs font-semibold text-muted mb-2">
-                        <Globe size={13} /> Where your campaigns travel
+                        <Globe size={13} /> {t.travel}
                     </div>
                     <div className="space-y-2 text-sm text-ink/80">
                         {countrySummary.published.size > 0 && (
                             <p>
-                                <span className="font-semibold text-ink">Published from:</span>{' '}
+                                <span className="font-semibold text-ink">{t.publishedFrom}</span>{' '}
                                 {[...countrySummary.published.entries()]
                                     .sort((a, b) => b[1] - a[1])
                                     .map(([code, n]) => `${countryChip(code)} (${n})`)
@@ -208,7 +210,7 @@ export const MyCampaignsClient: React.FC = () => {
                         )}
                         {countrySummary.firstJoin.size > 0 && (
                             <p>
-                                <span className="font-semibold text-ink">First supporters from:</span>{' '}
+                                <span className="font-semibold text-ink">{t.firstFrom}</span>{' '}
                                 {[...countrySummary.firstJoin.entries()]
                                     .sort((a, b) => b[1] - a[1])
                                     .map(([code, n]) => `${countryChip(code)} (${n})`)
@@ -227,25 +229,25 @@ export const MyCampaignsClient: React.FC = () => {
                     <div className="min-w-0">
                         <p className="font-display font-bold text-[15px]">
                             {hubHandle
-                                ? 'Your campaign hub'
+                                ? t.hubYours
                                 : accountRows.length > 0
-                                  ? 'Put these on one public page'
-                                  : 'Claim your campaign hub'}
+                                  ? t.hubPut
+                                  : t.hubClaim}
                         </p>
                         <p className="text-xs text-ink/70 truncate">
                             {hubHandle
                                 ? `ollabs.studio/u/${hubHandle}`
                                 : accountRows.length > 0
                                   ? suggestedHandle
-                                    ? `Set up /u/${suggestedHandle} with a Join button for your campaigns`
-                                    : 'One bio link with a Join button for the campaigns you run'
+                                    ? t.hubSetup(suggestedHandle)
+                                    : t.hubOneLink
                                   : suggestedHandle
-                                    ? `Suggested: /u/${suggestedHandle} with Join button, bio, and links`
-                                    : 'Claim /u/… with Join button, bio, and other links'}
+                                    ? t.hubSuggested(suggestedHandle)
+                                    : t.hubClaimLinks}
                         </p>
                     </div>
                     <span className="text-xs font-bold text-brand-deep shrink-0">
-                        {hubHandle ? 'View' : 'Edit'}
+                        {hubHandle ? t.view : t.edit}
                     </span>
                 </Link>
             )}
@@ -259,7 +261,7 @@ export const MyCampaignsClient: React.FC = () => {
                     ))}
 
                     {localOnly.length > 0 && accountRows.length > 0 && (
-                        <p className="text-xs font-semibold text-muted pt-4 pb-2 px-1">Only in this browser</p>
+                        <p className="text-xs font-semibold text-muted pt-4 pb-2 px-1">{t.onlyBrowser}</p>
                     )}
 
                     {localOnly.map((c) => (
@@ -272,8 +274,7 @@ export const MyCampaignsClient: React.FC = () => {
 
                     {localOnly.length > 0 && (
                         <p className="text-xs text-muted text-center py-3 leading-relaxed">
-                            Campaigns in this section live only in this browser. Keep their dashboard links saved
-                            somewhere safe.
+                            {t.browserOnlyNote}
                         </p>
                     )}
                 </div>
@@ -294,6 +295,8 @@ export const MyCampaignsClient: React.FC = () => {
 };
 
 const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRemove }) => {
+    const { locale, messages } = useLocale();
+    const t = messages.mine;
     const pub = countryChip(row.publisherCountry);
     const first = countryChip(row.firstSupporterCountry);
     const zeroSupporters = (row.supporters ?? 0) === 0;
@@ -329,73 +332,73 @@ const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRem
                         <span className="truncate">ollabs.studio/c/{row.slug}</span>
                         {row.supporters != null && (
                             <span className="inline-flex items-center gap-1 shrink-0">
-                                <Users size={11} /> {row.supporters.toLocaleString()}
+                                <Users size={11} /> {formatCount(row.supporters, locale)}
                             </span>
                         )}
                     </p>
                     {(pub || first) && (
                         <p className="text-[11px] text-ink/60 mt-1 leading-snug">
-                            {pub && <span>Published {pub}</span>}
+                            {pub && <span>{t.publishedIn(pub)}</span>}
                             {pub && first && <span> · </span>}
-                            {first && <span>First join {first}</span>}
+                            {first && <span>{t.firstJoinIn(first)}</span>}
                         </p>
                     )}
                 </div>
                 <div className="hidden sm:flex items-center gap-2 shrink-0">
-                    <a href={row.url} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:bg-ink/5 transition-colors" title="Open campaign">
+                    <a href={row.url} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:bg-ink/5 transition-colors" title={t.openCampaign}>
                         <ExternalLink size={16} className="text-ink" />
                     </a>
                     {row.manageUrl && (
-                        <a href={row.manageUrl} className={`inline-flex items-center justify-center gap-1.5 px-4 ${ORGANIZER_PRIMARY_BTN}`} title="Edit this campaign and see its stats">
-                            <Pencil size={15} /> Manage
+                        <a href={row.manageUrl} className={`inline-flex items-center justify-center gap-1.5 px-4 ${ORGANIZER_PRIMARY_BTN}`} title={t.manageHint}>
+                            <Pencil size={15} /> {t.manage}
                         </a>
                     )}
                     <a
                         href={`/create?remix=${encodeURIComponent(row.slug)}`}
                         className="min-h-11 px-3 rounded-lg border border-ink/15 text-ink font-semibold text-sm flex items-center gap-1 hover:bg-ink/5 transition-colors justify-center"
-                        title="Start a new campaign with this frame"
+                        title={t.reuseHint}
                     >
-                        Reuse frame
+                        {t.reuseFrame}
                     </a>
                     {onRemove && (
-                        <button onClick={onRemove} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:text-coral transition-colors" title="Remove from this list">
+                        <button onClick={onRemove} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:text-coral transition-colors" title={t.removeHint}>
                             <Trash2 size={16} />
                         </button>
                     )}
                 </div>
             </div>
             <div className="flex sm:hidden items-center gap-2">
-                <a href={row.url} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:bg-ink/5 transition-colors" title="Open campaign">
+                <a href={row.url} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:bg-ink/5 transition-colors" title={t.openCampaign}>
                     <ExternalLink size={16} className="text-ink" />
                 </a>
                 {row.manageUrl && (
-                    <a href={row.manageUrl} className={`flex-1 inline-flex items-center justify-center gap-1.5 px-4 ${ORGANIZER_PRIMARY_BTN}`} title="Edit this campaign and see its stats">
-                        <Pencil size={15} /> Manage
+                    <a href={row.manageUrl} className={`flex-1 inline-flex items-center justify-center gap-1.5 px-4 ${ORGANIZER_PRIMARY_BTN}`} title={t.manageHint}>
+                        <Pencil size={15} /> {t.manage}
                     </a>
                 )}
                 <a
                     href={`/create?remix=${encodeURIComponent(row.slug)}`}
                     className="min-h-11 px-3 rounded-lg border border-ink/15 text-ink font-semibold text-sm flex items-center gap-1 hover:bg-ink/5 transition-colors justify-center"
-                    title="Start a new campaign with this frame"
+                    title={t.reuseHint}
                 >
-                    Reuse
+                    {t.reuse}
                 </a>
                 {onRemove && (
-                    <button onClick={onRemove} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:text-coral transition-colors" title="Remove from this list">
+                    <button onClick={onRemove} className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-ink/10 hover:text-coral transition-colors" title={t.removeHint}>
                         <Trash2 size={16} />
                     </button>
                 )}
             </div>
             {showShareNudge && (
                 <a
-                    href={whatsappUrl(organizerShareText(row.title), withUtm(row.url, 'whatsapp'))}
+                    href={whatsappUrl(organizerShareText(row.title, locale), withUtm(row.url, 'whatsapp'))}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => track('campaign_share', { campaign: row.slug, method: 'whatsapp', from: 'mine_zero_nudge' })}
                     className="w-full min-h-[44px] py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-white hover:brightness-105 transition-all"
                     style={{ backgroundColor: WHATSAPP_GREEN }}
                 >
-                    <WhatsAppGlyph size={15} /> Share now on WhatsApp
+                    <WhatsAppGlyph size={15} /> {t.shareNow}
                 </a>
             )}
         </div>
