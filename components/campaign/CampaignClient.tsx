@@ -734,53 +734,57 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             </button>
                         )}
 
-                        <div className="flex gap-2">
-                            {canNativeShare && (
+                        <button
+                            onClick={copyLink}
+                            className="w-full min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
+                        >
+                            {linkCopied
+                                ? <><Check size={15} className="text-brand-deep" /> {t.copied}</>
+                                : <><Copy size={15} /> {t.copyLink}</>}
+                        </button>
+
+                        <details className="rounded-xl border border-ink/10 bg-cream">
+                            <summary className="min-h-[48px] px-4 py-3 cursor-pointer list-none flex items-center justify-center font-semibold text-sm text-ink [&::-webkit-details-marker]:hidden">
+                                {t.moreWays}
+                            </summary>
+                            <div className="px-3 pb-3 space-y-2">
+                                {canNativeShare && (
+                                    <button
+                                        onClick={handleShare}
+                                        className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-ink text-paper hover:bg-ink/90 transition-colors"
+                                    >
+                                        <Share2 size={15} /> {t.shareAnother}
+                                    </button>
+                                )}
                                 <button
-                                    onClick={handleShare}
-                                    className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-ink text-paper hover:bg-ink/90 transition-colors"
+                                    onClick={() => setShowQR((v) => !v)}
+                                    className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-paper hover:bg-ink/5 text-ink transition-colors"
                                 >
-                                    <Share2 size={15} /> {t.shareAnother}
+                                    <QrCode size={15} /> QR
                                 </button>
-                            )}
-                            <button
-                                onClick={copyLink}
-                                className="flex-1 min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
-                            >
-                                {linkCopied
-                                    ? <><Check size={15} className="text-brand-deep" /> {t.copied}</>
-                                    : <><Copy size={15} /> {t.copyLink}</>}
-                            </button>
-                            <button
-                                onClick={() => setShowQR((v) => !v)}
-                                className="min-h-[48px] py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
-                            >
-                                <QrCode size={15} /> QR
-                            </button>
-                        </div>
-
-                        {showQR && (
-                            <div className="flex flex-col items-center gap-2 pt-1">
-                                <QRCode value={pageUrl} size={168} className="border border-ink/10" />
-                                <p className="text-[11px] text-muted">{t.scanCampaign}</p>
+                                {showQR && (
+                                    <div className="flex flex-col items-center gap-2 pt-1">
+                                        <QRCode value={pageUrl} size={168} className="border border-ink/10" />
+                                        <p className="text-[11px] text-muted">{t.scanCampaign}</p>
+                                    </div>
+                                )}
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        onClick={() => openShare('x')}
+                                        className="min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 bg-ink text-white hover:brightness-125 transition-all"
+                                    >
+                                        <XGlyph size={14} /> X
+                                    </button>
+                                    <button
+                                        onClick={() => openShare('facebook')}
+                                        className="min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-all"
+                                        style={{ backgroundColor: '#1877F2' }}
+                                    >
+                                        <FacebookGlyph size={14} /> Facebook
+                                    </button>
+                                </div>
                             </div>
-                        )}
-
-                        <div className="grid grid-cols-2 gap-2">
-                            <button
-                                onClick={() => openShare('x')}
-                                className="min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 bg-ink text-white hover:brightness-125 transition-all"
-                            >
-                                <XGlyph size={14} /> X
-                            </button>
-                            <button
-                                onClick={() => openShare('facebook')}
-                                className="min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-all"
-                                style={{ backgroundColor: '#1877F2' }}
-                            >
-                                <FacebookGlyph size={14} /> Facebook
-                            </button>
-                        </div>
+                        </details>
 
                         <div className="w-full text-center space-y-3 pt-2">
                             <p className="font-display font-bold text-lg leading-tight flex items-center justify-center gap-1.5">
