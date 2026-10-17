@@ -12,6 +12,9 @@ export type Messages = {
         explore: string;
         guides: string;
         myCampaigns: string;
+        tabMine: string;
+        tabCreate: string;
+        tabHub: string;
         create: string;
         language: string;
         english: string;
@@ -393,6 +396,9 @@ const en: Messages = {
         explore: 'Explore',
         guides: 'Guides',
         myCampaigns: 'My campaigns',
+        tabMine: 'Mine',
+        tabCreate: 'Create',
+        tabHub: 'Hub',
         create: 'Create a campaign',
         language: 'Language',
         english: 'EN',
@@ -633,6 +639,9 @@ const pt: Messages = {
         explore: 'Explorar',
         guides: 'Guias',
         myCampaigns: 'Minhas campanhas',
+        tabMine: 'Minhas',
+        tabCreate: 'Criar',
+        tabHub: 'Hub',
         create: 'Criar campanha',
         language: 'Idioma',
         english: 'EN',
@@ -875,6 +884,9 @@ const id: Messages = {
         explore: 'Explore',
         guides: 'Guides',
         myCampaigns: 'My campaigns',
+        tabMine: 'Kampanye',
+        tabCreate: 'Buat',
+        tabHub: 'Hub',
         create: 'Create a campaign',
         language: 'Language',
         english: 'EN',

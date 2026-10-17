@@ -4,12 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FolderOpen, LayoutGrid, Plus } from 'lucide-react';
 import { MOBILE_NAV_H, shouldShowMobileOrganizerNav } from '@/lib/mobileNav';
-
-const ITEMS = [
-    { href: '/mine', label: 'Mine', Icon: FolderOpen },
-    { href: '/create', label: 'Create', Icon: Plus },
-    { href: '/hub', label: 'Hub', Icon: LayoutGrid },
-] as const;
+import { useLocale } from '@/components/i18n/LocaleProvider';
 
 /**
  * Organizer thumb-zone nav on phones. Equal-weight tabs, paper surface, brand
@@ -19,6 +14,12 @@ const ITEMS = [
  */
 export function MobileOrganizerNav() {
     const pathname = usePathname() || '/';
+    const nav = useLocale().messages.nav;
+    const items = [
+        { href: '/mine', label: nav.tabMine, Icon: FolderOpen },
+        { href: '/create', label: nav.tabCreate, Icon: Plus },
+        { href: '/hub', label: nav.tabHub, Icon: LayoutGrid },
+    ];
     if (!shouldShowMobileOrganizerNav(pathname)) return null;
 
     return (
@@ -34,7 +35,7 @@ export function MobileOrganizerNav() {
                     className="max-w-lg mx-auto grid grid-cols-3"
                     style={{ height: MOBILE_NAV_H }}
                 >
-                    {ITEMS.map(({ href, label, Icon }) => {
+                    {items.map(({ href, label, Icon }) => {
                         const active =
                             pathname === href || pathname.startsWith(`${href}/`);
                         const isCreate = href === '/create';

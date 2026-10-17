@@ -29,6 +29,11 @@ function mergeMessages(base: Messages, overlay: DeepPartial<Messages>): Messages
 }
 
 const ES: DeepPartial<Messages> = {
+    nav: {
+        tabMine: 'Mías',
+        tabCreate: 'Crear',
+        tabHub: 'Hub',
+    },
     campaign: {
         eyebrow: 'Campaña Ollabs',
         tapHint: 'Toca el círculo o suelta una foto.',
@@ -115,6 +120,11 @@ const ES: DeepPartial<Messages> = {
 };
 
 const TL: DeepPartial<Messages> = {
+    nav: {
+        tabMine: 'Akin',
+        tabCreate: 'Gawa',
+        tabHub: 'Hub',
+    },
     campaign: {
         eyebrow: 'Ollabs campaign',
         tapHint: 'I-tap ang bilog o i-drop ang photo.',
