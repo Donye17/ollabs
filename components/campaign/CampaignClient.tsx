@@ -512,6 +512,13 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                         {!hasImage && description && (
                             <p className="text-sm text-ink/70 mt-1">{description}</p>
                         )}
+                        {!hasImage && count > 0 && !(goal && goal > 0) && (
+                            <p className="text-sm text-ink/80 mt-2">
+                                <span className="font-semibold">{formatCount(count, locale)}</span>
+                                {' '}
+                                {count === 1 ? t.alreadyUsedOne : t.alreadyUsedMany}
+                            </p>
+                        )}
                     </div>
                 )}
 
@@ -821,8 +828,10 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                     </button>
                 )}
 
-                {/* Count stays below the fold while adjusting so the save bar leads. */}
-                {!adjusting && (
+                {/* Count stays below the fold while adjusting so the save bar leads.
+                    On the empty screen the same number is the sentence under the title,
+                    unless a goal needs the progress bar. */}
+                {(justDownloaded || (!hasImage && !!goal && goal > 0)) && (
                     <div className="w-full border-t border-ink/10 pt-5 mt-2 text-center">
                         <div className="font-display flex items-center justify-center gap-2 text-2xl font-bold">
                             <span className="w-2.5 h-2.5 rounded-full bg-coral" /> {formatCount(count, locale)}

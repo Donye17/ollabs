@@ -78,6 +78,8 @@ export type Messages = {
         share: string;
         copied: string;
         peopleSupporting: string;
+        alreadyUsedOne: string;
+        alreadyUsedMany: string;
         of: string;
         ofSupporters: string;
         goalReached: string;
@@ -595,6 +597,8 @@ const en: Messages = {
         share: 'Share',
         copied: 'Copied',
         peopleSupporting: 'people supporting',
+        alreadyUsedOne: 'person already used this frame',
+        alreadyUsedMany: 'people already used this frame',
         of: 'of',
         ofSupporters: 'supporters',
         goalReached: 'goal reached',
@@ -970,6 +974,8 @@ const pt: Messages = {
         share: 'Compartilhar',
         copied: 'Copiado',
         peopleSupporting: 'apoiadores',
+        alreadyUsedOne: 'pessoa já usou esta moldura',
+        alreadyUsedMany: 'pessoas já usaram esta moldura',
         of: 'de',
         ofSupporters: 'apoiadores',
         goalReached: 'meta atingida',
@@ -1347,6 +1353,8 @@ const id: Messages = {
         share: 'Bagikan',
         copied: 'Disalin',
         peopleSupporting: 'orang mendukung',
+        alreadyUsedOne: 'orang sudah memakai bingkai ini',
+        alreadyUsedMany: 'orang sudah memakai bingkai ini',
         of: 'dari',
         ofSupporters: 'pendukung',
         goalReached: 'target tercapai',
