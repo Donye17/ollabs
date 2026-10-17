@@ -66,7 +66,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                     <label className="flex-1">
                         <input type="file" accept="image/*" className="hidden" onChange={handleFileInput} />
                         <div className="flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-4 px-6 rounded-xl cursor-pointer transition-all font-bold font-heading select-none">
-                            <Upload size={20} /> <span>{imageObject ? 'Change photo' : 'Upload photo'}</span>
+                            <Upload size={20} /> <span>{imageObject ? copy.changePhoto : copy.uploadPhoto}</span>
                         </div>
                     </label>
                 </div>
@@ -78,11 +78,11 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                         that reliably saves the picture on a phone. */}
                     {onSharePhoto && (
                         <button onClick={onSharePhoto} disabled={isSharingPhoto} className="w-full flex items-center justify-center gap-2 bg-primary hover:brightness-105 text-ink py-3.5 px-6 rounded-xl transition-all font-bold disabled:opacity-50">
-                            {isSharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> <span>Save or share photo</span></>}
+                            {isSharingPhoto ? <Loader2 size={20} className="animate-spin" /> : <><ImageDown size={20} /> <span>{copy.saveOrShare}</span></>}
                         </button>
                     )}
                     <button onClick={onDownload} className="w-full flex items-center justify-center gap-2 bg-cream hover:bg-paper2/80 backdrop-blur-md text-ink py-3.5 px-6 rounded-xl transition-all font-bold border border-ink/10 hover:border-ink/10">
-                        <Download size={20} /> <span>{onSharePhoto ? 'Download' : 'Save'}</span>
+                        <Download size={20} /> <span>{onSharePhoto ? copy.downloadPhoto : copy.savePhoto}</span>
                     </button>
                 </div>
             )}
@@ -94,7 +94,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             {imageObject && (
                 <div className="w-full bg-cream p-5 rounded-2xl border border-ink/10 backdrop-blur-xl space-y-5 animate-in slide-in-from-bottom-4 duration-500">
                     <div className="flex justify-between items-center px-1">
-                        <h4 className="text-sm font-semibold text-muted">Adjust Base Image</h4>
+                        <h4 className="text-sm font-semibold text-muted">{copy.adjustPhoto}</h4>
                     </div>
 
                     {/* Magic Tools */}
@@ -109,7 +109,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                             ) : (
                                 <Sparkles size={16} className="text-brand-deep transition-colors" />
                             )}
-                            <span className="text-xs font-bold text-brand-deep">Magic remove background</span>
+                            <span className="text-xs font-bold text-brand-deep">{copy.magicRemove}</span>
                         </button>
                     )}
 
@@ -120,7 +120,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                             value={scale}
                             onChange={(e) => setScale(parseFloat(e.target.value))}
                             className="flex-1 h-1.5 bg-paper2 rounded-lg appearance-none cursor-pointer accent-brand"
-                            aria-label="Zoom level"
+                            aria-label={copy.zoomLevel}
                         />
                         <ZoomIn size={16} className="text-muted" />
                     </div>
@@ -132,17 +132,17 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                             value={rotation}
                             onChange={(e) => setRotation(parseInt(e.target.value))}
                             className="flex-1 h-1.5 bg-paper2 rounded-lg appearance-none cursor-pointer accent-brand"
-                            aria-label="Rotation angle"
+                            aria-label={copy.rotationAngle}
                         />
                         <span className="text-[10px] w-8 text-right font-mono text-muted">{rotation}&deg;</span>
                     </div>
 
                     <div className="flex gap-2 pt-3 border-t border-ink/10 justify-between">
-                        <button onClick={onAutoFit} className="flex items-center gap-2 px-3 py-2 hover:bg-cream rounded-lg text-xs font-bold text-muted hover:text-ink transition-colors bg-cream border border-transparent hover:border-ink/10">
-                            <Maximize size={14} /> <span>Fit to Frame</span>
+                        <button onClick={onAutoFit} className="min-h-11 flex items-center gap-2 px-3 py-2 hover:bg-cream rounded-lg text-xs font-bold text-muted hover:text-ink transition-colors bg-cream border border-transparent hover:border-ink/10">
+                            <Maximize size={14} /> <span>{copy.fitToFrame}</span>
                         </button>
-                        <button onClick={onReset} className="flex items-center gap-2 px-3 py-2 hover:bg-cream rounded-lg text-xs font-bold text-muted hover:text-ink transition-colors bg-cream border border-transparent hover:border-ink/10">
-                            <RefreshCcw size={14} /> <span>Reset All</span>
+                        <button onClick={onReset} className="min-h-11 flex items-center gap-2 px-3 py-2 hover:bg-cream rounded-lg text-xs font-bold text-muted hover:text-ink transition-colors bg-cream border border-transparent hover:border-ink/10">
+                            <RefreshCcw size={14} /> <span>{copy.resetAll}</span>
                         </button>
                     </div>
                 </div>

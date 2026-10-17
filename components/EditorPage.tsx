@@ -389,7 +389,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             />
 
             <footer className="hidden lg:block py-12 text-center text-muted text-sm border-t border-ink/10 bg-paper">
-                <p>&copy; {new Date().getFullYear()} Ollabs. Bring your people together.</p>
+                <p>&copy; {new Date().getFullYear()} Ollabs. {t.tagline}</p>
             </footer>
         </div>
     );

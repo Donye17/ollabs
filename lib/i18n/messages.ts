@@ -161,6 +161,21 @@ export type Messages = {
         stepSend: string;
         tryPhotoOptional: string;
         changePreviewPhoto: string;
+        adjustPhoto: string;
+        magicRemove: string;
+        zoomLevel: string;
+        rotationAngle: string;
+        fitToFrame: string;
+        resetAll: string;
+        saveOrShare: string;
+        downloadPhoto: string;
+        savePhoto: string;
+        uploadPhoto: string;
+        changePhoto: string;
+        dragZoom: string;
+        uploadFrameBelow: string;
+        tapToAdd: string;
+        tagline: string;
     };
     publish: {
         createTitle: string;
@@ -662,6 +677,21 @@ const en: Messages = {
         stepSend: 'Send',
         tryPhotoOptional: 'Try with a photo (optional)',
         changePreviewPhoto: 'Change preview photo',
+        adjustPhoto: 'Adjust photo',
+        magicRemove: 'Magic remove background',
+        zoomLevel: 'Zoom level',
+        rotationAngle: 'Rotation angle',
+        fitToFrame: 'Fit to frame',
+        resetAll: 'Reset',
+        saveOrShare: 'Save or share photo',
+        downloadPhoto: 'Download',
+        savePhoto: 'Save',
+        uploadPhoto: 'Upload photo',
+        changePhoto: 'Change photo',
+        dragZoom: 'Drag to move. Scroll or pinch to zoom.',
+        uploadFrameBelow: 'Upload your frame below',
+        tapToAdd: 'Tap to add a photo',
+        tagline: 'Bring your people together.',
     },
     publish: {
         createTitle: 'Name it',
@@ -1017,6 +1047,21 @@ const pt: Messages = {
         stepSend: 'Enviar',
         tryPhotoOptional: 'Testar com uma foto (opcional)',
         changePreviewPhoto: 'Trocar foto de preview',
+        adjustPhoto: 'Ajustar a foto',
+        magicRemove: 'Remover o fundo',
+        zoomLevel: 'Zoom',
+        rotationAngle: 'Rotação',
+        fitToFrame: 'Encaixar na moldura',
+        resetAll: 'Redefinir',
+        saveOrShare: 'Salvar ou compartilhar',
+        downloadPhoto: 'Baixar',
+        savePhoto: 'Salvar',
+        uploadPhoto: 'Enviar foto',
+        changePhoto: 'Trocar foto',
+        dragZoom: 'Arraste para mover. Role ou belisque para ampliar.',
+        uploadFrameBelow: 'Envie a moldura abaixo',
+        tapToAdd: 'Toque para adicionar uma foto',
+        tagline: 'Junte a sua gente.',
     },
     publish: {
         createTitle: 'Dê um nome',
@@ -1373,6 +1418,21 @@ const id: Messages = {
         stepSend: 'Kirim',
         tryPhotoOptional: 'Coba dengan foto (opsional)',
         changePreviewPhoto: 'Ganti foto pratinjau',
+        adjustPhoto: 'Sesuaikan foto',
+        magicRemove: 'Hapus latar',
+        zoomLevel: 'Zoom',
+        rotationAngle: 'Rotasi',
+        fitToFrame: 'Sesuaikan ke bingkai',
+        resetAll: 'Atur ulang',
+        saveOrShare: 'Simpan atau bagikan',
+        downloadPhoto: 'Unduh',
+        savePhoto: 'Simpan',
+        uploadPhoto: 'Unggah foto',
+        changePhoto: 'Ganti foto',
+        dragZoom: 'Seret untuk memindahkan. Gulir atau cubit untuk zoom.',
+        uploadFrameBelow: 'Unggah bingkai di bawah',
+        tapToAdd: 'Ketuk untuk menambah foto',
+        tagline: 'Kumpulkan orang-orangmu.',
     },
     publish: {
         createTitle: 'Beri nama',
