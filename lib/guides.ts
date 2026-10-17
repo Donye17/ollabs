@@ -155,7 +155,7 @@ export const GUIDES: Guide[] = [
                 screenshot:
                     'the create Frame step with the large upload zone and a transparent PNG sitting in the circle preview',
                 paragraphs: [
-                    'Go to Create. You do not need an account to publish. The builder is three steps: Frame, Name, Send. Artwork is the product. Colour rings are a collapsed fallback if you have no file yet.',
+                    'Go to Create. You do not need an account to publish. The builder is three steps: Frame, Name, Send. Artwork is the product. If you have no file yet, open No design? Start here and pick a colour ring.',
                     'Upload a square PNG with transparency. The on-page tip is blunt: PNG with transparency works best. A JPEG of a logo, a screenshot of a badge, or a photo of a jersey usually looks muddy at avatar size. If the crest is unreadable at WhatsApp avatar size, the frame is not done.',
                     'The drop zone is large on purpose. The old small circle made upload feel optional. This is the whole first step. You can change the frame image later without starting over. The live preview stays visible while you work, including on a phone. Do not design in a separate tab and hope.',
                     'A square logo or round badge works. Ollabs keeps the outer design and opens a window in the center for each supporter\'s photo. You can also upload a full designed ring that already has a transparent hole. Both are valid. What does not work is a busy rectangle of slogan, date, hashtag, URL, and logo with no empty middle.',
@@ -177,7 +177,7 @@ export const GUIDES: Guide[] = [
                 paragraphs: [
                     'If the upload looks solid in the center, Create shows a coral warning: this image looks opaque in the center. Use a PNG with a transparent hole for the photo, or open the photo window with the slider below. The site does not block you. The warning is there because organizers often expect a designed hole and uploaded a flattened badge instead.',
                     'Two honest fixes. Re-export the file with a transparent middle, or use the slider to cut a circle so the photo shows through. A transparent border around an otherwise solid square is not a hole. The check looks at the center disc, where the face sits.',
-                    'A colour ring from Simple styles is the right fallback when you have no art yet. Pick a ring, name the campaign, send. You can Change the frame from manage later without losing the link or the supporter count. That is better than delaying the first WhatsApp send for a designer who is not in the chat.',
+                    'A colour ring under No design? Start here is the right start when you have no art yet. Pick a ring, name the campaign, send. You can Change the frame from manage later without losing the link or the supporter count. That is better than delaying the first WhatsApp send for a designer who is not in the chat.',
                     'Premade rings are not the product. They exist so a teacher or a captain can publish tonight. If you have a crest, use the PNG. If you only have a hex colour in your head, use the ring and ship.',
                     'You can change the frame after people have joined. Manage has Change the frame. It reopens Create against the live campaign. The URL, the count, and old shares stay. Do not publish a second campaign to "fix the art." The people who already joined will not find the second link.',
                 ],
@@ -220,7 +220,7 @@ export const GUIDES: Guide[] = [
             },
             {
                 q: 'Where do colour rings fit?',
-                a: 'Simple styles are a fallback when you have no artwork yet. Custom PNG is the main path. You can replace a ring later from manage.',
+                a: 'No design? Start here is for when you have no artwork yet. Custom PNG is the main path. You can replace a ring later from manage.',
             },
         ],
         cta: { href: '/create', label: 'Create a campaign' },
@@ -419,7 +419,7 @@ export const GUIDES: Guide[] = [
                     'the frame builder with a transparent PNG loaded, showing the center window for the face',
                 paragraphs: [
                     'Most first frames try to carry a slogan, a date, a logo, a hashtag, and a website in the ring. The window for the face shrinks to a postage stamp. Supporters cannot see themselves, so they do not save the file, so they do not send it on.',
-                    'Create is three steps: Frame, Name, Send. You can upload a square PNG with transparency and a hole in the middle, or pick a colour ring if you do not have art yet. Premade rings are a fallback. The live preview stays on screen while you drag the window. Leave the centre empty on purpose.',
+                    'Create is three steps: Frame, Name, Send. You can upload a square PNG with transparency and a hole in the middle, or pick a colour ring if you do not have art yet. The live preview stays on screen while you drag the window. Leave the centre empty on purpose.',
                     'One short line of type is enough: the series title, the team name, the colour of the month. A QR code does not belong in the artwork. Every campaign already has a downloadable QR on the campaign page, for print and for a screen at the door.',
                     'If you have a crest or a logo, export it as a transparent PNG. Photographing a jersey, a poster, or a phone screenshot of a logo usually looks muddy at the size of a WhatsApp avatar. If the badge is unreadable there, the frame is not done.',
                     'Name the campaign something a supporter will recognize in a chat preview. The title is what WhatsApp shows next to the link. A private joke that only the committee understands will look like spam to the aunt who actually posts. Category and goal are optional. They do not replace a clear title.',

@@ -70,6 +70,8 @@ const ES: DeepPartial<Messages> = {
         pngTip: 'PNG con transparencia funciona mejor',
         opaqueFrameWarning:
             'Esta imagen se ve opaca en el centro. Usa un PNG con un hueco transparente para la foto, o abre la ventana con el control de abajo.',
+        simpleStyles: '¿Sin diseño? Empieza aquí',
+        simpleStylesHint: '¿Aún sin arte? Elige un anillo de color para empezar.',
         createCampaign: 'Crear campaña',
         nextNameIt: 'Continuar',
         stepFrame: 'Marco',
@@ -135,6 +137,8 @@ const TL: DeepPartial<Messages> = {
         pngTip: 'PNG na may transparency ang pinakamaganda',
         opaqueFrameWarning:
             'Mukhang opaque ang gitna ng image. Gumamit ng PNG na may transparent hole para sa photo, o buksan ang photo window sa slider sa baba.',
+        simpleStyles: 'Walang design? Magsimula dito',
+        simpleStylesHint: 'Wala pang artwork? Pumili ng colour ring para magsimula.',
         createCampaign: 'Gumawa ng campaign',
         nextNameIt: 'Magpatuloy',
         stepFrame: 'Frame',

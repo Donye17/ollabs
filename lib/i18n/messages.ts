@@ -125,7 +125,6 @@ export type Messages = {
         photoWindowStepHint: string;
         addText: string;
         optional: string;
-        fallback: string;
         uploadFrame: string;
         changeFrame: string;
         uploading: string;
@@ -491,7 +490,6 @@ const en: Messages = {
         photoWindowStepHint: 'Left = more frame. Right = more photo.',
         addText: 'Add text',
         optional: 'optional',
-        fallback: 'fallback',
         uploadFrame: 'Upload logo or frame',
         changeFrame: 'Change frame image',
         uploading: 'Uploading…',
@@ -503,7 +501,7 @@ const en: Messages = {
             'Cut a circle so the photo shows through. Left = more frame, right = more photo. Set to 0 if your PNG already has a transparent center.',
         tipLogo:
             "A square logo or round badge works great. Ollabs keeps the outer design and opens a window in the center for each supporter's photo.",
-        simpleStyles: 'Simple styles',
+        simpleStyles: 'No design? Start here',
         simpleStylesHint: 'No artwork yet? Pick a colour ring to start.',
         fineTune: 'Fine tune colours',
         previewContacts: 'Preview in contacts',
@@ -714,7 +712,6 @@ const pt: Messages = {
         photoWindowStepHint: 'Esquerda = mais moldura. Direita = mais foto.',
         addText: 'Adicionar texto',
         optional: 'opcional',
-        fallback: 'alternativa',
         uploadFrame: 'Enviar logo ou moldura',
         changeFrame: 'Trocar imagem da moldura',
         uploading: 'Enviando…',
@@ -726,7 +723,7 @@ const pt: Messages = {
             'Abra um círculo para a foto aparecer. Esquerda = mais moldura, direita = mais foto. Use 0 se o PNG já tiver o centro transparente.',
         tipLogo:
             'Um logo quadrado ou emblema redondo funciona bem. O Ollabs mantém o desenho de fora e abre uma janela no centro para a foto de cada pessoa.',
-        simpleStyles: 'Estilos simples',
+        simpleStyles: 'Sem arte? Comece aqui',
         simpleStylesHint: 'Ainda sem arte? Escolha um anel de cor para começar.',
         fineTune: 'Ajustar cores',
         previewContacts: 'Prévia nos contatos',
@@ -938,7 +935,6 @@ const id: Messages = {
         photoWindowStepHint: 'Kiri = lebih banyak bingkai. Kanan = lebih banyak foto.',
         addText: 'Tambah teks',
         optional: 'opsional',
-        fallback: 'cadangan',
         uploadFrame: 'Unggah logo atau bingkai',
         changeFrame: 'Ganti gambar bingkai',
         uploading: 'Mengunggah…',
@@ -950,7 +946,7 @@ const id: Messages = {
             'Potong lingkaran supaya fotonya terlihat. Kiri = lebih banyak bingkai, kanan = lebih banyak foto. Setel 0 jika PNG-mu sudah transparan di tengah.',
         tipLogo:
             'Logo persegi atau lencana bulat cocok. Ollabs menjaga desain luar dan membuka jendela di tengah untuk foto setiap pendukung.',
-        simpleStyles: 'Gaya sederhana',
+        simpleStyles: 'Belum ada desain? Mulai di sini',
         simpleStylesHint: 'Belum ada desain? Pilih cincin warna untuk mulai.',
         fineTune: 'Sesuaikan warna',
         previewContacts: 'Pratinjau di kontak',

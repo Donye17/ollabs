@@ -27,6 +27,14 @@ export interface EditTarget {
 export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const { messages } = useLocale();
     const t = messages.create;
+    // First visit shows the colour rings. A later collapse sticks, so someone
+    // who already has a PNG is not asked again on the next visit.
+    const [simpleStylesOpen, setSimpleStylesOpen] = useState(true);
+    useEffect(() => {
+        try {
+            if (localStorage.getItem('ollabs_simple_styles_open') === '0') setSimpleStylesOpen(false);
+        } catch { /* private mode keeps the first-visit default */ }
+    }, []);
     // History State (Frame Config)
     const [history, setHistory] = useState<FrameConfig[]>([DEFAULT_FRAME]);
     const [historyIndex, setHistoryIndex] = useState<number>(0);
@@ -320,10 +328,17 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             {imageSrc ? t.changePreviewPhoto : t.tryPhotoOptional}
                         </label>
 
-                        <details className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden">
-                            <summary className="flex items-center cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden">
-                                <span className="flex-1">{t.simpleStyles}</span>
-                                <span className="text-[11px] font-semibold text-muted normal-case tracking-normal mr-2">{t.fallback}</span>
+                        <details
+                            open={simpleStylesOpen}
+                            onToggle={(e) => {
+                                const open = e.currentTarget.open;
+                                setSimpleStylesOpen(open);
+                                try { localStorage.setItem('ollabs_simple_styles_open', open ? '1' : '0'); } catch { /* ignore */ }
+                            }}
+                            className="group bg-cream border border-ink/10 rounded-2xl overflow-hidden"
+                        >
+                            <summary className="flex items-center cursor-pointer list-none px-5 py-4 text-sm font-bold text-ink hover:bg-ink/5 transition-colors [&::-webkit-details-marker]:hidden min-h-[44px]">
+                                <span className="flex-1 text-left">{t.simpleStyles}</span>
                                 <ChevronDown size={18} className="text-muted transition-transform group-open:rotate-180 shrink-0" />
                             </summary>
                             <div className="px-5 pb-5 space-y-3 border-t border-ink/10 pt-4">
