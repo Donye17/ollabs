@@ -19,7 +19,7 @@ import { InAppRescueBar } from '@/components/campaign/InAppRescueBar';
 import { ProfileSetHint } from '@/components/campaign/ProfileSetHint';
 import { FormatCards, type ExportFormat } from '@/components/campaign/FormatCards';
 import { arrivalPlatform, detectInAppBrowser, INAPP_RECOVERY_KEY, sessionFlag, setSessionFlag } from '@/lib/inAppBrowser';
-import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles, ArrowRight } from 'lucide-react';
+import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles } from 'lucide-react';
 
 const CANVAS = 1024;
 
@@ -37,7 +37,7 @@ interface CampaignClientProps {
 export const CampaignClient: React.FC<CampaignClientProps> = ({
     slug, title, description, initialCount, goal, frame, campaignCountry,
 }) => {
-    const { locale: browserLocale } = useLocale();
+    const { locale: browserLocale, setLocale } = useLocale();
     // Country (or untagged → pt) wins over the browser so WhatsApp's English
     // UA cannot put a Brazilian supporter back on English copy.
     const locale = resolveSupporterLocale({
@@ -570,6 +570,8 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                     className={`rounded-full touch-none frame-shadow ${
                         exportFormat === 'story' && (hasImage || justDownloaded)
                             ? 'w-full h-auto aspect-square cursor-grab active:cursor-grabbing'
+                            : justDownloaded
+                            ? 'w-[min(52vw,28dvh)] h-[min(52vw,28dvh)] max-w-[200px] max-h-[200px]'
                             : hasImage
                             ? 'w-[min(88vw,58dvh)] h-[min(88vw,58dvh)] max-w-[400px] max-h-[400px] cursor-grab active:cursor-grabbing'
                             : 'w-[min(82vw,52dvh)] h-[min(82vw,52dvh)] max-w-[320px] max-h-[320px] cursor-pointer'
@@ -691,6 +693,17 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             </button>
                         )}
 
+                        <a
+                            href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_page')}
+                            onClick={() => {
+                                setLocale(locale);
+                                track('create_from_campaign', { campaign: slug, from: 'post_save' });
+                            }}
+                            className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border-2 border-ink/20 bg-paper text-ink hover:bg-ink/5 active:bg-ink/10 transition-colors"
+                        >
+                            {t.makeOwn}
+                        </a>
+
                         {exportFormat === 'square' && (
                         <button
                             onClick={handleShareStory}
@@ -774,13 +787,6 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                 <Sparkles size={17} className="text-brand-deep" /> {t.wantOwn}
                             </p>
                             <p className="text-sm text-ink/70 leading-relaxed px-1">{t.wantOwnBody}</p>
-                            <a
-                                href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_page')}
-                                onClick={() => track('create_from_campaign', { campaign: slug })}
-                                className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-ink text-paper hover:brightness-125 active:brightness-110 transition-all"
-                            >
-                                {t.makeOwn} <ArrowRight size={17} />
-                            </a>
                             <a
                                 href={withUtm('/hub', 'campaign_post_save')}
                                 onClick={() => track('hub_from_campaign', { campaign: slug })}

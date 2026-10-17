@@ -671,7 +671,7 @@ const pt: Messages = {
         wantOwn: 'Quer uma moldura sua?',
         wantOwnBody:
             'Faça uma moldura para o seu time, escola ou campanha. É grátis, e você ganha um link igual a este para enviar.',
-        makeOwn: 'Criar minha moldura',
+        makeOwn: 'Crie sua própria moldura',
         makeOwnFooter: 'Crie a sua no Ollabs',
         setupHub: 'Configure seu hub de campanhas',
         report: 'Denunciar esta campanha',
