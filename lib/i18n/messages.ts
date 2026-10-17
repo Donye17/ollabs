@@ -350,6 +350,12 @@ export type Messages = {
         browseUses: string;
         startOwn: string;
     };
+    meta: {
+        manage: string;
+        hub: string;
+        signIn: string;
+        recover: string;
+    };
     landingPt: LandingCopy;
     landingId: LandingCopy;
     landingTl: LandingCopy;
@@ -874,6 +880,12 @@ const en: Messages = {
         browseUses: 'Browse use cases',
         startOwn: 'Start your own campaign',
     },
+    meta: {
+        manage: 'Manage campaign',
+        hub: 'Your hub',
+        signIn: 'Organizer sign in',
+        recover: 'Find my campaigns',
+    },
     landingPt,
     landingId,
     landingTl,
@@ -1245,6 +1257,12 @@ const pt: Messages = {
         browseUses: 'Ver para quem é',
         startOwn: 'Criar sua campanha',
     },
+    meta: {
+        manage: 'Gerenciar campanha',
+        hub: 'Seu hub',
+        signIn: 'Entrar com um código',
+        recover: 'Achar minhas campanhas',
+    },
     landingPt,
     landingId,
     landingTl,
@@ -1615,6 +1633,12 @@ const id: Messages = {
         create: 'Buat kampanye',
         browseUses: 'Lihat contoh',
         startOwn: 'Buat kampanyemu',
+    },
+    meta: {
+        manage: 'Kelola kampanye',
+        hub: 'Hub kamu',
+        signIn: 'Masuk dengan kode',
+        recover: 'Cari kampanyeku',
     },
     landingPt,
     landingId,

@@ -4,12 +4,16 @@ import { Suspense } from 'react';
 import { NavBar } from '@/components/NavBar';
 import { LoginClient } from '@/components/auth/LoginClient';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
+import { requestMessages } from '@/lib/i18n/requestLocale';
 
-export const metadata: Metadata = {
-    title: 'Organizer sign in',
-    description: 'Sign in with a code to reach your Ollabs campaign dashboards from any device.',
-    robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const { messages } = await requestMessages();
+    return {
+        title: messages.meta.signIn,
+        description: 'Sign in with a code to reach your Ollabs campaign dashboards from any device.',
+        robots: { index: false, follow: false },
+    };
+}
 
 export default function LoginPage() {
     return (

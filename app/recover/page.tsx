@@ -3,12 +3,16 @@ import Link from 'next/link';
 import { NavBar } from '@/components/NavBar';
 import { RecoverClient } from '@/components/RecoverClient';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
+import { requestMessages } from '@/lib/i18n/requestLocale';
 
-export const metadata: Metadata = {
-    title: 'Find my campaigns',
-    description: 'Lost the link to your Ollabs campaign dashboard? Enter your email and we will send it back to you.',
-    robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const { messages } = await requestMessages();
+    return {
+        title: messages.meta.recover,
+        description: 'Lost the link to your Ollabs campaign dashboard? Enter your email and we will send it back to you.',
+        robots: { index: false, follow: false },
+    };
+}
 
 export default function RecoverPage() {
     return (

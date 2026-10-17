@@ -2,12 +2,16 @@ import type { Metadata } from 'next';
 import { NavBar } from '@/components/NavBar';
 import { MyCampaignsClient } from '@/components/MyCampaignsClient';
 import { MineFooter, MineIntro } from '@/components/MineIntro';
+import { requestMessages } from '@/lib/i18n/requestLocale';
 
-export const metadata: Metadata = {
-    title: 'My campaigns',
-    description: 'Your Ollabs campaigns and quick links back to their dashboards.',
-    robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const { messages } = await requestMessages();
+    return {
+        title: messages.mine.title,
+        description: 'Your Ollabs campaigns and quick links back to their dashboards.',
+        robots: { index: false, follow: false },
+    };
+}
 
 export default function MinePage() {
     return (

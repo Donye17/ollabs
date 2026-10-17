@@ -1,12 +1,16 @@
 import type { Metadata } from 'next';
 import { NavBar } from '@/components/NavBar';
 import { HubEditorClient } from '@/components/hub/HubEditorClient';
+import { requestMessages } from '@/lib/i18n/requestLocale';
 
-export const metadata: Metadata = {
-    title: 'Your hub',
-    description: 'Claim your Ollabs hub: a campaign directory with a Join button to your frame.',
-    robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const { messages } = await requestMessages();
+    return {
+        title: messages.meta.hub,
+        description: 'Claim your Ollabs hub: a campaign directory with a Join button to your frame.',
+        robots: { index: false, follow: false },
+    };
+}
 
 export default function HubEditPage() {
     return (

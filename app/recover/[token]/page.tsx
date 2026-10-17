@@ -4,13 +4,17 @@ import { pool } from '@/lib/neon';
 import { NavBar } from '@/components/NavBar';
 import { BarChart3, ExternalLink, AlertCircle } from 'lucide-react';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
+import { requestMessages } from '@/lib/i18n/requestLocale';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-    title: 'Your campaigns',
-    robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+    const { messages } = await requestMessages();
+    return {
+        title: messages.mine.title,
+        robots: { index: false, follow: false },
+    };
+}
 
 type Row = {
     slug: string;

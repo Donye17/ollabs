@@ -234,6 +234,12 @@ const ES: DeepPartial<Messages> = {
         browseUses: 'Ver para quién es',
         startOwn: 'Crea tu campaña',
     },
+    meta: {
+        manage: 'Gestionar campaña',
+        hub: 'Tu hub',
+        signIn: 'Entrar con un código',
+        recover: 'Encontrar mis campañas',
+    },
     footer: {
         guides: 'Guías',
         about: 'Acerca de',
@@ -450,6 +456,12 @@ const TL: DeepPartial<Messages> = {
         create: 'Gumawa ng campaign',
         browseUses: 'Tingnan ang mga halimbawa',
         startOwn: 'Gumawa ng campaign mo',
+    },
+    meta: {
+        manage: 'I-manage ang campaign',
+        hub: 'Hub mo',
+        signIn: 'Mag-sign in gamit ang code',
+        recover: 'Hanapin ang mga campaign ko',
     },
     footer: {
         guides: 'Mga gabay',
