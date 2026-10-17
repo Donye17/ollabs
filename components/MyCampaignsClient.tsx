@@ -11,6 +11,7 @@ import { CampaignGridThumb } from '@/components/CampaignGridThumb';
 import { hasVisibleFrame } from '@/lib/frameValidity';
 import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 import type { FrameConfig } from '@/lib/types';
+import { useLocale } from '@/components/i18n/LocaleProvider';
 
 interface SavedCampaign {
     slug: string;
@@ -250,20 +251,7 @@ export const MyCampaignsClient: React.FC = () => {
             )}
 
             {nothingAnywhere ? (
-                <div className="border border-ink/10 rounded-2xl p-10 text-center bg-cream">
-                    <Inbox className="w-8 h-8 text-muted mx-auto mb-3" />
-                    <p className="font-display font-bold text-lg mb-1">
-                        {signedIn ? 'No campaigns on this account yet' : 'No campaigns yet on this device'}
-                    </p>
-                    <p className="text-sm text-ink/70 mb-6">
-                        {signedIn
-                            ? 'Create a frame, then share the link on WhatsApp in the first hour. That is when most campaigns get their first supporter.'
-                            : 'Create a frame in this browser, then send the link on WhatsApp right away. Campaigns that are not shared in the first hour almost never take off.'}
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <Link href="/create" className="inline-flex min-h-[48px] px-6 rounded-xl bg-ink text-paper text-[15px] font-semibold items-center hover:bg-ink/90 transition-colors">Create a campaign</Link>
-                    </div>
-                </div>
+                <EmptyMine signedIn={signedIn} />
             ) : (
                 <div className="divide-y divide-ink/10 border-y border-ink/10">
                     {accountRows.map((c) => (
@@ -296,14 +284,7 @@ export const MyCampaignsClient: React.FC = () => {
                     <div className="flex items-start gap-3">
                         <LogIn size={18} className="text-brand-deep mt-0.5 shrink-0" />
                         <div className="min-w-0">
-                            <p className="font-display font-bold mb-1">Already have an account?</p>
-                            <p className="text-sm text-ink/70 mb-4">
-                                Sign in with a code and every campaign you saved to it shows up here, on any device.
-                                New campaigns join your account as you create them. Supporters never sign in.
-                            </p>
-                            <Link href="/login" className={`inline-flex items-center justify-center gap-2 px-5 ${ORGANIZER_PRIMARY_BTN}`}>
-                                Sign in with a code
-                            </Link>
+                            <AccountPrompt />
                         </div>
                     </div>
                 </div>
@@ -420,3 +401,34 @@ const CampaignRow: React.FC<{ row: Row; onRemove?: () => void }> = ({ row, onRem
         </div>
     );
 };
+
+function AccountPrompt() {
+    const t = useLocale().messages.mine;
+    return (
+        <>
+            <p className="font-display font-bold mb-1">{t.haveAccount}</p>
+            <p className="text-sm text-ink/70 mb-4">{t.haveAccountBody}</p>
+            <Link href="/login" className={`inline-flex items-center justify-center gap-2 px-5 ${ORGANIZER_PRIMARY_BTN}`}>
+                {t.signInCode}
+            </Link>
+        </>
+    );
+}
+
+function EmptyMine({ signedIn }: { signedIn: boolean }) {
+    const t = useLocale().messages.mine;
+    return (
+        <div className="border border-ink/10 rounded-2xl p-10 text-center bg-cream">
+            <Inbox className="w-8 h-8 text-muted mx-auto mb-3" />
+            <p className="font-display font-bold text-lg mb-1">
+                {signedIn ? t.emptyAccount : t.emptyDevice}
+            </p>
+            <p className="text-sm text-ink/70 mb-6">
+                {signedIn ? t.emptyAccountBody : t.emptyDeviceBody}
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Link href="/create" className="inline-flex min-h-[48px] px-6 rounded-xl bg-ink text-paper text-[15px] font-semibold items-center hover:bg-ink/90 transition-colors">{t.create}</Link>
+            </div>
+        </div>
+    );
+}

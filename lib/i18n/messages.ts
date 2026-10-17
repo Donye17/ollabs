@@ -205,6 +205,22 @@ export type Messages = {
         saved: string;
         createCampaign: string;
     };
+    mine: {
+        title: string;
+        lede: string;
+        emptyAccount: string;
+        emptyDevice: string;
+        emptyAccountBody: string;
+        emptyDeviceBody: string;
+        create: string;
+        whatsNew: string;
+        otherDevice: string;
+        signInCode: string;
+        or: string;
+        recoveryEmail: string;
+        haveAccount: string;
+        haveAccountBody: string;
+    };
     landingPt: LandingCopy;
     landingId: LandingCopy;
     landingTl: LandingCopy;
@@ -584,6 +600,22 @@ const en: Messages = {
         saved: 'Saved. Go set it as your profile picture.',
         createCampaign: 'Create a campaign',
     },
+    mine: {
+        title: 'My campaigns',
+        lede: 'Your campaigns, and quick links back to each dashboard.',
+        emptyAccount: 'No campaigns on this account yet',
+        emptyDevice: 'No campaigns yet on this device',
+        emptyAccountBody: 'Create a frame, then share the link on WhatsApp in the first hour. That is when most campaigns get their first supporter.',
+        emptyDeviceBody: 'Create a frame in this browser, then send the link on WhatsApp right away. Campaigns that are not shared in the first hour almost never take off.',
+        create: 'Create a campaign',
+        whatsNew: "What's new",
+        otherDevice: 'Made a campaign on another device?',
+        signInCode: 'Sign in with a code',
+        or: 'or',
+        recoveryEmail: 'get a recovery link by email',
+        haveAccount: 'Already have an account?',
+        haveAccountBody: 'Sign in with a code and every campaign you saved to it shows up here, on any device. New campaigns join your account as you create them. Supporters never sign in.',
+    },
     landingPt,
     landingId,
     landingTl,
@@ -810,6 +842,22 @@ const pt: Messages = {
         saved: 'Salvo. Agora use como foto de perfil.',
         createCampaign: 'Criar uma campanha',
     },
+    mine: {
+        title: 'Minhas campanhas',
+        lede: 'Suas campanhas, e atalhos para cada painel.',
+        emptyAccount: 'Nenhuma campanha nesta conta ainda',
+        emptyDevice: 'Nenhuma campanha neste aparelho ainda',
+        emptyAccountBody: 'Crie uma moldura e compartilhe o link no WhatsApp na primeira hora. É quando a maioria das campanhas ganha o primeiro apoiador.',
+        emptyDeviceBody: 'Crie uma moldura neste navegador e envie o link no WhatsApp agora. Campanha que não é compartilhada na primeira hora quase nunca decola.',
+        create: 'Criar campanha',
+        whatsNew: 'Novidades',
+        otherDevice: 'Fez uma campanha em outro aparelho?',
+        signInCode: 'Entrar com um código',
+        or: 'ou',
+        recoveryEmail: 'receber um link de recuperação por e-mail',
+        haveAccount: 'Já tem uma conta?',
+        haveAccountBody: 'Entre com um código e todas as campanhas salvas nela aparecem aqui, em qualquer aparelho. Campanhas novas entram na sua conta quando você cria. Quem apoia nunca entra.',
+    },
     landingPt,
     landingId,
     landingTl,
@@ -1035,6 +1083,22 @@ const id: Messages = {
         download: 'Unduh',
         saved: 'Tersimpan. Pasang sebagai foto profilmu.',
         createCampaign: 'Buat kampanye',
+    },
+    mine: {
+        title: 'Kampanye saya',
+        lede: 'Kampanyemu, dan jalan cepat kembali ke setiap dasbor.',
+        emptyAccount: 'Belum ada kampanye di akun ini',
+        emptyDevice: 'Belum ada kampanye di perangkat ini',
+        emptyAccountBody: 'Buat bingkai, lalu bagikan link di WhatsApp pada jam pertama. Saat itulah sebagian besar kampanye mendapat pendukung pertama.',
+        emptyDeviceBody: 'Buat bingkai di browser ini, lalu kirim link di WhatsApp sekarang. Kampanye yang tidak dibagikan pada jam pertama hampir tidak pernah jalan.',
+        create: 'Buat kampanye',
+        whatsNew: 'Yang baru',
+        otherDevice: 'Buat kampanye di perangkat lain?',
+        signInCode: 'Masuk dengan kode',
+        or: 'atau',
+        recoveryEmail: 'dapatkan link pemulihan lewat email',
+        haveAccount: 'Sudah punya akun?',
+        haveAccountBody: 'Masuk dengan kode dan setiap kampanye yang kamu simpan muncul di sini, di perangkat mana saja. Kampanye baru masuk ke akunmu saat kamu membuatnya. Pendukung tidak pernah masuk.',
     },
     landingPt,
     landingId,

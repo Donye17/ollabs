@@ -96,6 +96,22 @@ const ES: DeepPartial<Messages> = {
         shareHubWhatsApp: 'Compartir hub en WhatsApp',
         createButton: 'Crear campaña',
     },
+    mine: {
+        title: 'Mis campañas',
+        lede: 'Tus campañas, y atajos a cada panel.',
+        emptyAccount: 'Aún no hay campañas en esta cuenta',
+        emptyDevice: 'Aún no hay campañas en este dispositivo',
+        emptyAccountBody: 'Crea un marco y comparte el enlace en WhatsApp en la primera hora. Ahí es cuando la mayoría recibe a su primer apoyo.',
+        emptyDeviceBody: 'Crea un marco en este navegador y envía el enlace en WhatsApp ahora. Una campaña que no se comparte en la primera hora casi nunca arranca.',
+        create: 'Crear campaña',
+        whatsNew: 'Novedades',
+        otherDevice: '¿Hiciste una campaña en otro dispositivo?',
+        signInCode: 'Entrar con un código',
+        or: 'o',
+        recoveryEmail: 'recibir un enlace de recuperación por correo',
+        haveAccount: '¿Ya tienes una cuenta?',
+        haveAccountBody: 'Entra con un código y cada campaña que guardaste aparece aquí, en cualquier dispositivo. Las campañas nuevas se unen a tu cuenta al crearlas. Quien apoya nunca entra.',
+    },
 };
 
 const TL: DeepPartial<Messages> = {
@@ -165,6 +181,22 @@ const TL: DeepPartial<Messages> = {
         openHub: 'Buksan ang hub mo',
         shareHubWhatsApp: 'I-share ang hub sa WhatsApp',
         createButton: 'Gumawa ng campaign',
+    },
+    mine: {
+        title: 'Mga campaign ko',
+        lede: 'Mga campaign mo, at mabilis na balik sa bawat dashboard.',
+        emptyAccount: 'Wala pang campaign sa account na ito',
+        emptyDevice: 'Wala pang campaign sa device na ito',
+        emptyAccountBody: 'Gumawa ng frame, tapos i-share ang link sa WhatsApp sa unang oras. Doon karaniwang dumarating ang unang supporter.',
+        emptyDeviceBody: 'Gumawa ng frame sa browser na ito, tapos ipadala ang link sa WhatsApp ngayon. Ang campaign na hindi na-share sa unang oras ay halos hindi na umaandar.',
+        create: 'Gumawa ng campaign',
+        whatsNew: 'Ano ang bago',
+        otherDevice: 'May campaign ka sa ibang device?',
+        signInCode: 'Mag-sign in gamit ang code',
+        or: 'o',
+        recoveryEmail: 'kumuha ng recovery link sa email',
+        haveAccount: 'May account ka na?',
+        haveAccountBody: 'Mag-sign in gamit ang code at lalabas dito ang bawat campaign na na-save mo, sa anumang device. Ang bagong campaign ay sumasali sa account mo habang ginagawa mo. Ang supporter ay hindi nag-sign in.',
     },
 };
 
