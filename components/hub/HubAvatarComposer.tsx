@@ -180,7 +180,7 @@ export function HubAvatarComposer({ open, campaigns, onClose, onDone }: Props) {
         drag.current.active = false;
     };
 
-    const usePhoto = async () => {
+    const applyPhoto = async () => {
         const canvas = canvasRef.current;
         if (!canvas || !hasImage || !frame) return;
         setBusy(true);
@@ -346,7 +346,7 @@ export function HubAvatarComposer({ open, campaigns, onClose, onDone }: Props) {
                         </button>
                         <button
                             type="button"
-                            onClick={() => void usePhoto()}
+                            onClick={() => void applyPhoto()}
                             disabled={!hasImage || !frame || busy || campaigns.length === 0}
                             className={`w-full flex items-center justify-center gap-2 px-4 ${ORGANIZER_PRIMARY_BTN}`}
                         >

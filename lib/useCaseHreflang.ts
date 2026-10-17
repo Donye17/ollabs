@@ -18,7 +18,7 @@ const EN_TO_PT: Record<string, string> = Object.fromEntries(
 );
 
 /** Builds the hreflang cluster for a use-case page. English and Portuguese only. */
-export function useCaseLanguageAlternates(enSlug: string): Record<string, string> {
+export function caseLanguageAlternates(enSlug: string): Record<string, string> {
     const englishUrl = `${BASE_URL}/for/${enSlug}`;
     const languages: Record<string, string> = {
         en: englishUrl,

@@ -19,7 +19,7 @@ export default function TermsOfService() {
                 <div className="space-y-8 text-ink/75 leading-relaxed">
                     <section>
                         <h2 className="font-display text-xl font-bold text-ink mb-2">1. Acceptance of terms</h2>
-                        <p>By accessing or using Ollabs (the "Service"), you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the Service.</p>
+                        <p>By accessing or using Ollabs (the Service), you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the Service.</p>
                     </section>
 
                     <section>

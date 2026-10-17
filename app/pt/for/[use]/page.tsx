@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { UseCasePageShell } from '@/components/seo/UseCasePageShell';
 import { USE_CASES_PT, getUseCasePt } from '@/lib/useCasesPt';
-import { englishSlugFromPt, useCaseLanguageAlternates } from '@/lib/useCaseHreflang';
+import { englishSlugFromPt, caseLanguageAlternates } from '@/lib/useCaseHreflang';
 import { getSeoExampleCampaign, USE_CASE_CATEGORY } from '@/lib/seoExampleCampaign';
 
 export const revalidate = 86400;
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ use: stri
         title,
         description,
         keywords: [uc.keyword, 'moldura foto perfil', 'twibbon grátis', 'alternativa twibbonize'],
-        alternates: { canonical: url, languages: useCaseLanguageAlternates(enSlug) },
+        alternates: { canonical: url, languages: caseLanguageAlternates(enSlug) },
         openGraph: { type: 'website', url, title, description, siteName: 'Ollabs', locale: 'pt_BR', images: ['/og.png'] },
     };
 }

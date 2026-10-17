@@ -11,12 +11,16 @@ type TabType = 'apple' | 'social' | 'chat';
 type SocialApp = 'instagram' | 'twitter' | 'linkedin';
 type ChatApp = 'whatsapp' | 'telegram' | 'slack';
 
-export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) => {
-    const [activeTab, setActiveTab] = useState<TabType>('apple');
-    const [socialApp, setSocialApp] = useState<SocialApp>('instagram');
-    const [chatApp, setChatApp] = useState<ChatApp>('whatsapp');
-
-    const Avatar = ({ size = "w-16 h-16", className = "" }: { size?: string, className?: string }) => (
+function PreviewAvatar({
+    previewSrc,
+    size = 'w-16 h-16',
+    className = '',
+}: {
+    previewSrc: string | null;
+    size?: string;
+    className?: string;
+}) {
+    return (
         <div className={`${size} rounded-full bg-cream shrink-0 overflow-hidden relative ${className}`}>
             {previewSrc ? (
                 <img src={previewSrc} alt="Preview" className="w-full h-full object-cover" />
@@ -27,6 +31,12 @@ export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) =>
             )}
         </div>
     );
+}
+
+export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) => {
+    const [activeTab, setActiveTab] = useState<TabType>('apple');
+    const [socialApp, setSocialApp] = useState<SocialApp>('instagram');
+    const [chatApp, setChatApp] = useState<ChatApp>('whatsapp');
 
     return (
         <div className="space-y-6">
@@ -75,7 +85,7 @@ export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) =>
 
                             <div className="flex flex-col items-center">
                                 <div className="w-32 h-32 rounded-full shadow-2xl mb-4 bg-cream relative ring-1 ring-ink/10">
-                                    <Avatar size="w-32 h-32" />
+                                    <PreviewAvatar previewSrc={previewSrc} size="w-32 h-32" />
                                 </div>
 
                                 <h3 className="text-2xl font-semibold text-ink mb-1 tracking-tight">Jane Doe</h3>
@@ -103,7 +113,7 @@ export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) =>
                         {/* iOS List View */}
                         <div className="bg-white rounded-xl overflow-hidden max-w-sm mx-auto shadow-lg border border-ink/10">
                             <div className="p-3 flex items-center gap-3 border-b border-ink/10">
-                                <Avatar size="w-10 h-10" />
+                                <PreviewAvatar previewSrc={previewSrc} size="w-10 h-10" />
                                 <div className="flex-1 min-w-0">
                                     <h4 className="text-ink font-semibold text-sm truncate">Jane Doe</h4>
                                 </div>
@@ -152,7 +162,7 @@ export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) =>
                                 <div className="flex items-center gap-6 mb-4">
                                     <div className="relative">
                                         <div className="absolute -inset-1 bg-gradient-to-tr from-yellow-400 to-fuchsia-600 rounded-full p-[2px]"></div>
-                                        <Avatar size="w-20 h-20" className="border-4 border-ink relative z-10" />
+                                        <PreviewAvatar previewSrc={previewSrc} size="w-20 h-20" className="border-4 border-ink relative z-10" />
                                     </div>
                                     <div className="flex gap-4 text-center">
                                         <div><div className="font-bold text-sm">1.2k</div><div className="text-[10px] opacity-70">Posts</div></div>
@@ -172,7 +182,7 @@ export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) =>
                             <div className="bg-paper rounded-xl border border-ink/10 overflow-hidden text-ink shadow-xl">
                                 <div className="h-20 bg-cream relative">
                                     <div className="absolute bottom-[-24px] left-4 rounded-full p-1 bg-paper">
-                                        <Avatar size="w-16 h-16" />
+                                        <PreviewAvatar previewSrc={previewSrc} size="w-16 h-16" />
                                     </div>
                                 </div>
                                 <div className="pt-8 px-4 pb-4">
@@ -196,7 +206,7 @@ export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) =>
                             <div className="bg-cream rounded-xl border border-ink/10 overflow-hidden text-ink shadow-xl">
                                 <div className="h-16 bg-gradient-to-r from-brand-deep to-indigo-800 relative">
                                     <div className="absolute bottom-[-32px] left-4 p-1 bg-cream rounded-full">
-                                        <Avatar size="w-20 h-20" />
+                                        <PreviewAvatar previewSrc={previewSrc} size="w-20 h-20" />
                                     </div>
                                 </div>
                                 <div className="pt-10 px-4 pb-4">
@@ -247,7 +257,7 @@ export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) =>
                                 </div>
                                 <div className="p-2">
                                     <div className="flex items-center gap-3 p-2 hover:bg-cream rounded-lg transition-colors cursor-default">
-                                        <Avatar size="w-12 h-12" />
+                                        <PreviewAvatar previewSrc={previewSrc} size="w-12 h-12" />
                                         <div className="flex-1 border-b border-ink/10 pb-3 mb-[-12px]">
                                             <div className="flex justify-between items-center mb-0.5">
                                                 <h4 className="font-semibold text-ink text-sm">Jane Doe</h4>
@@ -282,7 +292,7 @@ export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) =>
                                 </div>
                                 <div className="p-2">
                                     <div className="flex items-center gap-3 p-2 rounded-lg bg-brand/10 border border-brand/20">
-                                        <Avatar size="w-12 h-12" />
+                                        <PreviewAvatar previewSrc={previewSrc} size="w-12 h-12" />
                                         <div className="flex-1">
                                             <div className="flex justify-between items-center mb-0.5">
                                                 <h4 className="font-semibold text-ink text-sm">Jane Doe</h4>
@@ -303,7 +313,7 @@ export const ContactPreview: React.FC<ContactPreviewProps> = ({ previewSrc }) =>
                                     <span className="text-xs font-bold uppercase tracking-wide">design-team</span>
                                 </div>
                                 <div className="flex gap-3">
-                                    <Avatar size="w-9 h-9" className="rounded-md" />
+                                    <PreviewAvatar previewSrc={previewSrc} size="w-9 h-9" className="rounded-md" />
                                     <div>
                                         <div className="flex items-baseline gap-2 mb-0.5">
                                             <span className="text-ink font-bold text-sm">Jane Doe</span>

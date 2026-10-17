@@ -4,7 +4,7 @@ import { USE_CASES_PT } from '@/lib/useCasesPt';
 import { GUIDES } from '@/lib/guides';
 import {
     englishSlugFromPt,
-    useCaseLanguageAlternates,
+    caseLanguageAlternates,
 } from '@/lib/useCaseHreflang';
 import { DAYS } from '@/lib/days';
 
@@ -55,14 +55,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             lastModified: new Date(),
             changeFrequency: 'monthly' as const,
             priority: 0.8,
-            alternates: { languages: useCaseLanguageAlternates(u.slug) },
+            alternates: { languages: caseLanguageAlternates(u.slug) },
         })),
         ...USE_CASES_PT.map((u) => ({
             url: `${baseUrl}/pt/for/${u.slug}`,
             lastModified: new Date(),
             changeFrequency: 'monthly' as const,
             priority: 0.82,
-            alternates: { languages: useCaseLanguageAlternates(englishSlugFromPt(u.slug)) },
+            alternates: { languages: caseLanguageAlternates(englishSlugFromPt(u.slug)) },
         })),
         { url: `${baseUrl}/day`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
         ...DAYS.map((d) => ({
