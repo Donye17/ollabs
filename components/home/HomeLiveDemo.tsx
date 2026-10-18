@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { HeroFrameFan } from '@/components/home/HeroFrameFan';
 import { track } from '@/lib/analytics';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 
@@ -18,7 +19,7 @@ function slugify(name: string, fallback: string): string {
 
 /**
  * Variant A, tool first. Type a name, watch the /c/ slug become yours.
- * Neutral silhouette, not a real supporter photo.
+ * The fan above the caption uses hero photos only, never a supporter upload.
  */
 export function HomeLiveDemo() {
     const { messages } = useLocale();
@@ -31,22 +32,7 @@ export function HomeLiveDemo() {
 
     return (
         <div className="w-full">
-            <div
-                role="img"
-                aria-label={t.exampleAlt}
-                className="mx-auto rounded-full bg-brand p-[7px] frame-shadow"
-                style={{ width: 150, height: 150 }}
-            >
-                <div className="w-full h-full rounded-full bg-cream overflow-hidden grid place-items-center" aria-hidden>
-                    <svg
-                        viewBox="0 0 24 24"
-                        className="w-[78%] h-[78%] mt-[14%] fill-muted"
-                    >
-                        <circle cx="12" cy="8" r="4.2" />
-                        <path d="M3.5 24c0-4.7 3.8-8.5 8.5-8.5s8.5 3.8 8.5 8.5z" />
-                    </svg>
-                </div>
-            </div>
+            <HeroFrameFan label={t.exampleAlt} emptyLabel={t.fanEmptyAlt} />
 
             <p className="mt-3 text-center font-mono text-xs text-muted truncate">
                 ollabs.studio/c/<span className="text-ink font-semibold">{slug}</span>

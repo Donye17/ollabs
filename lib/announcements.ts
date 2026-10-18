@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-18-hero-fan',
+        date: '2026-10-18',
+        title: 'The homepage hero is a fan of frames',
+        summary: 'Three campaign frames, and one photo changes at a time.',
+        items: [
+            'The gray silhouette on the homepage is a fan of three framed photos.',
+            'One photo crossfades every few seconds. The other two stay put.',
+        ],
+    },
+    {
         id: '2026-10-17-pt-headline',
         date: '2026-10-17',
         title: 'Portuguese homepage says Reúna sua galera',

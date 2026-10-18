@@ -41,6 +41,7 @@ export type Messages = {
         create: string;
         free: string;
         exampleAlt: string;
+        fanEmptyAlt: string;
         slugFallback: string;
         topCampaigns: string;
         topCampaignsBody: string;
@@ -564,7 +565,8 @@ const en: Messages = {
         namePlaceholder: 'Your cause, team, or candidate',
         create: 'Create a campaign',
         free: 'Free. No account.',
-        exampleAlt: 'Example profile photo with a frame',
+        exampleAlt: 'Three profile photos, each in a different campaign frame',
+        fanEmptyAlt: 'Three campaign frames',
         slugFallback: 'your-campaign',
         topCampaigns: 'Top campaigns',
         topCampaignsBody: 'Real frames people are using right now, ranked by supporters.',
@@ -947,7 +949,8 @@ const pt: Messages = {
         namePlaceholder: 'Sua causa, time ou candidato',
         create: 'Criar campanha',
         free: 'Grátis. Sem conta.',
-        exampleAlt: 'Exemplo de foto de perfil com moldura',
+        exampleAlt: 'Três fotos de perfil, cada uma em uma moldura diferente',
+        fanEmptyAlt: 'Três molduras de campanha',
         slugFallback: 'sua-campanha',
         topCampaigns: 'Campanhas em alta',
         topCampaignsBody: 'Molduras que as pessoas estão usando agora, por número de apoiadores.',
@@ -1332,7 +1335,8 @@ const id: Messages = {
         namePlaceholder: 'Your cause, team, or candidate',
         create: 'Create a campaign',
         free: 'Free. No account.',
-        exampleAlt: 'Example profile photo with a frame',
+        exampleAlt: 'Tiga foto profil, masing-masing dengan bingkai yang berbeda',
+        fanEmptyAlt: 'Tiga bingkai kampanye',
         slugFallback: 'your-campaign',
         topCampaigns: 'Top campaigns',
         topCampaignsBody: 'Real frames people are using right now, ranked by supporters.',
