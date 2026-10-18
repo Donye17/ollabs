@@ -102,6 +102,7 @@ const ES: DeepPartial<Messages> = {
         uploadFrameBelow: 'Sube tu marco abajo',
         tapToAdd: 'Toca para añadir una foto',
         tagline: 'Reúne a tu gente.',
+        remixNote: 'Marco nuevo. El arte de la otra campaña se queda allí.',
     },
     publish: {
         createTitle: 'Nombrar y enviar',
@@ -191,6 +192,8 @@ const ES: DeepPartial<Messages> = {
         details: 'Detalles de la campaña',
         title: 'Título',
         description: 'Descripción',
+        caption: 'Leyenda que pegan los apoyos',
+        captionHint: 'Opcional. Déjalo en blanco para la frase estándar. El enlace de la campaña siempre va en la primera línea.',
         goal: 'Meta de apoyos',
         noGoal: 'Sin meta',
         category: 'Categoría',
@@ -327,6 +330,7 @@ const TL: DeepPartial<Messages> = {
         uploadFrameBelow: 'I-upload ang frame sa baba',
         tapToAdd: 'I-tap para magdagdag ng photo',
         tagline: 'Tipunin ang mga tao mo.',
+        remixNote: 'Bagong frame. Ang artwork ng ibang campaign ay nananatili doon.',
     },
     publish: {
         createTitle: 'Pangalanan at ipadala',
@@ -416,6 +420,8 @@ const TL: DeepPartial<Messages> = {
         details: 'Detalye ng campaign',
         title: 'Pamagat',
         description: 'Deskripsyon',
+        caption: 'Caption na ipe-paste ng supporters',
+        captionHint: 'Opsyonal. Iwanang blangko para sa karaniwang linya. Ang link ng campaign ay laging nasa unang linya.',
         goal: 'Target na supporters',
         noGoal: 'Walang target',
         category: 'Kategorya',

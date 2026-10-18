@@ -27,6 +27,7 @@ interface CampaignClientProps {
     slug: string;
     title: string;
     description?: string | null;
+    organizerCaption?: string | null;
     creatorName?: string | null;
     initialCount: number;
     goal?: number | null;
@@ -35,7 +36,7 @@ interface CampaignClientProps {
 }
 
 export const CampaignClient: React.FC<CampaignClientProps> = ({
-    slug, title, description, initialCount, goal, frame, campaignCountry,
+    slug, title, description, organizerCaption, initialCount, goal, frame, campaignCountry,
 }) => {
     const { locale: browserLocale, setLocale } = useLocale();
     // Country (or untagged → pt) wins over the browser so WhatsApp's English
@@ -156,7 +157,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     // Spanish and Tagalog share copy is browser-detected until those languages
     // have full client UI dictionaries.
     const shareText = (source: string) =>
-        supporterShareText(title, withUtm(shareUrl(), source), locale === 'en' ? undefined : locale);
+        supporterShareText(title, withUtm(shareUrl(), source), locale === 'en' ? undefined : locale, organizerCaption);
 
     const noteCaption = (text: string, captionCopied: boolean) => {
         setShareCaption(text);

@@ -11,6 +11,8 @@ export const campaigns = pgTable("campaigns", {
 	slug: text().notNull(),
 	title: text().notNull(),
 	description: text(),
+	// Optional second line of the supporter paste. Null keeps the standard sentence.
+	shareCaption: text("share_caption"),
 	frameConfig: jsonb("frame_config").notNull(),
 	// Set to organizers.id (as text) when the creator is signed in or later
 	// claims the campaign. Still nullable for anonymous publishes.

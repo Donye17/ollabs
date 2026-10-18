@@ -30,6 +30,15 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     // First visit shows the colour rings. A later collapse sticks, so someone
     // who already has a PNG is not asked again on the next visit.
     const [simpleStylesOpen, setSimpleStylesOpen] = useState(true);
+    // Arriving from a campaign (?from=) starts a blank frame on purpose.
+    // Copying that artwork would republish someone else's design.
+    const [fromCampaign, setFromCampaign] = useState(false);
+    useEffect(() => {
+        try {
+            const from = new URLSearchParams(window.location.search).get('from');
+            setFromCampaign(Boolean(from && from.trim()));
+        } catch { /* ignore */ }
+    }, []);
     useEffect(() => {
         try {
             if (localStorage.getItem('ollabs_simple_styles_open') === '0') setSimpleStylesOpen(false);
@@ -276,6 +285,9 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
                             <li aria-hidden className="text-ink/25">·</li>
                             <li>{t.stepSend}</li>
                         </ol>
+                        {fromCampaign && (
+                            <p className="mt-2 max-w-sm text-center text-xs text-muted">{t.remixNote}</p>
+                        )}
 
                         {notice && (
                             <div role="alert" className="mt-3 p-3 bg-coral/10 rounded-xl border border-coral/30 text-sm text-ink/80 max-w-md w-full flex gap-2 items-start animate-fade-in">

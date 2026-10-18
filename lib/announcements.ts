@@ -17,6 +17,17 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-17-share-line',
+        date: '2026-10-17',
+        title: 'The share line leads with the link',
+        summary: 'Supporters paste a message that starts with the campaign URL. Organizers can write the second line.',
+        items: [
+            'The pasted caption starts with the campaign link, then one line that ends with (via Ollabs).',
+            'On Manage, an optional caption replaces only that second line. Blank keeps the standard sentence.',
+            'Campaigns with supporters show the count in a sentence above the photo button.',
+        ],
+    },
+    {
         id: '2026-08-30-home-tool',
         date: '2026-08-30',
         title: 'Homepage is the tool now',

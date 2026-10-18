@@ -79,7 +79,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         const { owned, mintSession } = resolved;
 
         const result = await pool.query(
-            `SELECT id, slug, title, description, frame_config, supporter_count, view_count, goal, category, preview_url, is_public, created_at
+            `SELECT id, slug, title, description, share_caption, frame_config, supporter_count, view_count, goal, category, preview_url, is_public, created_at
              FROM campaigns
              WHERE id = $1
              LIMIT 1`,
@@ -154,6 +154,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         if (typeof body.description === 'string') {
             sets.push(`description = $${i++}`);
             values.push(body.description.trim().slice(0, 400) || null);
+        }
+        if (typeof body.shareCaption === 'string') {
+            const caption = body.shareCaption.replace(/\s+/g, ' ').trim().slice(0, 180);
+            sets.push(`share_caption = $${i++}`);
+            values.push(caption || null);
         }
         if ('goal' in body) {
             let goalValue: number | null = null;

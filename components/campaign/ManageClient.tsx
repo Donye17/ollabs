@@ -61,6 +61,7 @@ interface ManageData {
     slug: string;
     title: string;
     description: string | null;
+    share_caption: string | null;
     supporter_count: number;
     view_count: number;
     goal: number | null;
@@ -83,6 +84,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     // edit fields
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [shareCaption, setShareCaption] = useState('');
     const [goalInput, setGoalInput] = useState('');
     const [categoryInput, setCategoryInput] = useState('');
     const [slugInput, setSlugInput] = useState('');
@@ -120,6 +122,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                 setCurrentSlug(d.slug);
                 setTitle(d.title);
                 setDescription(d.description || '');
+                setShareCaption(d.share_caption || '');
                 setGoalInput(d.goal != null ? String(d.goal) : '');
                 setCategoryInput(d.category || '');
                 setSlugInput(d.slug);
@@ -150,7 +153,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
         setSaving(true);
         setSaveMsg(null);
         setSaveErr(null);
-        const payload: Record<string, string> = { title, description, goal: goalInput, category: categoryInput };
+        const payload: Record<string, string> = { title, description, shareCaption, goal: goalInput, category: categoryInput };
         if (token) payload.token = token;
         if (slugInput && slugInput !== currentSlug) payload.slug = slugInput;
         try {
@@ -415,6 +418,14 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                 <label className="text-xs font-semibold text-ink/70">{t.description}</label>
                                 <textarea value={description} onChange={(e) => setDescription(e.target.value)}
                                     className="w-full bg-cream border border-ink/10 rounded-xl px-3 py-2.5 text-ink focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all min-h-[70px] resize-none" />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-ink/70" htmlFor="share-caption">{t.caption}</label>
+                                <textarea id="share-caption" value={shareCaption} onChange={(e) => setShareCaption(e.target.value)}
+                                    maxLength={180}
+                                    placeholder={t.captionHint}
+                                    className="w-full bg-cream border border-ink/10 rounded-xl px-3 py-2.5 text-ink placeholder-muted focus:ring-2 focus:ring-brand/50 focus:border-brand outline-none transition-all min-h-[70px] resize-none" />
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">

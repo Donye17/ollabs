@@ -72,24 +72,37 @@ export function organizerShareText(title: string, locale?: Locale | 'es' | 'tl' 
 /**
  * What a supporter sends after adding the frame to their own photo.
  *
- * The PNG has no watermark on purpose, so this sentence is the only
- * attribution that travels with the picture. The campaign URL has to live
- * inside the text: several share targets drop a separate `url` field, and
- * WhatsApp drops text entirely when the payload is a file.
+ * The PNG has no watermark, so this text is the only attribution. The URL is
+ * its own first line: WhatsApp can preview a bare link, and a file share often
+ * drops the caption, so the sentence has to be pasted as a second message.
+ * An organizer caption replaces only the second line. The link stays first,
+ * and "(via Ollabs)" stays unless they already wrote it.
  */
 export function supporterShareText(
     title: string,
     url: string,
     locale?: Locale | 'es' | 'tl' | null,
+    caption?: string | null,
 ): string {
     const name = title.trim();
     const link = url.trim();
     const lang = shareLocale(locale);
-    if (lang === 'pt') return `Acabei de participar de ${name}, coloque a moldura na sua foto: ${link} (via Ollabs)`;
-    if (lang === 'id') return `Saya baru bergabung dengan ${name}, pasang bingkainya di fotomu: ${link} (via Ollabs)`;
-    if (lang === 'es') return `Acabo de unirme a ${name}, añade el marco a tu foto: ${link} (via Ollabs)`;
-    if (lang === 'tl') return `Kasasali ko lang sa ${name}, ilagay ang frame sa photo mo: ${link} (via Ollabs)`;
-    return `I just joined ${name}, add the frame to your photo: ${link} (via Ollabs)`;
+    const custom = (caption || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+    let line: string;
+    if (custom) {
+        line = /ollabs/i.test(custom) ? custom : `${custom} (via Ollabs)`;
+    } else if (lang === 'pt') {
+        line = `Acabei de participar de ${name}, coloque a moldura na sua foto (via Ollabs)`;
+    } else if (lang === 'id') {
+        line = `Saya baru bergabung dengan ${name}, pasang bingkainya di fotomu (via Ollabs)`;
+    } else if (lang === 'es') {
+        line = `Acabo de unirme a ${name}, añade el marco a tu foto (via Ollabs)`;
+    } else if (lang === 'tl') {
+        line = `Kasasali ko lang sa ${name}, ilagay ang frame sa photo mo (via Ollabs)`;
+    } else {
+        line = `I just joined ${name}, add the frame to your photo (via Ollabs)`;
+    }
+    return `${link}\n${line}`;
 }
 
 /**

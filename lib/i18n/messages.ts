@@ -178,6 +178,7 @@ export type Messages = {
         uploadFrameBelow: string;
         tapToAdd: string;
         tagline: string;
+        remixNote: string;
     };
     publish: {
         createTitle: string;
@@ -307,6 +308,8 @@ export type Messages = {
         details: string;
         title: string;
         description: string;
+        caption: string;
+        captionHint: string;
         goal: string;
         noGoal: string;
         category: string;
@@ -702,6 +705,7 @@ const en: Messages = {
         uploadFrameBelow: 'Upload your frame below',
         tapToAdd: 'Tap to add a photo',
         tagline: 'Bring your people together.',
+        remixNote: 'New frame. The other campaign keeps its artwork.',
     },
     publish: {
         createTitle: 'Name it',
@@ -839,6 +843,8 @@ const en: Messages = {
         details: 'Campaign details',
         title: 'Title',
         description: 'Description',
+        caption: 'Caption supporters paste',
+        captionHint: 'Optional. Leave blank for the standard line. The campaign link always stays on the first line.',
         goal: 'Supporter goal',
         noGoal: 'No goal',
         category: 'Category',
@@ -1080,6 +1086,7 @@ const pt: Messages = {
         uploadFrameBelow: 'Envie a moldura abaixo',
         tapToAdd: 'Toque para adicionar uma foto',
         tagline: 'Reúna sua galera.',
+        remixNote: 'Moldura nova. A arte da outra campanha continua com ela.',
     },
     publish: {
         createTitle: 'Dê um nome',
@@ -1218,6 +1225,8 @@ const pt: Messages = {
         details: 'Detalhes da campanha',
         title: 'Título',
         description: 'Descrição',
+        caption: 'Legenda que as pessoas colam',
+        captionHint: 'Opcional. Deixe em branco para a frase padrão. O link da campanha fica sempre na primeira linha.',
         goal: 'Meta de apoiadores',
         noGoal: 'Sem meta',
         category: 'Categoria',
@@ -1459,6 +1468,7 @@ const id: Messages = {
         uploadFrameBelow: 'Unggah bingkai di bawah',
         tapToAdd: 'Ketuk untuk menambah foto',
         tagline: 'Kumpulkan orang-orangmu.',
+        remixNote: 'Bingkai baru. Karya kampanye lain tetap di sana.',
     },
     publish: {
         createTitle: 'Beri nama',
@@ -1597,6 +1607,8 @@ const id: Messages = {
         details: 'Detail kampanye',
         title: 'Judul',
         description: 'Deskripsi',
+        caption: 'Keterangan yang ditempel pendukung',
+        captionHint: 'Opsional. Kosongkan untuk kalimat standar. Link kampanye selalu di baris pertama.',
         goal: 'Target pendukung',
         noGoal: 'Tanpa target',
         category: 'Kategori',
