@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-17-pt-headline',
+        date: '2026-10-17',
+        title: 'Portuguese homepage says Reúna sua galera',
+        summary: 'The headline matches the tagline, and the phone label follows the language you picked.',
+        items: [
+            'The Portuguese homepage headline is Reúna sua galera.',
+            'On a phone, Create, Mine, Manage, Sign in, and Recover use the language of the page.',
+        ],
+    },
+    {
         id: '2026-10-17-share-line',
         date: '2026-10-17',
         title: 'The share line leads with the link',

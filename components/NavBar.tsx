@@ -7,15 +7,16 @@ import { BrandMark } from '@/components/BrandMark';
 import { BackControl } from '@/components/BackControl';
 import { LocaleSwitch } from '@/components/i18n/LocaleSwitch';
 import { useLocale } from '@/components/i18n/LocaleProvider';
+import type { Messages } from '@/lib/i18n/messages';
 
 /** Short label so phones know where they are without reading the page H1. */
-function chromeTitle(pathname: string): string | null {
-    if (pathname === '/create' || pathname.startsWith('/create/')) return 'Create';
-    if (pathname === '/hub' || pathname.startsWith('/hub/')) return 'Hub';
-    if (pathname === '/mine' || pathname.startsWith('/mine/')) return 'Mine';
-    if (pathname.includes('/manage')) return 'Manage';
-    if (pathname === '/login' || pathname.startsWith('/login')) return 'Sign in';
-    if (pathname === '/recover' || pathname.startsWith('/recover')) return 'Recover';
+function chromeTitle(pathname: string, nav: Messages['nav']): string | null {
+    if (pathname === '/create' || pathname.startsWith('/create/')) return nav.tabCreate;
+    if (pathname === '/hub' || pathname.startsWith('/hub/')) return nav.tabHub;
+    if (pathname === '/mine' || pathname.startsWith('/mine/')) return nav.tabMine;
+    if (pathname.includes('/manage')) return nav.manage;
+    if (pathname === '/login' || pathname.startsWith('/login')) return nav.signIn;
+    if (pathname === '/recover' || pathname.startsWith('/recover')) return nav.recover;
     return null;
 }
 
@@ -47,7 +48,7 @@ export const NavBar: React.FC<NavBarProps> = ({ isHome = false }) => {
     const backFallback = backFallbackFor(pathname, onCreate);
     // On a forced-home document, never paint a chrome title from a stale
     // usePathname() during SSR (same ISR glitch as showBack).
-    const title = onHome ? null : chromeTitle(pathname);
+    const title = onHome ? null : chromeTitle(pathname, messages.nav);
 
     return (
         <nav className="fixed top-0 inset-x-0 z-50 border-b border-ink/10 bg-paper pt-[env(safe-area-inset-top,0px)]">

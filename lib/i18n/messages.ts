@@ -15,6 +15,9 @@ export type Messages = {
         tabMine: string;
         tabCreate: string;
         tabHub: string;
+        manage: string;
+        signIn: string;
+        recover: string;
         create: string;
         language: string;
         english: string;
@@ -398,7 +401,7 @@ const landingPt: LandingCopy = {
     description:
         'Crie uma moldura de foto de perfil para a sua causa, time ou evento. Compartilhe um link e as pessoas adicionam na foto em segundos. Grátis, sem cadastro, sem marca d\'água.',
     eyebrow: 'De collabs, para reunir pessoas',
-    headline: 'Reúna a sua',
+    headline: 'Reúna sua',
     headlineAccent: 'galera.',
     sub: 'Faça uma moldura de foto de perfil para a sua causa, campanha ou evento. Mande um link e todo mundo coloca na foto em segundos. Grátis, sem cadastro, sem marca d\'água.',
     cta: 'Criar uma campanha',
@@ -536,6 +539,9 @@ const en: Messages = {
         tabMine: 'Mine',
         tabCreate: 'Create',
         tabHub: 'Hub',
+        manage: 'Manage',
+        signIn: 'Sign in',
+        recover: 'Recover',
         create: 'Create a campaign',
         language: 'Language',
         english: 'EN',
@@ -916,6 +922,9 @@ const pt: Messages = {
         tabMine: 'Minhas',
         tabCreate: 'Criar',
         tabHub: 'Hub',
+        manage: 'Gerenciar',
+        signIn: 'Entrar',
+        recover: 'Recuperar',
         create: 'Criar campanha',
         language: 'Idioma',
         english: 'EN',
@@ -1298,6 +1307,9 @@ const id: Messages = {
         tabMine: 'Kampanye',
         tabCreate: 'Buat',
         tabHub: 'Hub',
+        manage: 'Kelola',
+        signIn: 'Masuk',
+        recover: 'Pulihkan',
         create: 'Create a campaign',
         language: 'Language',
         english: 'EN',

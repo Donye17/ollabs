@@ -33,6 +33,9 @@ const ES: DeepPartial<Messages> = {
         tabMine: 'Mías',
         tabCreate: 'Crear',
         tabHub: 'Hub',
+        manage: 'Gestionar',
+        signIn: 'Entrar',
+        recover: 'Recuperar',
     },
     campaign: {
         eyebrow: 'Campaña Ollabs',
@@ -261,6 +264,9 @@ const TL: DeepPartial<Messages> = {
         tabMine: 'Akin',
         tabCreate: 'Gawa',
         tabHub: 'Hub',
+        manage: 'Pamahalaan',
+        signIn: 'Pasok',
+        recover: 'Hanapin',
     },
     campaign: {
         eyebrow: 'Ollabs campaign',
