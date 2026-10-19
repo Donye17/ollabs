@@ -1,0 +1,23 @@
+# Ollabs
+
+> Free profile-picture frame campaigns. An organizer publishes one link. A supporter opens it, adds a photo, and saves a square PNG. No app, no account, and no watermark on the photo.
+
+Ollabs is for causes, teams, churches, schools, and events. The supporter page is the product. Ads are labelled and stay off the photo and off campaign pages.
+
+## Guides
+
+- [How to add a frame to a profile picture](https://ollabs.studio/guides/add-a-frame-to-a-profile-picture): Four steps for someone who received a campaign link. English.
+- [Como colocar uma moldura na foto de perfil](https://ollabs.studio/pt/guides/add-a-frame-to-a-profile-picture): The same steps in Portuguese.
+- [How to start a campaign](https://ollabs.studio/guides/start-a-campaign): For the organizer. Upload a frame, name it, publish, share in the first hour.
+
+## Comparisons
+
+- [Ollabs vs Twibbonize](https://ollabs.studio/vs/twibbonize): Who pays. Twibbonize can watermark the download. Ollabs does not charge supporters.
+- [Ollabs vs Twibbonize em português](https://ollabs.studio/pt/vs/twibbonize): The same comparison in Portuguese.
+
+## Optional
+
+- [Use cases](https://ollabs.studio/for): Churches, schools, teams, events, and other organizers.
+- [Casos de uso](https://ollabs.studio/pt/for): Portuguese use-case hub.
+- [Calendar](https://ollabs.studio/day): Profile frames for named days.
+- [Privacy](https://ollabs.studio/privacy): What is stored, and how advertising cookies work.

@@ -12,12 +12,26 @@ export type GuideSection = {
 
 export type GuideFaq = { q: string; a: string };
 
+export type GuideLocale = 'en' | 'pt';
+
+/** Translatable body. English lives on the guide itself. Portuguese is optional. */
+export type GuideCopy = {
+    title: string;
+    description: string;
+    subtitle: string;
+    sections: GuideSection[];
+    faqs: GuideFaq[];
+    cta: { href: string; label: string };
+};
+
 export type Guide = {
     slug: string;
     title: string;
     description: string;
     subtitle: string;
     author: { name: string; role: string };
+    /** Portuguese role, when the guide has a PT body. */
+    authorRolePt?: string;
     publishedAt: string;
     updatedAt?: string;
     readingMinutes: number;
@@ -25,6 +39,7 @@ export type Guide = {
     sections: GuideSection[];
     faqs: GuideFaq[];
     cta: { href: string; label: string };
+    pt?: GuideCopy;
 };
 
 const AUTHOR = { name: 'Donye', role: 'Founder of Ollabs' };
@@ -36,13 +51,36 @@ export function sectionAnchor(title: string): string {
         .replace(/^-+|-+$/g, '');
 }
 
-export function formatGuideDate(iso: string): string {
+export function formatGuideDate(iso: string, locale: GuideLocale = 'en'): string {
     const [y, m, d] = iso.split('-').map(Number);
-    const names = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December',
-    ];
+    const names = locale === 'pt'
+        ? [
+            'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+            'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+        ]
+        : [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December',
+        ];
+    if (locale === 'pt') return `${d} de ${names[(m || 1) - 1]} de ${y}`;
     return `${names[(m || 1) - 1]} ${d}, ${y}`;
+}
+
+export function guideCopy(guide: Guide, locale: GuideLocale): GuideCopy {
+    if (locale === 'pt' && guide.pt) return guide.pt;
+    return {
+        title: guide.title,
+        description: guide.description,
+        subtitle: guide.subtitle,
+        sections: guide.sections,
+        faqs: guide.faqs,
+        cta: guide.cta,
+    };
+}
+
+export function guidesInLocale(locale: GuideLocale): Guide[] {
+    if (locale === 'pt') return GUIDES.filter((g) => g.pt);
+    return GUIDES;
 }
 
 /** Newest first. Array order breaks ties, so keep new guides at the top of GUIDES. */
@@ -53,6 +91,163 @@ export function recentGuides(n = 3): Guide[] {
 }
 
 export const GUIDES: Guide[] = [
+    {
+        slug: 'add-a-frame-to-a-profile-picture',
+        title: 'How to add a frame to a profile picture',
+        description:
+            'Open the campaign link, fit your face in the window, and save a square PNG. No app, no account, and no watermark on the photo.',
+        subtitle:
+            'To add a frame to a profile picture, open the link someone sent you, choose a photo, drag until your face sits in the round window, then tap Share photo and Save Image. You do not install an app or create an account. The result is a square PNG you set as your profile picture in WhatsApp or Instagram.',
+        author: AUTHOR,
+        authorRolePt: 'Fundador da Ollabs',
+        publishedAt: '2026-10-19',
+        readingMinutes: 6,
+        sections: [
+            {
+                title: 'Add the frame to your photo',
+                steps: [
+                    {
+                        title: 'Open the link',
+                        body: 'The person running the campaign sends one address, usually in WhatsApp. It looks like ollabs.studio/c/your-campaign. Open it in the browser you already have. There is nothing to install.',
+                    },
+                    {
+                        title: 'Choose a photo and fit your face',
+                        body: 'Tap the circle and pick a photo, or drop a file on it. Drag to move. Use Size to zoom. The framed face stays on screen while you adjust, so you see the result before you save.',
+                    },
+                    {
+                        title: 'Save the picture',
+                        body: 'On a phone, tap Share photo. In the system sheet, tap Save Image. That writes the PNG into your camera roll. On a computer, Download is the button that should lead. iPhone browsers inside WhatsApp and Instagram ignore a plain download, which is why Share photo comes first there.',
+                    },
+                    {
+                        title: 'Set it as your profile picture',
+                        body: 'Open WhatsApp or Instagram, edit your profile photo, and choose the picture you just saved. Do not crop it again unless you have to. The campaign already fitted the face to the window.',
+                    },
+                ],
+            },
+            {
+                title: 'Make a frame for your group',
+                paragraphs: [
+                    'If you are the organizer, you publish the link before anyone else can use it. Go to Create, upload a square PNG with a transparent middle, or start from a color ring. Name the campaign, publish, and send the link to one group chat in the first hour. Most campaigns that get a supporter get that person within an hour of sharing.',
+                    'Supporters never make an account. They only need the link. A second campaign splits the count, so if a save fails, fix the save. Do not start over.',
+                ],
+            },
+            {
+                title: 'What the file should look like',
+                bullets: [
+                    'A square PNG. Profile photos are square, then the app crops them to a circle.',
+                    'Your face in the window, the campaign art around it. Text and logos belong on the rim, not over the face.',
+                    'No watermark and no payment screen on the download.',
+                    'A separate tall 9:16 file exists for a story. That one is not the profile picture. Save the square first.',
+                ],
+            },
+            {
+                title: 'When the phone will not save',
+                paragraphs: [
+                    'If the page says it could not save here, tap Open in Safari (or Chrome on Android), fit the face again, and use Share photo. The error sits next to the button. There is no popup to dismiss by accident.',
+                    'The longer version, including why Download fails inside WhatsApp on iPhone, is in the guide on saving a framed photo.',
+                ],
+            },
+        ],
+        faqs: [
+            {
+                q: 'How do I add a frame to my profile picture?',
+                a: 'Open the campaign link, add your photo, drag your face into the window, then tap Share photo and Save Image. Set that PNG as your profile photo in WhatsApp or Instagram.',
+            },
+            {
+                q: 'Do I need an app or an account?',
+                a: 'No. Supporters open the link in the browser and leave with a picture. An account is optional, and only for the person who wants their campaigns listed under My campaigns.',
+            },
+            {
+                q: 'Does my photo get uploaded?',
+                a: 'The framed picture is built in your browser. Ollabs does not keep a gallery of supporter faces from the save itself.',
+            },
+            {
+                q: 'Is there a watermark?',
+                a: 'No. The PNG you save is the photo and the frame. Ollabs does not charge supporters to remove a mark.',
+            },
+            {
+                q: 'How is this different from Twibbonize?',
+                a: 'Both put a frame on a profile photo from one link. Twibbonize can put a watermark on the download and charge to remove it. Ollabs does not. See the comparison for the rest, including where Twibbonize is the better pick.',
+            },
+        ],
+        cta: { href: '/create', label: 'Create a campaign' },
+        pt: {
+            title: 'Como colocar uma moldura na foto de perfil',
+            description:
+                'Abra o link da campanha, encaixe o rosto na janela e salve um PNG quadrado. Sem aplicativo, sem conta e sem marca d\'água na foto.',
+            subtitle:
+                'Para colocar uma moldura na foto de perfil, abra o link que alguém enviou, escolha uma foto, arraste até o rosto ficar na janela redonda e toque em Compartilhar foto e Salvar imagem. Não precisa instalar aplicativo nem criar conta. O resultado é um PNG quadrado para usar no WhatsApp ou no Instagram.',
+            sections: [
+                {
+                    title: 'Coloque a moldura na sua foto',
+                    steps: [
+                        {
+                            title: 'Abra o link',
+                            body: 'Quem organiza a campanha manda um endereço, em geral no WhatsApp. Ele tem a forma ollabs.studio/c/sua-campanha. Abra no navegador que você já tem. Não há nada para instalar.',
+                        },
+                        {
+                            title: 'Escolha a foto e encaixe o rosto',
+                            body: 'Toque no círculo e escolha uma foto, ou solte um arquivo nele. Arraste para mover. Use Tamanho para aproximar. O rosto com a moldura fica na tela enquanto você ajusta.',
+                        },
+                        {
+                            title: 'Salve a imagem',
+                            body: 'No celular, toque em Compartilhar foto. Na folha do sistema, toque em Salvar imagem. Isso grava o PNG no rolo da câmera. No computador, Baixar é o botão principal. No iPhone, o navegador de dentro do WhatsApp e do Instagram ignora um download comum, por isso Compartilhar foto vem primeiro.',
+                        },
+                        {
+                            title: 'Defina como foto de perfil',
+                            body: 'Abra o WhatsApp ou o Instagram, edite a foto do perfil e escolha a imagem que você acabou de salvar. Não recorte de novo, a menos que precise. A campanha já encaixou o rosto na janela.',
+                        },
+                    ],
+                },
+                {
+                    title: 'Faça uma moldura para o seu grupo',
+                    paragraphs: [
+                        'Se você organiza, publique o link antes de qualquer pessoa usar. Vá em Criar, envie um PNG quadrado com o meio transparente, ou comece por um anel de cor. Dê um nome, publique e mande o link para um grupo na primeira hora. A maior parte das campanhas que conseguem um apoiador recebe essa pessoa na primeira hora.',
+                        'Quem apoia não cria conta. Só precisa do link. Uma segunda campanha divide a contagem. Se o salvamento falhar, conserte o salvamento. Não comece outra.',
+                    ],
+                },
+                {
+                    title: 'Como o arquivo deve ficar',
+                    bullets: [
+                        'Um PNG quadrado. Foto de perfil é quadrada, e o aplicativo corta em círculo depois.',
+                        'O rosto na janela e a arte da campanha em volta. Texto e logo ficam na borda, não em cima do rosto.',
+                        'Sem marca d\'água e sem tela de pagamento no download.',
+                        'Existe um arquivo alto, 9:16, para story. Esse não é a foto de perfil. Salve o quadrado primeiro.',
+                    ],
+                },
+                {
+                    title: 'Quando o celular não salva',
+                    paragraphs: [
+                        'Se a página disser que não conseguiu salvar ali, toque em Abrir no Safari (ou no Chrome, no Android), encaixe o rosto de novo e use Compartilhar foto. O erro aparece ao lado do botão. Não há um alerta para dispensar sem ler.',
+                        'A versão longa, inclusive por que Baixar falha dentro do WhatsApp no iPhone, está no guia de salvar a foto com moldura.',
+                    ],
+                },
+            ],
+            faqs: [
+                {
+                    q: 'Como coloco uma moldura na minha foto de perfil?',
+                    a: 'Abra o link da campanha, adicione a sua foto, arraste o rosto para a janela e toque em Compartilhar foto e Salvar imagem. Defina esse PNG como foto de perfil no WhatsApp ou no Instagram.',
+                },
+                {
+                    q: 'Preciso de aplicativo ou de conta?',
+                    a: 'Não. Quem apoia abre o link no navegador e sai com a imagem. A conta é opcional, e só para quem quer ver as próprias campanhas em Minhas campanhas.',
+                },
+                {
+                    q: 'A minha foto é enviada para um servidor?',
+                    a: 'A imagem com moldura é montada no seu navegador. O Ollabs não guarda uma galeria de rostos a partir do salvamento.',
+                },
+                {
+                    q: 'Tem marca d\'água?',
+                    a: 'Não. O PNG que você salva é a foto e a moldura. O Ollabs não cobra o apoiador para tirar uma marca.',
+                },
+                {
+                    q: 'Qual a diferença para o Twibbonize?',
+                    a: 'Os dois colocam uma moldura na foto de perfil a partir de um link. O Twibbonize pode colocar uma marca d\'água no download e cobrar para remover. O Ollabs não faz isso. A comparação explica o resto, inclusive onde o Twibbonize é a melhor escolha.',
+                },
+            ],
+            cta: { href: '/create', label: 'Criar campanha' },
+        },
+    },
     {
         slug: 'save-framed-photo-on-iphone',
         title: 'How to save a framed photo on iPhone from WhatsApp or Instagram',

@@ -4,6 +4,10 @@ export type VsCopy = {
     eyebrow: string;
     h1: string;
     hero: string;
+    /** Optional how-to, shown under the hero. Both strings are required together. */
+    guideBefore?: string;
+    guideHref?: string;
+    guideLabel?: string;
     createCta: string;
     exploreCta: string;
     tableHeaderOllabs: string;
@@ -82,6 +86,9 @@ export const VS_PT: VsCopy = {
     eyebrow: 'Comparação',
     h1: 'Ollabs vs Twibbonize',
     hero: 'Os dois servem para campanha de moldura na foto de perfil. A diferença real é quem paga: no Twibbonize, quem apoia paga para remover a marca d\'água. No Ollabs, quem apoia nunca paga.',
+    guideBefore: 'Quem recebeu o link faz assim:',
+    guideHref: '/pt/guides/add-a-frame-to-a-profile-picture',
+    guideLabel: 'como colocar uma moldura na foto de perfil',
     createCta: 'Criar campanha grátis',
     exploreCta: 'Ver campanhas ao vivo',
     tableHeaderOllabs: 'Ollabs',

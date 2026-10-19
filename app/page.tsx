@@ -98,6 +98,7 @@ export default function Home() {
                                     <Link href="/guides" className="hover:text-brand-deep transition-colors">Guides</Link>
                                 </h5>
                                 <ul className="space-y-2 font-sans text-[15px] text-muted leading-relaxed">
+                                    <li><Link href="/guides/add-a-frame-to-a-profile-picture" className="hover:text-brand-deep transition-colors">Add a frame to a photo</Link></li>
                                     <li><Link href="/guides/run-a-campaign-people-join" className="hover:text-brand-deep transition-colors">Campaigns people join</Link></li>
                                     <li><Link href="/guides/start-a-campaign" className="hover:text-brand-deep transition-colors">Start a campaign</Link></li>
                                     <li><Link href="/guides/hub" className="hover:text-brand-deep transition-colors">What is a hub?</Link></li>

@@ -134,10 +134,20 @@ export default function VsTwibbonizePage() {
                     <h1 className="font-display text-4xl md:text-6xl font-extrabold leading-[1.03] mb-5">
                         Ollabs vs Twibbonize
                     </h1>
-                    <p className="text-lg md:text-xl text-ink/70 mb-8 max-w-2xl">
+                    <p className="text-lg md:text-xl text-ink/70 mb-4 max-w-2xl">
                         Both let you run a profile picture frame campaign. The difference that actually matters is
                         who ends up paying: Twibbonize charges your supporters to remove a watermark. Ollabs never
                         charges supporters, ever.
+                    </p>
+                    <p className="text-base text-ink/75 mb-8 max-w-2xl">
+                        If someone sent you a link,{' '}
+                        <Link
+                            href="/guides/add-a-frame-to-a-profile-picture"
+                            className="font-semibold text-brand-deep hover:underline"
+                        >
+                            add the frame to your profile picture
+                        </Link>
+                        {' '}in four steps.
                     </p>
                     <div className="flex flex-wrap items-center gap-3">
                         <Link

@@ -14,7 +14,9 @@ type Props = {
  * Keep lean: no second Product column.
  */
 export function SiteFooter({ className = '' }: Props) {
-    const t = useLocale().messages.footer;
+    const { locale, messages } = useLocale();
+    const t = messages.footer;
+    const guidesHref = locale === 'pt' ? '/pt/guides' : '/guides';
     return (
         <footer
             className={`border-t border-ink/10 bg-paper py-10 pb-[max(2.5rem,env(safe-area-inset-bottom))] ${className}`}
@@ -22,7 +24,7 @@ export function SiteFooter({ className = '' }: Props) {
             <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
                 <BrandMark href="/" size={24} />
                 <nav className="flex flex-wrap items-center justify-center gap-x-1 gap-y-1" aria-label={t.label}>
-                    <Link href="/guides" className="min-h-11 inline-flex items-center px-2 hover:text-brand-deep transition-colors">
+                    <Link href={guidesHref} className="min-h-11 inline-flex items-center px-2 hover:text-brand-deep transition-colors">
                         {t.guides}
                     </Link>
                     <span aria-hidden className="text-ink/20">

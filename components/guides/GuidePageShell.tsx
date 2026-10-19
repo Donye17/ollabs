@@ -7,14 +7,48 @@ import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import {
     GUIDES,
     formatGuideDate,
+    guideCopy,
     sectionAnchor,
     type Guide,
+    type GuideLocale,
     type GuideSection,
 } from '@/lib/guides';
 
 type Props = {
     guide: Guide;
+    locale?: GuideLocale;
 };
+
+const CHROME = {
+    en: {
+        kicker: 'Guide',
+        minRead: 'min read',
+        onThisPage: 'On this page',
+        tocLabel: 'On this page',
+        questions: 'Common questions',
+        explore: 'Explore campaigns',
+        more: 'More guides',
+        home: 'Home',
+        guides: 'Guides',
+        about: 'About',
+        contact: 'Contact',
+        useCases: 'Use cases',
+    },
+    pt: {
+        kicker: 'Guia',
+        minRead: 'min de leitura',
+        onThisPage: 'Nesta página',
+        tocLabel: 'Nesta página',
+        questions: 'Perguntas frequentes',
+        explore: 'Ver campanhas',
+        more: 'Mais guias',
+        home: 'Início',
+        guides: 'Guias',
+        about: 'Sobre',
+        contact: 'Contato',
+        useCases: 'Usos',
+    },
+} as const;
 
 function GuideImage({
     image,
@@ -84,22 +118,72 @@ function SectionBody({ section }: { section: GuideSection }) {
     );
 }
 
-export function GuidePageShell({ guide }: Props) {
+export function GuidePageShell({ guide, locale = 'en' }: Props) {
+    const copy = guideCopy(guide, locale);
+    const ui = CHROME[locale];
+    const pageUrl = locale === 'pt'
+        ? `https://ollabs.studio/pt/guides/${guide.slug}`
+        : `https://ollabs.studio/guides/${guide.slug}`;
+    const role = locale === 'pt' && guide.authorRolePt ? guide.authorRolePt : guide.author.role;
+
     const faqLd = {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
-        mainEntity: guide.faqs.map((f) => ({
+        mainEntity: copy.faqs.map((f) => ({
             '@type': 'Question',
             name: f.q,
             acceptedAnswer: { '@type': 'Answer', text: f.a },
         })),
     };
 
+    const steps = copy.sections.find((section) => section.steps)?.steps ?? [];
+    const howToLd = steps.length
+        ? {
+            '@context': 'https://schema.org',
+            '@type': 'HowTo',
+            name: copy.title,
+            description: copy.description,
+            inLanguage: locale === 'pt' ? 'pt-BR' : 'en',
+            step: steps.map((step, i) => ({
+                '@type': 'HowToStep',
+                position: i + 1,
+                name: step.title,
+                text: step.body,
+            })),
+        }
+        : null;
+
+    const crumbItems = [
+        {
+            name: ui.home,
+            path: locale === 'pt' ? '/pt' : '/',
+        },
+        {
+            name: ui.guides,
+            path: locale === 'pt' ? '/pt/guides' : '/guides',
+        },
+        {
+            name: copy.title,
+            path: locale === 'pt' ? `/pt/guides/${guide.slug}` : `/guides/${guide.slug}`,
+        },
+    ];
+    const breadcrumbLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: crumbItems.map((item, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            name: item.name,
+            item: `https://ollabs.studio${item.path}`,
+        })),
+    };
+
     const articleLd = {
         '@context': 'https://schema.org',
         '@type': 'Article',
-        headline: guide.title,
-        description: guide.description,
+        headline: copy.title,
+        description: copy.description,
+        inLanguage: locale === 'pt' ? 'pt-BR' : 'en',
         author: {
             '@type': 'Person',
             name: guide.author.name,
@@ -117,40 +201,55 @@ export function GuidePageShell({ guide }: Props) {
                 url: 'https://ollabs.studio/og.png',
             },
         },
-        mainEntityOfPage: `https://ollabs.studio/guides/${guide.slug}`,
+        mainEntityOfPage: pageUrl,
     };
 
-    const others = GUIDES.filter((g) => g.slug !== guide.slug);
-    const showToc = guide.sections.length >= 4;
-    const adAfter = Math.max(0, Math.floor((guide.sections.length - 1) / 2));
+    const others = GUIDES.filter((g) => g.slug !== guide.slug && (locale === 'en' || g.pt));
+    const showToc = copy.sections.length >= 4;
+    const adAfter = Math.max(0, Math.floor((copy.sections.length - 1) / 2));
 
     return (
         <div className="min-h-screen bg-paper text-ink font-sans">
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
+            {howToLd && (
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }} />
+            )}
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
             <NavBar />
             <main className={`max-w-3xl mx-auto px-4 sm:px-6 ${PAGE_TOP_UNDER_NAV} pb-[max(4rem,env(safe-area-inset-bottom))]`}>
-                <p className="text-sm font-semibold text-muted mb-2">Guide</p>
-                <h1 className="font-display text-3xl sm:text-4xl font-extrabold mb-3">{guide.title}</h1>
+                <nav aria-label={locale === 'pt' ? 'Trilha' : 'Breadcrumb'} className="text-sm text-muted mb-3">
+                    {crumbItems.slice(0, -1).map((item, i) => (
+                        <span key={item.path}>
+                            {i > 0 && <span aria-hidden> / </span>}
+                            <Link href={item.path} className="hover:text-brand-deep transition-colors">
+                                {item.name}
+                            </Link>
+                        </span>
+                    ))}
+                    <span aria-hidden> / </span>
+                    <span className="text-ink/80" aria-current="page">{copy.title}</span>
+                </nav>
+                <h1 className="font-display text-3xl sm:text-4xl font-extrabold mb-3">{copy.title}</h1>
                 <p className="text-sm text-muted mb-6">
-                    {guide.author.name}, {guide.author.role}
+                    {guide.author.name}, {role}
                     {' · '}
-                    {formatGuideDate(guide.publishedAt)}
+                    {formatGuideDate(guide.publishedAt, locale)}
                     {' · '}
-                    {guide.readingMinutes} min read
+                    {guide.readingMinutes} {ui.minRead}
                 </p>
-                <p className="text-[15px] sm:text-base text-ink/75 leading-relaxed mb-8">{guide.subtitle}</p>
+                <p className="text-[15px] sm:text-base text-ink/75 leading-relaxed mb-8">{copy.subtitle}</p>
 
                 {guide.heroImage && <GuideImage image={guide.heroImage} />}
 
                 {showToc && (
                     <nav
                         className="mb-10 rounded-2xl border border-ink/10 bg-cream/40 px-5 py-4"
-                        aria-label="On this page"
+                        aria-label={ui.tocLabel}
                     >
-                        <p className="text-sm font-semibold text-ink mb-3">On this page</p>
+                        <p className="text-sm font-semibold text-ink mb-3">{ui.onThisPage}</p>
                         <ol className="space-y-2">
-                            {guide.sections.map((section) => (
+                            {copy.sections.map((section) => (
                                 <li key={section.title}>
                                     <a
                                         href={`#${sectionAnchor(section.title)}`}
@@ -165,7 +264,7 @@ export function GuidePageShell({ guide }: Props) {
                 )}
 
                 <div className="space-y-10 text-ink/75 leading-relaxed">
-                    {guide.sections.map((section, i) => (
+                    {copy.sections.map((section, i) => (
                         <div key={section.title}>
                             <section id={sectionAnchor(section.title)} className="scroll-mt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
                                 <h2 className="font-display text-xl font-bold text-ink mb-3">{section.title}</h2>
@@ -180,9 +279,9 @@ export function GuidePageShell({ guide }: Props) {
                     ))}
 
                     <section>
-                        <h2 className="font-display text-xl font-bold text-ink mb-4">Common questions</h2>
+                        <h2 className="font-display text-xl font-bold text-ink mb-4">{ui.questions}</h2>
                         <div className="divide-y divide-ink/10 border-y border-ink/10">
-                            {guide.faqs.map((f) => (
+                            {copy.faqs.map((f) => (
                                 <div key={f.q} className="py-4">
                                     <h3 className="font-semibold text-ink mb-1.5">{f.q}</h3>
                                     <p className="text-[15px]">{f.a}</p>
@@ -194,32 +293,32 @@ export function GuidePageShell({ guide }: Props) {
                     <section className="pt-2">
                         <div className="flex flex-wrap items-center gap-3">
                             <Link
-                                href={guide.cta.href}
+                                href={copy.cta.href}
                                 className="inline-flex min-h-[48px] items-center gap-2 rounded-xl bg-brand px-6 font-bold text-ink hover:brightness-105 transition-all"
                             >
-                                {guide.cta.label}
+                                {copy.cta.label}
                                 <ArrowRight size={16} />
                             </Link>
                             <Link
                                 href="/explore"
                                 className="inline-flex min-h-[48px] items-center px-4 text-sm font-semibold text-muted hover:text-brand-deep transition-colors"
                             >
-                                Explore campaigns
+                                {ui.explore}
                             </Link>
                         </div>
                     </section>
 
                     {others.length > 0 && (
                         <section className="border-t border-ink/10 pt-8">
-                            <p className="text-sm font-semibold text-muted mb-3">More guides</p>
+                            <p className="text-sm font-semibold text-muted mb-3">{ui.more}</p>
                             <ul className="space-y-2">
                                 {others.map((g) => (
                                     <li key={g.slug}>
                                         <Link
-                                            href={`/guides/${g.slug}`}
+                                            href={locale === 'pt' ? `/pt/guides/${g.slug}` : `/guides/${g.slug}`}
                                             className="text-[15px] font-medium text-brand-deep hover:underline"
                                         >
-                                            {g.title}
+                                            {guideCopy(g, locale).title}
                                         </Link>
                                     </li>
                                 ))}
@@ -229,24 +328,24 @@ export function GuidePageShell({ guide }: Props) {
                 </div>
 
                 <p className="text-center text-xs text-muted mt-12">
-                    <Link href="/" className="hover:text-brand-deep transition-colors">
-                        Home
+                    <Link href={locale === 'pt' ? '/pt' : '/'} className="hover:text-brand-deep transition-colors">
+                        {ui.home}
                     </Link>
                     {' · '}
-                    <Link href="/guides" className="hover:text-brand-deep transition-colors">
-                        Guides
+                    <Link href={locale === 'pt' ? '/pt/guides' : '/guides'} className="hover:text-brand-deep transition-colors">
+                        {ui.guides}
                     </Link>
                     {' · '}
                     <Link href="/about" className="hover:text-brand-deep transition-colors">
-                        About
+                        {ui.about}
                     </Link>
                     {' · '}
                     <Link href="/contact" className="hover:text-brand-deep transition-colors">
-                        Contact
+                        {ui.contact}
                     </Link>
                     {' · '}
-                    <Link href="/for" className="hover:text-brand-deep transition-colors">
-                        Use cases
+                    <Link href={locale === 'pt' ? '/pt/for' : '/for'} className="hover:text-brand-deep transition-colors">
+                        {ui.useCases}
                     </Link>
                 </p>
             </main>

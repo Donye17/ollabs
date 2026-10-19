@@ -29,7 +29,16 @@ export function VsTwibbonizeShell({ copy }: { copy: VsCopy; canonical?: string }
                         <span className="w-2.5 h-2.5 rounded-full bg-brand" /> {copy.eyebrow}
                     </span>
                     <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold leading-[1.05] mb-4">{copy.h1}</h1>
-                    <p className="text-base sm:text-lg text-ink/70 mb-7 max-w-2xl">{copy.hero}</p>
+                    <p className="text-base sm:text-lg text-ink/70 mb-4 max-w-2xl">{copy.hero}</p>
+                    {copy.guideHref && copy.guideLabel && (
+                        <p className="text-base text-ink/75 mb-7 max-w-2xl">
+                            {copy.guideBefore}{' '}
+                            <Link href={copy.guideHref} className="font-semibold text-brand-deep hover:underline">
+                                {copy.guideLabel}
+                            </Link>
+                            .
+                        </p>
+                    )}
                     <div className="flex flex-wrap items-center gap-3">
                         <Link
                             href="/create"

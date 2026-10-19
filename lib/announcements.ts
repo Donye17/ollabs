@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-19-frame-guide',
+        date: '2026-10-19',
+        title: 'A guide for adding a frame to a profile picture',
+        summary: 'English and Portuguese, for the person who just got a link.',
+        items: [
+            'Open the link, fit your face, then Share photo and Save Image.',
+            'The same steps are in Portuguese at /pt/guides.',
+        ],
+    },
+    {
         id: '2026-10-19-hero-frames',
         date: '2026-10-19',
         title: 'The homepage fan uses real campaign frames',

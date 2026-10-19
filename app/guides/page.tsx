@@ -9,7 +9,14 @@ export const metadata: Metadata = {
     title: 'Guides',
     description:
         'Guides for organizers: custom frames, WhatsApp, saving a photo on iPhone, the manage dashboard, hubs, and keeping access when you switch phones.',
-    alternates: { canonical: 'https://ollabs.studio/guides' },
+    alternates: {
+        canonical: 'https://ollabs.studio/guides',
+        languages: {
+            en: 'https://ollabs.studio/guides',
+            'pt-BR': 'https://ollabs.studio/pt/guides',
+            'x-default': 'https://ollabs.studio/guides',
+        },
+    },
     openGraph: {
         type: 'website',
         url: 'https://ollabs.studio/guides',

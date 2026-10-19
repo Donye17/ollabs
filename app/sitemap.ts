@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { USE_CASES } from '@/lib/useCases';
 import { USE_CASES_PT } from '@/lib/useCasesPt';
-import { GUIDES } from '@/lib/guides';
+import { GUIDES, guidesInLocale } from '@/lib/guides';
 import {
     englishSlugFromPt,
     caseLanguageAlternates,
@@ -75,12 +75,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { url: `${baseUrl}/vs/twibbonize`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8, alternates: { languages: twibbonizeLanguages } },
         { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.55 },
         { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.4 },
-        { url: `${baseUrl}/guides`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-        ...GUIDES.map((g) => ({
-            url: `${baseUrl}/guides/${g.slug}`,
+        { url: `${baseUrl}/guides`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7, alternates: { languages: { en: `${baseUrl}/guides`, 'pt-BR': `${baseUrl}/pt/guides`, 'x-default': `${baseUrl}/guides` } } },
+        { url: `${baseUrl}/pt/guides`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.72, alternates: { languages: { en: `${baseUrl}/guides`, 'pt-BR': `${baseUrl}/pt/guides`, 'x-default': `${baseUrl}/guides` } } },
+        ...GUIDES.map((g) => {
+            const languages = g.pt
+                ? { en: `${baseUrl}/guides/${g.slug}`, 'pt-BR': `${baseUrl}/pt/guides/${g.slug}`, 'x-default': `${baseUrl}/guides/${g.slug}` }
+                : undefined;
+            return {
+                url: `${baseUrl}/guides/${g.slug}`,
+                lastModified: g.updatedAt ? new Date(g.updatedAt) : new Date(g.publishedAt),
+                changeFrequency: 'monthly' as const,
+                priority: g.slug === 'add-a-frame-to-a-profile-picture' ? 0.85 : 0.7,
+                ...(languages ? { alternates: { languages } } : {}),
+            };
+        }),
+        ...guidesInLocale('pt').map((g) => ({
+            url: `${baseUrl}/pt/guides/${g.slug}`,
             lastModified: g.updatedAt ? new Date(g.updatedAt) : new Date(g.publishedAt),
             changeFrequency: 'monthly' as const,
-            priority: 0.7,
+            priority: 0.86,
+            alternates: {
+                languages: {
+                    en: `${baseUrl}/guides/${g.slug}`,
+                    'pt-BR': `${baseUrl}/pt/guides/${g.slug}`,
+                    'x-default': `${baseUrl}/guides/${g.slug}`,
+                },
+            },
         })),
         { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
         { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
