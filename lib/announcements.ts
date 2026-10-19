@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-19-organizer-cta',
+        date: '2026-10-19',
+        title: 'After you save, you can make your own frame',
+        summary: 'The post-save screen now offers a frame of your own.',
+        items: [
+            'Like it? Make your own. The button sits under the share actions.',
+            'It opens Create. Free, and it takes under a minute.',
+        ],
+    },
+    {
         id: '2026-10-19-save-caption',
         date: '2026-10-19',
         title: 'Saving the photo keeps the campaign link',

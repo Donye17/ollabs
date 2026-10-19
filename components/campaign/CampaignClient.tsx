@@ -19,7 +19,7 @@ import { InAppRescueBar } from '@/components/campaign/InAppRescueBar';
 import { ProfileSetHint } from '@/components/campaign/ProfileSetHint';
 import { FormatCards, type ExportFormat } from '@/components/campaign/FormatCards';
 import { arrivalPlatform, detectInAppBrowser, INAPP_RECOVERY_KEY, sessionFlag, setSessionFlag } from '@/lib/inAppBrowser';
-import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown, Sparkles } from 'lucide-react';
+import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown } from 'lucide-react';
 
 const CANVAS = 1024;
 
@@ -712,16 +712,20 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             </button>
                         )}
 
-                        <a
-                            href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_page')}
-                            onClick={() => {
-                                setLocale(locale);
-                                track('create_from_campaign', { campaign: slug, from: 'post_save' });
-                            }}
-                            className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border-2 border-ink/20 bg-paper text-ink hover:bg-ink/5 active:bg-ink/10 transition-colors"
-                        >
-                            {t.makeOwn}
-                        </a>
+                        <div className="w-full rounded-2xl border border-ink/10 bg-cream px-4 py-4 text-center">
+                            <p className="font-display text-xl font-extrabold leading-tight text-ink">{t.wantOwn}</p>
+                            <p className="mt-1.5 text-sm text-ink/75 leading-relaxed">{t.wantOwnBody}</p>
+                            <a
+                                href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_post_save')}
+                                onClick={() => {
+                                    setLocale(locale);
+                                    track('create_from_campaign', { campaign: slug, from: 'post_save' });
+                                }}
+                                className="mt-3 inline-flex w-full min-h-[48px] items-center justify-center rounded-xl bg-brand px-4 font-bold text-ink hover:brightness-105 active:brightness-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
+                            >
+                                {t.makeOwn}
+                            </a>
+                        </div>
 
                         {exportFormat === 'square' && (
                         <button
@@ -805,19 +809,13 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             </div>
                         </details>
 
-                        <div className="w-full text-center space-y-3 pt-2">
-                            <p className="font-display font-bold text-lg leading-tight flex items-center justify-center gap-1.5">
-                                <Sparkles size={17} className="text-brand-deep" /> {t.wantOwn}
-                            </p>
-                            <p className="text-sm text-ink/70 leading-relaxed px-1">{t.wantOwnBody}</p>
-                            <a
-                                href={withUtm('/hub', 'campaign_post_save')}
-                                onClick={() => track('hub_from_campaign', { campaign: slug })}
-                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-brand/30 bg-brand/10 text-brand-deep hover:bg-brand/15 transition-all"
-                            >
-                                {t.setupHub}
-                            </a>
-                        </div>
+                        <a
+                            href={withUtm('/hub', 'campaign_post_save')}
+                            onClick={() => track('hub_from_campaign', { campaign: slug })}
+                            className="inline-flex min-h-[44px] items-center justify-center px-2 text-sm font-semibold text-muted hover:text-brand-deep transition-colors"
+                        >
+                            {t.setupHub}
+                        </a>
 
                         <button
                             onClick={() => {
