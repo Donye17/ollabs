@@ -2,17 +2,21 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { FrameRendererFactory } from '@/components/renderer/FrameRendererFactory';
-import { AVAILABLE_FRAMES } from '@/lib/constants';
-import type { FrameConfig } from '@/lib/types';
+import { prefetchFrameOverlays } from '@/components/renderer/strategies';
+import { DEFAULT_FRAME } from '@/lib/constants';
+import { FrameType, type FrameConfig } from '@/lib/types';
 
 /**
  * Homepage hero only. The supporter canvas stays still: that preview is the
  * product, and motion there reads as the photo slipping. Here the fan is the
  * pitch, so one photo may crossfade while the other two hold.
  *
- * Photos come only from /hero/photo-01.jpg … photo-10.jpg. A missing file is
+ * Photos come only from /hero/photo-01.jpg … photo-07.jpg. A missing file is
  * skipped. Nothing else is substituted: no generated faces, no stock, no
  * supporter uploads.
+ *
+ * The rings are the published overlay art from three live campaigns, drawn
+ * through FrameRendererFactory with the same cutout the campaign page uses.
  */
 
 const CIRCLE = 112;
@@ -23,7 +27,7 @@ const FAN_W = PAD + STEP * 2 + CIRCLE + PAD;
 const FAN_H = PAD + DROP + CIRCLE + PAD;
 const SWAP_MS = 3500;
 const FADE_MS = 250;
-const PHOTO_COUNT = 10;
+const PHOTO_COUNT = 7;
 
 const PLACEMENTS = [
     { x: PAD, y: PAD + DROP, rotate: -16, z: 1 },
@@ -31,12 +35,36 @@ const PLACEMENTS = [
     { x: PAD + STEP * 2, y: PAD + DROP, rotate: 16, z: 2 },
 ] as const;
 
-/** Left: green ring. Center: brand cyan. Right: sunset gradient. Center sits in front. */
-const FAN_FRAME_IDS = ['frame-emerald', 'frame-ollabs-blue', 'frame-sunset-gradient'] as const;
-
-const FAN_FRAMES: FrameConfig[] = FAN_FRAME_IDS.map(
-    (id) => AVAILABLE_FRAMES.find((frame) => frame.id === id) ?? AVAILABLE_FRAMES[0],
-);
+/** Left Hugo, center Valkyries, right Pitágoras. Center sits in front. */
+const FAN_FRAMES: FrameConfig[] = [
+    {
+        id: 'hero-hugo',
+        type: FrameType.CUSTOM_IMAGE,
+        name: 'Hugo Wanderley',
+        imageUrl: '/hero/frames/hugo.png',
+        cutoutScale: 0,
+        color1: DEFAULT_FRAME.color1,
+        width: 12,
+    },
+    {
+        id: 'hero-valkyries',
+        type: FrameType.CUSTOM_IMAGE,
+        name: 'Golden State Valkyries',
+        imageUrl: '/hero/frames/valkyries.png',
+        cutoutScale: 0,
+        color1: DEFAULT_FRAME.color1,
+        width: 12,
+    },
+    {
+        id: 'hero-pitagoras',
+        type: FrameType.CUSTOM_IMAGE,
+        name: 'Foto com DrPitagoras',
+        imageUrl: '/hero/frames/pitagoras.png',
+        cutoutScale: 0.18,
+        color1: DEFAULT_FRAME.color1,
+        width: 12,
+    },
+];
 
 function photoSrc(index: number): string {
     return `/hero/photo-${String(index + 1).padStart(2, '0')}.jpg`;
@@ -52,6 +80,7 @@ function drawFramed(
     photo: HTMLImageElement | null,
     frame: FrameConfig,
     size: number,
+    onImageLoad?: () => void,
 ) {
     const dpr = 2;
     if (canvas.width !== size * dpr || canvas.height !== size * dpr) {
@@ -90,7 +119,7 @@ function drawFramed(
     }
     ctx.restore();
 
-    FrameRendererFactory.render({ ctx, centerX: cx, centerY: cy, radius, frame });
+    FrameRendererFactory.render({ ctx, centerX: cx, centerY: cy, radius, frame, onImageLoad });
 }
 
 function FanSlot({
@@ -116,17 +145,26 @@ function FanSlot({
         if (!a || !b) return;
         if (painted.current === photo) return;
 
+        const paint = (canvas: HTMLCanvasElement, img: HTMLImageElement | null) => {
+            const whenFrameLoads = () => {
+                const current = painted.current === undefined ? img : painted.current;
+                if (aRef.current) drawFramed(aRef.current, current, frame, CIRCLE);
+                if (bRef.current) drawFramed(bRef.current, current, frame, CIRCLE);
+            };
+            drawFramed(canvas, img, frame, CIRCLE, whenFrameLoads);
+        };
+
         const first = painted.current === undefined;
         painted.current = photo;
 
         if (first) {
-            drawFramed(a, photo, frame, CIRCLE);
-            drawFramed(b, photo, frame, CIRCLE);
+            paint(a, photo);
+            paint(b, photo);
             return;
         }
 
         const incoming = layerRef.current === 'a' ? 'b' : 'a';
-        drawFramed(incoming === 'a' ? a : b, photo, frame, CIRCLE);
+        paint(incoming === 'a' ? a : b, photo);
         layerRef.current = incoming;
         setLayer(incoming);
     }, [photo, frame]);
@@ -192,6 +230,7 @@ export function HeroFrameFan({ label, emptyLabel }: { label: string; emptyLabel:
     }, []);
 
     useEffect(() => {
+        prefetchFrameOverlays(FAN_FRAMES.map((frame) => frame.imageUrl));
         let cancelled = false;
         const slots: (HTMLImageElement | null)[] = Array.from({ length: PHOTO_COUNT }, () => null);
         let left = PHOTO_COUNT;

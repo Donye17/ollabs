@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-19-hero-frames',
+        date: '2026-10-19',
+        title: 'The homepage fan uses real campaign frames',
+        summary: 'Hugo Wanderley, the Valkyries, and Dr. Pitágoras sit on the hero photos.',
+        items: [
+            'Each circle in the homepage fan wears a real campaign frame.',
+            'One photo changes every few seconds. The other two stay put.',
+        ],
+    },
+    {
         id: '2026-10-18-hero-fan',
         date: '2026-10-18',
         title: 'The homepage hero is a fan of frames',
