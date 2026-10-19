@@ -390,13 +390,24 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
         try {
             const exported = await exportBlob();
             if (!exported) return;
+            const text = shareText('download');
             const outcome = await saveFramedPhoto({
                 blob: exported.blob,
                 filename: exported.filename,
                 title,
+                text,
+                url: withUtm(shareUrl(), 'download'),
                 forceDownload: true,
             });
             if (applySaveOutcome(outcome)) {
+                // The file is already on the device. The sentence still has to
+                // be on screen, selectable, because a download has no caption.
+                let copied = false;
+                try {
+                    await navigator.clipboard.writeText(text);
+                    copied = true;
+                } catch { /* the sentence stays selectable below */ }
+                noteCaption(text, copied);
                 track('frame_download', { campaign: slug, format: exportFormat });
             }
         } finally {
@@ -427,6 +438,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 filename: exported.filename,
                 title,
                 text,
+                url: withUtm(shareUrl(), 'share_photo'),
             });
             if ((result.outcome === 'shared' || result.outcome === 'downloaded') && applySaveOutcome(result.outcome)) {
                 noteCaption(text, result.captionCopied);
@@ -454,6 +466,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 filename: `ollabs-${slug}-story.png`,
                 title,
                 text,
+                url: withUtm(shareUrl(), 'share_story'),
             });
             if (result.outcome === 'shared' || result.outcome === 'downloaded') {
                 recordSupporterUse();

@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-19-save-caption',
+        date: '2026-10-19',
+        title: 'Saving the photo keeps the campaign link',
+        summary: 'The sentence to paste under the picture stays on the page after you save.',
+        items: [
+            'On Android, sharing the saved photo can include the campaign link.',
+            'After a download, the paste line stays on screen so you can copy it under the photo.',
+        ],
+    },
+    {
         id: '2026-10-19-frame-guide',
         date: '2026-10-19',
         title: 'A guide for adding a frame to a profile picture',

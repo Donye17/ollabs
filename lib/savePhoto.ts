@@ -49,39 +49,38 @@ export function preferShareSheetForSave(): boolean {
 /**
  * Save the framed photo. Share sheet on phones (Save Image → Photos); anchor
  * download on desktop. Pass forceDownload only for an explicit desktop fallback.
+ *
+ * Android can attach the campaign sentence and URL next to the PNG. iOS
+ * in-app browsers reject a share that mixes files with text or url, so those
+ * stay files-only and the page shows the sentence after the save.
  */
 export async function saveFramedPhoto(opts: {
     blob: Blob;
     filename: string;
     title?: string;
+    text?: string;
+    url?: string;
     forceDownload?: boolean;
 }): Promise<SavePhotoOutcome> {
     const file = pngFile(opts.blob, opts.filename);
     const canShare = canShareFiles([file]);
 
-    if (canShare && !opts.forceDownload) {
-        try {
-            // Files-only payload: adding text/url alongside files breaks some
-            // iOS in-app browsers and they reject the whole share.
-            await navigator.share({ files: [file], title: opts.title });
-            return 'shared';
-        } catch (e) {
-            if (e instanceof Error && e.name === 'AbortError') return 'cancelled';
-            if (!isIOS()) {
-                downloadBlob(opts.blob, file.name);
-                return 'downloaded';
-            }
+    if (!canShare || opts.forceDownload) {
+        if (isIOS()) {
+            // Never anchor-download on iOS. It becomes a stray Files entry, not Photos.
             return 'unavailable';
         }
+        downloadBlob(opts.blob, file.name);
+        return 'downloaded';
     }
 
-    if (isIOS()) {
-        // Never anchor-download on iOS. It becomes a stray Files entry, not Photos.
-        return 'unavailable';
+    const shared = await sharePngFile({ file, title: opts.title, text: opts.text, url: opts.url });
+    if (shared === 'shared' || shared === 'cancelled') return shared;
+    if (!isIOS()) {
+        downloadBlob(opts.blob, file.name);
+        return 'downloaded';
     }
-
-    downloadBlob(opts.blob, file.name);
-    return 'downloaded';
+    return 'unavailable';
 }
 
 function canShareData(data: ShareData): boolean {
@@ -111,6 +110,8 @@ export async function shareFramedPhoto(opts: {
     filename: string;
     title?: string;
     text: string;
+    /** Campaign URL. Same value already inside text, so a target that keeps url and drops text still links back. */
+    url?: string;
 }): Promise<FramedShareResult> {
     const file = pngFile(opts.blob, opts.filename);
     const copyPromise: Promise<boolean> =
@@ -130,27 +131,50 @@ export async function shareFramedPhoto(opts: {
         return finish('downloaded');
     }
 
+    const shared = await sharePngFile({ file, title: opts.title, text: opts.text, url: opts.url });
+    if (shared === 'shared' || shared === 'cancelled') return finish(shared);
     if (!isIOS()) {
-        const withText: ShareData = { files: [file], text: opts.text, title: opts.title };
-        if (canShareData(withText)) {
-            try {
-                await navigator.share(withText);
-                return finish('shared');
-            } catch (e) {
-                if (e instanceof Error && e.name === 'AbortError') return finish('cancelled');
-            }
-        }
+        downloadBlob(opts.blob, file.name);
+        return finish('downloaded');
     }
+    return finish('unavailable');
+}
 
-    try {
-        await navigator.share({ files: [file], title: opts.title });
-        return finish('shared');
-    } catch (e) {
-        if (e instanceof Error && e.name === 'AbortError') return finish('cancelled');
-        if (!isIOS()) {
-            downloadBlob(opts.blob, file.name);
-            return finish('downloaded');
+/**
+ * Hand a PNG to the share sheet.
+ *
+ * File sharing has to be possible first. On Android we then ask canShare
+ * whether files, title, text, and url can travel together. If that payload
+ * is rejected, try text without url, then the file alone. iOS stays
+ * files-only: mixing text or url makes WhatsApp's browser throw away the
+ * whole sheet, and Save Image is the only way into Photos.
+ */
+async function sharePngFile(opts: {
+    file: File;
+    title?: string;
+    text?: string;
+    url?: string;
+}): Promise<'shared' | 'cancelled' | 'failed'> {
+    const attempts: ShareData[] = [];
+    if (!isIOS() && (opts.text || opts.url)) {
+        const rich: ShareData = { files: [opts.file], title: opts.title };
+        if (opts.text) rich.text = opts.text;
+        if (opts.url) rich.url = opts.url;
+        attempts.push(rich);
+        if (opts.text && opts.url) {
+            attempts.push({ files: [opts.file], text: opts.text, title: opts.title });
         }
-        return finish('unavailable');
     }
+    attempts.push({ files: [opts.file], title: opts.title });
+
+    for (const data of attempts) {
+        if (!canShareData(data)) continue;
+        try {
+            await navigator.share(data);
+            return 'shared';
+        } catch (e) {
+            if (e instanceof Error && e.name === 'AbortError') return 'cancelled';
+        }
+    }
+    return 'failed';
 }
