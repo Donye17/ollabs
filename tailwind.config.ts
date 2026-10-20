@@ -27,10 +27,26 @@ const config: Config = {
                 coral: '#FF5C39',
                 amber: '#FFC24B',
                 muted: '#5A6570',
+                frame: {
+                    magenta: 'var(--frame-magenta)',
+                    green: 'var(--frame-green)',
+                    purple: 'var(--frame-purple)',
+                    orange: 'var(--frame-orange)',
+                },
                 // legacy aliases kept so existing components compile
                 primary: '#01BEF6',
                 secondary: '#EAE6DC',
                 cta: '#FF5C39',
+            },
+            boxShadow: {
+                'frame-sm': 'var(--shadow-frame-sm)',
+                'frame-md': 'var(--shadow-frame-md)',
+                'frame-lg': 'var(--shadow-frame-lg)',
+            },
+            borderRadius: {
+                control: 'var(--radius-control)',
+                card: 'var(--radius-card)',
+                avatar: 'var(--radius-avatar)',
             },
             animation: {
                 'fade-in': 'fade-in 0.5s ease-out',

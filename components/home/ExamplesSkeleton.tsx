@@ -1,33 +1,17 @@
-/** Placeholder shaped like the top campaigns block while data loads. */
+/** Placeholder shaped like the top campaigns fan while data loads. */
 export function ExamplesSkeleton() {
     return (
-        <>
-            <div className="md:hidden flex items-end justify-center gap-3 sm:gap-4 py-2" aria-hidden>
-                <div className="flex flex-col items-center gap-2 opacity-70">
-                    <div className="h-7 w-7 rounded-full bg-ink/10 animate-pulse" />
-                    <div className="w-20 h-20 rounded-full bg-ink/10 animate-pulse" />
-                    <div className="h-3 w-16 rounded bg-ink/10 animate-pulse" />
-                </div>
-                <div className="flex flex-col items-center gap-2 -mt-4">
-                    <div className="h-8 w-8 rounded-full bg-brand/30 animate-pulse" />
-                    <div className="w-[112px] h-[112px] sm:w-[128px] sm:h-[128px] rounded-full bg-ink/10 animate-pulse" />
-                    <div className="h-3 w-20 rounded bg-ink/10 animate-pulse" />
-                </div>
-                <div className="flex flex-col items-center gap-2 opacity-70">
-                    <div className="h-7 w-7 rounded-full bg-ink/10 animate-pulse" />
-                    <div className="w-20 h-20 rounded-full bg-ink/10 animate-pulse" />
-                    <div className="h-3 w-16 rounded bg-ink/10 animate-pulse" />
-                </div>
+        <div className="campaign-fan-set" aria-hidden>
+            <div className="campaign-fan">
+                <div className="absolute left-0 top-[var(--fan-drop)] z-[1] h-[var(--fan-side)] w-[var(--fan-side)] -rotate-[14deg] rounded-avatar bg-frame-green/25 animate-pulse" />
+                <div className="absolute left-[calc(var(--fan-step)-(var(--fan-center)-var(--fan-side))/2)] top-0 z-[3] h-[var(--fan-center)] w-[var(--fan-center)] rounded-avatar bg-brand/20 animate-pulse" />
+                <div className="absolute left-[calc(var(--fan-step)*2)] top-[var(--fan-drop)] z-[2] h-[var(--fan-side)] w-[var(--fan-side)] rotate-[14deg] rounded-avatar bg-frame-purple/30 animate-pulse" />
             </div>
-            <div className="hidden md:grid grid-cols-3 lg:grid-cols-6 gap-8 max-w-6xl mx-auto px-2" aria-hidden>
-                {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="flex flex-col items-center gap-3">
-                        <div className="w-36 h-36 lg:w-40 lg:h-40 rounded-full bg-ink/10 animate-pulse" />
-                        <div className="h-3 w-20 rounded bg-ink/10 animate-pulse" />
-                        <div className="h-2.5 w-12 rounded bg-ink/10 animate-pulse" />
-                    </div>
-                ))}
+            <div className="campaign-fan-labels">
+                <div className="mx-auto h-3 w-16 rounded bg-ink/10 animate-pulse" />
+                <div className="mx-auto h-3 w-20 rounded bg-ink/10 animate-pulse" />
+                <div className="mx-auto h-3 w-16 rounded bg-ink/10 animate-pulse" />
             </div>
-        </>
+        </div>
     );
 }

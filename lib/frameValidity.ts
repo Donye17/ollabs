@@ -62,7 +62,7 @@ export function visibleFrameSql(alias = 'c'): string {
 
 /**
  * How many campaigns to fetch for the home discovery block.
- * Mobile still renders a top-3 podium; desktop shows up to six tiles.
+ * The homepage fan shows the top three. Extra rows cover a frame that fails to parse.
  */
 export const HOME_TOP_CAMPAIGNS = 6;
 

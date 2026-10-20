@@ -1,6 +1,5 @@
 import { pool } from '@/lib/neon';
-import { visibleFrameSql, HOME_TOP_CAMPAIGNS, MIN_SUPPORTERS_TO_DISPLAY } from '@/lib/frameValidity';
-import { SUPPORTER_PHOTOS_LATERAL, parseSupporterPhotos } from '@/lib/supporterPhotosSql';
+import { visibleFrameSql, HOME_TOP_CAMPAIGNS, HOME_PODIUM_SLOTS, MIN_SUPPORTERS_TO_DISPLAY } from '@/lib/frameValidity';
 import type { TopCampaign } from '@/components/home/TopCampaignsPodium';
 import { HomeTopCampaignsClient } from '@/components/home/HomeTopCampaignsClient';
 import { HomeCalendarLink, HomeExamplesCopy } from '@/components/home/HomeExamplesCopy';
@@ -10,22 +9,18 @@ async function getTopCampaigns(): Promise<TopCampaign[]> {
     try {
         // Rank by real campaign_uses rows, not the denormalized counter. Seeded
         // demo frames used to inflate supporter_count without matching uses.
-        // Over-fetch: parseFrameConfig can drop a row, and we prefer thumbs
-        // that already have a supporter JPEG. Requiring a JPEG used to leave
-        // the podium with a single card (Foto com DrPitagoras) because almost
-        // no campaign_uses row stores image_url.
+        // Supporter JPEGs stay off this page. Those uploads are not a gallery
+        // consent, and the hero photo pool is approved for the hero only.
         const fetchLimit = HOME_TOP_CAMPAIGNS * 4;
         const res = await pool.query(
             `SELECT c.slug, c.title, c.frame_config,
-                    COALESCE(u.real_uses, 0)::int AS supporter_count,
-                    COALESCE(sp.supporter_photos, ARRAY[]::text[]) AS supporter_photos
+                    COALESCE(u.real_uses, 0)::int AS supporter_count
              FROM campaigns c
              LEFT JOIN (
                  SELECT campaign_id, COUNT(*)::int AS real_uses
                  FROM campaign_uses
                  GROUP BY campaign_id
              ) u ON u.campaign_id = c.id
-             ${SUPPORTER_PHOTOS_LATERAL}
              WHERE c.is_public = true
                AND c.is_hidden IS NOT TRUE
                AND COALESCE(u.real_uses, 0) >= $1
@@ -42,12 +37,9 @@ async function getTopCampaigns(): Promise<TopCampaign[]> {
                 title: r.title,
                 supporterCount: r.supporter_count ?? 0,
                 frame,
-                supporterPhotos: parseSupporterPhotos(r.supporter_photos),
             }];
         });
-        const withPhotos = mapped.filter((c) => c.supporterPhotos.length > 0);
-        const without = mapped.filter((c) => c.supporterPhotos.length === 0);
-        return [...withPhotos, ...without].slice(0, HOME_TOP_CAMPAIGNS);
+        return mapped.slice(0, HOME_PODIUM_SLOTS);
     } catch (e) {
         console.error('Failed to load top campaigns', e);
         return [];

@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { Users } from 'lucide-react';
-import { CampaignGridThumb } from '@/components/CampaignGridThumb';
+import { FramePreview } from '@/components/FramePreview';
 import { useLocale } from '@/components/i18n/LocaleProvider';
-import { formatCount, type Locale } from '@/lib/i18n/locale';
+import { formatCount } from '@/lib/i18n/locale';
 import type { FrameConfig } from '@/lib/types';
 import { HOME_PODIUM_SLOTS } from '@/lib/frameValidity';
 
@@ -14,183 +13,118 @@ export type TopCampaign = {
     title: string;
     supporterCount: number;
     frame: FrameConfig;
-    supporterPhotos: string[];
 };
 
-type Slot = { rank: 1 | 2 | 3; campaign: TopCampaign };
+type Ring = 'conic' | 'green' | 'purple';
 
-function PodiumLink({
+const SLOT_CLASS: Record<1 | 2 | 3, string> = {
+    2: 'left-0 top-[var(--fan-drop)] z-[1] -rotate-[14deg]',
+    1: 'left-[calc(var(--fan-step)-(var(--fan-center)-var(--fan-side))/2)] top-0 z-[3]',
+    3: 'left-[calc(var(--fan-step)*2)] top-[var(--fan-drop)] z-[2] rotate-[14deg]',
+};
+
+function FanLink({
     campaign,
     rank,
-    first,
-    supportingLabel,
-    locale,
+    ring,
 }: {
     campaign: TopCampaign;
     rank: 1 | 2 | 3;
-    first: boolean;
-    supportingLabel: string;
-    locale: Locale;
+    ring: Ring;
 }) {
-    // CSS box vs file pixels: 2x DPR. Side slots stay at 176 so we do not
-    // pull a larger JPEG than the circle can show on phones.
-    const framePx = first ? 128 : 88;
-    const canvasPx = first ? 256 : 176;
-    const count = formatCount(campaign.supporterCount, locale);
+    const ringStyle =
+        ring === 'green'
+            ? ({ '--ring': 'var(--frame-green)' } as React.CSSProperties)
+            : ring === 'purple'
+              ? ({ '--ring': 'var(--frame-purple)' } as React.CSSProperties)
+              : undefined;
 
     return (
         <Link
             href={`/c/${campaign.slug}`}
-            className={`group flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-xl ${
-                first ? 'pt-0' : 'pt-6'
+            aria-hidden
+            tabIndex={-1}
+            className={`group absolute rounded-avatar outline-none ${SLOT_CLASS[rank]} ${
+                rank === 1 ? 'shadow-frame-lg' : 'shadow-frame-sm'
             }`}
-            aria-label={`${campaign.title}. ${count} ${supportingLabel}`}
+            style={{
+                width: rank === 1 ? 'var(--fan-center)' : 'var(--fan-side)',
+                height: rank === 1 ? 'var(--fan-center)' : 'var(--fan-side)',
+            }}
         >
             <span
-                className={`mb-2 inline-flex items-center justify-center rounded-full font-display font-bold tabular-nums ${
-                    first
-                        ? 'h-8 min-w-8 px-2.5 text-sm bg-brand text-ink ring-4 ring-brand/25'
-                        : 'h-7 min-w-7 px-2 text-xs bg-ink/10 text-ink'
+                className={`block h-full w-full rounded-avatar p-[3px] ${
+                    ring === 'conic' ? 'ring-frame-conic' : 'ring-frame-solid'
                 }`}
-                aria-label={`Rank ${rank}`}
+                style={ringStyle}
             >
-                {rank}
-            </span>
-            <div
-                className={`rounded-full overflow-hidden bg-ink/5 frame-shadow ${
-                    first ? 'ring-2 ring-brand/40' : 'ring-1 ring-ink/10'
-                }`}
-                style={{ width: framePx, height: framePx }}
-            >
-                <CampaignGridThumb
-                    frame={campaign.frame}
-                    supporterPhotos={campaign.supporterPhotos}
-                    size={canvasPx}
-                    className="w-full h-full"
-                    title={campaign.title}
-                />
-            </div>
-            <p
-                className={`mt-3 font-display font-bold leading-snug line-clamp-2 break-words text-balance group-hover:text-brand-deep transition-colors ${
-                    first ? 'text-[15px] sm:text-base' : 'text-sm'
-                }`}
-            >
-                {campaign.title}
-            </p>
-            <p className="mt-1 block font-sans text-xs text-muted tabular-nums">
-                <Users size={12} className="inline shrink-0 mr-1" aria-hidden />
-                {count} {supportingLabel}
-            </p>
-        </Link>
-    );
-}
-
-function DesktopTile({
-    campaign,
-    rank,
-    supportingLabel,
-    locale,
-}: {
-    campaign: TopCampaign;
-    rank: number;
-    supportingLabel: string;
-    locale: Locale;
-}) {
-    const count = formatCount(campaign.supporterCount, locale);
-    return (
-        <Link
-            href={`/c/${campaign.slug}`}
-            className="group flex flex-col items-center text-center outline-none"
-        >
-            <div className="relative">
-                <div className="w-36 h-36 lg:w-40 lg:h-40 rounded-full overflow-hidden bg-ink/5 ring-1 ring-ink/10 frame-shadow">
-                    <CampaignGridThumb
+                <span className="sr-only">{campaign.title}</span>
+                <span className="block h-full w-full overflow-hidden rounded-avatar bg-paper">
+                    <FramePreview
                         frame={campaign.frame}
-                        supporterPhotos={campaign.supporterPhotos}
-                        size={192}
-                        className="w-full h-full"
-                        title={campaign.title}
+                        size={rank === 1 ? 256 : 192}
+                        tone="paper"
+                        className="h-full w-full"
                     />
-                </div>
-                <span className="absolute -top-1 -left-1 h-7 min-w-7 px-1.5 inline-flex items-center justify-center rounded-full bg-ink text-paper text-xs font-bold tabular-nums">
-                    {rank}
                 </span>
-            </div>
-            <p className="mt-3 font-display font-bold text-sm leading-snug line-clamp-2 break-words text-balance group-hover:text-brand-deep transition-colors max-w-[10rem]">
-                {campaign.title}
-            </p>
-            <p className="mt-1 block font-sans text-xs text-muted tabular-nums">
-                <Users size={12} className="inline shrink-0 mr-1" aria-hidden />
-                {count} {supportingLabel}
-            </p>
+            </span>
         </Link>
     );
 }
 
 /**
- * Top campaigns by supporters. Phones keep a 2nd / 1st / 3rd podium. Desktop
- * shows up to six equal tiles so discovery feels fuller without a carousel.
+ * Top three campaigns as one overlapping fan. The count sits under each
+ * circle. Supporter photos are not drawn here: those uploads are not a
+ * gallery consent, and the hero photo pool is for the hero only.
  */
 export function TopCampaignsPodium({ campaigns }: { campaigns: TopCampaign[] }) {
     const { locale, messages } = useLocale();
     const supportingLabel = messages.campaign.peopleSupporting;
+    const shown = campaigns.slice(0, HOME_PODIUM_SLOTS);
+    if (shown.length === 0) return null;
 
-    useEffect(() => {
-        const targets = [campaigns[1], campaigns[0], campaigns[2]].filter(Boolean) as TopCampaign[];
-        for (const c of targets) {
-            const url = c.supporterPhotos[0];
-            if (url) {
-                const img = new Image();
-                img.decoding = 'async';
-                img.src = url;
-            }
-        }
-    }, [campaigns]);
+    const leader = shown[0];
+    const proof = messages.home.framedTheirs.replace(
+        '{count}',
+        formatCount(leader.supporterCount, locale),
+    );
 
-    const podium: Slot[] = [];
-    if (campaigns[1]) podium.push({ rank: 2, campaign: campaigns[1] });
-    if (campaigns[0]) podium.push({ rank: 1, campaign: campaigns[0] });
-    if (campaigns[2]) podium.push({ rank: 3, campaign: campaigns[2] });
-
-    if (campaigns.length === 0) return null;
-
-    const desktop = campaigns.slice(0, Math.max(HOME_PODIUM_SLOTS, campaigns.length));
+    const slots: { rank: 1 | 2 | 3; campaign: TopCampaign; ring: Ring }[] = [];
+    if (shown[1]) slots.push({ rank: 2, campaign: shown[1], ring: 'green' });
+    slots.push({ rank: 1, campaign: shown[0], ring: 'conic' });
+    if (shown[2]) slots.push({ rank: 3, campaign: shown[2], ring: 'purple' });
 
     return (
         <div className="w-full">
-            {/* Mobile / tablet: classic podium */}
-            {podium.length > 0 && (
-                <div className="md:hidden w-full max-w-lg mx-auto">
-                    <ol className="flex items-end justify-center gap-2 sm:gap-4 px-1 list-none">
-                        {podium.map(({ rank, campaign }) => (
-                            <li
-                                key={campaign.slug}
-                                className={`flex-1 min-w-0 max-w-[140px] sm:max-w-[160px] ${rank === 1 ? 'z-10' : ''}`}
-                            >
-                                <PodiumLink
-                                    campaign={campaign}
-                                    rank={rank}
-                                    first={rank === 1}
-                                    supportingLabel={supportingLabel}
-                                    locale={locale}
-                                />
-                            </li>
-                        ))}
-                    </ol>
-                </div>
-            )}
-
-            {/* Desktop: up to six live tiles. loading=lazy so phones skip them. */}
-            <div className="hidden md:grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-6 max-w-5xl lg:max-w-6xl mx-auto px-2">
-                {desktop.map((campaign, i) => (
-                    <DesktopTile
-                        key={campaign.slug}
-                        campaign={campaign}
-                        rank={i + 1}
-                        supportingLabel={supportingLabel}
-                        locale={locale}
-                    />
+            <p className="mx-auto mb-6 max-w-lg px-5 text-center font-sans text-base font-semibold leading-snug text-ink">
+                {proof}
+            </p>
+            <div className="campaign-fan-set">
+            <div className="campaign-fan">
+                {slots.map(({ rank, campaign, ring }) => (
+                    <FanLink key={campaign.slug} campaign={campaign} rank={rank} ring={ring} />
                 ))}
+            </div>
+            <ol className="campaign-fan-labels">
+                {slots.map(({ campaign }) => {
+                    const count = formatCount(campaign.supporterCount, locale);
+                    return (
+                        <li key={campaign.slug} className="min-w-0">
+                            <Link
+                                href={`/c/${campaign.slug}`}
+                                className="block rounded-control px-0.5 py-1 text-center outline-none focus-visible:ring-2 focus-visible:ring-brand-deep"
+                            >
+                                <span className="block font-display text-sm font-bold leading-snug text-ink line-clamp-2 break-words text-balance">
+                                    {campaign.title}
+                                </span>
+                                <span className="mt-1 block font-sans text-xs tabular-nums text-ink/80">
+                                    {count} {supportingLabel}
+                                </span>
+                            </Link>
+                        </li>
+                    );
+                })}
+            </ol>
             </div>
         </div>
     );

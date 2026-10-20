@@ -6,7 +6,31 @@
     :root {
         --paper: #F7F8F6;
         --ink: #06141F;
+        /* Primary stays the brand cyan. Body text uses brand-deep, not this. */
         --brand: #01BEF6;
+        --brand-deep: #026D94;
+
+        /* Supporting frame palette, sampled from published campaign art.
+           Magenta: Pitágoras ring. Green: Hugo Wanderley ring.
+           Purple and orange: Golden State Valkyries clouds and helmet. */
+        --frame-magenta: #D00060;
+        --frame-green: #50A000;
+        --frame-purple: #9078C0;
+        --frame-orange: #C09048;
+
+        /* Avatar diameters. Circles, so radius is half. */
+        --avatar-sm: 120px;
+        --avatar-md: 156px;
+        --avatar-lg: 208px;
+
+        /* Elevation. Offset plus blur, ink-tinted, never a zero-offset halo. */
+        --shadow-frame-sm: 0 6px 14px rgba(6, 20, 31, 0.12);
+        --shadow-frame-md: 0 12px 40px rgba(6, 20, 31, 0.12);
+        --shadow-frame-lg: 0 16px 28px rgba(6, 20, 31, 0.16);
+
+        --radius-control: 12px;
+        --radius-card: 16px;
+        --radius-avatar: 999px;
     }
 
     /* No global scroll-behavior: smooth. It applies to every scroll on the site,
@@ -49,13 +73,64 @@
 
     /* Soft ambient under the circular frame only. Nowhere else. */
     .frame-shadow {
-        box-shadow: 0 12px 40px rgba(6, 20, 31, 0.12);
+        box-shadow: var(--shadow-frame-md);
     }
 
     /* The homepage fan sits three across. The 40px frame-shadow blur would
        paint past a 390px screen, so this one stays inside the fan box. */
     .frame-fan-shadow {
-        box-shadow: 0 8px 16px rgba(6, 20, 31, 0.14);
+        box-shadow: var(--shadow-frame-sm);
+    }
+
+    /* Solid ring from one sampled frame color. */
+    .ring-frame-solid {
+        background: var(--ring, var(--frame-green));
+    }
+
+    /* Conic ring that walks the supporting palette once. */
+    .ring-frame-conic {
+        background: conic-gradient(
+            from 210deg,
+            var(--frame-magenta),
+            var(--frame-purple),
+            var(--frame-green),
+            var(--frame-orange),
+            var(--frame-magenta)
+        );
+    }
+
+    /* Top campaigns fan. Sizes stay inside a 390px screen with the page padding. */
+    .campaign-fan-set {
+        --fan-side: var(--avatar-sm);
+        --fan-center: var(--avatar-md);
+        --fan-step: 86px;
+        --fan-drop: 22px;
+        width: calc(var(--fan-step) * 2 + var(--fan-side));
+        margin-inline: auto;
+    }
+
+    .campaign-fan {
+        position: relative;
+        width: 100%;
+        height: calc(var(--fan-drop) + var(--fan-center));
+    }
+
+    .campaign-fan-labels {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.25rem;
+        margin: 0.75rem 0 0;
+        list-style: none;
+        padding: 0;
+    }
+
+    @media (min-width: 768px) {
+        .campaign-fan-set {
+            --fan-side: 160px;
+            --fan-center: var(--avatar-lg);
+            --fan-step: 120px;
+            --fan-drop: 28px;
+        }
     }
 
     @media (prefers-reduced-motion: reduce) {

@@ -45,6 +45,7 @@ export type Messages = {
         slugFallback: string;
         topCampaigns: string;
         topCampaignsBody: string;
+        framedTheirs: string;
         calendarLink: string;
         howTitle: string;
         how1Title: string;
@@ -570,6 +571,7 @@ const en: Messages = {
         slugFallback: 'your-campaign',
         topCampaigns: 'Top campaigns',
         topCampaignsBody: 'Real frames people are using right now, ranked by supporters.',
+        framedTheirs: '{count} people already framed theirs',
         calendarLink: 'Calendar moments',
         howTitle: 'How it works',
         how1Title: 'Upload your frame',
@@ -953,6 +955,7 @@ const pt: Messages = {
         slugFallback: 'sua-campanha',
         topCampaigns: 'Campanhas em alta',
         topCampaignsBody: 'Molduras que as pessoas estão usando agora, por número de apoiadores.',
+        framedTheirs: '{count} pessoas já usaram esta moldura',
         calendarLink: 'Datas para marcar',
         howTitle: 'Como funciona',
         how1Title: 'Envie sua moldura',
@@ -1338,6 +1341,7 @@ const id: Messages = {
         slugFallback: 'your-campaign',
         topCampaigns: 'Top campaigns',
         topCampaignsBody: 'Real frames people are using right now, ranked by supporters.',
+        framedTheirs: '{count} orang sudah memakai bingkai ini',
         calendarLink: 'Calendar moments',
         howTitle: 'How it works',
         how1Title: 'Upload your frame',

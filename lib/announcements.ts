@@ -17,6 +17,15 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-19-home-frames',
+        date: '2026-10-19',
+        title: 'Top campaigns show the real frames',
+        summary: 'The homepage fan uses campaign art, with a live supporter count under each.',
+        items: [
+            'The count under each frame is how many people have used it.',
+        ],
+    },
+    {
         id: '2026-10-19-organizer-cta',
         date: '2026-10-19',
         title: 'After you save, you can make your own frame',
