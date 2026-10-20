@@ -12,16 +12,18 @@ description: >-
 
 - App Router metadata API + sitemap / robots conventions.
 - Campaign + day pages use ISR-style revalidate where freshness matters without hammering Neon.
-- Locales in play: PT, ID, TL, HI, ES landings and localized `/for` where they exist.
+- Marketing default is English (`DEFAULT_LOCALE`). `/pt` is the SEO landing. `/es` `/id` `/tl` 301 to `/`. `/hi` is a noindex stub. Product cookie UI exists for pt/id/es/tl (`es`/`tl` are overlays on English). `requestLocale()` for organizer metadata is cookie-only.
+- Campaign pages use `resolveSupporterLocale`. Pass `publisher_country` only (BR/PT or unset → Portuguese). On current `main`, `app/c/[slug]/page.tsx` ORs `first_supporter_country`, so one non-BR first save on an untagged campaign flips `/c` copy to English. Do not use the marketing cookie for `/c` copy.
+- `/c` and `/u` are crawlable + noindex. Do not add them to `disallow` in `robots.ts`.
 - No em dashes in user-facing hub/create/mine copy.
 
 ## When changing pages
 
-1. Set `generateMetadata` (title, description, openGraph, twitter) for share previews — WhatsApp unfurls decide click-through.
-2. Keep OG images accurate to the frame/campaign; use existing OG routes when present.
+1. Set `generateMetadata` (title, description, openGraph, twitter) for share previews. WhatsApp unfurls decide click-through.
+2. Keep OG images accurate to the frame. `/c` OG prefers stored `preview_url` over `frame_config.imageUrl`. On current `main` that column can be the empty cream circle from a mid-decode snapshot (`docs/ENGINEERING.md`, pitfall 25). Do not treat a non-null `preview_url` as proof the overlay loaded.
 3. Ensure new public routes appear in the sitemap when they should be indexed.
 4. For locale variants, keep hreflang / alternates consistent.
-5. `/c` and supporter flows stay lean; put denser SEO content on `/for`, `/day`, hubs — not on the save path.
+5. `/c` and `/u` stay lean and noindex. Put denser SEO content on `/for`, `/day`, `/guides`, `/pt`, `/vs`, not on the save path or public hubs.
 
 ## Dig deeper
 
