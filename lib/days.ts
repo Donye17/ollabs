@@ -152,17 +152,24 @@ export function nextOccurrence(rule: DateRule, from: Date = new Date()): { start
     return thisYear.end >= today ? thisYear : build(y + 1);
 }
 
-export function formatOccurrence(day: AwarenessDay, occ: { start: Date; end: Date }): string {
+export function formatOccurrence(
+    day: AwarenessDay,
+    occ: { start: Date; end: Date },
+    locale: 'en' | 'pt' = 'en',
+): string {
     const s = occ.start, e = occ.end;
+    const loc = locale === 'pt' ? 'pt-BR' : 'en-US';
     const sameDay = s.getTime() === e.getTime();
-    if (day.kind === 'month' && s.getUTCDate() === 1) return `${MONTHS[s.getUTCMonth()]} ${s.getUTCFullYear()}`;
+    if (day.kind === 'month' && s.getUTCDate() === 1) {
+        return s.toLocaleDateString(loc, { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    }
     if (sameDay) {
-        return s.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+        return s.toLocaleDateString(loc, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
     }
     const sameYear = s.getUTCFullYear() === e.getUTCFullYear();
-    const a = s.toLocaleDateString('en-US', { month: 'long', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }), timeZone: 'UTC' });
-    const b = e.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-    return `${a} to ${b}`;
+    const a = s.toLocaleDateString(loc, { month: 'long', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }), timeZone: 'UTC' });
+    const b = e.toLocaleDateString(loc, { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+    return locale === 'pt' ? `${a} a ${b}` : `${a} to ${b}`;
 }
 
 /**
@@ -180,14 +187,20 @@ export function calendarDateParts(day: AwarenessDay, occ: { start: Date; end: Da
 }
 
 /** "12 days away", "Happening now", "Today". Drives the countdown in the hero. */
-export function countdownLabel(occ: { start: Date; end: Date }, from: Date = new Date()): string {
+export function countdownLabel(
+    occ: { start: Date; end: Date },
+    from: Date = new Date(),
+    locale: 'en' | 'pt' = 'en',
+): string {
     const today = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()));
     const days = Math.round((occ.start.getTime() - today.getTime()) / 86_400_000);
+    const pt = locale === 'pt';
     if (days <= 0 && occ.end.getTime() >= today.getTime()) {
-        return occ.start.getTime() === occ.end.getTime() ? 'Today' : 'Happening now';
+        if (occ.start.getTime() === occ.end.getTime()) return pt ? 'Hoje' : 'Today';
+        return pt ? 'Acontecendo agora' : 'Happening now';
     }
-    if (days === 1) return 'Tomorrow';
-    return `${days} days away`;
+    if (days === 1) return pt ? 'Amanhã' : 'Tomorrow';
+    return pt ? `Faltam ${days} dias` : `${days} days away`;
 }
 
 // ------------------------------------------------------------------- content

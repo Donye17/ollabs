@@ -252,13 +252,36 @@ export const GUIDES: Guide[] = [
         slug: 'save-framed-photo-on-iphone',
         title: 'How to save a framed photo on iPhone from WhatsApp or Instagram',
         description:
-            'Why Download can fail inside those apps, how Share photo puts the PNG in Photos, when to open Safari, and how Share as story is different from a profile picture.',
+            'On iPhone, tap Share photo, then Save Image. Download does nothing inside WhatsApp or Instagram. If the sheet never opens, use Open in Safari.',
         subtitle:
-            'Most Ollabs links open inside WhatsApp or Instagram, not in Safari. The campaign page is built around that. This is the path that actually leaves a picture on the phone.',
+            'To save a framed photo on iPhone from WhatsApp or Instagram, tap Share photo, then Save Image. Download does nothing inside those apps. If the share sheet never opens, tap Open in Safari, fit your face again, and use Share photo. The PNG goes to Photos, which is the file you set as your profile picture.',
         author: AUTHOR,
+        authorRolePt: 'Fundador da Ollabs',
         publishedAt: '2026-08-28',
+        updatedAt: '2026-10-19',
         readingMinutes: 8,
         sections: [
+            {
+                title: 'Save the photo',
+                steps: [
+                    {
+                        title: 'Fit your face',
+                        body: 'Open the campaign link. Tap the circle and choose a photo. Drag until your face sits in the window. Use Size to zoom. The framed face stays on screen while you adjust.',
+                    },
+                    {
+                        title: 'Tap Share photo',
+                        body: 'Share photo is the primary button on a phone. It opens the iPhone share sheet with the PNG attached. Download photo is the wrong first tap inside WhatsApp or Instagram.',
+                    },
+                    {
+                        title: 'Tap Save Image',
+                        body: 'In the system sheet, tap Save Image. That writes the square PNG into Photos. A plain download on iPhone often lands in Files instead, or nowhere.',
+                    },
+                    {
+                        title: 'Open in Safari if the sheet never appears',
+                        body: 'If the page says it could not save here, tap Open in Safari. Fit the face again, then Share photo and Save Image. You are leaving the in-app browser, not a different product.',
+                    },
+                ],
+            },
             {
                 title: 'Why Download is the wrong first tap on iPhone',
                 screenshot:
@@ -333,6 +356,105 @@ export const GUIDES: Guide[] = [
             },
         ],
         cta: { href: '/guides/run-a-campaign-people-join', label: 'How to run a campaign people join' },
+        pt: {
+            title: 'Como salvar a foto com moldura no iPhone pelo WhatsApp ou Instagram',
+            description:
+                'No iPhone, toque em Compartilhar foto e depois em Salvar imagem. Baixar foto não funciona dentro do WhatsApp ou do Instagram. Se a folha não abrir, use Abrir no Safari.',
+            subtitle:
+                'Para salvar a foto com moldura no iPhone pelo WhatsApp ou Instagram, toque em Compartilhar foto e depois em Salvar imagem. Baixar foto não faz nada dentro desses aplicativos. Se a folha de compartilhar não abrir, toque em Abrir no Safari, encaixe o rosto de novo e use Compartilhar foto. O PNG vai para Fotos, que é o arquivo da foto de perfil.',
+            sections: [
+                {
+                    title: 'Salve a foto',
+                    steps: [
+                        {
+                            title: 'Encaixe o rosto',
+                            body: 'Abra o link da campanha. Toque no círculo e escolha uma foto. Arraste até o rosto ficar na janela. Use Tamanho para aproximar. O rosto com a moldura fica na tela enquanto você ajusta.',
+                        },
+                        {
+                            title: 'Toque em Compartilhar foto',
+                            body: 'Compartilhar foto é o botão principal no celular. Ele abre a folha do iPhone com o PNG anexado. Baixar foto é o toque errado dentro do WhatsApp ou do Instagram.',
+                        },
+                        {
+                            title: 'Toque em Salvar imagem',
+                            body: 'Na folha do sistema, toque em Salvar imagem. Isso grava o PNG quadrado em Fotos. Um download comum no iPhone costuma ir para Arquivos, ou para lugar nenhum.',
+                        },
+                        {
+                            title: 'Abra no Safari se a folha não aparecer',
+                            body: 'Se a página disser que não foi possível salvar ali, toque em Abrir no Safari. Encaixe o rosto de novo, depois Compartilhar foto e Salvar imagem. Você sai do navegador de dentro do aplicativo, não muda de produto.',
+                        },
+                    ],
+                },
+                {
+                    title: 'Por que Baixar foto é o toque errado no iPhone',
+                    paragraphs: [
+                        'Se alguém mandou um link do Ollabs no WhatsApp ou no Instagram, você provavelmente ainda está dentro do aplicativo. A página parece um site. Ela roda num navegador pequeno que o aplicativo controla. No iPhone, esse navegador ignora o botão Baixar foto. O toque pode parecer que funcionou e não deixar nada em Fotos.',
+                        'O Ollabs aprendeu isso na prática. Um link de download solto é ignorado em alguns celulares. Mesmo quando o arquivo começa, encerrar cedo demais pode ganhar a corrida do navegador e o PNG nunca chega. A página não pede para você caçar uma pasta. O caminho que funciona é a folha de compartilhar.',
+                        'No iPhone, até o Safari é um lugar ruim para um download cru. Um download por link costuma cair em Arquivos como um documento genérico, não na biblioteca de Fotos, onde mora a foto de perfil. Por isso a página começa com Compartilhar foto quando o celular consegue entregar um PNG para a folha do sistema.',
+                        'No computador é o contrário. Ali, Baixar foto é o controle que deve vir primeiro, e a folha de compartilhar é extra. Se você está ajudando alguém no computador, Baixar foto serve. Se a pessoa abriu o link de um chat no iPhone, diga para ignorar Baixar foto e usar Compartilhar foto.',
+                        'O resultado é um PNG quadrado. Esse é o arquivo que você define como foto de perfil no WhatsApp, no Instagram ou na agenda. Não recorte em outro editor, a menos que precise. A campanha já encaixou o rosto na janela.',
+                    ],
+                },
+                {
+                    title: 'Compartilhar foto e Salvar imagem',
+                    paragraphs: [
+                        'Adicione a foto tocando no círculo ou soltando um arquivo nele. Arraste para mover o rosto. Use Tamanho para aproximar. A página fica nesse encaixe até você salvar. Não há muro de conta. Quem apoia não entra.',
+                        'Quando o encaixe estiver certo, toque em Compartilhar foto. O celular deve abrir a folha do sistema com o PNG já anexado. Nessa folha, toque em Salvar imagem. Essa é a linha que grava a imagem em Fotos.',
+                        'Você também pode mandar a imagem direto para um chat pela mesma folha. Isso serve quando você quer que outra pessoa veja o rosto com moldura antes de trocar a sua própria foto de perfil. A folha é o produto. O site só monta o arquivo.',
+                        'Se você cancelar a folha, nada conta como salvamento. Abra Compartilhar foto de novo. Não fique tocando em Baixar foto à espera de uma pasta. No iPhone o download é tratado como indisponível de propósito, porque deixaria um arquivo solto em Arquivos em vez de Fotos.',
+                        'O Android perdoa mais. Um download costuma chegar na galeria. A página ainda prefere a folha de compartilhar quando o navegador aceita, porque é o que a maioria queria do botão: uma imagem para guardar ou enviar, não uma aula de gerenciador de arquivos.',
+                    ],
+                },
+                {
+                    title: 'Quando a página diz que não foi possível salvar',
+                    paragraphs: [
+                        'Às vezes o navegador de dentro do aplicativo não entrega o arquivo para a folha. A página mostra o erro ao lado dos controles: Não foi possível salvar. Abra esta página no Safari e tente de novo. No iPhone há o botão Abrir no Safari para esse caso.',
+                        'Toque nele. Encaixe de novo se precisar, depois Compartilhar foto. O Safari também usa a folha, não um download silencioso. Você está saindo do navegador do WhatsApp, não trocando de produto.',
+                        'O erro fica numa caixa coral ao lado do controle que falhou. O site não usa um alerta que cobre a página, porque num navegador de dentro do aplicativo um toque distraído fecha o alerta antes da leitura. Se você vê a caixa coral, essa é a instrução.',
+                        'Se Fotos continuar vazio depois de Salvar imagem, confira se você não tocou em outra linha da folha, como um contato ou um aplicativo que não aceita imagem. Salvar imagem é a linha que importa para a foto de perfil. Depois abra o WhatsApp ou o Instagram e defina a foto a partir da biblioteca, como você já faz.',
+                        'O contador da campanha só anda quando uma foto com moldura é salva ou compartilhada, não quando alguém só viu a página. Se você encaixou o rosto e voltou, ainda não está na contagem. Por isso um grupo pode ter muitas visitas e poucos apoiadores: as pessoas olharam e saíram sem o arquivo.',
+                    ],
+                },
+                {
+                    title: 'Compartilhar nos stories e o quadrado da foto de perfil',
+                    paragraphs: [
+                        'Compartilhar nos stories é um segundo arquivo. É um PNG alto, 9:16, para stories do Instagram ou status do WhatsApp. O rosto quadrado fica no meio de um campo escuro. Não substitui o quadrado que você define como foto de perfil. Salve o quadrado primeiro. Use o arquivo de story se também quiser um status com o mesmo rosto.',
+                        'A exportação de story não adiciona slogan nem uma tela falsa de celular. É o círculo sobre o fundo escuro, no tamanho de um story. Se precisar de texto, coloque no Instagram ou no WhatsApp depois de compartilhar. O arquivo do Ollabs é a imagem, não um cartaz pronto.',
+                        'Depois de um salvamento que funciona, a página muda de tom. Você entrou. Agora chame a sua gente. Compartilhe a foto com moldura primeiro. Depois mande o link para outras pessoas colocarem também. A ordem é de propósito. Uma selfie com moldura no chat é prova. Um URL pelado, sem imagem, é mais fácil de ignorar.',
+                        'Compartilhar no WhatsApp nessa tela manda o link da campanha, não só a imagem. Se a folha existe, Compartilhar foto continua principal e o WhatsApp fica abaixo. Quem fala tagalo, ou usa o produto em indonésio, também vê o Messenger, porque essas conversas ainda vivem lá. Os outros podem usar outro jeito de compartilhar ou copiar o link.',
+                        'Há um QR na mesma tela se você precisar jogar a campanha num projetor ou num cartão impresso. Escanear abre a campanha. Isso é para uma sala de pessoas, não para quem já está com o celular. Para um grupo, mande o link. Para um salão, mostre o QR.',
+                    ],
+                },
+                {
+                    title: 'Depois da foto, mande o link',
+                    paragraphs: [
+                        'Trocar a sua foto de perfil não traz mais ninguém. A próxima pessoa ainda precisa do URL da campanha. Cole embaixo da foto, ou use o WhatsApp para a mensagem já ir escrita.',
+                        'O texto de quem apoia é uma frase: Acabei de participar de {campanha}, coloque a moldura na sua foto (via Ollabs). A primeira linha é o link. Quando o celular parece brasileiro, a frase já está em português. Você não precisa reescrever.',
+                        'Não comece uma segunda campanha porque o primeiro download falhou. Quem organiza já tem um link. Se o PNG não chegou, o conserto é Compartilhar foto ou o Safari, não um endereço novo. Um URL novo divide o grupo e o contador.',
+                        'Se você organiza e está lendo isto para orientar um grupo: diga Compartilhar foto, depois Salvar imagem. Não diga baixar a moldura. Essa frase é como quem usa iPhone acaba em Arquivos, ou sem nada. Se a pessoa insistir que o botão não fez nada, mande Abrir no Safari.',
+                        'Quer uma moldura sua depois de entrar na campanha de outra pessoa? Crie a sua no fim da página da campanha. Essa é uma campanha nova, com um link novo. Ela não substitui a que você acabou de salvar.',
+                    ],
+                },
+            ],
+            faqs: [
+                {
+                    q: 'Por que Baixar foto não fez nada no meu iPhone?',
+                    a: 'Dentro do WhatsApp e do Instagram, o iPhone ignora o download comum. Use Compartilhar foto e depois Salvar imagem. Se a folha não abrir, toque em Abrir no Safari e tente de novo.',
+                },
+                {
+                    q: 'Para onde vai o arquivo?',
+                    a: 'Salvar imagem grava em Fotos. Um download cru no iPhone costuma ir para Arquivos, e é por isso que a página evita esse caminho.',
+                },
+                {
+                    q: 'Compartilhar nos stories é a minha foto de perfil?',
+                    a: 'Não. Compartilhar nos stories é uma imagem alta para status. O PNG quadrado de Compartilhar foto é o que você define como foto de perfil.',
+                },
+                {
+                    q: 'Preciso de conta no Ollabs para salvar?',
+                    a: 'Não. Abra o link, adicione a foto e compartilhe ou salve. A página da campanha nunca exige cadastro.',
+                },
+            ],
+            cta: { href: '/create', label: 'Criar campanha' },
+        },
     },
     {
         slug: 'custom-png-frame-photo-window',
@@ -340,11 +462,28 @@ export const GUIDES: Guide[] = [
         description:
             'Upload a square transparent PNG, open a photo window so the face is not crushed, when the opaque warning means you should cut a hole, and when a colour ring is enough.',
         subtitle:
-            'Create is Frame, Name, Send. The live preview stays on screen while you adjust the window. Most first frames fail because the art eats the face.',
+            'To make a custom PNG frame that leaves room for the face, upload a square PNG with a transparent middle, open the photo window until the face is readable at avatar size, then name the campaign and publish. A JPEG of a poster usually crushes the face. A color ring is enough when you have no art yet.',
         author: AUTHOR,
         publishedAt: '2026-08-28',
         readingMinutes: 8,
         sections: [
+            {
+                title: 'Leave room for the face',
+                steps: [
+                    {
+                        title: 'Upload a square PNG',
+                        body: 'Go to Create. Use a square PNG with transparency. A JPEG of a poster or a photo of a logo usually looks muddy at avatar size.',
+                    },
+                    {
+                        title: 'Open the photo window',
+                        body: 'Drag the window until a face fits without the art covering the eyes. The live preview stays on screen while you adjust. Leave the centre empty on purpose.',
+                    },
+                    {
+                        title: 'Name it and publish',
+                        body: 'Give the campaign a title people will recognize, publish, and send one link. If the crest is unreadable at WhatsApp size, the frame is not done.',
+                    },
+                ],
+            },
             {
                 title: 'Start with a square PNG, not a photo of a poster',
                 screenshot:
@@ -426,11 +565,28 @@ export const GUIDES: Guide[] = [
         description:
             'What views, supporters, and conversion actually mean, how to use the 14-day chart and country list, when to change the frame instead of the link, and how to keep the manage key private.',
         subtitle:
-            'Manage is the private page for the person who published. It is not the public campaign. The numbers tell you whether the link left your phone, and whether the frame is the problem.',
+            'To read the dashboard, open the private manage link, not the public campaign. Views are people who opened the page. Supporters are people who saved or shared a framed photo. If views are high and supporters are not, change the frame and keep the same link.',
         author: AUTHOR,
         publishedAt: '2026-08-28',
         readingMinutes: 8,
         sections: [
+            {
+                title: 'Read the three numbers',
+                steps: [
+                    {
+                        title: 'Open manage, not the public page',
+                        body: 'The dashboard is the private link from publish, often with a key. The public /c/ page is what supporters see. Do not paste the manage key into the group chat.',
+                    },
+                    {
+                        title: 'Compare views and supporters',
+                        body: 'Views are opens. Supporters are saves or shares. A person who fitted a face and left is a view, not a supporter.',
+                    },
+                    {
+                        title: 'Change the frame or send the link',
+                        body: 'Tiny views mean the link never left your phone. Send it to one group. High views and few supporters usually mean the frame is the problem. Upload a cleaner PNG and keep the same URL.',
+                    },
+                ],
+            },
             {
                 title: 'How you get into manage',
                 screenshot:
@@ -515,11 +671,28 @@ export const GUIDES: Guide[] = [
         description:
             'Publish without an account, bookmark the private manage key, save access with a 6 digit email code, recover a lost dashboard, and claim the campaign onto a login so My campaigns follows you.',
         subtitle:
-            'Create does not require a signup. That is a feature until the phone dies. These are the three ways the same campaign stays yours.',
+            'To keep a campaign when you switch phones, bookmark the private manage link before you close the tab, save an email so Recover can send a code, or claim the campaign onto a free login. The public /c/ link stays the same. Signup is not required to publish.',
         author: AUTHOR,
         publishedAt: '2026-08-28',
         readingMinutes: 8,
         sections: [
+            {
+                title: 'Keep the same campaign',
+                steps: [
+                    {
+                        title: 'Bookmark the manage link',
+                        body: 'Right after publish, save the private manage URL. The public /c/ link is for the group. The manage link is how you edit the frame later.',
+                    },
+                    {
+                        title: 'Save an email for Recover',
+                        body: 'A 6 digit code sent to that address opens the dashboard if you lose the phone. Without an email, Recover cannot invent access.',
+                    },
+                    {
+                        title: 'Claim it onto a login',
+                        body: 'A free organizer login lists the campaign under My campaigns on the next phone. Claiming does not change the public URL.',
+                    },
+                ],
+            },
             {
                 title: 'You can publish with nothing but a frame',
                 paragraphs: [
@@ -603,11 +776,28 @@ export const GUIDES: Guide[] = [
         description:
             'What to put on the frame, why the first hour on WhatsApp decides the outcome, how to write the ask, what to do when the counter stalls, and when a hub link beats a campaign link.',
         subtitle:
-            'A campaign is a picture and a link, sent to people who already talk to each other. Most Ollabs traffic is phones and WhatsApp. The large majority of campaigns are Brazilian. The rest of this guide is what to do with that.',
+            'To run a profile-picture campaign that people join, publish one frame, paste the link into one WhatsApp group in the first hour, and do not start a second URL if the first save fails. Most campaigns that get a supporter get that person within an hour. After a day with no one, the link was not sent.',
         author: AUTHOR,
         publishedAt: '2026-08-28',
         readingMinutes: 8,
         sections: [
+            {
+                title: 'Get the first supporter',
+                steps: [
+                    {
+                        title: 'Publish one frame',
+                        body: 'Upload a square PNG with room for the face, or start from a color ring. One short line of type is enough. Leave the centre empty.',
+                    },
+                    {
+                        title: 'Send the link in the first hour',
+                        body: 'Paste it into one WhatsApp group that already talks. Most campaigns that get a supporter get that person within an hour of sharing.',
+                    },
+                    {
+                        title: 'Fix the save, do not start over',
+                        body: 'If someone on iPhone cannot download, tell them Share photo, then Save Image. A second campaign URL splits the count.',
+                    },
+                ],
+            },
             {
                 title: 'What the frame should actually say',
                 screenshot:
@@ -762,7 +952,7 @@ export const GUIDES: Guide[] = [
         description:
             'Step-by-step: upload a frame, name your campaign, publish, and share on WhatsApp in the first hour when most campaigns get their first supporter.',
         subtitle:
-            'You can publish in under a minute. No signup required to create. Share the link immediately after publish: most campaigns that take off get their first supporter within an hour.',
+            'To start a campaign, upload a square frame or pick a color ring, name it, and publish. No signup is required. Paste the link into WhatsApp in the first hour. Most campaigns that take off get their first supporter within that hour.',
         author: AUTHOR,
         publishedAt: '2026-08-28',
         readingMinutes: 3,

@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { USE_CASES } from '@/lib/useCases';
 import { USE_CASES_PT } from '@/lib/useCasesPt';
 import { GUIDES, guidesInLocale } from '@/lib/guides';
+import { dayPtSlugs, getDayPt } from '@/lib/daysPt';
 import {
     englishSlugFromPt,
     caseLanguageAlternates,
@@ -65,11 +66,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             alternates: { languages: caseLanguageAlternates(englishSlugFromPt(u.slug)) },
         })),
         { url: `${baseUrl}/day`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
-        ...DAYS.map((d) => ({
-            url: `${baseUrl}/day/${d.slug}`,
+        ...DAYS.map((d) => {
+            const languages = getDayPt(d.slug)
+                ? {
+                    en: `${baseUrl}/day/${d.slug}`,
+                    'pt-BR': `${baseUrl}/pt/day/${d.slug}`,
+                    'x-default': `${baseUrl}/day/${d.slug}`,
+                }
+                : undefined;
+            return {
+                url: `${baseUrl}/day/${d.slug}`,
+                lastModified: new Date(),
+                changeFrequency: 'weekly' as const,
+                priority: 0.9,
+                ...(languages ? { alternates: { languages } } : {}),
+            };
+        }),
+        ...dayPtSlugs().map((slug) => ({
+            url: `${baseUrl}/pt/day/${slug}`,
             lastModified: new Date(),
             changeFrequency: 'weekly' as const,
             priority: 0.9,
+            alternates: {
+                languages: {
+                    en: `${baseUrl}/day/${slug}`,
+                    'pt-BR': `${baseUrl}/pt/day/${slug}`,
+                    'x-default': `${baseUrl}/day/${slug}`,
+                },
+            },
         })),
         { url: `${baseUrl}/day/national-coffee-day/independents`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.8 },
         { url: `${baseUrl}/vs/twibbonize`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8, alternates: { languages: twibbonizeLanguages } },

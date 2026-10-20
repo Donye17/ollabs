@@ -17,6 +17,12 @@ const EN_TO_PT: Record<string, string> = Object.fromEntries(
     Object.entries(PT_TO_EN).map(([ptSlug, enSlug]) => [enSlug, ptSlug])
 );
 
+/** Portuguese use-case path for an English slug, or null when that page is English only. */
+export function ptForPath(enSlug: string): string | null {
+    const pt = EN_TO_PT[enSlug];
+    return pt ? `/pt/for/${pt}` : null;
+}
+
 /** Builds the hreflang cluster for a use-case page. English and Portuguese only. */
 export function caseLanguageAlternates(enSlug: string): Record<string, string> {
     const englishUrl = `${BASE_URL}/for/${enSlug}`;

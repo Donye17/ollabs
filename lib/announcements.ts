@@ -17,6 +17,24 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-19-day-pt',
+        date: '2026-10-19',
+        title: 'Independência and Dia das Crianças have Portuguese pages',
+        summary: 'The two Brazilian holidays now have a Portuguese body, next to the English page.',
+        items: [
+            'Sete de Setembro and 12 de outubro, with the same frame tool and no extra ads.',
+        ],
+    },
+    {
+        id: '2026-10-19-iphone-guide-pt',
+        date: '2026-10-19',
+        title: 'The iPhone save guide is in Portuguese',
+        summary: 'How to save a framed photo from WhatsApp or Instagram, in English and Portuguese.',
+        items: [
+            'On iPhone, tap Share photo, then Save Image. Download does nothing inside those apps.',
+        ],
+    },
+    {
         id: '2026-10-19-home-frames',
         date: '2026-10-19',
         title: 'Top campaigns show the real frames',

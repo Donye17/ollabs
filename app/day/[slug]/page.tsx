@@ -6,6 +6,8 @@ import { NavBar } from '@/components/NavBar';
 import { SiteFooter } from '@/components/SiteFooter';
 import { DayFrameTool } from '@/components/day/DayFrameTool';
 import { DAYS, getDay, nextOccurrence, formatOccurrence, countdownLabel, resolveFrame } from '@/lib/days';
+import { getDayPt, type DayPtCopy } from '@/lib/daysPt';
+import { ptForPath } from '@/lib/useCaseHreflang';
 import { FrameType } from '@/lib/types';
 import { getUseCase } from '@/lib/useCases';
 import { visibleFrameSql } from '@/lib/frameValidity';
@@ -26,28 +28,63 @@ export function generateStaticParams() {
     return DAYS.map((d) => ({ slug: d.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-    const { slug } = await params;
+type DayLocale = 'en' | 'pt';
+
+function dayLanguages(slug: string) {
+    if (!getDayPt(slug)) return undefined;
+    const en = `https://ollabs.studio/day/${slug}`;
+    return {
+        en,
+        'pt-BR': `https://ollabs.studio/pt/day/${slug}`,
+        'x-default': en,
+    };
+}
+
+export async function dayMetadata(slug: string, locale: DayLocale): Promise<Metadata> {
     const day = getDay(slug);
-    if (!day) return { title: 'Not found' };
+    const pt = locale === 'pt' ? getDayPt(slug) : undefined;
+    if (!day || (locale === 'pt' && !pt)) return { title: 'Not found' };
+    const name = pt?.name ?? day.name;
+    const tagline = pt?.tagline ?? day.tagline;
     const occ = nextOccurrence(day.date);
-    const when = formatOccurrence(day, occ);
-    const url = `https://ollabs.studio/day/${day.slug}`;
-    const description = `${day.name} is ${when}. ${day.tagline} Make a free profile picture frame and share one link. No signup, no watermark.`;
+    const when = formatOccurrence(day, occ, locale);
+    const url = locale === 'pt'
+        ? `https://ollabs.studio/pt/day/${day.slug}`
+        : `https://ollabs.studio/day/${day.slug}`;
+    const description = locale === 'pt'
+        ? `${name} é ${when}. ${tagline} Faça uma moldura grátis e compartilhe um link. Sem cadastro e sem marca d'água.`
+        : `${name} is ${when}. ${tagline} Make a free profile picture frame and share one link. No signup, no watermark.`;
+    const title = locale === 'pt'
+        ? `${name}: moldura para foto de perfil`
+        : `${name} Profile Picture Frame`;
     const overrideUrl = await getFrameOverride(day.slug);
     const frame = resolveFrame(day, overrideUrl);
     const ogImage =
         (frame.type === FrameType.CUSTOM_IMAGE && frame.imageUrl) ? frame.imageUrl
         : overrideUrl || '/og.png';
+    const languages = dayLanguages(day.slug);
     return {
-        title: `${day.name} Profile Picture Frame`,
+        title,
         description,
-        keywords: [day.keyword, `${day.name.toLowerCase()} frame`, `${day.name.toLowerCase()} profile picture`,
+        keywords: [day.keyword, `${name.toLowerCase()} frame`, `${name.toLowerCase()} profile picture`,
             'profile picture frame', 'twibbon alternative'],
-        alternates: { canonical: url },
-        openGraph: { type: 'website', url, siteName: 'Ollabs', title: `${day.name} Profile Picture Frame`, description, images: [ogImage] },
-        twitter: { card: 'summary_large_image', title: `${day.name} Profile Picture Frame`, description, images: [ogImage] },
+        alternates: { canonical: url, ...(languages ? { languages } : {}) },
+        openGraph: {
+            type: 'website',
+            locale: locale === 'pt' ? 'pt_BR' : 'en_US',
+            url,
+            siteName: 'Ollabs',
+            title,
+            description,
+            images: [ogImage],
+        },
+        twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
     };
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const { slug } = await params;
+    return dayMetadata(slug, 'en');
 }
 
 type LiveCampaign = {
@@ -92,14 +129,87 @@ async function liveCampaigns(slug: string): Promise<LiveCampaign[]> {
     }
 }
 
-export default async function DayPage({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params;
-    const day = getDay(slug);
-    if (!day) notFound();
+const CHROME = {
+    en: {
+        addFrame: 'Add the frame to your photo',
+        free: 'Free, no signup, and no watermark. Your photo never leaves your browser.',
+        celebrate: (name: string) => `How to celebrate ${name}`,
+        what: (name: string) => `What ${name} is`,
+        orgs: 'How organisations mark it',
+        first: 'Be the first',
+        running: 'Campaigns running now',
+        noneYet: (name: string) => `No one has run a ${name} campaign yet.`,
+        live: 'Live campaigns on Ollabs, with real supporter counts.',
+        emptyCta: 'Make the frame, share one link, and your supporter count starts moving today.',
+        create: 'Create a campaign',
+        ideas: 'Campaign ideas',
+        questions: 'Common questions',
+        runOrg: 'Run it for your organisation',
+        runBody: 'Make the frame once, share one link, and watch the supporter count move. Takes about a minute.',
+        explore: 'Explore campaigns',
+        moreTeam: 'More for your team',
+        framesFor: (who: string) => `Frames for ${who}`,
+        allDays: 'All awareness days',
+        example: 'Example campaign',
+        faqHow: (name: string) => `How do you celebrate ${name}?`,
+        h1: (name: string) => `${name} profile picture frame`,
+    },
+    pt: {
+        addFrame: 'Coloque a moldura na sua foto',
+        free: 'Grátis, sem cadastro e sem marca d\'água. A sua foto não sai do navegador.',
+        celebrate: (name: string) => `Como celebrar ${name}`,
+        what: (name: string) => `O que é ${name}`,
+        orgs: 'Como organizações marcam o dia',
+        first: 'Seja o primeiro',
+        running: 'Campanhas acontecendo agora',
+        noneYet: (name: string) => `Ninguém fez uma campanha de ${name} ainda.`,
+        live: 'Campanhas ao vivo no Ollabs, com a contagem real de apoiadores.',
+        emptyCta: 'Faça a moldura, compartilhe um link, e a contagem de apoiadores começa a andar hoje.',
+        create: 'Criar campanha',
+        ideas: 'Ideias de campanha',
+        questions: 'Perguntas frequentes',
+        runOrg: 'Faça para a sua organização',
+        runBody: 'Faça a moldura uma vez, compartilhe um link e veja a contagem subir. Leva cerca de um minuto.',
+        explore: 'Ver campanhas',
+        moreTeam: 'Mais para o seu time',
+        framesFor: (who: string) => `Molduras para ${who}`,
+        allDays: 'Todas as datas',
+        example: 'Campanha de exemplo',
+        faqHow: (name: string) => `Como celebrar ${name}?`,
+        h1: (name: string) => `${name}: moldura para foto de perfil`,
+    },
+} as const;
 
+const AUDIENCE_PT: Record<string, string> = {
+    fundraisers: 'arrecadação',
+    nonprofits: 'ONGs',
+    churches: 'igrejas',
+    schools: 'escolas',
+    'sports-teams': 'times',
+    events: 'eventos',
+    birthdays: 'aniversários',
+    'awareness-campaigns': 'conscientização',
+    companies: 'empresas',
+    universities: 'universidades',
+};
+
+export async function DayArticle({ slug, locale = 'en' }: { slug: string; locale?: DayLocale }) {
+    const day = getDay(slug);
+    const pt: DayPtCopy | undefined = locale === 'pt' ? getDayPt(slug) : undefined;
+    if (!day || (locale === 'pt' && !pt)) notFound();
+
+    const ui = CHROME[locale];
+    const name = pt?.name ?? day.name;
+    const tagline = pt?.tagline ?? day.tagline;
+    const intro = pt?.intro ?? day.intro;
+    const background = pt?.background ?? day.background;
+    const howToCelebrate = pt?.howToCelebrate ?? day.howToCelebrate;
+    const howOrgsMark = pt?.howOrgsMark ?? day.howOrgsMark;
+    const campaignIdeas = pt?.campaignIdeas ?? day.campaignIdeas;
+    const faqs = pt?.faqs ?? day.faqs;
     const occ = nextOccurrence(day.date);
-    const when = formatOccurrence(day, occ);
-    const countdown = countdownLabel(occ);
+    const when = formatOccurrence(day, occ, locale);
+    const countdown = countdownLabel(occ, new Date(), locale);
     const [campaigns, overrideUrl] = await Promise.all([
         liveCampaigns(day.slug),
         getFrameOverride(day.slug),
@@ -112,13 +222,13 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             mainEntity: [
                 {
                     '@type': 'Question',
-                    name: `How do you celebrate ${day.name}?`,
+                    name: ui.faqHow(name),
                     acceptedAnswer: {
                         '@type': 'Answer',
-                        text: day.howToCelebrate.map((b) => `${b.title}. ${b.body}`).join(' '),
+                        text: howToCelebrate.map((b) => `${b.title}. ${b.body}`).join(' '),
                     },
                 },
-                ...day.faqs.map((f) => ({
+                ...faqs.map((f) => ({
                     '@type': 'Question', name: f.q,
                     acceptedAnswer: { '@type': 'Answer', text: f.a },
                 })),
@@ -127,13 +237,13 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
         {
             '@context': 'https://schema.org',
             '@type': 'Event',
-            name: day.name,
+            name,
             startDate: occ.start.toISOString().slice(0, 10),
             endDate: occ.end.toISOString().slice(0, 10),
             eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
             eventStatus: 'https://schema.org/EventScheduled',
-            location: { '@type': 'VirtualLocation', url: `https://ollabs.studio/day/${day.slug}` },
-            description: day.tagline,
+            location: { '@type': 'VirtualLocation', url: locale === 'pt' ? `https://ollabs.studio/pt/day/${day.slug}` : `https://ollabs.studio/day/${day.slug}` },
+            description: tagline,
         },
     ];
 
@@ -154,9 +264,9 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                         </span>
                     </div>
                     <h1 className="font-display text-4xl md:text-6xl font-extrabold leading-[1.03] mb-5">
-                        {day.name} profile picture frame
+                        {ui.h1(name)}
                     </h1>
-                    <p className="text-lg md:text-xl text-ink/70 max-w-2xl">{day.tagline}</p>
+                    <p className="text-lg md:text-xl text-ink/70 max-w-2xl">{tagline}</p>
                 </div>
             </section>
 
@@ -164,9 +274,9 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             <section className="px-6 pb-16">
                 <div className="max-w-3xl mx-auto">
                     <div className="bg-cream border border-ink/10 rounded-3xl p-6 md:p-10">
-                        <h2 className="font-display text-2xl font-bold mb-1 text-center">Add the frame to your photo</h2>
+                        <h2 className="font-display text-2xl font-bold mb-1 text-center">{ui.addFrame}</h2>
                         <p className="text-sm text-ink/70 mb-7 text-center">
-                            Free, no signup, and no watermark. Your photo never leaves your browser.
+                            {ui.free}
                         </p>
                         <DayFrameTool frame={resolveFrame(day, overrideUrl)} dayName={day.name} daySlug={day.slug} />
                         <div className="mt-5">
@@ -187,7 +297,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             {/* Intro + background */}
             <section className="px-6 pb-4">
                 <div className="max-w-3xl mx-auto space-y-4">
-                    {day.intro.map((p, i) => <p key={i} className="text-lg text-ink/75 leading-relaxed">{p}</p>)}
+                    {intro.map((p, i) => <p key={i} className="text-lg text-ink/75 leading-relaxed">{p}</p>)}
                 </div>
             </section>
 
@@ -198,10 +308,10 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             <section className="px-6 py-12">
                 <div className="max-w-3xl mx-auto">
                     <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">
-                        How to celebrate {day.name}
+                        {ui.celebrate(name)}
                     </h2>
                     <div className="space-y-4">
-                        {day.howToCelebrate.map((b) => (
+                        {howToCelebrate.map((b) => (
                             <div key={b.title} className="bg-cream border border-ink/10 rounded-2xl p-5">
                                 <h3 className="font-display font-bold mb-1.5">{b.title}</h3>
                                 <p className="text-ink/75 leading-relaxed">{b.body}</p>
@@ -213,9 +323,9 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
 
             <section className="px-6 py-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">What {day.name} is</h2>
+                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">{ui.what(name)}</h2>
                     <div className="space-y-4">
-                        {day.background.map((p, i) => <p key={i} className="text-lg text-ink/75 leading-relaxed">{p}</p>)}
+                        {background.map((p, i) => <p key={i} className="text-lg text-ink/75 leading-relaxed">{p}</p>)}
                     </div>
                 </div>
             </section>
@@ -223,9 +333,9 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             {/* How organisations mark it */}
             <section className="px-6 pb-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">How organisations mark it</h2>
+                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">{ui.orgs}</h2>
                     <div className="space-y-4">
-                        {day.howOrgsMark.map((b) => (
+                        {howOrgsMark.map((b) => (
                             <div key={b.title} className="bg-cream border border-ink/10 rounded-2xl p-5">
                                 <h3 className="font-display font-bold mb-1.5">{b.title}</h3>
                                 <p className="text-ink/75 leading-relaxed">{b.body}</p>
@@ -245,23 +355,21 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             <section className="px-6 pb-12">
                 <div className="max-w-3xl mx-auto">
                     <h2 className="font-display text-2xl md:text-3xl font-bold mb-2">
-                        {campaigns.length === 0 ? 'Be the first' : 'Campaigns running now'}
+                        {campaigns.length === 0 ? ui.first : ui.running}
                     </h2>
                     <p className="text-ink/70 mb-6">
-                        {campaigns.length === 0
-                            ? `No one has run a ${day.name} campaign yet.`
-                            : `Live ${day.category} campaigns on Ollabs, with real supporter counts.`}
+                        {campaigns.length === 0 ? ui.noneYet(name) : ui.live}
                     </p>
                     {campaigns.length === 0 ? (
                         <div className="border border-dashed border-ink/15 rounded-2xl p-8 text-center">
                             <p className="text-ink/75 mb-5">
-                                Make the frame, share one link, and your supporter count starts moving today.
+                                {ui.emptyCta}
                             </p>
                             <Link
                                 href={`/create?day=${day.slug}`}
                                 className="inline-flex h-11 px-6 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all"
                             >
-                                Create a campaign <ArrowRight size={16} />
+                                {ui.create} <ArrowRight size={16} />
                             </Link>
                         </div>
                     ) : (
@@ -281,7 +389,7 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
                                                 supporterPhotos: parseSupporterPhotos(featured.supporter_photos),
                                             }}
                                             size={200}
-                                            title="Example campaign"
+                                            title={ui.example}
                                         />
                                     </div>
                                 );
@@ -312,9 +420,9 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             {/* Ideas */}
             <section className="px-6 pb-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">Campaign ideas</h2>
+                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">{ui.ideas}</h2>
                     <ul className="space-y-3">
-                        {day.campaignIdeas.map((idea, i) => (
+                        {campaignIdeas.map((idea, i) => (
                             <li key={i} className="flex gap-3 text-lg text-ink/75 leading-relaxed">
                                 <span className="mt-2 w-2 h-2 rounded-full bg-brand shrink-0" />
                                 <span>{idea}</span>
@@ -333,9 +441,9 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             {/* FAQ */}
             <section className="px-6 pb-12">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">Common questions</h2>
+                    <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">{ui.questions}</h2>
                     <div className="space-y-4">
-                        {day.faqs.map((f) => (
+                        {faqs.map((f) => (
                             <div key={f.q} className="bg-cream border border-ink/10 rounded-2xl p-5">
                                 <h3 className="font-display font-bold mb-2">{f.q}</h3>
                                 <p className="text-ink/75 leading-relaxed">{f.a}</p>
@@ -376,39 +484,41 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             <section className="px-6 pb-24">
                 <div className="max-w-3xl mx-auto">
                     <div className="bg-cream border border-ink/10 rounded-3xl p-10 text-center mb-10">
-                        <h2 className="font-display text-2xl md:text-3xl font-bold mb-3">Run it for your organisation</h2>
+                        <h2 className="font-display text-2xl md:text-3xl font-bold mb-3">{ui.runOrg}</h2>
                         <p className="text-ink/70 mb-7 max-w-xl mx-auto">
-                            Make the frame once, share one link, and watch the supporter count move. Takes about a minute.
+                            {ui.runBody}
                         </p>
                         <Link href={`/create?day=${day.slug}`} className="inline-flex h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center gap-2 hover:brightness-105 transition-all">
-                            Create a campaign <ArrowRight size={16} />
+                            {ui.create} <ArrowRight size={16} />
                         </Link>
                         <div className="mt-3">
                             <Link
                                 href="/explore"
                                 className="inline-flex min-h-[44px] px-4 text-sm font-semibold text-muted hover:text-brand-deep transition-colors"
                             >
-                                Explore campaigns
+                                {ui.explore}
                             </Link>
                         </div>
                     </div>
 
                     {day.relatedUseCases.length > 0 && (
                         <>
-                            <h3 className="font-display font-bold mb-3">More for your team</h3>
+                            <h3 className="font-display font-bold mb-3">{ui.moreTeam}</h3>
                             <div className="flex flex-wrap gap-2">
                                 {day.relatedUseCases.map((s) => {
                                     const uc = getUseCase(s);
                                     if (!uc) return null;
+                                    const href = locale === 'pt' && ptForPath(s) ? ptForPath(s)! : `/for/${s}`;
+                                    const who = locale === 'pt' ? (AUDIENCE_PT[s] ?? uc.audience.toLowerCase()) : uc.audience.toLowerCase();
                                     return (
-                                        <Link key={s} href={`/for/${s}`}
+                                        <Link key={s} href={href}
                                             className="rounded-full border border-ink/15 px-4 py-2 text-sm font-semibold hover:bg-ink/5 transition-colors">
-                                            Frames for {uc.audience.toLowerCase()}
+                                            {ui.framesFor(who)}
                                         </Link>
                                     );
                                 })}
                                 <Link href="/day" className="rounded-full border border-ink/15 px-4 py-2 text-sm font-semibold hover:bg-ink/5 transition-colors">
-                                    All awareness days
+                                    {ui.allDays}
                                 </Link>
                             </div>
                         </>
@@ -419,4 +529,9 @@ export default async function DayPage({ params }: { params: Promise<{ slug: stri
             <SiteFooter />
         </main>
     );
+}
+
+export default async function DayPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    return DayArticle({ slug, locale: 'en' });
 }

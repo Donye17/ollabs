@@ -170,6 +170,58 @@ These are clicks in a logged-in AdSense or Vercel session. Code cannot do them.
 6. After this deploy is live, in AdSense open Sites, then ads.txt, then Check for updates. The live file is already `google.com, pub-5665798404376894, DIRECT, f08c47fec0942fa0`. Status should become Authorized. If it says Not found, wait and check again. Do not add a second ads.txt under `public/`.
 7. Do not turn Auto ads on to speed up review. Manual units are already in the HTML on guides, `/for`, `/day`, and the Portuguese comparison.
 
+## Loop 2 (`cursor-seo-aeo-2`, 2026-10-19)
+
+Starting scores are the after scores above: Technical 8, Content 7, AEO 7, AdSense 7.5.
+
+### Cycle 1. iPhone save guide in Portuguese
+
+Gap: the highest-traffic remaining English guide had no Portuguese twin, and it opened with context instead of the answer. It also had no visible steps, so no HowTo.
+
+Change: `/guides/save-framed-photo-on-iphone` now leads with the save path, and a visible four-step list feeds HowTo. `/pt/guides/save-framed-photo-on-iphone` is the same article in Portuguese, same slug, with FAQPage, Article, HowTo, and BreadcrumbList. Sitemap and hreflang include the pair. `llms.txt` lists both. One labelled ad, from the existing guide shell.
+
+Re-score: Content 7 to 8. AEO 7 to 7.5. Technical 8 to 8.5 (HowTo and hreflang on a guide that had neither). AdSense stays 7.5.
+
+### Cycle 2. Two Brazilian holiday bodies, and the upcoming calendar
+
+Coverage from 19 October 2026. Every upcoming date already in the calendar has an English page. Nothing new was missing:
+
+| Next date | Page | Language before this cycle |
+| --- | --- | --- |
+| 21 Oct 2026, Unity Day | `/day/unity-day` | English |
+| 28 Oct 2026, Sumpah Pemuda | `/day/sumpah-pemuda` | English |
+| 29 Oct 2026, National Cat Day | `/day/national-cat-day` | English |
+| Through 31 Oct, breast cancer and domestic violence months | those two slugs | English |
+| 30 Nov 2026, Bonifacio Day | `/day/philippines-bonifacio-day` | English |
+| 5 Dec 2026, Thailand National Day | `/day/thailand-national-day` | English |
+| 7 Sep 2027, Independência | `/day/independencia-do-brasil` | English only |
+| 12 Oct 2027, Dia das Crianças | `/day/dia-das-criancas` | English only. 12 Oct 2026 has passed, so the page already rolls to 2027 |
+
+Change: Portuguese bodies for Independência and Dia das Crianças at `/pt/day/independencia-do-brasil` and `/pt/day/dia-das-criancas`. Same frame tool, FAQ, and Event schema, hreflang to the English URL. The other upcoming days stay English. Day pages keep four labelled units below the tool, the count already decided. No fifth unit.
+
+Re-score: Content 8 to 8.5. AEO 7.5 to 8. Technical stays 8.5. AdSense stays 7.5.
+
+### Cycle 3. Answer-first on the remaining English guides
+
+Gap: four organizer guides opened with context and had no step list, so an engine had no HowTo and no standalone first paragraph.
+
+Change: custom PNG frame, dashboard, keeping a campaign across phones, and running a campaign people join now open with the answer and a visible three-step list. HowTo comes from that list. The start-a-campaign subtitle now leads with the steps. The hub guide already defined the hub in the first sentence and already had steps, so it was left.
+
+Re-score: AEO 8 to 8.5. Content, Technical, and AdSense unchanged. The pages were already indexed. The gain is that each one can be quoted.
+
+### Stop
+
+The three items in this brief are done. A fourth cycle would be another guide translation or another day page. Either moves Content a little, and neither is in the priority list. Legal copy, root `html lang`, and the AdSense dashboard stay NEEDS-HUMAN. Two further cycles inside those limits would not beat 8.5.
+
+## Loop 2 scores
+
+| Area | Before this loop | After | Why |
+| --- | --- | --- | --- |
+| Technical SEO | 8 | 8.5 | hreflang and HowTo on the iPhone guide pair, and hreflang on the two Portuguese day URLs. `html lang` is still `en` on `/pt` |
+| Content and keywords | 7 | 8.5 | The iPhone save guide is in Portuguese. Independência and Dia das Crianças have Portuguese bodies. Other day pages and four use cases are still English only |
+| AEO readiness | 7 | 8.5 | The iPhone guide and the four organizer guides now open with a quotable answer and visible steps. The two holiday pages answer in Portuguese |
+| AdSense readiness | 7.5 | 7.5 | The new guide has one labelled unit. Day pages, including the Portuguese ones, stay at four below the tool. Campaign pages still have none |
+
 ## Content cadence
 
 - One Portuguese translation of an existing guide each week, starting with "How to save a framed photo on iPhone," because that is the WhatsApp failure mode.
