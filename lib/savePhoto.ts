@@ -51,8 +51,8 @@ export function preferShareSheetForSave(): boolean {
  * download on desktop. Pass forceDownload only for an explicit desktop fallback.
  *
  * Android can attach the campaign sentence and URL next to the PNG. iOS
- * in-app browsers reject a share that mixes files with text or url, so those
- * stay files-only and the page shows the sentence after the save.
+ * in-app browsers reject a share that mixes files with title, text, or url,
+ * so those stay files-only and the page shows the sentence after the save.
  */
 export async function saveFramedPhoto(opts: {
     blob: Blob;
@@ -141,22 +141,23 @@ export async function shareFramedPhoto(opts: {
 }
 
 /**
- * Hand a PNG to the share sheet.
+ * Payloads for canShare / share, richest first.
  *
- * File sharing has to be possible first. On Android we then ask canShare
- * whether files, title, text, and url can travel together. If that payload
- * is rejected, try text without url, then the file alone. iOS stays
- * files-only: mixing text or url makes WhatsApp's browser throw away the
- * whole sheet, and Save Image is the only way into Photos.
+ * The last attempt is always `{ files }` and nothing else. That is the
+ * same shape canShareFiles already probed. Adding title (or text/url) here
+ * made iOS WhatsApp and Instagram WebViews return false from canShare, so
+ * navigator.share never ran and Save Image never opened.
  */
-async function sharePngFile(opts: {
+function pngShareAttempts(opts: {
     file: File;
     title?: string;
     text?: string;
     url?: string;
-}): Promise<'shared' | 'cancelled' | 'failed'> {
+    ios: boolean;
+}): ShareData[] {
+    const filesOnly: ShareData = { files: [opts.file] };
     const attempts: ShareData[] = [];
-    if (!isIOS() && (opts.text || opts.url)) {
+    if (!opts.ios && (opts.text || opts.url)) {
         const rich: ShareData = { files: [opts.file], title: opts.title };
         if (opts.text) rich.text = opts.text;
         if (opts.url) rich.url = opts.url;
@@ -165,7 +166,32 @@ async function sharePngFile(opts: {
             attempts.push({ files: [opts.file], text: opts.text, title: opts.title });
         }
     }
-    attempts.push({ files: [opts.file], title: opts.title });
+    attempts.push(filesOnly);
+    return attempts;
+}
+
+/**
+ * Hand a PNG to the share sheet.
+ *
+ * File sharing has to be possible first. On Android we then ask canShare
+ * whether files, title, text, and url can travel together. If that payload
+ * is rejected, try text without url, then the file alone. iOS stays
+ * files-only: mixing title, text, or url makes WhatsApp's browser throw
+ * away the whole sheet, and Save Image is the only way into Photos.
+ */
+async function sharePngFile(opts: {
+    file: File;
+    title?: string;
+    text?: string;
+    url?: string;
+}): Promise<'shared' | 'cancelled' | 'failed'> {
+    const attempts = pngShareAttempts({
+        file: opts.file,
+        title: opts.title,
+        text: opts.text,
+        url: opts.url,
+        ios: isIOS(),
+    });
 
     for (const data of attempts) {
         if (!canShareData(data)) continue;
