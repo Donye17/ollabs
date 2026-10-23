@@ -16,8 +16,12 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     try {
+        // Group by campaign id, not r.slug. Reports store the URL at report
+        // time; after a custom-link rename that slug can be gone or owned by
+        // someone else. Hide/View must use the live campaign, not the old name.
         const result = await pool.query(
-            `SELECT r.slug,
+            `SELECT c.id,
+                    c.slug,
                     c.title,
                     c.is_hidden,
                     c.supporter_count,
@@ -27,7 +31,7 @@ export async function GET(request: NextRequest) {
                     array_agg(r.reason) FILTER (WHERE r.reason IS NOT NULL AND r.reason <> '') AS reasons
              FROM campaign_reports r
              JOIN campaigns c ON c.id = r.campaign_id
-             GROUP BY r.slug, c.title, c.is_hidden, c.supporter_count, c.view_count
+             GROUP BY c.id, c.slug, c.title, c.is_hidden, c.supporter_count, c.view_count
              ORDER BY MAX(r.created_at) DESC
              LIMIT 200`
         );
