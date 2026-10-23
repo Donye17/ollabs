@@ -96,6 +96,25 @@ export function handleError(handle: string): string | null {
     return null;
 }
 
+/**
+ * Handle to write on a first-time claim from publish.
+ *
+ * Returns null when the organizer already has a handle. Publish used to send
+ * `handle` whenever the client had not loaded the hub bundle yet, so a signed-in
+ * organizer with /u/coolbrand in an Instagram bio could lose it by tapping
+ * Create before GET /api/organizer/hub returned, or when that GET failed.
+ */
+export function firstTimeHandleClaim(
+    existingHandle: string | null | undefined,
+    requested: unknown,
+): string | null {
+    if (typeof existingHandle === 'string' && existingHandle.length > 0) return null;
+    if (typeof requested !== 'string') return null;
+    const normalized = normalizeHandle(requested);
+    if (handleError(normalized)) return null;
+    return normalized;
+}
+
 export function isSafeHttpUrl(raw: string): boolean {
     try {
         const u = new URL(raw);
