@@ -9,20 +9,43 @@ link. Supporters open that link, drop in a photo, and download the framed result
 
 ---
 
-## Where things stand (2026-08-22)
+## Where things stand (2026-09-28)
 
-**On `main` (pending push of path-to-million work):** Phases 1–8 plus Path A–E thesis-safe
-slice (P0 conversion, hub H1–H10, P1 growth, P2 polish, owner-token hash + manage sessions,
-9:16 story export, hub upgrade interest waitlist). Skipped by thesis: social feed, full frame
-designer, Stripe billing.
+**On `main` (`e10e89d`):** Phases 1–8 plus Path A–E thesis-safe slice (P0 conversion, hub H1–H10,
+P1 growth, P2 polish, owner-token hash + manage sessions, 9:16 story export, hub upgrade
+interest waitlist). Skipped by thesis: social feed, full frame designer, Stripe billing.
 
-Mobile shell, custom-frame create (Frame → Name → Send), organizer save + slug 301s, quiet ads, PT-BR,
-organizer hubs (themes, reorder, social icons, click counts, hide campaigns, one-tap claim), Bahasa /
-Tagalog / Spanish product UI (no `/es` `/id` `/tl` marketing landings; those 301 to `/`), Hindi stub
-`/hi`, localized `/pt/for` and `/pt/vs/twibbonize`, top-market `/day` pages
-(NG, MX, MY, PH, TH) with WhatsApp share + frame OG, geo-biased Explore, starter frame packs,
-geo tracking, first-supporter + zero-supporter organizer email (cron), country breakdown on manage,
-Messenger+WhatsApp parity on publish for ID/TL, funnel `track()` events, report auto-hide.
+**Shipped after the 2026-08-22 handoff:** homepage is the tool (English-default live slug +
+Create a campaign; EN | PT switch; no organizer tab bar on `/`); campaign pages stay
+Portuguese-first when country is BR/PT or untagged; `/guides` (seven organizer articles in
+`lib/guides.ts`); ads and Search indexing off `/c` and `/u` (crawlable + noindex); `/es`
+`/id` `/tl` 301 to `/`; Explore hides campaigns with fewer than five supporters; Contact page;
+quieter campaign last-mile (profile vs story, Open in Safari).
+
+**Do not regress while editing manage / reports / thumbs / recover / hub / slugs / locale:**
+public `/c` slug redirects do not apply to `/manage`; Change the frame needs `k=` today
+(cookie-only manage opens Create as a new campaign); admin hide keys off current
+slug, not `campaign_id`; only day-frame admin pins Vercel Blob hosts;
+`GET /recover/[token]` redeems on first fetch and renders `k=` in HTML; taking a
+custom URL that is only a redirect hijacks the old WhatsApp link; signed-in
+publish can overwrite a claimed `/u` handle if hub GET has not returned;
+`POST /use` `/view` `/report` and `GET /api/campaigns/[slug]` key the live slug
+only, so a custom-link rename can 404 first-hour saves from the original WhatsApp
+paste (ISR 60s + `countedRef` latches on 404); `/use` waits on the Explore thumb
+upload, so leaving for WhatsApp during that upload drops the count; hub PATCH
+deletes and reinserts links on every save, wiping tap counts; do not feed the
+marketing locale cookie into campaign copy (`resolveSupporterLocale`, not
+`resolveLocale`). Details: `docs/ENGINEERING.md`.
+
+Mobile shell, custom-frame create (Frame → Name → Send), organizer save + slug redirects, quiet ads,
+organizer hubs (themes, reorder, social icons, click counts, hide campaigns, one-tap claim),
+Bahasa / Tagalog / Spanish product UI (no marketing landings except `/pt`), Hindi stub `/hi`,
+localized `/pt/for` and `/pt/vs/twibbonize`, top-market `/day` pages (NG, MX, MY, PH, TH),
+geo-biased Explore, starter frame packs, geo tracking, first-supporter + zero-supporter
+organizer email (cron), country breakdown on manage, Messenger+WhatsApp parity on publish for
+ID/TL, funnel `track()` events, report auto-hide.
+
+Developer map (auth, env, APIs, indexing, locale, migrations): `docs/ENGINEERING.md`.
 
 **Still needs a real phone (Phase 0):** see `docs/REAL_PHONE_QA.md`.
 
@@ -40,8 +63,8 @@ between content blocks.
 
 AdSense: ownership meta in root layout; `adsbygoogle.js` loads via `DeferredAdSense`
 (after interaction or ~5s) so home LCP is not fighting unused ad JS. Units still only
-via `AdSlot` (never on `/create` or the photo). Set
-`NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` and `NEXT_PUBLIC_ADSENSE_SLOT_SEO` on Vercel;
+via `AdSlot` (never on `/create`, `/c`, `/u`, or the photo). Set
+`NEXT_PUBLIC_ADSENSE_SLOT_SEO` on Vercel (campaign slot env is unused);
 keep Auto ads / anchors / vignettes OFF. See `docs/ADSENSE_SLOTS.md`.
 
 Email (Resend): `RESEND_API_KEY` + verified `ollabs.studio`. Outbound uses
@@ -51,10 +74,12 @@ Email (Resend): `RESEND_API_KEY` + verified `ollabs.studio`. Outbound uses
 Zero-supporter cron: set `CRON_SECRET` for `/api/cron/zero-supporter` (`vercel.json`).
 
 Organizer mobile tab bar (**Mine · Create · Hub**): show on organizer surfaces;
-**hide** on `/c` public, `/u` hubs, `/for`, `/day`, locale landings, `/vs` —
+**hide** on `/` (home is the tool), `/c` public, `/u` hubs, `/for`, `/day`,
+`/guides`, locale landings, `/vs`, `/explore`, legal/about/contact/updates —
 see `lib/mobileNav.ts`. Language banner never covers a save/publish bar.
 
-Execution brief: `docs/PATH_TO_MILLION_HANDOFF.md`.
+Execution brief (historical tables, shipped): `docs/PATH_TO_MILLION_HANDOFF.md`.
+Developer map: `docs/ENGINEERING.md`.
 Future backlog (not scheduled): `docs/FUTURE_IDEAS.md`.
 
 ---
