@@ -42,6 +42,9 @@ Before inventing APIs or SEO/ad behavior, read the local reference tree:
 
 ## Hard project facts
 
+- Canonical developer map: `docs/ENGINEERING.md` (auth, manage, recover, slugs, hub claim, locale, indexing, share preview).
+- Campaign locale: pass `publisher_country` only into `resolveSupporterLocale`. On current `main`, `/c` ORs `first_supporter_country`.
+- Custom-frame `preview_url`: snapshot must wait for overlay decode (`textureVersion`). OG prefers that column.
 - Tailwind **v3.4**, not v4 syntax.
 - Mobile WhatsApp/Instagram in-app browsers: use `saveFramedPhoto` / `downloadBlob` + `canShareFiles`; share-first on iPhone.
 - Draggable canvases need `touchAction: 'none'`.
