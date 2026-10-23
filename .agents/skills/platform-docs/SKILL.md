@@ -42,6 +42,8 @@ Before inventing APIs or SEO/ad behavior, read the local reference tree:
 
 ## Hard project facts
 
+- Canonical developer map: `docs/ENGINEERING.md` (auth, manage, recover, slugs, hub claim, locale, indexing).
+- Campaign locale: pass `publisher_country` only into `resolveSupporterLocale`. On current `main`, `/c` ORs `first_supporter_country`.
 - Tailwind **v3.4**, not v4 syntax.
 - Mobile WhatsApp/Instagram in-app browsers: use `saveFramedPhoto` / `downloadBlob` + `canShareFiles`; share-first on iPhone.
 - Draggable canvases need `touchAction: 'none'`.
