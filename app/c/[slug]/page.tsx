@@ -9,6 +9,7 @@ import {
     resolveSupporterLocale,
     type Locale,
 } from '@/lib/i18n/locale';
+import { isPublicBlobUrl } from '@/lib/publicBlobUrl';
 
 // Cache the rendered page for 60s per slug. Repeat visits and crawler hits are
 // served from cache instead of querying Postgres every time, which keeps Neon
@@ -83,7 +84,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         && c.frame_config.imageUrl.startsWith('https://')
         ? c.frame_config.imageUrl as string
         : null;
-    const shareImage = c.preview_url || frameImage || 'https://ollabs.studio/og.png';
+    // preview_url is a face-in-frame composite we uploaded. Ignore anything
+    // else so an old or injected off-site URL cannot become the WhatsApp card.
+    const storedPreview = isPublicBlobUrl(c.preview_url) ? c.preview_url : null;
+    const shareImage = storedPreview || frameImage || 'https://ollabs.studio/og.png';
 
     return {
         title: c.title,

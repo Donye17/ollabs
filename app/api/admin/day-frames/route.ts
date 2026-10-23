@@ -2,6 +2,7 @@ import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { DAYS, getDay } from '@/lib/days';
+import { isPublicBlobUrl } from '@/lib/publicBlobUrl';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unknown day' }, { status: 400 });
         }
         // Only our own blob storage, so this cannot be pointed at an arbitrary host.
-        if (typeof imageUrl !== 'string' || !/^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\//.test(imageUrl)) {
+        if (!isPublicBlobUrl(imageUrl)) {
             return NextResponse.json({ error: 'Image must be an uploaded file.' }, { status: 400 });
         }
         await pool.query(
