@@ -1,91 +1,66 @@
-# 🔌 Ollabs Integration Master Checklist
+# Integrations and environment
 
-To activate the "Smooth Running" tech stack and "Viral Engine", you must configure the following services.
+How to stand the stack up. Values stay in the Vercel dashboard (and `.env.local`).
+Do not commit secrets. Architecture and pitfalls: `docs/ENGINEERING.md`.
 
-## 1. Vercel Environment Variables (Critical)
-Go to **Vercel Dashboard > Settings > Environment Variables** and add these:
+## 1. Vercel environment variables
 
-### A. Authentication (Social Login)
-*Get these from Google Cloud Console & Discord Developer Portal.*
-- `GOOGLE_CLIENT_ID`: `...`
-- `GOOGLE_CLIENT_SECRET`: `...`
-- `DISCORD_CLIENT_ID`: `...`
-- `DISCORD_CLIENT_SECRET`: `...`
-- `TWITTER_CLIENT_ID`: `...`
-- `TWITTER_CLIENT_SECRET`: `...`
-- `NEXT_PUBLIC_APP_URL`: `https://ollabs.studio` (or your vercel url)
-- `BETTER_AUTH_SECRET`: `...` (Generate a random string)
+### Database and files
 
-#### ⚠️ Important: Redirect URIs
-When creating your apps in Google/Discord, you must add these **Redirect URIs**:
+| Name | Where it comes from |
+|------|---------------------|
+| `DATABASE_URL` | Neon. Required. App throws at import without it. |
+| `BLOB_READ_WRITE_TOKEN` | Vercel → Storage → Blob |
 
-**For Google Console:**
-- `http://localhost:3000/api/auth/callback/google`
-- `https://ollabs.studio/api/auth/callback/google`
+### Organizer email (Resend)
 
-**For Discord Developer Portal:**
-- `http://localhost:3000/api/auth/callback/discord`
-- `https://ollabs.studio/api/auth/callback/discord`
-- **Scopes:** `identify`, `email` (The app requests these automatically, no need to check boxes in the URL generator)
+Verified domain: `ollabs.studio`.
 
-**For Twitter (X) Developer Portal:**
-- `http://localhost:3000/api/auth/callback/twitter`
-- `https://ollabs.studio/api/auth/callback/twitter`
-- **Permissions:** Read and Write (or at least Read user info)
+| Name | Purpose |
+|------|---------|
+| `RESEND_API_KEY` | Outbound. If missing, mail no-ops in `lib/email.ts` (local/preview still boot). |
+| `EMAIL_FROM` | Optional. Default `Ollabs <hello@ollabs.studio>` |
+| `EMAIL_REPLY_TO` | Optional. Default `hello@ollabs.studio` |
+| `RESEND_WEBHOOK_SECRET` | `POST /api/webhooks/resend` (Svix) |
+| `CONTACT_NOTIFY_EMAIL` | Optional. Forwards inbound Receiving mail. |
+| `NEXT_PUBLIC_SITE_URL` | Links inside emails. Default `https://ollabs.studio` |
 
-### B. Storage (Vercel Blob)
-*Get this from Vercel > Storage > Create Blob.*
-- `BLOB_READ_WRITE_TOKEN`: `vercel_blob_rw_...`
+There is **no** Google / Discord / Twitter OAuth. Organizer login is a 6-digit
+code mailed to the address they type (`POST /api/auth/code`). Redirect URI
+checklists for social providers do not apply.
 
-### C. Database (Already Set)
-- `DATABASE_URL`: (You should already have this from Neon)
+### Cron, admin, Sentry, ads
 
----
+| Name | Purpose |
+|------|---------|
+| `CRON_SECRET` | `GET /api/cron/zero-supporter` every 15 minutes (`vercel.json`). Vercel sends `Authorization: Bearer`. |
+| `ADMIN_KEY` | `/admin?key=...` and `/api/admin/*`. An empty key never authenticates. |
+| `SENTRY_DSN` | Server/edge only. Do not set `NEXT_PUBLIC_SENTRY_DSN`. Checklist: `docs/SENTRY.md`. |
+| `NEXT_PUBLIC_ADSENSE_CLIENT` | Publisher id / meta |
+| `NEXT_PUBLIC_ADSENSE_SLOT_SEO` | SEO units. Campaign slot env is unused. |
+| `NEXT_PUBLIC_GA_ID` | Deferred GA |
 
-## 2. Antigravity Integrations (MCP)
-To give **me** (your AI Agent) superpowers, add these to your MCP Config file (usually `.cursor/mcp.json` or similar, depending on your setup).
+Keep AdSense Auto ads / anchors / vignettes off. Slot notes: `docs/ADSENSE_SLOTS.md`.
 
-### A. GitHub (Manage Code)
-Allows me to open PRs, read issues, and manage the repo.
-```json
-"github": {
-  "command": "npx",
-  "args": ["-y", "@modelcontextprotocol/server-github"],
-  "env": {
-    "GITHUB_PERSONAL_ACCESS_TOKEN": "..."
-  }
-}
+## 2. Vercel product toggles
+
+- Web Analytics and Speed Insights: enable in the Vercel project if they are not already on.
+- Cron: `vercel.json` already declares `/api/cron/zero-supporter`. It still needs `CRON_SECRET`.
+
+## 3. Admin
+
+Moderation, geo, and day-frame overrides live at `/admin`. Pass the same
+`ADMIN_KEY` as the `key` query param. Robots disallow `/admin`. Do not bookmark
+that URL in a shared doc.
+
+## 4. Local
+
+```bash
+# .env.local: DATABASE_URL at minimum. Blob + Resend when you exercise upload or mail.
+npm install
+npm run dev
 ```
 
-### B. Sentry (Fix Crashes)
-**What is it?** It tracks errors and bugs in real-time. Giving me this token allows me to read those crash reports and fix bugs automatically.
-
-**How to get it:**
-1. Sign up/Log in at [sentry.io](https://sentry.io).
-2. Go to [Auth Tokens](https://sentry.io/settings/account/api/auth-tokens/).
-3. Create a token with `project:read` and `issue:read` scopes.
-4. Paste it below.
-
-```json
-"sentry": {
-  "command": "npx",
-  "args": ["-y", "@modelcontextprotocol/server-sentry"],
-  "env": {
-    "SENTRY_AUTH_TOKEN": "..."
-  }
-}
-```
-
----
-
-## 3. SEO & Analytics (No Code Needed)
-These are already integrated into the codebase, but ensure they are enabled in Vercel.
-- **Vercel Web Analytics**: Go to Vercel Dashboard > Analytics > Enable.
-- **Vercel Speed Insights**: Go to Vercel Dashboard > Speed Insights > Enable.
-
----
-
-## 4. Admin Access
-Once deployed, claim your ownership:
-1. Visit: `https://ollabs.studio/api/admin/claim?secret=ollabs-2026-master-key`
-2. Click: "Populate Default Templates" in the Gallery.
+Migrations: numbered files in `drizzle/`. `scripts/apply-migrations.mjs` only
+covers 0014–0016. Apply later files on Neon or extend the script. See
+`docs/ENGINEERING.md`.
