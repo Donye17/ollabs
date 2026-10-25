@@ -17,6 +17,15 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-25-save-paste',
+        date: '2026-10-25',
+        title: 'The campaign sentence stays next to the saved photo',
+        summary: 'After you save, the message and the link are on the page, with a Copy button.',
+        items: [
+            'On iPhone, if the share sheet does not open, Download and the message are both on the confirmation.',
+        ],
+    },
+    {
         id: '2026-10-19-day-pt',
         date: '2026-10-19',
         title: 'Independência and Dia das Crianças have Portuguese pages',

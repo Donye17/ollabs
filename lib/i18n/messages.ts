@@ -98,6 +98,7 @@ export type Messages = {
         shareAnother: string;
         moreWays: string;
         copyLink: string;
+        copyMessage: string;
         linkCopiedPaste: string;
         copyCaptionFailed: string;
         scanCampaign: string;
@@ -625,6 +626,7 @@ const en: Messages = {
         shareAnother: 'Share another way',
         moreWays: 'More ways to share',
         copyLink: 'Copy link',
+        copyMessage: 'Copy message',
         linkCopiedPaste: 'Link copied. Paste it under the photo.',
         copyCaptionFailed: 'Could not copy the link. Select this and paste it with your photo:',
         scanCampaign: 'Scan to open this campaign',
@@ -1010,6 +1012,7 @@ const pt: Messages = {
         shareAnother: 'Compartilhar de outro jeito',
         moreWays: 'Outras formas de compartilhar',
         copyLink: 'Copiar link',
+        copyMessage: 'Copiar mensagem',
         linkCopiedPaste: 'Link copiado. Cole embaixo da foto.',
         copyCaptionFailed: 'Não deu para copiar o link. Selecione isto e cole junto com a sua foto:',
         scanCampaign: 'Escaneie para abrir esta campanha',
@@ -1396,6 +1399,7 @@ const id: Messages = {
         shareAnother: 'Bagikan cara lain',
         moreWays: 'Cara lain untuk berbagi',
         copyLink: 'Salin link',
+        copyMessage: 'Salin pesan',
         linkCopiedPaste: 'Link disalin. Tempel di bawah fotonya.',
         copyCaptionFailed: 'Link tidak tersalin. Pilih teks ini dan tempel bersama fotomu:',
         scanCampaign: 'Pindai untuk buka kampanye ini',
