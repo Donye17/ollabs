@@ -1,6 +1,7 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { clientIp, rateLimit } from '@/lib/rateLimit';
+import { referrerBucket } from '@/lib/campaignBrand';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,12 +22,27 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                 { status: 429 }
             );
         }
+        let body: { utm?: unknown; referrer?: unknown; inApp?: unknown } = {};
+        try {
+            body = await request.json();
+        } catch { /* a view with no body still counts */ }
+        const bucket = referrerBucket({
+            utm: typeof body.utm === 'string' ? body.utm : null,
+            referrer: typeof body.referrer === 'string' ? body.referrer : null,
+            inApp: typeof body.inApp === 'string' ? body.inApp : null,
+        });
         const result = await pool.query(
             `UPDATE campaigns
-             SET view_count = COALESCE(view_count, 0) + 1
+             SET view_count = COALESCE(view_count, 0) + 1,
+                 referrer_counts = jsonb_set(
+                     COALESCE(referrer_counts, '{}'::jsonb),
+                     ARRAY[$2::text],
+                     to_jsonb(COALESCE((referrer_counts->>$2)::int, 0) + 1),
+                     true
+                 )
              WHERE slug = $1 AND is_public = true
              RETURNING view_count`,
-            [slug]
+            [slug, bucket]
         );
         if (result.rows.length === 0) {
             return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });

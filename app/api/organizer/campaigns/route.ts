@@ -1,6 +1,7 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionOrganizer } from '@/lib/auth';
+import { readReferrers } from '@/lib/campaignBrand';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +25,9 @@ export async function GET(request: NextRequest) {
         const result = await pool.query(
             `SELECT c.slug, c.title, c.owner_token, c.supporter_count, c.view_count, c.created_at,
                     c.publisher_country, c.first_supporter_country, c.frame_config,
+                    COALESCE(c.share_count, 0) AS share_count,
+                    COALESCE(c.cta_taps, 0) AS cta_taps,
+                    c.referrer_counts, c.accent_color, c.logo_url,
                     COALESCE(u.last_use, c.created_at) AS last_activity
              FROM campaigns c
              LEFT JOIN (
@@ -52,6 +56,11 @@ export async function GET(request: NextRequest) {
             publisher_country: string | null;
             first_supporter_country: string | null;
             frame_config: unknown;
+            share_count: number | null;
+            cta_taps: number | null;
+            referrer_counts: unknown;
+            accent_color: string | null;
+            logo_url: string | null;
             last_activity: string;
         }) => {
             let frameConfig = row.frame_config;
@@ -73,6 +82,11 @@ export async function GET(request: NextRequest) {
                 first_supporter_country: row.first_supporter_country,
                 last_activity: row.last_activity,
                 frameConfig: frameConfig ?? null,
+                share_count: row.share_count ?? 0,
+                cta_taps: row.cta_taps ?? 0,
+                referrers: readReferrers(row.referrer_counts),
+                accent_color: row.accent_color,
+                logo_url: row.logo_url,
             };
         });
 

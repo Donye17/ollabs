@@ -9,6 +9,7 @@ import {
     resolveSupporterLocale,
     type Locale,
 } from '@/lib/i18n/locale';
+import { parseAccent, parseLogoUrl } from '@/lib/campaignBrand';
 
 // Cache the rendered page for 60s per slug. Repeat visits and crawler hits are
 // served from cache instead of querying Postgres every time, which keeps Neon
@@ -20,7 +21,7 @@ const getCampaign = cache(async (slug: string) => {
     try {
         const res = await pool.query(
             `SELECT id, slug, title, description, share_caption, frame_config, creator_name, supporter_count, goal, preview_url, is_public, is_hidden,
-                    publisher_country, first_supporter_country
+                    publisher_country, first_supporter_country, accent_color, logo_url
              FROM campaigns WHERE slug = $1 LIMIT 1`,
             [slug]
         );
@@ -135,6 +136,8 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
             goal={campaign.goal ?? null}
             frame={frame}
             campaignCountry={country}
+            accent={parseAccent(campaign.accent_color)}
+            logoUrl={parseLogoUrl(campaign.logo_url)}
         />
     );
 }

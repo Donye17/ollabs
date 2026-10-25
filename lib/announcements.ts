@@ -35,6 +35,15 @@ export const ANNOUNCEMENTS: Announcement[] = [
         ],
     },
     {
+        id: '2026-10-25-free-hub',
+        date: '2026-10-25',
+        title: 'Your hub lists every campaign, free',
+        summary: 'Supporter counts, shares, taps, and where people arrived. A color and a logo, then a CSV.',
+        items: [
+            'Nothing on the hub is locked. There is no upgrade step.',
+        ],
+    },
+    {
         id: '2026-10-19-day-pt',
         date: '2026-10-19',
         title: 'Independência and Dia das Crianças have Portuguese pages',

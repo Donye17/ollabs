@@ -361,6 +361,25 @@ export type Messages = {
         browseUses: string;
         startOwn: string;
     };
+    growth: {
+        title: string;
+        lede: string;
+        supporters: string;
+        shares: string;
+        taps: string;
+        whatsapp: string;
+        instagram: string;
+        facebook: string;
+        direct: string;
+        accent: string;
+        logo: string;
+        logoHint: string;
+        saveBrand: string;
+        saved: string;
+        export: string;
+        empty: string;
+        error: string;
+    };
     meta: {
         manage: string;
         hub: string;
@@ -901,6 +920,25 @@ const en: Messages = {
         browseUses: 'Browse use cases',
         startOwn: 'Start your own campaign',
     },
+    growth: {
+        title: 'Your campaigns',
+        lede: 'Every campaign you publish, with the counts. Free.',
+        supporters: 'Supporters',
+        shares: 'Shares',
+        taps: 'Make-your-own taps',
+        whatsapp: 'WhatsApp',
+        instagram: 'Instagram',
+        facebook: 'Facebook',
+        direct: 'Direct',
+        accent: 'Accent color',
+        logo: 'Logo',
+        logoHint: 'A small mark on the campaign page.',
+        saveBrand: 'Save brand',
+        saved: 'Saved',
+        export: 'Download CSV',
+        empty: 'Publish a campaign and it shows up here.',
+        error: 'Could not save that.',
+    },
     meta: {
         manage: 'Manage campaign',
         hub: 'Your hub',
@@ -1288,6 +1326,25 @@ const pt: Messages = {
         browseUses: 'Ver para quem é',
         startOwn: 'Criar sua campanha',
     },
+    growth: {
+        title: 'Suas campanhas',
+        lede: 'Cada campanha que você publicou, com os números. Grátis.',
+        supporters: 'Apoiadores',
+        shares: 'Compartilhamentos',
+        taps: 'Toques em criar moldura',
+        whatsapp: 'WhatsApp',
+        instagram: 'Instagram',
+        facebook: 'Facebook',
+        direct: 'Direto',
+        accent: 'Cor de destaque',
+        logo: 'Logo',
+        logoHint: 'Uma marca pequena na página da campanha.',
+        saveBrand: 'Salvar marca',
+        saved: 'Salvo',
+        export: 'Baixar CSV',
+        empty: 'Publique uma campanha e ela aparece aqui.',
+        error: 'Não deu para salvar.',
+    },
     meta: {
         manage: 'Gerenciar campanha',
         hub: 'Seu hub',
@@ -1674,6 +1731,25 @@ const id: Messages = {
         create: 'Buat kampanye',
         browseUses: 'Lihat contoh',
         startOwn: 'Buat kampanyemu',
+    },
+    growth: {
+        title: 'Kampanye kamu',
+        lede: 'Setiap kampanye yang kamu terbitkan, dengan angkanya. Gratis.',
+        supporters: 'Pendukung',
+        shares: 'Bagikan',
+        taps: 'Ketukan buat bingkai',
+        whatsapp: 'WhatsApp',
+        instagram: 'Instagram',
+        facebook: 'Facebook',
+        direct: 'Langsung',
+        accent: 'Warna aksen',
+        logo: 'Logo',
+        logoHint: 'Tanda kecil di halaman kampanye.',
+        saveBrand: 'Simpan merek',
+        saved: 'Tersimpan',
+        export: 'Unduh CSV',
+        empty: 'Terbitkan kampanye dan kampanye itu muncul di sini.',
+        error: 'Tidak bisa menyimpan.',
     },
     meta: {
         manage: 'Kelola kampanye',

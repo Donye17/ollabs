@@ -20,6 +20,7 @@ import { InAppRescueBar } from '@/components/campaign/InAppRescueBar';
 import { ProfileSetHint } from '@/components/campaign/ProfileSetHint';
 import { FormatCards, type ExportFormat } from '@/components/campaign/FormatCards';
 import { arrivalPlatform, detectInAppBrowser, INAPP_RECOVERY_KEY, sessionFlag, setSessionFlag } from '@/lib/inAppBrowser';
+import { ACCENT_BG, ACCENT_BORDER, type AccentId } from '@/lib/campaignBrand';
 import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown } from 'lucide-react';
 
 const CANVAS = 1024;
@@ -34,10 +35,12 @@ interface CampaignClientProps {
     goal?: number | null;
     frame: FrameConfig;
     campaignCountry?: string | null;
+    accent?: AccentId | null;
+    logoUrl?: string | null;
 }
 
 export const CampaignClient: React.FC<CampaignClientProps> = ({
-    slug, title, description, organizerCaption, initialCount, goal, frame, campaignCountry,
+    slug, title, description, organizerCaption, initialCount, goal, frame, campaignCountry, accent, logoUrl,
 }) => {
     const { locale: browserLocale, setLocale } = useLocale();
     // Country (or untagged → pt) wins over the browser so WhatsApp's English
@@ -147,7 +150,15 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
             const key = `ollabs_viewed_${slug}`;
             if (!sessionStorage.getItem(key)) {
                 sessionStorage.setItem(key, '1');
-                fetch(`/api/campaigns/${slug}/view`, { method: 'POST' }).catch(() => { });
+                fetch(`/api/campaigns/${slug}/view`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        utm: new URLSearchParams(window.location.search).get('utm_source'),
+                        referrer: document.referrer || '',
+                        inApp: detectInAppBrowser(),
+                    }),
+                }).catch(() => { });
             }
         } catch { /* ignore */ }
     }, [slug]);
@@ -183,6 +194,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
             window.open(map[platform], '_blank', 'noopener,noreferrer');
         }
         track('frame_share', { campaign: slug, platform });
+        fetch(`/api/campaigns/${slug}/share`, { method: 'POST', keepalive: true }).catch(() => {});
     };
 
     const copyLink = async () => {
@@ -466,6 +478,9 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 setIosSaveFallback(false);
                 noteCaption(text, result.captionCopied);
                 track(result.outcome === 'shared' ? 'frame_share_photo' : 'frame_download', { campaign: slug, format: exportFormat });
+                if (result.outcome === 'shared') {
+                    fetch(`/api/campaigns/${slug}/share`, { method: 'POST', keepalive: true }).catch(() => {});
+                }
             } else if (result.outcome === 'unavailable' && isIOS()) {
                 // Sheet never opened. Stay on a confirmation they can leave:
                 // Download, the sentence, and the campaign URL.
@@ -505,6 +520,9 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 setSaveError(null);
                 noteCaption(text, result.captionCopied);
                 track('frame_share_story', { campaign: slug, outcome: result.outcome });
+                if (result.outcome === 'shared') {
+                    fetch(`/api/campaigns/${slug}/share`, { method: 'POST', keepalive: true }).catch(() => {});
+                }
             } else if (result.outcome === 'unavailable' && isIOS()) {
                 setIosSaveFallback(true);
                 setJustDownloaded(true);
@@ -526,6 +544,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 // makes some targets append it a second time.
                 await navigator.share({ title, text });
                 track('frame_share', { campaign: slug, platform: 'native' });
+                fetch(`/api/campaigns/${slug}/share`, { method: 'POST', keepalive: true }).catch(() => {});
                 return;
             } catch { /* cancelled */ }
         }
@@ -547,6 +566,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
 
     return (
         <div lang={htmlLang(locale)} className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-[max(0.75rem,env(safe-area-inset-top,0px))] ${bottomPad}`}>
+            {accent && <div aria-hidden className={`fixed top-0 inset-x-0 z-50 h-1 ${ACCENT_BG[accent]}`} />}
             {/* A3: mark only on empty / post-save. During adjust the frame is the UI. */}
             {!adjusting && <BrandMark className="mb-4 mt-2" size={24} />}
 
@@ -555,6 +575,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                     <div className="text-center">
                         {!hasImage && (
                             <p className="text-sm font-semibold text-muted">{t.eyebrow}</p>
+                        )}
+                        {logoUrl && !hasImage && (
+                            <div
+                                role="img"
+                                aria-label={title}
+                                className={`mx-auto mb-2 h-12 w-12 rounded-full border-2 bg-contain bg-center bg-no-repeat ${accent ? ACCENT_BORDER[accent] : 'border-ink/10'}`}
+                                style={{ backgroundImage: `url("${logoUrl.replace(/"/g, '')}")` }}
+                            />
                         )}
                         <h1 className={`font-display font-bold text-balance ${hasImage ? 'text-lg mt-0' : 'text-2xl mt-1'}`}>
                             {title}
@@ -738,6 +766,9 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                 downloadLabel={iosSaveFallback ? t.download : null}
                                 downloading={downloading}
                                 onDownload={iosSaveFallback ? handleDownload : undefined}
+                                accentClass={accent ? ACCENT_BORDER[accent] : null}
+                                logoUrl={logoUrl}
+                                logoLabel={title}
                             />
                         )}
                         {canSharePhoto ? (
@@ -1035,6 +1066,9 @@ function SharePaste({
     downloadLabel,
     downloading,
     onDownload,
+    accentClass,
+    logoUrl,
+    logoLabel,
 }: {
     caption: string;
     hint: string;
@@ -1043,12 +1077,23 @@ function SharePaste({
     downloadLabel: string | null;
     downloading: boolean;
     onDownload?: () => void;
+    accentClass?: string | null;
+    logoUrl?: string | null;
+    logoLabel?: string;
 }) {
     const nl = caption.indexOf('\n');
     const url = nl === -1 ? caption : caption.slice(0, nl);
     const sentence = nl === -1 ? '' : caption.slice(nl + 1);
     return (
-        <div role="status" className="text-sm text-ink bg-brand/10 border border-brand/25 rounded-xl px-3 py-3 text-center">
+        <div role="status" className={`text-sm text-ink bg-brand/10 border-2 rounded-xl px-3 py-3 text-center ${accentClass || 'border-brand/25'}`}>
+            {logoUrl && (
+                <div
+                    role="img"
+                    aria-label={logoLabel || ''}
+                    className={`mx-auto mb-2 h-10 w-10 rounded-full border-2 bg-contain bg-center bg-no-repeat ${accentClass || 'border-ink/10'}`}
+                    style={{ backgroundImage: `url("${logoUrl.replace(/"/g, '')}")` }}
+                />
+            )}
             <p>{hint}</p>
             {sentence && (
                 <button
