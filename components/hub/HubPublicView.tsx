@@ -1,12 +1,17 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Users } from 'lucide-react';
+import { Check, Link2, Users } from 'lucide-react';
 import type { PublicHub } from '@/lib/hub';
+import { campaignFromHubPath } from '@/lib/hub';
 import { HubMadeWithFooter } from '@/components/hub/HubMadeWithFooter';
 import { resolveHubTheme } from '@/lib/hubThemes';
 import { detectSocial } from '@/lib/hubSocial';
-import { supportVerb, supportersLabel } from '@/lib/hubSupportLabel';
+import { supportVerb } from '@/lib/hubSupportLabel';
+import { useLocale } from '@/components/i18n/LocaleProvider';
+import { formatCount, htmlLang, isLocale, type Locale } from '@/lib/i18n/locale';
+import { track } from '@/lib/analytics';
 import {
     FacebookGlyph,
     InstagramGlyph,
@@ -45,24 +50,77 @@ function beacon(handle: string, kind: 'support' | 'link', linkId?: string) {
     } catch { /* ignore */ }
 }
 
+function readLangParam(): Locale | null {
+    if (typeof window === 'undefined') return null;
+    const raw = new URLSearchParams(window.location.search).get('lang');
+    return isLocale(raw) ? raw : null;
+}
+
 /**
- * Mobile-first Linktree column. Primary job: push people into /c for the frame.
- * Featured campaign sits above the fold: large frame preview + filled Join CTA.
+ * Mobile-first campaign directory. Primary job: open the featured frame.
+ * Language starts where that campaign page starts, then the visitor can switch.
  */
 export function HubPublicView({ hub }: { hub: PublicHub }) {
     const theme = resolveHubTheme(hub.theme);
-    const ctaHref = hub.featured ? `/c/${hub.featured.slug}` : null;
+    const { messages, setLocale } = useLocale();
+    const copy = messages.hub;
+    const [picked, setPicked] = useState<Locale | null>(null);
+    const [copied, setCopied] = useState(false);
+    const [copyFailed, setCopyFailed] = useState(false);
+    const [hubUrl, setHubUrl] = useState(`https://ollabs.studio/u/${hub.handle}`);
+    const copying = useRef(false);
+
+    const locale = picked ?? hub.suggestedLocale;
+    const verb = supportVerb(locale);
     const featured = hub.featured;
-    const localeHint =
-        typeof document !== 'undefined'
-            ? (document.cookie.match(/(?:^|; )ollabs_locale=([^;]*)/)?.[1]
-                || (typeof navigator !== 'undefined' ? navigator.language : undefined))
-            : undefined;
-    const verb = supportVerb(localeHint);
-    const count = featured?.supporter_count ?? 0;
+    const ctaHref = featured ? campaignFromHubPath(featured.slug, hub.handle, locale) : null;
+    const bioText =
+        hub.bio?.trim() ||
+        (hub.links.length === 0 ? featured?.description?.trim() || '' : '');
+
+    useEffect(() => {
+        setHubUrl(`${window.location.origin}/u/${hub.handle}`);
+        const fromUrl = readLangParam();
+        if (fromUrl) {
+            setPicked(fromUrl);
+            setLocale(fromUrl);
+        }
+    }, [hub.handle, setLocale]);
+
+    const pickLocale = (next: Locale) => {
+        setPicked(next);
+        setLocale(next);
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', next);
+        window.history.replaceState(null, '', `${url.pathname}${url.search}`);
+    };
+
+    const copyHubLink = async () => {
+        if (copying.current) return;
+        copying.current = true;
+        const url = typeof window !== 'undefined'
+            ? `${window.location.origin}/u/${hub.handle}`
+            : hubUrl;
+        setHubUrl(url);
+        try {
+            await navigator.clipboard.writeText(url);
+            setCopied(true);
+            setCopyFailed(false);
+            track('hub_share', { handle: hub.handle, platform: 'copy', from: 'public' });
+            window.setTimeout(() => setCopied(false), 2000);
+        } catch {
+            setCopied(false);
+            setCopyFailed(true);
+        } finally {
+            copying.current = false;
+        }
+    };
+
+    const countLabel = (n: number | null | undefined) =>
+        `${formatCount(n ?? 0, locale)} ${messages.campaign.peopleSupporting}`;
 
     return (
-        <div className="min-h-screen" style={{ background: theme.pageBg, color: theme.pageFg }}>
+        <div lang={htmlLang(locale)} className="min-h-screen" style={{ background: theme.pageBg, color: theme.pageFg }}>
             <div
                 className="pointer-events-none fixed inset-0 opacity-[0.35]"
                 style={{ background: theme.accentWash }}
@@ -70,8 +128,27 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
             />
 
             <div className="relative mx-auto max-w-md px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
-                {/* Compact identity so Join + frame clear the first viewport on phones. */}
-                <header className="flex flex-col items-center text-center pt-3 pb-5">
+                <div className="flex justify-end">
+                    <div role="group" aria-label={messages.nav.language} className="inline-flex items-center">
+                        {(['en', 'pt'] as const).map((code) => {
+                            const active = locale === code;
+                            return (
+                                <button
+                                    key={code}
+                                    type="button"
+                                    onClick={() => pickLocale(code)}
+                                    aria-pressed={active}
+                                    className="min-h-11 min-w-11 px-2 rounded-lg text-xs font-bold tracking-wide"
+                                    style={{ color: active ? theme.pageFg : theme.muted }}
+                                >
+                                    {code === 'en' ? messages.nav.english : messages.nav.portuguese}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <header className="flex flex-col items-center text-center pt-1 pb-4">
                     {hub.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -97,16 +174,22 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                         {hub.displayName}
                     </h1>
                     <p className="mt-0.5 text-sm" style={{ color: theme.muted }}>@{hub.handle}</p>
-                    {hub.bio && (
-                        <p className="mt-2 text-sm leading-relaxed max-w-sm opacity-90 line-clamp-3">
-                            {hub.bio}
+                    {bioText && (
+                        <p className="mt-2 text-sm leading-relaxed max-w-sm opacity-90">
+                            {bioText}
                         </p>
                     )}
+                    <p className="mt-3 text-sm leading-relaxed max-w-sm" style={{ color: theme.pageFg }}>
+                        {copy.joinHint}
+                    </p>
                 </header>
 
                 <div className="space-y-3">
                     {ctaHref && featured && (
-                        <div className="flex flex-col items-center gap-4 pb-1">
+                        <section className="flex flex-col items-center gap-4 pb-1" aria-labelledby="hub-featured">
+                            <h2 id="hub-featured" className="font-display text-base font-bold">
+                                {copy.featured}
+                            </h2>
                             {featured.preview_url ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
@@ -121,21 +204,17 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                                 />
                             )}
 
-                            {/* Two lines on purpose: Join / title. Never Join + em dash + title. */}
                             <div className="text-center px-2">
-                                <p className="font-display text-lg font-bold leading-tight">{verb}</p>
-                                <p className="text-[15px] font-semibold mt-0.5 opacity-90 line-clamp-2">
+                                <p className="font-display text-lg font-bold leading-tight line-clamp-2">
                                     {featured.title}
                                 </p>
-                                {count > 0 && (
-                                    <p
-                                        className="text-sm flex items-center justify-center gap-1.5 mt-2"
-                                        style={{ color: theme.muted }}
-                                    >
-                                        <Users size={14} aria-hidden />
-                                        {supportersLabel(count, localeHint)}
-                                    </p>
-                                )}
+                                <p
+                                    className="text-sm flex items-center justify-center gap-1.5 mt-2"
+                                    style={{ color: theme.muted }}
+                                >
+                                    <Users size={14} aria-hidden />
+                                    {countLabel(featured.supporter_count)}
+                                </p>
                             </div>
 
                             <Link
@@ -149,8 +228,30 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                             >
                                 {verb}
                             </Link>
-                        </div>
+                        </section>
                     )}
+
+                    <div className="space-y-2">
+                        <button
+                            type="button"
+                            onClick={() => { void copyHubLink(); }}
+                            className="flex w-full min-h-11 items-center justify-center gap-2 rounded-2xl border px-5 text-[15px] font-semibold"
+                            style={{
+                                background: theme.cardBg,
+                                borderColor: theme.cardBorder,
+                                color: theme.pageFg,
+                            }}
+                        >
+                            {copied ? <Check size={16} aria-hidden /> : <Link2 size={16} aria-hidden />}
+                            {copied ? copy.linkCopied : copy.shareHub}
+                        </button>
+                        {copyFailed && (
+                            <p role="alert" className="text-sm text-center" style={{ color: theme.pageFg }}>
+                                {copy.copyFailed}
+                                <span className="mt-1 block break-all select-all font-semibold">{hubUrl}</span>
+                            </p>
+                        )}
+                    </div>
 
                     {hub.links.map((link) => {
                         const icon = <SocialIcon url={link.url} />;
@@ -178,18 +279,18 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
 
                     {hub.campaigns.length > 0 && (
                         <div className="pt-4">
-                            <p
+                            <h2
                                 className="mb-3 text-sm font-semibold px-1"
                                 style={{ color: theme.muted }}
                             >
-                                More campaigns
-                            </p>
+                                {copy.moreCampaigns}
+                            </h2>
                             <ul className="space-y-2">
                                 {hub.campaigns.map((c) => (
                                     <li key={c.slug}>
                                         <Link
-                                            href={`/c/${c.slug}`}
-                                            className="flex items-center gap-3 rounded-2xl border px-4 py-3 transition-opacity hover:opacity-90"
+                                            href={campaignFromHubPath(c.slug, hub.handle, locale)}
+                                            className="flex min-h-11 items-center gap-3 rounded-2xl border px-4 py-3 transition-opacity hover:opacity-90"
                                             style={{
                                                 background: theme.cardBg,
                                                 borderColor: theme.cardBorder,
@@ -217,15 +318,13 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                                                 <p className="font-display font-bold truncate text-[15px]">
                                                     {c.title}
                                                 </p>
-                                                {c.supporter_count != null && c.supporter_count > 0 && (
-                                                    <p
-                                                        className="text-xs flex items-center gap-1 mt-0.5"
-                                                        style={{ color: theme.muted }}
-                                                    >
-                                                        <Users size={11} />
-                                                        {supportersLabel(c.supporter_count, localeHint)}
-                                                    </p>
-                                                )}
+                                                <p
+                                                    className="text-xs flex items-center gap-1 mt-0.5"
+                                                    style={{ color: theme.muted }}
+                                                >
+                                                    <Users size={11} aria-hidden />
+                                                    {countLabel(c.supporter_count)}
+                                                </p>
                                             </div>
                                         </Link>
                                     </li>
@@ -236,7 +335,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
 
                     {!ctaHref && hub.links.length === 0 && hub.campaigns.length === 0 && (
                         <p className="text-center text-sm py-8" style={{ color: theme.muted }}>
-                            This hub is not ready yet.
+                            {copy.notReady}
                         </p>
                     )}
                 </div>

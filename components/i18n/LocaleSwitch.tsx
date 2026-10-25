@@ -8,13 +8,22 @@ import type { Locale } from '@/lib/i18n/locale';
  * Compact EN | PT. Switching to Portuguese on `/` stays on `/`.
  * `/pt` is the SEO landing, not the product UI. English from `/pt` goes home.
  */
-export function LocaleSwitch() {
+export function LocaleSwitch({
+    value,
+    onPick,
+}: {
+    /** Page language when it is not the cookie, such as a campaign's country default. */
+    value?: Locale;
+    onPick?: (next: Locale) => void;
+}) {
     const { locale, setLocale, messages } = useLocale();
     const pathname = usePathname() || '/';
     const router = useRouter();
+    const shown = value ?? locale;
 
     const pick = (next: Locale) => {
         setLocale(next);
+        onPick?.(next);
         const onPtLanding = pathname === '/pt' || pathname.startsWith('/pt/');
         if (next === 'en' && onPtLanding) {
             router.push('/');
@@ -22,7 +31,7 @@ export function LocaleSwitch() {
     };
 
     const btn = (code: 'en' | 'pt', label: string) => {
-        const active = locale === code;
+        const active = shown === code;
         return (
             <button
                 type="button"

@@ -49,7 +49,10 @@ const ES: DeepPartial<Messages> = {
         wantOwn: '¿Te gustó? Crea el tuyo.',
         wantOwnBody: 'Crea un marco para tu causa en menos de un minuto. Gratis.',
         makeOwn: 'Crear mi marco',
-        makeOwnFooter: 'Haz la tuya con Ollabs',
+        makeOwnFooter: 'Crea la tuya en Ollabs',
+        byName: 'Por {name}',
+        seeAllCampaigns: 'ver todas las campañas',
+        backToHub: 'Volver al hub',
         report: 'Denunciar esta campaña',
         guides: 'Guías',
         stepAdd: 'Añade tu foto',
@@ -259,6 +262,22 @@ const ES: DeepPartial<Messages> = {
         terms: 'Términos',
         label: 'Pie de página',
     },
+    home: {
+        seeHub: 'Ver un hub: Profª Ana Lúcia',
+    },
+    hub: {
+        featured: 'Campaña destacada',
+        joinHint: 'Toca Unirme para poner este marco en tu foto, gratis, sin registro',
+        shareHub: 'Compartir este hub',
+        linkCopied: 'Enlace copiado',
+        copyFailed: 'No se pudo copiar. Selecciónalo y copia:',
+        moreCampaigns: 'Más campañas',
+        notReady: 'Este hub todavía no está listo.',
+        seeExample: 'Ver un hub público de ejemplo',
+        publicUrl: 'Los hubs públicos viven en ollabs.studio/u/tu-nombre.',
+        bioRequired: 'Escribe una bio corta antes de publicar. Una frase sobre quién eres.',
+        bioFallback: 'Sin bio, la gente ve la descripción de la campaña destacada.',
+    },
 };
 
 const TL: DeepPartial<Messages> = {
@@ -283,6 +302,9 @@ const TL: DeepPartial<Messages> = {
         wantOwnBody: 'Gumawa ng frame para sa layunin mo nang wala pang isang minuto. Libre.',
         makeOwn: 'Gawin ang frame ko',
         makeOwnFooter: 'Gumawa ng sarili sa Ollabs',
+        byName: 'Ni {name}',
+        seeAllCampaigns: 'tingnan ang lahat ng campaign',
+        backToHub: 'Bumalik sa hub',
         report: 'I-report ang campaign na ito',
         guides: 'Mga gabay',
         stepAdd: 'Idagdag ang photo',
@@ -491,6 +513,22 @@ const TL: DeepPartial<Messages> = {
         privacy: 'Pribasiya',
         terms: 'Mga tuntunin',
         label: 'Footer',
+    },
+    home: {
+        seeHub: 'Tingnan ang hub: Profª Ana Lúcia',
+    },
+    hub: {
+        featured: 'Tampok na campaign',
+        joinHint: 'I-tap ang Sumali para ilagay ang frame na ito sa photo mo, libre, walang signup',
+        shareHub: 'Ibahagi ang hub na ito',
+        linkCopied: 'Nakopya ang link',
+        copyFailed: 'Hindi makopya. Piliin at kopyahin:',
+        moreCampaigns: 'Iba pang campaign',
+        notReady: 'Hindi pa handa ang hub na ito.',
+        seeExample: 'Tingnan ang isang pampublikong hub',
+        publicUrl: 'Ang pampublikong hub ay nasa ollabs.studio/u/pangalan-mo.',
+        bioRequired: 'Maglagay ng maikling bio bago i-publish. Isang pangungusap kung sino ka.',
+        bioFallback: 'Hangga\'t walang bio, makikita ang description ng tampok na campaign.',
     },
 };
 

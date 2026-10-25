@@ -20,6 +20,7 @@ import {
     Upload,
 } from 'lucide-react';
 import {
+    EXAMPLE_PUBLIC_HUB,
     HUB_BIO_MAX,
     HUB_DISPLAY_NAME_MAX,
     HUB_LINKS_MAX,
@@ -27,6 +28,7 @@ import {
     normalizeHandle,
     suggestHandleFromEmail,
 } from '@/lib/hub';
+import { useLocale } from '@/components/i18n/LocaleProvider';
 import { ABOVE_MOBILE_NAV, ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 import { track, withUtm } from '@/lib/analytics';
 import { hubShareText, whatsappUrl } from '@/lib/share';
@@ -65,11 +67,14 @@ function newKey() {
 }
 
 export const HubEditorClient: React.FC = () => {
+    const { messages } = useLocale();
+    const hubCopy = messages.hub;
     const [loading, setLoading] = useState(true);
     const [signedIn, setSignedIn] = useState(false);
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [bioError, setBioError] = useState<string | null>(null);
     const [saveMsg, setSaveMsg] = useState<string | null>(null);
     const [lastSavedOk, setLastSavedOk] = useState(false);
 
@@ -183,8 +188,14 @@ export const HubEditorClient: React.FC = () => {
             setError(herr);
             return { ok: false, handle: null };
         }
+        // First save is what makes /u/handle public. A bare handle is not a page.
+        if (!publishedHandle && !bio.trim()) {
+            setBioError(hubCopy.bioRequired);
+            return { ok: false, handle: null };
+        }
 
         setSaving(true);
+        setBioError(null);
         setError(null);
         setSaveMsg(null);
         try {
@@ -294,10 +305,17 @@ export const HubEditorClient: React.FC = () => {
             <div className="bg-cream border border-ink/10 rounded-2xl p-8 text-center max-w-md mx-auto">
                 <LogIn className="w-8 h-8 text-brand-deep mx-auto mb-3" />
                 <p className="font-display font-bold text-lg mb-2">Sign in to claim your hub</p>
-                <p className="text-sm text-ink/70 mb-6">
+                <p className="text-sm text-ink/70 mb-3">
                     Creating a campaign never needs an account. A hub does, so your
                     page has a stable owner and survives device switches.
                 </p>
+                <p className="text-sm text-ink/80 mb-4">{hubCopy.publicUrl}</p>
+                <Link
+                    href={`/u/${EXAMPLE_PUBLIC_HUB.handle}`}
+                    className="inline-flex min-h-11 items-center justify-center text-sm font-semibold text-brand-deep mb-5"
+                >
+                    {hubCopy.seeExample}
+                </Link>
                 <Link
                     href="/login?next=/hub"
                     className={`inline-flex items-center justify-center gap-2 px-6 ${ORGANIZER_PRIMARY_BTN}`}
@@ -493,13 +511,26 @@ export const HubEditorClient: React.FC = () => {
                     </label>
                     <textarea
                         value={bio}
-                        onChange={(e) => setBio(e.target.value.slice(0, HUB_BIO_MAX))}
+                        onChange={(e) => {
+                            setBio(e.target.value.slice(0, HUB_BIO_MAX));
+                            if (bioError) setBioError(null);
+                        }}
                         placeholder="One short line about the campaign"
                         rows={3}
                         maxLength={HUB_BIO_MAX}
                         className="w-full px-4 py-3 rounded-xl border border-ink/15 bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-brand resize-none"
                     />
                     <p className="text-xs text-muted text-right mt-1">{bio.length}/{HUB_BIO_MAX}</p>
+                    {!bio.trim() && (
+                        <p className="text-sm text-ink/75 mt-2 leading-relaxed">
+                            {publishedHandle ? hubCopy.bioFallback : hubCopy.bioRequired}
+                        </p>
+                    )}
+                    {bioError && (
+                        <p role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 mt-2">
+                            {bioError}
+                        </p>
+                    )}
                 </div>
 
                 <div>

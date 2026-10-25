@@ -1,3 +1,5 @@
+import type { Locale } from '@/lib/i18n/locale';
+
 // Organizer hub helpers: handle rules, reserved words, and public-page shape.
 //
 // /u/[handle] is the campaign directory. The frame tool stays on /c/[slug].
@@ -50,9 +52,30 @@ export type HubCampaignSummary = {
     title: string;
     supporter_count: number | null;
     preview_url: string | null;
+    /** Used when the hub has no bio and no links. */
+    description?: string | null;
     /** Campaign id for editor hide toggles. Optional on public payloads. */
     id?: string;
 };
+
+/**
+ * A real public hub, used wherever the product needs to show what /u is
+ * before asking anyone to sign in. Profª Ana Lúcia claimed this handle.
+ */
+export const EXAMPLE_PUBLIC_HUB = {
+    handle: 'tocomaprof',
+    displayName: 'Profª Ana Lúcia',
+} as const;
+
+export function campaignFromHubPath(slug: string, handle: string, locale: Locale): string {
+    const q = new URLSearchParams({ hub: handle, lang: locale });
+    return `/c/${slug}?${q.toString()}`;
+}
+
+export function hubPath(handle: string, locale: Locale): string {
+    const q = new URLSearchParams({ lang: locale });
+    return `/u/${handle}?${q.toString()}`;
+}
 
 export type PublicHub = {
     handle: string;
@@ -64,6 +87,8 @@ export type PublicHub = {
     links: { id: string; title: string; url: string }[];
     updatedAt: string | null;
     theme: string;
+    /** Same default the featured campaign page would use, before a visitor switches. */
+    suggestedLocale: Locale;
 };
 
 /** Normalize to lowercase a-z / digits / hyphens. Empty string if nothing left. */

@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-25-hub-flow',
+        date: '2026-10-25',
+        title: 'Campaign pages link back to the hub',
+        summary: 'A campaign names who made it, and a hub explains what Join does.',
+        items: [
+            'From a hub, Join opens the frame. The campaign page can send you back.',
+            'Share a hub from the hub page itself. Copy the link.',
+        ],
+    },
+    {
         id: '2026-10-19-day-pt',
         date: '2026-10-19',
         title: 'Independência and Dia das Crianças have Portuguese pages',

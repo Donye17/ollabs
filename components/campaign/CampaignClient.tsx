@@ -1,5 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { FrameRendererFactory } from '@/components/renderer/FrameRendererFactory';
 import { FrameConfig, FrameType } from '@/lib/types';
 import { QRCode } from '@/components/QRCode';
@@ -13,8 +14,10 @@ import { framedCircleToStoryBlob } from '@/lib/storyExport';
 import { uploadExploreThumb } from '@/lib/exploreThumb';
 import { BrandMark } from '@/components/BrandMark';
 import { getMessages } from '@/lib/i18n/messages';
-import { formatCount, htmlLang, resolveSupporterLocale } from '@/lib/i18n/locale';
+import { formatCount, htmlLang, isLocale, resolveSupporterLocale, type Locale } from '@/lib/i18n/locale';
 import { useLocale } from '@/components/i18n/LocaleProvider';
+import { LocaleSwitch } from '@/components/i18n/LocaleSwitch';
+import { hubPath, isValidHandle, normalizeHandle } from '@/lib/hub';
 import { InAppRescueBar } from '@/components/campaign/InAppRescueBar';
 import { ProfileSetHint } from '@/components/campaign/ProfileSetHint';
 import { FormatCards, type ExportFormat } from '@/components/campaign/FormatCards';
@@ -29,6 +32,7 @@ interface CampaignClientProps {
     description?: string | null;
     organizerCaption?: string | null;
     creatorName?: string | null;
+    organizer?: { handle: string; name: string } | null;
     initialCount: number;
     goal?: number | null;
     frame: FrameConfig;
@@ -36,12 +40,14 @@ interface CampaignClientProps {
 }
 
 export const CampaignClient: React.FC<CampaignClientProps> = ({
-    slug, title, description, organizerCaption, initialCount, goal, frame, campaignCountry,
+    slug, title, description, organizerCaption, organizer, initialCount, goal, frame, campaignCountry,
 }) => {
     const { locale: browserLocale, setLocale } = useLocale();
-    // Country (or untagged → pt) wins over the browser so WhatsApp's English
-    // UA cannot put a Brazilian supporter back on English copy.
-    const locale = resolveSupporterLocale({
+    // A hub link passes lang= so this page opens in the language the visitor
+    // just used. Country still wins for a direct WhatsApp arrival with no lang.
+    const [picked, setPicked] = useState<Locale | null>(null);
+    const [fromHub, setFromHub] = useState<string | null>(null);
+    const locale = picked ?? resolveSupporterLocale({
         campaignCountry,
         languages: [browserLocale],
     });
@@ -83,6 +89,17 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     const [pasteHint, setPasteHint] = useState<'copied' | 'manual' | null>(null);
     const [shareCaption, setShareCaption] = useState('');
     const reportBoxRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const q = new URLSearchParams(window.location.search);
+        const hub = normalizeHandle(q.get('hub') || '');
+        if (isValidHandle(hub)) setFromHub(hub);
+        const lang = q.get('lang');
+        if (isLocale(lang)) {
+            setPicked(lang);
+            setLocale(lang);
+        }
+    }, [setLocale]);
 
     useEffect(() => {
         setCanCopyImage(
@@ -512,17 +529,38 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     return (
         <div lang={htmlLang(locale)} className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-[max(0.75rem,env(safe-area-inset-top,0px))] ${bottomPad}`}>
             {/* A3: mark only on empty / post-save. During adjust the frame is the UI. */}
-            {!adjusting && <BrandMark className="mb-4 mt-2" size={24} />}
+            {!adjusting && (
+                <div className="w-full max-w-sm flex items-center justify-between mb-2 mt-2">
+                    <BrandMark size={24} />
+                    <LocaleSwitch value={locale} onPick={setPicked} />
+                </div>
+            )}
 
             <div className="w-full max-w-sm flex flex-col items-center gap-3">
                 {!justDownloaded && (
                     <div className="text-center">
+                        {fromHub && (
+                            <Link
+                                href={hubPath(fromHub, locale)}
+                                className="inline-flex min-h-11 items-center text-sm font-semibold text-brand-deep"
+                            >
+                                {t.backToHub}
+                            </Link>
+                        )}
                         {!hasImage && (
                             <p className="text-sm font-semibold text-muted">{t.eyebrow}</p>
                         )}
                         <h1 className={`font-display font-bold text-balance ${hasImage ? 'text-lg mt-0' : 'text-2xl mt-1'}`}>
                             {title}
                         </h1>
+                        {organizer && (
+                            <Link
+                                href={hubPath(organizer.handle, locale)}
+                                className="inline-flex min-h-11 items-center justify-center px-1 text-sm font-semibold text-brand-deep"
+                            >
+                                {t.byName.replace('{name}', organizer.name)}, {t.seeAllCampaigns}
+                            </Link>
+                        )}
                         {!hasImage && description && (
                             <p className="text-sm text-ink/70 mt-1">{description}</p>
                         )}
@@ -648,6 +686,16 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                     </button>
                 )}
 
+                {!hasImage && (
+                    <a
+                        href={`/create?from=${encodeURIComponent(slug)}`}
+                        onClick={() => track('create_from_campaign', { campaign: slug, from: 'footer' })}
+                        className="inline-flex min-h-11 items-center justify-center px-2 text-sm font-semibold text-muted"
+                    >
+                        {t.makeOwnFooter}
+                    </a>
+                )}
+
                 {/* Post-save: framed result stays above. Share sheet leads when
                     available (iOS in-app); WhatsApp link is the explicit chat path. */}
                 {justDownloaded && (
@@ -712,18 +760,17 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             </button>
                         )}
 
-                        <div className="w-full rounded-2xl border border-ink/10 bg-cream px-4 py-4 text-center">
-                            <p className="font-display text-xl font-extrabold leading-tight text-ink">{t.wantOwn}</p>
-                            <p className="mt-1.5 text-sm text-ink/75 leading-relaxed">{t.wantOwnBody}</p>
+                        <div className="w-full px-2 text-center">
+                            <p className="text-sm text-ink/70 leading-relaxed">{t.wantOwnBody}</p>
                             <a
                                 href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_post_save')}
                                 onClick={() => {
                                     setLocale(locale);
                                     track('create_from_campaign', { campaign: slug, from: 'post_save' });
                                 }}
-                                className="mt-3 inline-flex w-full min-h-[48px] items-center justify-center rounded-xl bg-brand px-4 font-bold text-ink hover:brightness-105 active:brightness-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
+                                className="inline-flex min-h-11 items-center justify-center px-2 text-sm font-semibold text-muted"
                             >
-                                {t.makeOwn}
+                                {t.makeOwnFooter}
                             </a>
                         </div>
 
@@ -867,18 +914,9 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                     </div>
                 )}
 
-                {!hasImage && (
-                    <a
-                        href={`/create?from=${encodeURIComponent(slug)}`}
-                        onClick={() => track('create_from_campaign', { campaign: slug, from: 'footer' })}
-                        className="text-xs text-muted hover:text-brand-deep transition-colors mt-1"
-                    >
-                        {t.makeOwnFooter}
-                    </a>
-                )}
                 <a
                     href="/guides"
-                    className="text-xs text-muted hover:text-brand-deep transition-colors mt-1"
+                    className="inline-flex min-h-11 items-center text-xs text-muted hover:text-brand-deep transition-colors mt-1"
                 >
                     {t.guides}
                 </a>
@@ -896,12 +934,12 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                 className="w-full bg-paper border border-ink/10 rounded-lg px-2.5 py-2 text-sm text-ink placeholder-muted outline-none focus:ring-2 focus:ring-brand/40 resize-none min-h-[56px]"
                             />
                             <div className="flex gap-2">
-                                <button onClick={submitReport} className="flex-1 py-2 rounded-lg text-xs font-bold bg-coral text-white hover:brightness-105 transition-all">{t.submitReport}</button>
-                                <button onClick={() => setReportOpen(false)} className="py-2 px-3 rounded-lg text-xs font-semibold bg-paper border border-ink/10 text-ink hover:bg-ink/5 transition-colors">{t.cancel}</button>
+                                <button onClick={submitReport} className="flex-1 min-h-11 py-2 rounded-lg text-xs font-bold bg-coral text-white hover:brightness-105 transition-all">{t.submitReport}</button>
+                                <button onClick={() => setReportOpen(false)} className="min-h-11 py-2 px-3 rounded-lg text-xs font-semibold bg-paper border border-ink/10 text-ink hover:bg-ink/5 transition-colors">{t.cancel}</button>
                             </div>
                         </div>
                     ) : (
-                        <button onClick={() => setReportOpen(true)} className="text-[11px] text-muted/70 hover:text-coral transition-colors">{t.report}</button>
+                        <button onClick={() => setReportOpen(true)} className="inline-flex min-h-11 items-center text-[11px] text-muted/70 hover:text-coral transition-colors">{t.report}</button>
                     )
                 )}
             </div>

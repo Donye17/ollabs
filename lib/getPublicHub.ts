@@ -1,6 +1,7 @@
 import { cache } from 'react';
 import { pool } from '@/lib/neon';
 import { normalizeHandle, type PublicHub } from '@/lib/hub';
+import { resolveSupporterLocale } from '@/lib/i18n/locale';
 import { resolveHubTheme } from '@/lib/hubThemes';
 
 function parseHiddenIds(raw: unknown): string[] {
@@ -45,7 +46,7 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
                 [org.id]
             ),
             pool.query(
-                `SELECT id, slug, title, supporter_count, preview_url
+                `SELECT id, slug, title, description, supporter_count, preview_url, publisher_country
                  FROM campaigns
                  WHERE creator_id = $1
                    AND is_public = true
@@ -60,8 +61,10 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
             id: string;
             slug: string;
             title: string;
+            description: string | null;
             supporter_count: number | null;
             preview_url: string | null;
+            publisher_country: string | null;
         };
 
         const campaigns = campsRes.rows as Camp[];
@@ -91,6 +94,7 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
                 ? {
                       slug: featured.slug,
                       title: featured.title,
+                      description: featured.description,
                       supporter_count: featured.supporter_count,
                       preview_url: featured.preview_url,
                       id: featured.id,
@@ -113,6 +117,9 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
             })),
             updatedAt: (org.hub_updated_at as string | null) ?? null,
             theme,
+            suggestedLocale: resolveSupporterLocale({
+                campaignCountry: featured?.publisher_country ?? null,
+            }),
         };
     } catch (e) {
         console.error('Failed to load public hub', e);
