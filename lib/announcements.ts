@@ -17,6 +17,15 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-25-hub-pages',
+        date: '2026-10-25',
+        title: 'Public hubs show the bio and the frame',
+        summary: 'A hub with a real bio can be found in search. A handle alone stays private to search.',
+        items: [
+            'The page now includes the organizer bio, the featured campaign, and how many people joined.',
+        ],
+    },
+    {
         id: '2026-10-19-day-pt',
         date: '2026-10-19',
         title: 'Independência and Dia das Crianças have Portuguese pages',

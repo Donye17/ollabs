@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { HubPublicView } from '@/components/hub/HubPublicView';
 import { getPublicHub } from '@/lib/getPublicHub';
+import { hubIsIndexable } from '@/lib/hub';
 
 export const revalidate = 60;
 
@@ -12,22 +13,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const hub = await getPublicHub(handle);
     if (!hub) return { title: 'Not found', robots: { index: false, follow: false } };
 
-    const title = `${hub.displayName} · Ollabs`;
+    // The root template already appends " | Ollabs". A second brand in the
+    // title was showing up as "Name · Ollabs | Ollabs".
+    const title = hub.displayName;
+    const bio = hub.bio?.trim() || '';
+    const featuredDescription = hub.featured?.description?.trim() || '';
     const description =
-        hub.bio?.trim() ||
+        bio ||
+        featuredDescription ||
         (hub.featured
-            ? `Support ${hub.featured.title}. Add the frame to your profile picture.`
+            ? `Join ${hub.featured.title}. Add the frame to your profile picture. Free, no signup.`
             : `Campaigns and links from ${hub.displayName}.`);
 
     // Prefer featured frame art for WhatsApp unfurls; avatar is a weaker signal.
     const ogImage = hub.featured?.preview_url || hub.avatarUrl || null;
+    // Index only a hub whose own bio is a real sentence. Everyone else stays
+    // crawlable so Google can read this tag. Do not disallow /u in robots.ts.
+    const indexable = hubIsIndexable(hub);
 
     return {
         title,
         description,
-        // 17 hubs exist and one has a bio over 80 characters. Not enough
-        // publisher content to index or to carry ads. See docs/ADSENSE_REMEDIATION.md.
-        robots: { index: false, follow: true },
+        robots: { index: indexable, follow: true },
         openGraph: {
             title,
             description,

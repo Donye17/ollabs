@@ -80,11 +80,11 @@ export const VS_EN: VsCopy = {
 };
 
 export const VS_PT: VsCopy = {
-    metaTitle: 'Ollabs vs Twibbonize',
+    metaTitle: 'Alternativa grátis ao Twibbonize, sem cadastro',
     metaDescription:
-        'Comparação honesta entre Ollabs e Twibbonize. A diferença que importa: Twibbonize cobra quem apoia para tirar a marca d\'água. O Ollabs nunca cobra quem apoia.',
+        'Alternativa grátis ao Twibbonize. Sem cadastro e sem marca d\'água. Um link para colocar a moldura na foto de perfil.',
     eyebrow: 'Comparação',
-    h1: 'Ollabs vs Twibbonize',
+    h1: 'Alternativa grátis ao Twibbonize',
     hero: 'Os dois servem para campanha de moldura na foto de perfil. A diferença real é quem paga: no Twibbonize, quem apoia paga para remover a marca d\'água. No Ollabs, quem apoia nunca paga.',
     guideBefore: 'Quem recebeu o link faz assim:',
     guideHref: '/pt/guides/add-a-frame-to-a-profile-picture',

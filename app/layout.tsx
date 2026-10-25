@@ -52,13 +52,10 @@ export const metadata: Metadata = {
             },
         ],
     },
-    alternates: {
-        languages: {
-            en: 'https://ollabs.studio',
-            'pt-BR': 'https://ollabs.studio/pt',
-            'x-default': 'https://ollabs.studio',
-        },
-    },
+    // No sitewide hreflang. Next copies layout `alternates` onto any route
+    // that does not set its own, so private pages were telling Google their
+    // Portuguese URL was the homepage. The homepage and each translated page
+    // declare their own pair.
     twitter: {
         card: 'summary_large_image',
         title: 'Ollabs: Free Profile Picture Frame Maker for Campaigns & Causes',
