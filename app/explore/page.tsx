@@ -16,12 +16,12 @@ export const revalidate = 300;
 export async function generateMetadata(): Promise<Metadata> {
     const jar = await cookies();
     const locale = resolveLocale({ cookie: jar.get(LOCALE_COOKIE)?.value ?? null });
-    const title = getMessages(locale).explore.title;
+    const copy = getMessages(locale).explore;
     return {
-        title,
-        description: 'Browse live profile-picture frame campaigns for causes, teams, events, and more. Add one to your photo, or make your own for free.',
+        title: copy.title,
+        description: copy.lede,
         alternates: { canonical: 'https://ollabs.studio/explore' },
-        openGraph: { type: 'website', url: 'https://ollabs.studio/explore', title, description: 'Browse live profile-picture frame campaigns and add one to your photo.', siteName: 'Ollabs', images: ['/og.png'] },
+        openGraph: { type: 'website', url: 'https://ollabs.studio/explore', title: copy.title, description: copy.lede, siteName: 'Ollabs', images: ['/og.png'] },
         twitter: { card: 'summary_large_image', images: ['/og.png'] },
     };
 }
@@ -102,6 +102,32 @@ async function getCampaigns(
     }
 }
 
+/** Eligible campaign totals for the filter chips. Same gate as the grid. */
+async function getCategoryCounts(): Promise<{ all: number; byCategory: Record<string, number> }> {
+    const byCategory: Record<string, number> = {};
+    let all = 0;
+    try {
+        const res = await pool.query(
+            `SELECT c.category AS category, COUNT(*)::int AS n
+             FROM campaigns c
+             WHERE c.is_public = true AND c.is_hidden IS NOT TRUE
+               AND ${visibleFrameSql('c')}
+               AND COALESCE(c.supporter_count, 0) >= 5
+             GROUP BY c.category`
+        );
+        for (const row of res.rows) {
+            const n = Number(row.n) || 0;
+            all += n;
+            if (typeof row.category === 'string' && CATEGORY_KEYS.includes(row.category)) {
+                byCategory[row.category] = n;
+            }
+        }
+    } catch (e) {
+        console.error('Failed to count explore categories', e);
+    }
+    return { all, byCategory };
+}
+
 export default async function ExplorePage({ searchParams }: { searchParams: Promise<{ sort?: string; category?: string }> }) {
     const sp = await searchParams;
     const sort: ExploreSort = sp.sort === 'newest' ? 'newest' : sp.sort === 'trending' ? 'trending' : 'popular';
@@ -110,11 +136,12 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
     const rawCountry = (hdrs.get('x-vercel-ip-country') || hdrs.get('cf-ipcountry') || '').toUpperCase();
     const visitorCountry = /^[A-Z]{2}$/.test(rawCountry) && rawCountry !== 'XX' ? rawCountry : null;
     const campaigns = await getCampaigns(sort, category, visitorCountry);
+    const counts = await getCategoryCounts();
 
     return (
         <main className="min-h-screen bg-paper text-ink">
             <NavBar />
-            <ExploreClient campaigns={campaigns} sort={sort} category={category} />
+            <ExploreClient campaigns={campaigns} sort={sort} category={category} counts={counts} />
             <SiteFooter />
         </main>
     );

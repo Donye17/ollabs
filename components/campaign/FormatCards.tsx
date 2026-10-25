@@ -63,9 +63,9 @@ function FormatCard({
             role="radio"
             aria-checked={selected}
             onClick={onSelect}
-            className={`min-h-[44px] rounded-xl border px-3 py-3 text-left transition-colors ${
+            className={`min-h-[44px] rounded-control border px-3 py-3 text-left transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep ${
                 selected
-                    ? 'border-brand bg-brand/10'
+                    ? 'border-brand-deep bg-brand/10'
                     : 'border-ink/15 bg-cream hover:bg-ink/5'
             }`}
         >

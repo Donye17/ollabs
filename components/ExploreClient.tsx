@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { CampaignGridThumb } from '@/components/CampaignGridThumb';
@@ -80,7 +81,7 @@ const LazyPreview: React.FC<{ frame: FrameConfig; supporterPhotos: string[]; eag
     return (
         <div
             ref={holder}
-            className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full overflow-hidden bg-ink/5 ring-1 ring-ink/10 frame-shadow"
+            className="h-full w-full overflow-hidden rounded-avatar bg-paper"
         >
             {show ? (
                 <CampaignGridThumb
@@ -91,7 +92,7 @@ const LazyPreview: React.FC<{ frame: FrameConfig; supporterPhotos: string[]; eag
                     title={title}
                 />
             ) : (
-                <div className="w-full h-full rounded-full bg-ink/10 animate-pulse" aria-hidden />
+                <div className="h-full w-full rounded-avatar bg-paper2 motion-safe:animate-pulse" aria-hidden />
             )}
         </div>
     );
@@ -125,9 +126,11 @@ export const ExploreClient: React.FC<{
     campaigns: ExploreCampaign[];
     sort: ExploreSort;
     category: string | null;
-}> = ({ campaigns, sort, category }) => {
+    counts: { all: number; byCategory: Record<string, number> };
+}> = ({ campaigns, sort, category, counts }) => {
     const { locale, messages } = useLocale();
     const t = messages.explore;
+    const router = useRouter();
     const [q, setQ] = useState('');
 
     // Warm custom-frame PNGs for the first screen before canvases mount, so
@@ -150,6 +153,11 @@ export const ExploreClient: React.FC<{
         return campaigns.filter((c) => c.title.toLowerCase().includes(term));
     }, [q, campaigns]);
 
+    const chipClass = (pressed: boolean) =>
+        `min-h-11 gap-2 rounded-control border px-3 text-sm font-semibold inline-flex items-center transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep ${
+            pressed ? 'border-transparent bg-brand text-ink' : 'border-ink/10 bg-cream text-ink hover:bg-paper2'
+        }`;
+
     return (
         <>
             <section className={`${PAGE_TOP_UNDER_NAV} pb-8 px-6`}>
@@ -161,37 +169,46 @@ export const ExploreClient: React.FC<{
 
             <section className="px-6 pb-4">
                 <div className="max-w-5xl mx-auto flex flex-col gap-4">
-                    <div className="inline-flex flex-wrap p-1 bg-cream border border-ink/10 rounded-full self-start">
+                    <div className="inline-flex flex-wrap gap-2 self-start" role="group" aria-label={t.title}>
                         {([
                             ['popular', t.popular],
                             ['trending', t.trending],
                             ['newest', t.newest],
                         ] as const).map(([key, label]) => (
-                            <Link
+                            <button
                                 key={key}
-                                href={buildHref(key, category)}
-                                className={`min-h-11 px-4 rounded-full text-sm font-semibold inline-flex items-center transition-colors ${sort === key ? 'bg-ink text-paper' : 'text-muted hover:text-ink'}`}
+                                type="button"
+                                aria-pressed={sort === key}
+                                onClick={() => router.push(buildHref(key, category))}
+                                className={chipClass(sort === key)}
                             >
                                 {label}
-                            </Link>
+                                <span className="tabular-nums text-xs">{formatCount(category ? (counts.byCategory[category] ?? 0) : counts.all, locale)}</span>
+                            </button>
                         ))}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                        <Link
-                            href={buildHref(sort, null)}
-                            className={`min-h-11 px-3.5 rounded-full text-sm font-medium border inline-flex items-center transition-colors ${category === null ? 'bg-brand/15 border-brand/40 text-brand-deep' : 'bg-cream border-ink/10 text-muted hover:text-ink'}`}
+                        <button
+                            type="button"
+                            aria-pressed={category === null}
+                            onClick={() => router.push(buildHref(sort, null))}
+                            className={chipClass(category === null)}
                         >
                             {t.all}
-                        </Link>
+                            <span className="tabular-nums text-xs">{formatCount(counts.all, locale)}</span>
+                        </button>
                         {CATEGORIES.map((c) => (
-                            <Link
+                            <button
                                 key={c.key}
-                                href={buildHref(sort, c.key)}
-                                className={`min-h-11 px-3.5 rounded-full text-sm font-medium border inline-flex items-center transition-colors ${category === c.key ? 'bg-brand/15 border-brand/40 text-brand-deep' : 'bg-cream border-ink/10 text-muted hover:text-ink'}`}
+                                type="button"
+                                aria-pressed={category === c.key}
+                                onClick={() => router.push(buildHref(sort, c.key))}
+                                className={chipClass(category === c.key)}
                             >
                                 {categoryName(c.key, messages.manage, c.label)}
-                            </Link>
+                                <span className="tabular-nums text-xs">{formatCount(counts.byCategory[c.key] ?? 0, locale)}</span>
+                            </button>
                         ))}
                     </div>
                 </div>
@@ -206,14 +223,14 @@ export const ExploreClient: React.FC<{
                             </p>
                             <p className="text-sm text-ink/70 mb-6 max-w-md">{t.emptyShare}</p>
                             <div className="flex flex-wrap items-center gap-3">
-                                <Link href="/create" className="inline-flex min-h-12 px-7 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">{t.create}</Link>
-                                <Link href="/for" className="inline-flex min-h-12 px-5 rounded-xl border border-ink/15 text-ink font-bold items-center hover:bg-ink/5 transition-all">{t.browseUses}</Link>
+                                <Link href="/create" className="inline-flex min-h-12 items-center rounded-control bg-brand px-7 font-bold text-ink hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep transition-colors duration-200">{t.create}</Link>
+                                <Link href="/for" className="inline-flex min-h-12 items-center rounded-control border border-ink/15 px-5 font-bold text-ink hover:bg-ink/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep transition-colors duration-200">{t.browseUses}</Link>
                             </div>
                         </div>
                     ) : (
         <div>
             <div className="max-w-md mx-auto mb-10">
-                <div className="flex items-center gap-2 bg-cream border border-ink/10 rounded-xl px-4 focus-within:ring-2 focus-within:ring-brand/40 focus-within:border-brand transition-all">
+                <div className="flex items-center gap-2 rounded-control border border-ink/10 bg-cream px-4 transition-colors duration-200 focus-within:border-brand-deep focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand-deep">
                     <Search size={18} className="text-muted shrink-0" />
                     <input
                         value={q}
@@ -228,23 +245,32 @@ export const ExploreClient: React.FC<{
             {filtered.length === 0 ? (
                 <p className="text-muted">{t.noMatch}</p>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 md:gap-8">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 xl:grid-cols-4">
                     {filtered.map((c, i) => {
                         const count = formatCount(c.supporterCount, locale);
                         const countLabel = `${count} ${messages.campaign.peopleSupporting}`;
                         return (
-                        <Link key={c.slug} href={`/c/${c.slug}`} className="group flex flex-col items-center gap-3" aria-label={`${c.title}. ${countLabel}`}>
-                            <LazyPreview
-                                frame={c.frame}
-                                supporterPhotos={c.supporterPhotos}
-                                eager={i < INITIAL_WINDOW}
-                                title={c.title}
-                            />
-                            <div className="text-center w-full min-w-0">
-                                <p className="text-sm font-semibold text-ink group-hover:text-brand-deep transition-colors line-clamp-2 break-words">
+                        <Link
+                            key={c.slug}
+                            href={`/c/${c.slug}`}
+                            className="group flex min-w-0 flex-col items-center gap-3 rounded-card bg-cream p-3 shadow-frame-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:-translate-y-0.5"
+                            aria-label={`${c.title}. ${countLabel}`}
+                        >
+                            <span className="block w-[var(--avatar-sm)] aspect-square rounded-avatar p-[3px] ring-frame-conic sm:w-[var(--avatar-md)] xl:w-[var(--avatar-lg)]">
+                                <span className="block h-full w-full overflow-hidden rounded-avatar bg-paper shadow-frame-sm">
+                                    <LazyPreview
+                                        frame={c.frame}
+                                        supporterPhotos={c.supporterPhotos}
+                                        eager={i < INITIAL_WINDOW}
+                                        title={c.title}
+                                    />
+                                </span>
+                            </span>
+                            <div className="w-full min-w-0 text-center">
+                                <p className="line-clamp-2 break-words text-sm font-semibold text-ink transition-colors duration-200 group-hover:text-brand-deep">
                                     {c.title}
                                 </p>
-                                <p className="block text-xs text-muted mt-1 tabular-nums">
+                                <p className="mt-1 block text-xs tabular-nums text-ink/70">
                                     {countLabel}
                                 </p>
                             </div>
@@ -261,7 +287,7 @@ export const ExploreClient: React.FC<{
             {campaigns.length > 0 && (
                 <section className="px-6 pb-24">
                     <div className="max-w-3xl mx-auto">
-                        <Link href="/create" className="inline-flex min-h-12 px-8 rounded-xl bg-brand text-ink font-bold items-center hover:brightness-105 transition-all">{t.startOwn}</Link>
+                        <Link href="/create" className="inline-flex min-h-12 items-center rounded-control bg-brand px-8 font-bold text-ink hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep transition-colors duration-200">{t.startOwn}</Link>
                     </div>
                 </section>
             )}
