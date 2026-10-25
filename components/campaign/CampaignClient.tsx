@@ -761,13 +761,13 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                         )}
 
                         <div className="w-full rounded-2xl border border-ink/10 bg-cream px-4 py-4 text-center">
-                            <p className="font-display text-xl font-extrabold leading-tight text-ink">{t.wantOwn}</p>
-                            <p className="mt-1.5 text-sm text-ink/75 leading-relaxed">{t.wantOwnBody}</p>
+                            <p className="text-sm text-ink/75 leading-relaxed">{t.wantOwnBody}</p>
                             <a
                                 href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_post_save')}
                                 onClick={() => {
                                     setLocale(locale);
                                     track('create_from_campaign', { campaign: slug, from: 'post_save' });
+                                    fetch(`/api/campaigns/${slug}/cta`, { method: 'POST', keepalive: true }).catch(() => {});
                                 }}
                                 className="mt-3 inline-flex w-full min-h-[48px] items-center justify-center rounded-xl bg-brand px-4 font-bold text-ink hover:brightness-105 active:brightness-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                             >

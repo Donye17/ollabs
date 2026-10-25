@@ -26,6 +26,15 @@ export const ANNOUNCEMENTS: Announcement[] = [
         ],
     },
     {
+        id: '2026-10-25-own-frame',
+        date: '2026-10-25',
+        title: 'Make your own frame, after you save',
+        summary: 'One button under the saved photo. It does not block download or share.',
+        items: [
+            'English: Make your own frame. Portuguese: Crie sua própria moldura.',
+        ],
+    },
+    {
         id: '2026-10-19-day-pt',
         date: '2026-10-19',
         title: 'Independência and Dia das Crianças have Portuguese pages',

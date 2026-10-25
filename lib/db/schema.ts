@@ -20,6 +20,8 @@ export const campaigns = pgTable("campaigns", {
 	creatorName: text("creator_name").default('Anonymous'),
 	supporterCount: integer("supporter_count").default(0),
 	viewCount: integer("view_count").default(0),
+	// Post-save "Make your own frame" taps. Display only. Never a gate.
+	ctaTaps: integer("cta_taps").default(0),
 	goal: integer("goal"),
 	category: text("category"),
 	// Awareness-day attribution when the builder was opened from /day/[slug].
