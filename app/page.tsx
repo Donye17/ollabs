@@ -4,10 +4,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 import { ExamplesSkeleton } from "@/components/home/ExamplesSkeleton";
-import { HomeExamplesSection } from "@/components/home/HomeExamplesSection";
+import { HomeExamplesSection, HomeHeroProof } from "@/components/home/HomeExamplesSection";
 import { HomeHowItWorks } from "@/components/home/HomeHowItWorks";
 import { HomeHero } from "@/components/home/HomeHero";
-import { HomeBottomCta, HomeMarketingCopy } from "@/components/home/HomeMarketingCopy";
+import { HomeBottomCta } from "@/components/home/HomeMarketingCopy";
 import { BrandMark } from "@/components/BrandMark";
 import { HOME_FAQS } from "@/lib/faqs";
 
@@ -50,86 +50,90 @@ export default function Home() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
             />
+            <link rel="preload" as="image" href="/hero/photo-01.jpg" />
+            <link rel="preload" as="image" href="/hero/photo-02.jpg" />
+            <link rel="preload" as="image" href="/hero/photo-03.jpg" />
+            <link rel="preload" as="image" href="/hero/frames/hugo.png" />
+            <link rel="preload" as="image" href="/hero/frames/valkyries.png" />
+            <link rel="preload" as="image" href="/hero/frames/pitagoras.png" />
+
             <NavBar isHome />
 
-            <HomeHero />
-
-            <section className="pb-12 sm:pb-16">
-                <Suspense fallback={
-                    <div className="relative z-10 max-w-lg mx-auto px-5">
-                        <p className="font-display text-center text-2xl font-bold tracking-tight mb-8">Top campaigns</p>
-                        <ExamplesSkeleton />
-                    </div>
-                }>
-                    <HomeExamplesSection />
-                </Suspense>
-            </section>
+            <HomeHero
+                proof={(
+                    <Suspense fallback={null}>
+                        <HomeHeroProof />
+                    </Suspense>
+                )}
+            />
 
             <HomeHowItWorks />
 
-            <HomeMarketingCopy />
+            <section className="border-y border-ink/10 bg-paper2 py-8">
+                <Suspense fallback={<ExamplesSkeleton />}>
+                    <HomeExamplesSection />
+                </Suspense>
+            </section>
 
             <FAQSection />
 
             <HomeBottomCta />
 
-            <footer className="border-t border-ink/10 py-16 bg-paper">
-                <div className="max-w-lg mx-auto px-5">
-                    <div className="flex flex-col items-start gap-12 mb-12">
-                        <div>
-                            <BrandMark href={null} size={28} className="mb-4" />
-                            <p className="font-sans text-muted text-[15px] leading-relaxed">
-                                The fast way to run a profile-picture campaign. Ollabs is a play on collabs, because coming together is the whole point.
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-10 w-full">
+            <footer className="border-t border-ink/10 bg-paper py-8">
+                <div className="mx-auto max-w-5xl px-5">
+                    <div className="mb-6">
+                        <BrandMark href={null} size={28} className="mb-2" />
+                        <p className="max-w-sm font-sans text-sm leading-relaxed text-ink/80">
+                            The fast way to run a profile-picture campaign. Ollabs is a play on collabs, because coming together is the whole point.
+                        </p>
+                    </div>
+                    <div className="grid w-full grid-cols-2 gap-x-6 gap-y-6 lg:grid-cols-4 lg:gap-y-0">
                             <div>
-                                <h5 className="font-display font-bold mb-4">Product</h5>
-                                <ul className="space-y-2 font-sans text-[15px] text-muted leading-relaxed">
-                                    <li><Link href="/create" className="hover:text-brand-deep transition-colors">Create a campaign</Link></li>
-                                    <li><Link href="/explore" className="hover:text-brand-deep transition-colors">Explore campaigns</Link></li>
-                                    <li><Link href="/mine" className="hover:text-brand-deep transition-colors">My campaigns</Link></li>
-                                    <li><Link href="/hub" className="hover:text-brand-deep transition-colors">Your hub</Link></li>
-                                    <li><Link href="/updates" className="hover:text-brand-deep transition-colors">What&apos;s new</Link></li>
+                                <h5 className="font-display font-bold mb-2">Product</h5>
+                                <ul className="space-y-1 font-sans text-sm leading-relaxed text-ink/80">
+                                    <li><Link href="/create" className="hover:text-ink hover:underline">Create a campaign</Link></li>
+                                    <li><Link href="/explore" className="hover:text-ink hover:underline">Explore campaigns</Link></li>
+                                    <li><Link href="/mine" className="hover:text-ink hover:underline">My campaigns</Link></li>
+                                    <li><Link href="/hub" className="hover:text-ink hover:underline">Your hub</Link></li>
+                                    <li><Link href="/updates" className="hover:text-ink hover:underline">What&apos;s new</Link></li>
                                 </ul>
                             </div>
                             <div>
-                                <h5 className="font-display font-bold mb-4">
-                                    <Link href="/guides" className="hover:text-brand-deep transition-colors">Guides</Link>
+                                <h5 className="font-display font-bold mb-2">
+                                    <Link href="/guides" className="hover:text-ink hover:underline">Guides</Link>
                                 </h5>
-                                <ul className="space-y-2 font-sans text-[15px] text-muted leading-relaxed">
-                                    <li><Link href="/guides/add-a-frame-to-a-profile-picture" className="hover:text-brand-deep transition-colors">Add a frame to a photo</Link></li>
-                                    <li><Link href="/guides/run-a-campaign-people-join" className="hover:text-brand-deep transition-colors">Campaigns people join</Link></li>
-                                    <li><Link href="/guides/start-a-campaign" className="hover:text-brand-deep transition-colors">Start a campaign</Link></li>
-                                    <li><Link href="/guides/hub" className="hover:text-brand-deep transition-colors">What is a hub?</Link></li>
-                                    <li><Link href="/guides" className="hover:text-brand-deep transition-colors">All guides</Link></li>
+                                <ul className="space-y-1 font-sans text-sm leading-relaxed text-ink/80">
+                                    <li><Link href="/guides/add-a-frame-to-a-profile-picture" className="hover:text-ink hover:underline">Add a frame to a photo</Link></li>
+                                    <li><Link href="/guides/run-a-campaign-people-join" className="hover:text-ink hover:underline">Campaigns people join</Link></li>
+                                    <li><Link href="/guides/start-a-campaign" className="hover:text-ink hover:underline">Start a campaign</Link></li>
+                                    <li><Link href="/guides/hub" className="hover:text-ink hover:underline">What is a hub?</Link></li>
+                                    <li><Link href="/guides" className="hover:text-ink hover:underline">All guides</Link></li>
                                 </ul>
                             </div>
                             <div>
-                                <h5 className="font-display font-bold mb-4">Discover</h5>
-                                <ul className="space-y-2 font-sans text-[15px] text-muted leading-relaxed">
-                                    <li><Link href="/day" className="hover:text-brand-deep transition-colors">Calendar moments</Link></li>
-                                    <li><Link href="/vs/twibbonize" className="hover:text-brand-deep transition-colors">Twibbonize alternative</Link></li>
-                                    <li><Link href="/for" className="hover:text-brand-deep transition-colors">Use cases</Link></li>
-                                    <li className="flex flex-wrap gap-x-2 gap-y-1 pt-1">
-                                        <Link href="/pt" className="hover:text-brand-deep transition-colors">Português</Link>
-                                        <Link href="/hi" className="hover:text-brand-deep transition-colors">हिन्दी</Link>
+                                <h5 className="font-display font-bold mb-2">Discover</h5>
+                                <ul className="space-y-1 font-sans text-sm leading-relaxed text-ink/80">
+                                    <li><Link href="/day" className="hover:text-ink hover:underline">Calendar moments</Link></li>
+                                    <li><Link href="/vs/twibbonize" className="hover:text-ink hover:underline">Twibbonize alternative</Link></li>
+                                    <li><Link href="/for" className="hover:text-ink hover:underline">Use cases</Link></li>
+                                    <li className="flex flex-wrap gap-x-2 gap-y-1">
+                                        <Link href="/pt" className="hover:text-ink hover:underline">Português</Link>
+                                        <Link href="/hi" className="hover:text-ink hover:underline">हिन्दी</Link>
                                     </li>
                                 </ul>
                             </div>
                             <div>
-                                <h5 className="font-display font-bold mb-4">Legal</h5>
-                                <ul className="space-y-2 font-sans text-[15px] text-muted leading-relaxed">
-                                    <li><Link href="/about" className="hover:text-brand-deep transition-colors">About</Link></li>
-                                    <li><Link href="/contact" className="hover:text-brand-deep transition-colors">Contact</Link></li>
-                                    <li><Link href="/privacy" className="hover:text-brand-deep transition-colors">Privacy</Link></li>
-                                    <li><Link href="/terms" className="hover:text-brand-deep transition-colors">Terms</Link></li>
+                                <h5 className="font-display font-bold mb-2">Legal</h5>
+                                <ul className="space-y-1 font-sans text-sm leading-relaxed text-ink/80">
+                                    <li><Link href="/about" className="hover:text-ink hover:underline">About</Link></li>
+                                    <li><Link href="/contact" className="hover:text-ink hover:underline">Contact</Link></li>
+                                    <li><Link href="/privacy" className="hover:text-ink hover:underline">Privacy</Link></li>
+                                    <li><Link href="/terms" className="hover:text-ink hover:underline">Terms</Link></li>
                                 </ul>
                             </div>
-                        </div>
                     </div>
 
-                    <div className="border-t border-ink/10 pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-sans text-xs text-muted">
+                    <div className="mt-6 flex flex-col items-start justify-between gap-2 border-t border-ink/10 pt-4 font-sans text-xs text-ink/80 sm:flex-row sm:items-center">
                         <p>&copy; 2026 Ollabs. All rights reserved.</p>
                         <p>Bring your people together.</p>
                     </div>

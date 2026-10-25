@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { NavBar } from '@/components/NavBar';
 import { HubEditorClient } from '@/components/hub/HubEditorClient';
+import { HubFaq } from '@/components/hub/HubFaq';
 import { requestMessages } from '@/lib/i18n/requestLocale';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,6 +29,7 @@ export default function HubEditPage() {
             <section className="px-5 sm:px-6">
                 <HubEditorClient />
             </section>
+            <HubFaq />
         </main>
     );
 }

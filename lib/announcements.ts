@@ -17,6 +17,15 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-25-one-hero',
+        date: '2026-10-25',
+        title: 'The homepage leads with one hero',
+        summary: 'Top campaigns sit lower, as a short row of proof.',
+        items: [
+            'The framed-photo count is in the hero line. How it works comes before the examples.',
+        ],
+    },
+    {
         id: '2026-10-19-day-pt',
         date: '2026-10-19',
         title: 'Independência and Dia das Crianças have Portuguese pages',
