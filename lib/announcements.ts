@@ -17,6 +17,15 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-25-pt-guides-days',
+        date: '2026-10-25',
+        title: 'Guides, day pages, and use cases are in Portuguese',
+        summary: 'The English guides, calendar pages, and the four remaining use cases now have a Portuguese body.',
+        items: [
+            'Same HowTo and FAQ on the guides. Same questions on the day pages. Arrecadação, aniversário, empresas e universidades em /pt/for.',
+        ],
+    },
+    {
         id: '2026-10-19-day-pt',
         date: '2026-10-19',
         title: 'Independência and Dia das Crianças have Portuguese pages',

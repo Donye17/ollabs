@@ -1,5 +1,7 @@
 /** Organizer how-to guides. Plain language, no em dashes. */
 
+import { GUIDE_PT } from '@/lib/guidesPt';
+
 export type GuideSection = {
     title: string;
     paragraphs?: string[];
@@ -1015,6 +1017,14 @@ export const GUIDES: Guide[] = [
         cta: { href: '/create', label: 'Create a campaign' },
     },
 ];
+
+for (const guide of GUIDES) {
+    const pt = GUIDE_PT[guide.slug];
+    if (pt && !guide.pt) {
+        guide.pt = pt;
+        guide.authorRolePt = guide.authorRolePt ?? 'Fundador da Ollabs';
+    }
+}
 
 export function getGuide(slug: string): Guide | undefined {
     return GUIDES.find((g) => g.slug === slug);

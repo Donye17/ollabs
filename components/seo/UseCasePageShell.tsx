@@ -7,6 +7,7 @@ import { SeoCampaignExample } from '@/components/seo/SeoCampaignExample';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import type { UseCase } from '@/lib/useCases';
 import type { SeoExampleCampaign } from '@/lib/seoExampleCampaign';
+import type { Locale } from '@/lib/i18n/locale';
 
 export type UseCaseLabels = {
     forPrefix: string;
@@ -36,6 +37,7 @@ type Props = {
     relatedHref: (slug: string) => string;
     createHref?: string;
     example?: SeoExampleCampaign | null;
+    locale?: Locale;
 };
 
 /** Shared layout for /for and localized /pt/for SEO pages. */
@@ -46,6 +48,7 @@ export function UseCasePageShell({
     relatedHref,
     createHref = '/create',
     example = null,
+    locale = 'en',
 }: Props) {
     const faqLd = {
         '@context': 'https://schema.org',
@@ -102,6 +105,7 @@ export function UseCasePageShell({
                             campaign={example}
                             size={220}
                             title={labels.exampleTitle || 'Example campaign'}
+                            locale={locale}
                         />
                         {uc.exampleNote && (
                             <p className="mt-4 max-w-xl text-center text-sm text-ink/60 leading-relaxed">

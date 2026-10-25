@@ -7,6 +7,10 @@ const PT_TO_EN: Record<string, string> = {
     ongs: 'nonprofits',
     eventos: 'events',
     conscientizacao: 'awareness-campaigns',
+    arrecadacao: 'fundraisers',
+    aniversarios: 'birthdays',
+    empresas: 'companies',
+    universidades: 'universities',
 };
 
 export function englishSlugFromPt(ptSlug: string): string {
