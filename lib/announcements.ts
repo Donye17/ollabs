@@ -17,6 +17,16 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-25-polish',
+        date: '2026-10-25',
+        title: 'Pages show their shape while they load',
+        summary: 'Home, Explore, and campaign pages use skeletons. A short bar marks the move to the next page.',
+        items: [
+            'Cut out the background is the plain name for removing the photo background.',
+            'A second tap on Save or Share waits until the first one finishes.',
+        ],
+    },
+    {
         id: '2026-10-19-day-pt',
         date: '2026-10-19',
         title: 'Independência and Dia das Crianças have Portuguese pages',

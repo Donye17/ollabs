@@ -52,15 +52,17 @@
     }
 
     :focus-visible {
-        outline: 2px solid #01BEF6;
+        outline: 2px solid var(--brand-deep);
         outline-offset: 2px;
     }
 
+    /* One gate for every CSS animation and transition, including the route bar.
+       JS timers (the hero fan) still have to read prefers-reduced-motion themselves. */
     @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
+            animation: none !important;
+            transition: none !important;
+            scroll-behavior: auto !important;
         }
     }
 }
@@ -133,10 +135,14 @@
         }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-        .hero-fan-layer {
-            transition: none !important;
-        }
+    /* 250ms navigation bar. Transform only. The reduced-motion gate above turns it off. */
+    .route-progress {
+        animation: route-progress 250ms ease-out;
+    }
+
+    @keyframes route-progress {
+        from { transform: scaleX(0); }
+        to { transform: scaleX(1); }
     }
 
     /* Elevated card on cool paper */

@@ -24,7 +24,7 @@ export function HomeCalendarLink() {
 
     return (
         <p className="mt-8 text-left max-w-lg mx-auto px-5 font-sans text-[15px] leading-relaxed">
-            <Link href="/day" className="font-semibold text-brand-deep hover:underline">
+            <Link href="/day" className="inline-flex min-h-11 items-center font-semibold text-brand-deep hover:underline">
                 {messages.home.calendarLink}
             </Link>
         </p>

@@ -885,7 +885,7 @@ export const SEPT_OCT_DAYS: AwarenessDay[] = [
         category: 'school',
         audience: ['Indonesian youth groups', 'Schools', 'Universities', 'Student associations', 'Indonesian communities'],
         keyword: 'sumpah pemuda profile picture frame',
-        tagline: 'One homeland, one nation, one language — and a day for young people to decide what unity asks now.',
+        tagline: 'One homeland, one nation, one language, and a day for young people to decide what unity asks now.',
         intro: [
             'Indonesia marks Sumpah Pemuda, or Youth Pledge Day, on October 28. The day remembers young people who declared one homeland, one nation and one language in 1928, before an independent Indonesia existed.',
             'A red and white profile frame can connect students, youth groups and Indonesian communities across cities and campuses. The useful question beside it is what young people are being trusted to lead now.',

@@ -9,6 +9,7 @@ import { track } from '@/lib/analytics';
 import { saveFramedPhoto, preferShareSheetForSave, isIOS } from '@/lib/savePhoto';
 import { framedCircleToStoryBlob } from '@/lib/storyExport';
 import { useLocale } from '@/components/i18n/LocaleProvider';
+import { useTapGuard } from '@/lib/tapLock';
 import { Upload, Download, Loader2, ArrowRight, ImageDown, AlertCircle } from 'lucide-react';
 
 const CANVAS = 1024;
@@ -42,6 +43,7 @@ export const DayFrameTool: React.FC<{
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const imgRef = useRef<HTMLImageElement | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
+    const photoTap = useTapGuard();
 
     const [hasImage, setHasImage] = useState(false);
     const [zoom, setZoom] = useState(1);
@@ -152,6 +154,7 @@ export const DayFrameTool: React.FC<{
 
     const download = async () => {
         if (!canvasRef.current || !hasImage) return;
+        if (!photoTap.start()) return;
         setDownloading(true);
         setError(null);
         try {
@@ -174,6 +177,7 @@ export const DayFrameTool: React.FC<{
             }
         } finally {
             setDownloading(false);
+            photoTap.end();
         }
     };
 
@@ -187,6 +191,7 @@ export const DayFrameTool: React.FC<{
      */
     const sharePhoto = async () => {
         if (!canvasRef.current || !hasImage) return;
+        if (!photoTap.start()) return;
         setSharingPhoto(true);
         setError(null);
         try {
@@ -208,12 +213,14 @@ export const DayFrameTool: React.FC<{
             }
         } finally {
             setSharingPhoto(false);
+            photoTap.end();
         }
     };
 
     const shareStory = async () => {
         const canvas = canvasRef.current;
         if (!canvas || !hasImage) return;
+        if (!photoTap.start()) return;
         setSharingStory(true);
         setError(null);
         try {
@@ -232,6 +239,7 @@ export const DayFrameTool: React.FC<{
             }
         } finally {
             setSharingStory(false);
+            photoTap.end();
         }
     };
 

@@ -7,6 +7,7 @@ import { FrameConfig } from '@/lib/types';
 import { fileToDisplayDataUrl } from '@/lib/imageLoad';
 import { Loader2, Upload, X } from 'lucide-react';
 import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
+import { useTapGuard } from '@/lib/tapLock';
 
 const CANVAS = 768;
 
@@ -44,6 +45,7 @@ export function HubAvatarComposer({ open, campaigns, onClose, onDone }: Props) {
     const [tick, setTick] = useState(0);
     const [error, setError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
+    const photoTap = useTapGuard();
 
     const drag = useRef({ active: false, startX: 0, startY: 0, baseX: 0, baseY: 0 });
 
@@ -183,6 +185,7 @@ export function HubAvatarComposer({ open, campaigns, onClose, onDone }: Props) {
     const applyPhoto = async () => {
         const canvas = canvasRef.current;
         if (!canvas || !hasImage || !frame) return;
+        if (!photoTap.start()) return;
         setBusy(true);
         setError(null);
         try {
@@ -204,6 +207,7 @@ export function HubAvatarComposer({ open, campaigns, onClose, onDone }: Props) {
             setError('Could not upload that photo. Try again.');
         } finally {
             setBusy(false);
+            photoTap.end();
         }
     };
 

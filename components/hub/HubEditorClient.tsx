@@ -28,6 +28,7 @@ import {
     suggestHandleFromEmail,
 } from '@/lib/hub';
 import { ABOVE_MOBILE_NAV, ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
+import { useTapGuard } from '@/lib/tapLock';
 import { track, withUtm } from '@/lib/analytics';
 import { hubShareText, whatsappUrl } from '@/lib/share';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
@@ -68,6 +69,8 @@ export const HubEditorClient: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [signedIn, setSignedIn] = useState(false);
     const [saving, setSaving] = useState(false);
+    const saveTap = useTapGuard();
+    const uploadTap = useTapGuard();
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [saveMsg, setSaveMsg] = useState<string | null>(null);
@@ -160,6 +163,7 @@ export const HubEditorClient: React.FC = () => {
 
     const onAvatar = async (file: File | null) => {
         if (!file) return;
+        if (!uploadTap.start()) return;
         setUploading(true);
         setError(null);
         try {
@@ -172,15 +176,17 @@ export const HubEditorClient: React.FC = () => {
             setError('Could not upload that image.');
         } finally {
             setUploading(false);
+            uploadTap.end();
         }
     };
 
     const save = async (): Promise<{ ok: boolean; handle: string | null }> => {
-        if (saving) return { ok: false, handle: null };
+        if (!saveTap.start()) return { ok: false, handle: null };
         const normalized = normalizeHandle(handle);
         const herr = handleError(normalized);
         if (herr) {
             setError(herr);
+            saveTap.end();
             return { ok: false, handle: null };
         }
 
@@ -239,6 +245,7 @@ export const HubEditorClient: React.FC = () => {
             return { ok: false, handle: null };
         } finally {
             setSaving(false);
+            saveTap.end();
         }
     };
 

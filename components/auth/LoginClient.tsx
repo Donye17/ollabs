@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, KeyRound, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { track } from '@/lib/analytics';
 import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
+import { useTapGuard } from '@/lib/tapLock';
 
 type Step = 'email' | 'code' | 'done';
 
@@ -21,12 +22,13 @@ export const LoginClient: React.FC = () => {
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
     const [busy, setBusy] = useState(false);
+    const authTap = useTapGuard();
     const [error, setError] = useState<string | null>(null);
     const [claimed, setClaimed] = useState(0);
 
     const requestCode = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (busy) return;
+        if (!authTap.start()) return;
         setBusy(true);
         setError(null);
         try {
@@ -47,12 +49,13 @@ export const LoginClient: React.FC = () => {
             setError('Could not reach the server. Please try again.');
         } finally {
             setBusy(false);
+            authTap.end();
         }
     };
 
     const verify = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (busy) return;
+        if (!authTap.start()) return;
         setBusy(true);
         setError(null);
         try {
@@ -81,6 +84,7 @@ export const LoginClient: React.FC = () => {
             setError('Could not reach the server. Please try again.');
         } finally {
             setBusy(false);
+            authTap.end();
         }
     };
 

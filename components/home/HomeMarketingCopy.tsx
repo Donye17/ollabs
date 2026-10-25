@@ -34,21 +34,19 @@ export function HomeMarketingCopy() {
                     <p className="font-sans text-sm text-muted font-semibold mb-4 text-center">
                         {t.madeFor}
                     </p>
-                    <p className="font-sans text-[15px] text-ink/80 leading-relaxed text-left">
-                        {audiences.map((a, i) => (
-                            <span key={a.href}>
-                                {i > 0 && <span className="text-muted/50 mx-1.5">·</span>}
-                                <Link
-                                    href={a.href}
-                                    className="font-medium text-ink hover:text-brand-deep transition-colors"
-                                >
-                                    {locale === 'pt' ? audiencesPt[a.href] ?? a.label : a.label}
-                                </Link>
-                            </span>
+                    <div className="flex flex-wrap items-center justify-center gap-x-1 gap-y-1">
+                        {audiences.map((a) => (
+                            <Link
+                                key={a.href}
+                                href={a.href}
+                                className="inline-flex min-h-11 items-center px-2 font-medium text-ink hover:text-brand-deep transition-colors"
+                            >
+                                {locale === 'pt' ? audiencesPt[a.href] ?? a.label : a.label}
+                            </Link>
                         ))}
-                    </p>
-                    <div className="mt-5">
-                        <Link href="/for" className="font-sans text-sm font-semibold text-brand-deep hover:underline">
+                    </div>
+                    <div className="mt-2 text-center">
+                        <Link href="/for" className="inline-flex min-h-11 items-center font-sans text-sm font-semibold text-brand-deep hover:underline">
                             {t.seeAllUseCases}
                         </Link>
                     </div>

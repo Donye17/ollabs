@@ -9,6 +9,7 @@ import { track, withUtm } from '@/lib/analytics';
 import { XGlyph, WhatsAppGlyph, FacebookGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { supporterShareText, whatsappUrl, messengerShareUrl, prefersTagalog } from '@/lib/share';
 import { saveFramedPhoto, shareFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome } from '@/lib/savePhoto';
+import { useTapGuard } from '@/lib/tapLock';
 import { framedCircleToStoryBlob } from '@/lib/storyExport';
 import { uploadExploreThumb } from '@/lib/exploreThumb';
 import { BrandMark } from '@/components/BrandMark';
@@ -50,6 +51,8 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     const imgRef = useRef<HTMLImageElement | null>(null);
     const fileRef = useRef<HTMLInputElement>(null);
     const countedRef = useRef(false);
+    const saveTap = useTapGuard();
+    const reportTap = useTapGuard();
 
     const [hasImage, setHasImage] = useState(false);
     const [zoom, setZoom] = useState(1);
@@ -122,6 +125,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     };
 
     const submitReport = async () => {
+        if (!reportTap.start()) return;
         try {
             await fetch(`/api/campaigns/${slug}/report`, {
                 method: 'POST',
@@ -129,6 +133,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 body: JSON.stringify({ reason: reportReason }),
             });
         } catch { /* ignore */ }
+        finally { reportTap.end(); }
         setReportDone(true);
         setReportOpen(false);
     };
@@ -385,6 +390,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     const handleDownload = async () => {
         const canvas = canvasRef.current;
         if (!canvas || !hasImage) return;
+        if (!saveTap.start()) return;
         setDownloading(true);
         setSaveError(null);
         try {
@@ -412,6 +418,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
             }
         } finally {
             setDownloading(false);
+            saveTap.end();
         }
     };
 
@@ -427,6 +434,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     const handleSharePhoto = async () => {
         const canvas = canvasRef.current;
         if (!canvas || !hasImage) return;
+        if (!saveTap.start()) return;
         setSharingPhoto(true);
         setSaveError(null);
         try {
@@ -448,6 +456,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
             }
         } finally {
             setSharingPhoto(false);
+            saveTap.end();
         }
     };
 
@@ -455,6 +464,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     const handleShareStory = async () => {
         const canvas = canvasRef.current;
         if (!canvas || !hasImage) return;
+        if (!saveTap.start()) return;
         setSharingStory(true);
         setSaveError(null);
         try {
@@ -479,6 +489,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
             }
         } finally {
             setSharingStory(false);
+            saveTap.end();
         }
     };
 
@@ -871,14 +882,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                     <a
                         href={`/create?from=${encodeURIComponent(slug)}`}
                         onClick={() => track('create_from_campaign', { campaign: slug, from: 'footer' })}
-                        className="text-xs text-muted hover:text-brand-deep transition-colors mt-1"
+                        className="inline-flex min-h-11 items-center text-xs text-muted hover:text-brand-deep transition-colors mt-1"
                     >
                         {t.makeOwnFooter}
                     </a>
                 )}
                 <a
                     href="/guides"
-                    className="text-xs text-muted hover:text-brand-deep transition-colors mt-1"
+                    className="inline-flex min-h-11 items-center text-xs text-muted hover:text-brand-deep transition-colors mt-1"
                 >
                     {t.guides}
                 </a>
@@ -896,12 +907,12 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                 className="w-full bg-paper border border-ink/10 rounded-lg px-2.5 py-2 text-sm text-ink placeholder-muted outline-none focus:ring-2 focus:ring-brand/40 resize-none min-h-[56px]"
                             />
                             <div className="flex gap-2">
-                                <button onClick={submitReport} className="flex-1 py-2 rounded-lg text-xs font-bold bg-coral text-white hover:brightness-105 transition-all">{t.submitReport}</button>
-                                <button onClick={() => setReportOpen(false)} className="py-2 px-3 rounded-lg text-xs font-semibold bg-paper border border-ink/10 text-ink hover:bg-ink/5 transition-colors">{t.cancel}</button>
+                                <button type="button" onClick={submitReport} className="flex-1 min-h-11 rounded-lg text-xs font-bold bg-coral text-white hover:brightness-105 transition-colors">{t.submitReport}</button>
+                                <button type="button" onClick={() => setReportOpen(false)} className="min-h-11 px-3 rounded-lg text-xs font-semibold bg-paper border border-ink/10 text-ink hover:bg-ink/5 transition-colors">{t.cancel}</button>
                             </div>
                         </div>
                     ) : (
-                        <button onClick={() => setReportOpen(true)} className="text-[11px] text-muted/70 hover:text-coral transition-colors">{t.report}</button>
+                        <button type="button" onClick={() => setReportOpen(true)} className="inline-flex min-h-11 items-center text-[11px] text-muted/70 hover:text-coral transition-colors">{t.report}</button>
                     )
                 )}
             </div>

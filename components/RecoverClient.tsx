@@ -3,15 +3,17 @@ import React, { useState } from 'react';
 import { Mail, CheckCircle2, Loader2 } from 'lucide-react';
 import { track } from '@/lib/analytics';
 import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
+import { useTapGuard } from '@/lib/tapLock';
 
 export const RecoverClient: React.FC = () => {
     const [email, setEmail] = useState('');
     const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle');
     const [error, setError] = useState<string | null>(null);
+    const sendTap = useTapGuard();
 
     const submit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (state === 'sending') return;
+        if (!sendTap.start()) return;
         setError(null);
         setState('sending');
         try {
@@ -31,6 +33,8 @@ export const RecoverClient: React.FC = () => {
         } catch {
             setError('Could not reach the server. Please try again.');
             setState('idle');
+        } finally {
+            sendTap.end();
         }
     };
 

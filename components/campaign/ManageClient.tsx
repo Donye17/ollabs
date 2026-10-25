@@ -9,6 +9,7 @@ import { BarChart3, Users, Eye, Copy, Check, Loader2, Save, ExternalLink, QrCode
 import { countryLabel } from '@/lib/geo';
 import { ORGANIZER_PRIMARY_BTN, PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 import { useLocale } from '@/components/i18n/LocaleProvider';
+import { useTapGuard } from '@/lib/tapLock';
 import { formatCount, htmlLang } from '@/lib/i18n/locale';
 import type { Messages } from '@/lib/i18n/messages';
 
@@ -75,6 +76,7 @@ interface ManageData {
 export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     const { locale, messages } = useLocale();
     const t = messages.manage;
+    const saveTap = useTapGuard();
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -150,6 +152,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     };
 
     const save = async () => {
+        if (!saveTap.start()) return;
         setSaving(true);
         setSaveMsg(null);
         setSaveErr(null);
@@ -185,6 +188,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
             setSaveErr('Could not save');
         } finally {
             setSaving(false);
+            saveTap.end();
         }
     };
 
