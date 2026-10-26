@@ -17,6 +17,15 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-25-explore-frames',
+        date: '2026-10-25',
+        title: 'Explore and campaign pages use the frame palette',
+        summary: 'Filter chips show how many campaigns are in each group. The frame ring is the mark on both pages.',
+        items: [
+            'Bright cyan stays on buttons. Text that used to be cyan uses the darker brand color.',
+        ],
+    },
+    {
         id: '2026-10-25-pt-guides-days',
         date: '2026-10-25',
         title: 'Guides, day pages, and use cases are in Portuguese',

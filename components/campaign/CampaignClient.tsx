@@ -570,8 +570,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 <div
                     className={
                         exportFormat === 'story' && (hasImage || justDownloaded)
-                            ? 'w-[min(52vw,42dvh)] max-w-[220px] aspect-[9/16] rounded-2xl bg-ink flex items-center justify-center p-3'
-                            : ''
+                            ? 'flex aspect-[9/16] w-[min(52vw,42dvh)] max-w-[220px] items-center justify-center rounded-card bg-ink p-3 shadow-frame-md'
+                            : `rounded-avatar p-[3px] ring-frame-conic shadow-frame-md ${
+                                justDownloaded
+                                    ? 'h-[min(52vw,28dvh)] w-[min(52vw,28dvh)] max-h-[200px] max-w-[200px]'
+                                    : hasImage
+                                    ? 'h-[min(88vw,58dvh)] w-[min(88vw,58dvh)] max-h-[400px] max-w-[400px]'
+                                    : 'h-[min(82vw,52dvh)] w-[min(82vw,52dvh)] max-h-[320px] max-w-[320px]'
+                            } ${dragOver ? 'outline outline-2 outline-offset-2 outline-brand-deep' : ''}`
                     }
                 >
                 <canvas
@@ -588,15 +594,13 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                     onDragLeave={onDragLeave}
                     onDrop={onDrop}
                     onClick={() => { if (!hasImage) fileRef.current?.click(); }}
-                    className={`rounded-full touch-none frame-shadow ${
+                    className={`h-full w-full touch-none rounded-avatar ${
                         exportFormat === 'story' && (hasImage || justDownloaded)
-                            ? 'w-full h-auto aspect-square cursor-grab active:cursor-grabbing'
-                            : justDownloaded
-                            ? 'w-[min(52vw,28dvh)] h-[min(52vw,28dvh)] max-w-[200px] max-h-[200px]'
-                            : hasImage
-                            ? 'w-[min(88vw,58dvh)] h-[min(88vw,58dvh)] max-w-[400px] max-h-[400px] cursor-grab active:cursor-grabbing'
-                            : 'w-[min(82vw,52dvh)] h-[min(82vw,52dvh)] max-w-[320px] max-h-[320px] cursor-pointer'
-                    } ${dragOver ? 'ring-4 ring-brand/70' : ''}`}
+                            ? 'aspect-square h-auto w-full cursor-grab active:cursor-grabbing'
+                            : !hasImage
+                            ? 'cursor-pointer'
+                            : 'cursor-grab active:cursor-grabbing'
+                    }`}
                     style={{ background: 'transparent', touchAction: 'none' }}
                 />
                 </div>
@@ -623,7 +627,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 {!hasImage && <p className="text-sm text-muted">{t.tapHint}</p>}
 
                 {uploadError && (
-                    <p role="alert" className="w-full text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center">
+                    <p role="alert" className="w-full text-sm text-coral bg-coral/10 border border-coral/25 rounded-control px-3 py-2.5 text-center">
                         {uploadError}
                     </p>
                 )}
@@ -642,7 +646,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 {!hasImage && (
                     <button
                         onClick={() => fileRef.current?.click()}
-                        className="w-full min-h-[56px] py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all"
+                        className="w-full min-h-[56px] py-4 rounded-control font-bold text-base flex items-center justify-center gap-2 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                     >
                         <Upload size={18} /> {t.uploadPhoto}
                     </button>
@@ -665,7 +669,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             }}
                         />
                         {(saveError || showSaveRecovery) && (
-                            <div role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center space-y-2">
+                            <div role="alert" className="text-sm text-coral bg-coral/10 border border-coral/25 rounded-control px-3 py-2.5 text-center space-y-2">
                                 <p>{saveError || t.inAppSaveFailed}</p>
                                 <div className="flex flex-wrap justify-center gap-2">
                                     <a
@@ -687,7 +691,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             </div>
                         )}
                         {pasteHint && (
-                            <div role="status" className="text-sm text-ink bg-brand/10 border border-brand/25 rounded-xl px-3 py-2.5 text-center">
+                            <div role="status" className="text-sm text-ink bg-brand/10 border border-brand/25 rounded-control px-3 py-2.5 text-center">
                                 <p>{pasteHint === 'copied' ? t.linkCopiedPaste : t.copyCaptionFailed}</p>
                                 <p className="mt-2 text-left text-xs leading-relaxed break-all select-all">{shareCaption}</p>
                             </div>
@@ -696,7 +700,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             <button
                                 onClick={handleSharePhoto}
                                 disabled={sharingPhoto}
-                                className="w-full min-h-[52px] py-3.5 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2.5 bg-ink text-paper hover:bg-ink/90 active:bg-ink/80 transition-colors disabled:opacity-50"
+                                className="w-full min-h-[52px] py-3.5 rounded-control font-semibold text-[15px] flex items-center justify-center gap-2.5 bg-ink text-paper hover:bg-ink/90 active:bg-ink/80 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep disabled:opacity-50"
                             >
                                 {sharingPhoto
                                     ? <Loader2 size={20} className="animate-spin" />
@@ -705,14 +709,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                         ) : (
                             <button
                                 onClick={() => openShare('whatsapp')}
-                                className="w-full min-h-[52px] py-3.5 rounded-xl font-semibold text-[15px] flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-all"
+                                className="w-full min-h-[52px] py-3.5 rounded-control font-semibold text-[15px] flex items-center justify-center gap-2.5 text-white hover:brightness-105 active:brightness-95 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                                 style={{ backgroundColor: WHATSAPP_GREEN }}
                             >
                                 <WhatsAppGlyph size={20} /> {t.shareWhatsApp}
                             </button>
                         )}
 
-                        <div className="w-full rounded-2xl border border-ink/10 bg-cream px-4 py-4 text-center">
+                        <div className="w-full rounded-card border border-ink/10 bg-cream px-4 py-4 text-center">
                             <p className="font-display text-xl font-extrabold leading-tight text-ink">{t.wantOwn}</p>
                             <p className="mt-1.5 text-sm text-ink/75 leading-relaxed">{t.wantOwnBody}</p>
                             <a
@@ -721,7 +725,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                     setLocale(locale);
                                     track('create_from_campaign', { campaign: slug, from: 'post_save' });
                                 }}
-                                className="mt-3 inline-flex w-full min-h-[48px] items-center justify-center rounded-xl bg-brand px-4 font-bold text-ink hover:brightness-105 active:brightness-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
+                                className="mt-3 inline-flex w-full min-h-[48px] items-center justify-center rounded-control bg-brand px-4 font-bold text-ink hover:brightness-105 active:brightness-95 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                             >
                                 {t.makeOwn}
                             </a>
@@ -731,7 +735,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                         <button
                             onClick={handleShareStory}
                             disabled={sharingStory}
-                            className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors disabled:opacity-50"
+                            className="w-full min-h-[48px] py-3 rounded-control font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep disabled:opacity-50"
                         >
                             {sharingStory
                                 ? <Loader2 size={16} className="animate-spin" />
@@ -742,7 +746,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                         {canSharePhoto && (
                             <button
                                 onClick={() => openShare('whatsapp')}
-                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
+                                className="w-full min-h-[48px] py-3 rounded-control font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                             >
                                 <WhatsAppGlyph size={16} /> {t.shareLinkWhatsApp}
                             </button>
@@ -751,7 +755,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                         {(prefersTagalog() || locale === 'id') && (
                             <button
                                 onClick={() => openShare('messenger')}
-                                className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-[#0084FF]/40 bg-[#0084FF]/10 text-ink hover:bg-[#0084FF]/15 transition-colors"
+                                className="w-full min-h-[48px] py-3 rounded-control font-semibold flex items-center justify-center gap-2 border border-[#0084FF]/40 bg-[#0084FF]/10 text-ink hover:bg-[#0084FF]/15 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                             >
                                 {t.shareMessenger}
                             </button>
@@ -759,14 +763,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
 
                         <button
                             onClick={copyLink}
-                            className="w-full min-h-[48px] py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
+                            className="w-full min-h-[48px] py-3 rounded-control font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                         >
                             {linkCopied
                                 ? <><Check size={15} className="text-brand-deep" /> {t.copied}</>
                                 : <><Copy size={15} /> {t.copyLink}</>}
                         </button>
 
-                        <details className="rounded-xl border border-ink/10 bg-cream">
+                        <details className="rounded-control border border-ink/10 bg-cream">
                             <summary className="min-h-[48px] px-4 py-3 cursor-pointer list-none flex items-center justify-center font-semibold text-sm text-ink [&::-webkit-details-marker]:hidden">
                                 {t.moreWays}
                             </summary>
@@ -774,14 +778,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                 {canNativeShare && (
                                     <button
                                         onClick={handleShare}
-                                        className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-ink text-paper hover:bg-ink/90 transition-colors"
+                                        className="w-full min-h-[44px] py-2.5 rounded-control font-semibold text-sm flex items-center justify-center gap-2 bg-ink text-paper hover:bg-ink/90 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                                     >
                                         <Share2 size={15} /> {t.shareAnother}
                                     </button>
                                 )}
                                 <button
                                     onClick={() => setShowQR((v) => !v)}
-                                    className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-paper hover:bg-ink/5 text-ink transition-colors"
+                                    className="w-full min-h-[44px] py-2.5 rounded-control font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-paper hover:bg-ink/5 text-ink transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                                 >
                                     <QrCode size={15} /> QR
                                 </button>
@@ -794,13 +798,13 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                 <div className="grid grid-cols-2 gap-2">
                                     <button
                                         onClick={() => openShare('x')}
-                                        className="min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 bg-ink text-white hover:brightness-125 transition-all"
+                                        className="min-h-[44px] py-2.5 rounded-control font-semibold text-sm flex items-center justify-center gap-1.5 bg-ink text-white hover:brightness-125 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                                     >
                                         <XGlyph size={14} /> X
                                     </button>
                                     <button
                                         onClick={() => openShare('facebook')}
-                                        className="min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-all"
+                                        className="min-h-[44px] py-2.5 rounded-control font-semibold text-sm flex items-center justify-center gap-1.5 text-white hover:brightness-105 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                                         style={{ backgroundColor: '#1877F2' }}
                                     >
                                         <FacebookGlyph size={14} /> Facebook
@@ -812,7 +816,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                         <a
                             href={withUtm('/hub', 'campaign_post_save')}
                             onClick={() => track('hub_from_campaign', { campaign: slug })}
-                            className="inline-flex min-h-[44px] items-center justify-center px-2 text-sm font-semibold text-muted hover:text-brand-deep transition-colors"
+                            className="inline-flex min-h-[44px] items-center justify-center px-2 text-sm font-semibold text-muted hover:text-brand-deep transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                         >
                             {t.setupHub}
                         </a>
@@ -822,7 +826,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                 setJustDownloaded(false);
                                 fileRef.current?.click();
                             }}
-                            className="w-full min-h-[48px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
+                            className="w-full min-h-[48px] py-3 rounded-control font-semibold flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                         >
                             <Upload size={16} /> {t.newPhoto}
                         </button>
@@ -832,7 +836,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 {adjusting && canCopyImage && (
                     <button
                         onClick={handleCopyImage}
-                        className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors"
+                        className="w-full min-h-[44px] py-2.5 rounded-control font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                     >
                         {imageCopied
                             ? <><Check size={16} className="text-brand-deep" /> {t.imageCopied}</>
@@ -844,15 +848,15 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                     On the empty screen the same number is the sentence under the title,
                     unless a goal needs the progress bar. */}
                 {(justDownloaded || (!hasImage && !!goal && goal > 0)) && (
-                    <div className="w-full border-t border-ink/10 pt-5 mt-2 text-center">
-                        <div className="font-display flex items-center justify-center gap-2 text-2xl font-bold">
-                            <span className="w-2.5 h-2.5 rounded-full bg-coral" /> {formatCount(count, locale)}
+                    <div className="mt-2 w-full rounded-card bg-cream px-4 py-4 text-center shadow-frame-sm">
+                        <div className="font-display flex items-center justify-center gap-2 text-3xl font-extrabold tabular-nums text-ink">
+                            <span className="h-2.5 w-2.5 rounded-avatar ring-frame-conic" aria-hidden /> {formatCount(count, locale)}
                         </div>
                         {goal && goal > 0 ? (
                             <>
                                 <div className="mt-2 h-2 w-full rounded-full bg-paper2 overflow-hidden">
                                     <div
-                                        className="h-full rounded-full bg-brand transition-all"
+                                        className="h-full rounded-avatar bg-brand transition-[width] duration-200"
                                         style={{ width: `${Math.min(100, Math.round((count / goal) * 100))}%` }}
                                     />
                                 </div>
@@ -887,7 +891,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                     reportDone ? (
                         <p className="text-[11px] text-muted/70">{t.reportThanks}</p>
                     ) : reportOpen ? (
-                        <div ref={reportBoxRef} className="w-full max-w-xs bg-cream border border-ink/10 rounded-xl p-3 space-y-2">
+                        <div ref={reportBoxRef} className="w-full max-w-xs bg-cream border border-ink/10 rounded-control p-3 space-y-2">
                             <p className="text-xs font-semibold text-ink">{t.reportTitle}</p>
                             <textarea
                                 value={reportReason}
@@ -896,12 +900,12 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                 className="w-full bg-paper border border-ink/10 rounded-lg px-2.5 py-2 text-sm text-ink placeholder-muted outline-none focus:ring-2 focus:ring-brand/40 resize-none min-h-[56px]"
                             />
                             <div className="flex gap-2">
-                                <button onClick={submitReport} className="flex-1 py-2 rounded-lg text-xs font-bold bg-coral text-white hover:brightness-105 transition-all">{t.submitReport}</button>
-                                <button onClick={() => setReportOpen(false)} className="py-2 px-3 rounded-lg text-xs font-semibold bg-paper border border-ink/10 text-ink hover:bg-ink/5 transition-colors">{t.cancel}</button>
+                                <button onClick={submitReport} className="flex-1 py-2 rounded-lg text-xs font-bold bg-coral text-white hover:brightness-105 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep">{t.submitReport}</button>
+                                <button onClick={() => setReportOpen(false)} className="py-2 px-3 rounded-lg text-xs font-semibold bg-paper border border-ink/10 text-ink hover:bg-ink/5 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep">{t.cancel}</button>
                             </div>
                         </div>
                     ) : (
-                        <button onClick={() => setReportOpen(true)} className="text-[11px] text-muted/70 hover:text-coral transition-colors">{t.report}</button>
+                        <button onClick={() => setReportOpen(true)} className="text-[11px] text-muted/70 hover:text-coral transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep">{t.report}</button>
                     )
                 )}
             </div>
@@ -911,7 +915,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 <div className="fixed bottom-0 inset-x-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-xl px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
                     <div className="w-full max-w-sm mx-auto flex flex-col gap-2">
                         {saveError && (
-                            <div role="alert" className="text-xs text-coral bg-coral/10 border border-coral/25 rounded-xl px-3 py-2.5 text-center space-y-2">
+                            <div role="alert" className="text-xs text-coral bg-coral/10 border border-coral/25 rounded-control px-3 py-2.5 text-center space-y-2">
                                 <p>{saveError}</p>
                                 <div className="flex flex-wrap justify-center gap-2">
                                     <a
@@ -937,7 +941,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                 <button
                                     onClick={handleSharePhoto}
                                     disabled={sharingPhoto}
-                                    className="w-full min-h-[52px] py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-all disabled:opacity-50"
+                                    className="w-full min-h-[52px] py-3.5 rounded-control font-bold text-base flex items-center justify-center gap-2.5 bg-brand hover:brightness-105 active:brightness-95 text-ink transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep disabled:opacity-50"
                                 >
                                     {sharingPhoto
                                         ? <Loader2 size={20} className="animate-spin" />
@@ -947,7 +951,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                     <button
                                         onClick={handleDownload}
                                         disabled={downloading}
-                                        className="w-full min-h-[44px] py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors disabled:opacity-50"
+                                        className="w-full min-h-[44px] py-2.5 rounded-control font-semibold text-sm flex items-center justify-center gap-2 border border-ink/15 bg-cream hover:bg-ink/5 text-ink transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep disabled:opacity-50"
                                     >
                                         {downloading
                                             ? <Loader2 size={16} className="animate-spin" />
@@ -960,7 +964,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             <button
                                 onClick={handleDownload}
                                 disabled={downloading}
-                                className="w-full min-h-[52px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-all disabled:opacity-50"
+                                className="w-full min-h-[52px] py-3.5 rounded-control font-bold flex items-center justify-center gap-2 bg-brand hover:brightness-105 text-ink transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep disabled:opacity-50"
                             >
                                 {downloading
                                     ? <Loader2 size={18} className="animate-spin" />
