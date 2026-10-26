@@ -35,6 +35,7 @@ import { track, withUtm } from '@/lib/analytics';
 import { hubShareText, whatsappUrl } from '@/lib/share';
 import { WhatsAppGlyph, WHATSAPP_GREEN } from '@/components/ShareGlyphs';
 import { HUB_THEME_IDS, HUB_THEMES, type HubThemeId } from '@/lib/hubThemes';
+import { HubGrowthPanel } from '@/components/hub/HubGrowthPanel';
 import { HUB_LINK_PRESETS } from '@/lib/hubSocial';
 import type { FrameConfig } from '@/lib/types';
 
@@ -350,6 +351,7 @@ export const HubEditorClient: React.FC = () => {
     return (
         <div className="max-w-lg lg:max-w-6xl mx-auto lg:grid lg:grid-cols-12 lg:gap-10 lg:items-start pb-8">
             <div className="lg:col-span-6 xl:col-span-5 space-y-6">
+            <HubGrowthPanel />
             {/* Sticky under the site NavBar so Save never fights the thumb tab bar. */}
             <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-30 -mx-1 px-1 py-2 bg-paper/95 backdrop-blur-xl border-b border-ink/10">
                 <div className="flex items-center gap-2">

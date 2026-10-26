@@ -11,6 +11,7 @@ import { XGlyph, WhatsAppGlyph, FacebookGlyph, WHATSAPP_GREEN } from '@/componen
 import { supporterShareText, whatsappUrl, messengerShareUrl, prefersTagalog } from '@/lib/share';
 import { saveFramedPhoto, shareFramedPhoto, preferShareSheetForSave, isIOS, type SavePhotoOutcome } from '@/lib/savePhoto';
 import { useTapGuard } from '@/lib/tapLock';
+import { downloadBlob } from '@/lib/download';
 import { framedCircleToStoryBlob } from '@/lib/storyExport';
 import { uploadExploreThumb } from '@/lib/exploreThumb';
 import { BrandMark } from '@/components/BrandMark';
@@ -23,6 +24,7 @@ import { InAppRescueBar } from '@/components/campaign/InAppRescueBar';
 import { ProfileSetHint } from '@/components/campaign/ProfileSetHint';
 import { FormatCards, type ExportFormat } from '@/components/campaign/FormatCards';
 import { arrivalPlatform, detectInAppBrowser, INAPP_RECOVERY_KEY, sessionFlag, setSessionFlag } from '@/lib/inAppBrowser';
+import { ACCENT_BG, ACCENT_BORDER, type AccentId } from '@/lib/campaignBrand';
 import { Upload, Download, Share2, Check, Loader2, Copy, QrCode, ImageDown } from 'lucide-react';
 
 const CANVAS = 1024;
@@ -38,10 +40,12 @@ interface CampaignClientProps {
     goal?: number | null;
     frame: FrameConfig;
     campaignCountry?: string | null;
+    accent?: AccentId | null;
+    logoUrl?: string | null;
 }
 
 export const CampaignClient: React.FC<CampaignClientProps> = ({
-    slug, title, description, organizerCaption, organizer, initialCount, goal, frame, campaignCountry,
+    slug, title, description, organizerCaption, organizer, initialCount, goal, frame, campaignCountry, accent, logoUrl,
 }) => {
     const { locale: browserLocale, setLocale } = useLocale();
     // A hub link passes lang= so this page opens in the language the visitor
@@ -73,6 +77,8 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
     // photo was supposed to land in.
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [justDownloaded, setJustDownloaded] = useState(false);
+    /** iOS had no share sheet, so Download on the confirmation is the save path. */
+    const [iosSaveFallback, setIosSaveFallback] = useState(false);
     const [canNativeShare, setCanNativeShare] = useState(false);
     const [showQR, setShowQR] = useState(false);
     const [pageUrl, setPageUrl] = useState(`https://ollabs.studio/c/${slug}`);
@@ -166,7 +172,15 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
             const key = `ollabs_viewed_${slug}`;
             if (!sessionStorage.getItem(key)) {
                 sessionStorage.setItem(key, '1');
-                fetch(`/api/campaigns/${slug}/view`, { method: 'POST' }).catch(() => { });
+                fetch(`/api/campaigns/${slug}/view`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        utm: new URLSearchParams(window.location.search).get('utm_source'),
+                        referrer: document.referrer || '',
+                        inApp: detectInAppBrowser(),
+                    }),
+                }).catch(() => { });
             }
         } catch { /* ignore */ }
     }, [slug]);
@@ -202,6 +216,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
             window.open(map[platform], '_blank', 'noopener,noreferrer');
         }
         track('frame_share', { campaign: slug, platform });
+        fetch(`/api/campaigns/${slug}/share`, { method: 'POST', keepalive: true }).catch(() => {});
     };
 
     const copyLink = async () => {
@@ -414,12 +429,31 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
             const exported = await exportBlob();
             if (!exported) return;
             const text = shareText('download');
+            const url = withUtm(shareUrl(), 'download');
+            // iOS refuses a silent anchor download (it lands in Files, not Photos).
+            // When the share sheet is not the path, the person tapped Download on
+            // purpose, so this is the remaining way to keep the PNG, and the
+            // sentence stays on the confirmation for a second paste.
+            if (isIOS()) {
+                downloadBlob(exported.blob, exported.filename);
+                setIosSaveFallback(true);
+                if (applySaveOutcome('downloaded')) {
+                    let copied = false;
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        copied = true;
+                    } catch { /* the sentence stays selectable below */ }
+                    noteCaption(text, copied);
+                    track('frame_download', { campaign: slug, format: exportFormat });
+                }
+                return;
+            }
             const outcome = await saveFramedPhoto({
                 blob: exported.blob,
                 filename: exported.filename,
                 title,
                 text,
-                url: withUtm(shareUrl(), 'download'),
+                url,
                 forceDownload: true,
             });
             if (applySaveOutcome(outcome)) {
@@ -466,8 +500,20 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 url: withUtm(shareUrl(), 'share_photo'),
             });
             if ((result.outcome === 'shared' || result.outcome === 'downloaded') && applySaveOutcome(result.outcome)) {
+                setIosSaveFallback(false);
                 noteCaption(text, result.captionCopied);
                 track(result.outcome === 'shared' ? 'frame_share_photo' : 'frame_download', { campaign: slug, format: exportFormat });
+                if (result.outcome === 'shared') {
+                    fetch(`/api/campaigns/${slug}/share`, { method: 'POST', keepalive: true }).catch(() => {});
+                }
+            } else if (result.outcome === 'unavailable' && isIOS()) {
+                // Sheet never opened. Stay on a confirmation they can leave:
+                // Download, the sentence, and the campaign URL.
+                setIosSaveFallback(true);
+                setJustDownloaded(true);
+                setSaveError(null);
+                setShowSaveRecovery(false);
+                noteCaption(text, false);
             } else {
                 applySaveOutcome(result.outcome);
             }
@@ -501,6 +547,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 setSaveError(null);
                 noteCaption(text, result.captionCopied);
                 track('frame_share_story', { campaign: slug, outcome: result.outcome });
+                if (result.outcome === 'shared') {
+                    fetch(`/api/campaigns/${slug}/share`, { method: 'POST', keepalive: true }).catch(() => {});
+                }
+            } else if (result.outcome === 'unavailable' && isIOS()) {
+                setIosSaveFallback(true);
+                setJustDownloaded(true);
+                setSaveError(null);
+                noteCaption(text, false);
             } else if (result.outcome === 'unavailable') {
                 setSaveError(t.savePhotoUnavailable);
             }
@@ -518,6 +572,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                 // makes some targets append it a second time.
                 await navigator.share({ title, text });
                 track('frame_share', { campaign: slug, platform: 'native' });
+                fetch(`/api/campaigns/${slug}/share`, { method: 'POST', keepalive: true }).catch(() => {});
                 return;
             } catch { /* cancelled */ }
         }
@@ -539,6 +594,7 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
 
     return (
         <div lang={htmlLang(locale)} className={`min-h-screen bg-paper text-ink flex flex-col items-center px-4 pt-[max(0.75rem,env(safe-area-inset-top,0px))] ${bottomPad}`}>
+            {accent && <div aria-hidden className={`fixed top-0 inset-x-0 z-50 h-1 ${ACCENT_BG[accent]}`} />}
             {/* A3: mark only on empty / post-save. During adjust the frame is the UI. */}
             {!adjusting && (
                 <div className="w-full max-w-sm flex items-center justify-between mb-2 mt-2">
@@ -560,6 +616,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                         )}
                         {!hasImage && (
                             <p className="text-sm font-semibold text-muted">{t.eyebrow}</p>
+                        )}
+                        {logoUrl && !hasImage && (
+                            <div
+                                role="img"
+                                aria-label={title}
+                                className={`mx-auto mb-2 h-12 w-12 rounded-full border-2 bg-contain bg-center bg-no-repeat ${accent ? ACCENT_BORDER[accent] : 'border-ink/10'}`}
+                                style={{ backgroundImage: `url("${logoUrl.replace(/"/g, '')}")` }}
+                            />
                         )}
                         <h1 className={`font-display font-bold text-balance ${hasImage ? 'text-lg mt-0' : 'text-2xl mt-1'}`}>
                             {title}
@@ -749,12 +813,31 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                 </div>
                             </div>
                         )}
-                        {pasteHint && (
+                        {shareCaption ? (
+                            <SharePaste
+                                caption={shareCaption}
+                                hint={pasteHint === 'copied' ? t.linkCopiedPaste : t.copyCaptionFailed}
+                                copyLabel={pasteHint === 'copied' ? t.copied : t.copyMessage}
+                                onCopy={async () => {
+                                    try {
+                                        await navigator.clipboard.writeText(shareCaption);
+                                        setPasteHint('copied');
+                                    } catch {
+                                        setPasteHint('manual');
+                                    }
+                                }}
+                                downloadLabel={iosSaveFallback ? t.download : null}
+                                downloading={downloading}
+                                onDownload={iosSaveFallback ? handleDownload : undefined}
+                                accentClass={accent ? ACCENT_BORDER[accent] : null}
+                                logoUrl={logoUrl}
+                                logoLabel={title}
+                            />
+                        ) : pasteHint ? (
                             <div role="status" className="text-sm text-ink bg-brand/10 border border-brand/25 rounded-control px-3 py-2.5 text-center">
                                 <p>{pasteHint === 'copied' ? t.linkCopiedPaste : t.copyCaptionFailed}</p>
-                                <p className="mt-2 text-left text-xs leading-relaxed break-all select-all">{shareCaption}</p>
                             </div>
-                        )}
+                        ) : null}
                         {canSharePhoto ? (
                             <button
                                 onClick={handleSharePhoto}
@@ -775,13 +858,14 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             </button>
                         )}
 
-                        <div className="w-full px-2 text-center">
-                            <p className="text-sm text-ink/70 leading-relaxed">{t.wantOwnBody}</p>
+                        <div className="w-full rounded-2xl border border-ink/10 bg-cream px-4 py-4 text-center">
+                            <p className="text-sm text-ink/75 leading-relaxed">{t.wantOwnBody}</p>
                             <a
                                 href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_post_save')}
                                 onClick={() => {
                                     setLocale(locale);
                                     track('create_from_campaign', { campaign: slug, from: 'post_save' });
+                                    fetch(`/api/campaigns/${slug}/cta`, { method: 'POST', keepalive: true }).catch(() => {});
                                 }}
                                 className="inline-flex min-h-11 items-center justify-center px-2 text-sm font-semibold text-ink/80 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                             >
@@ -1035,3 +1119,85 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
         </div>
     );
 };
+
+/**
+ * The sentence and the campaign URL, on the page.
+ * WhatsApp often keeps the picture and drops the caption, so this is the
+ * second paste. Tapping either line copies the whole message.
+ */
+function SharePaste({
+    caption,
+    hint,
+    copyLabel,
+    onCopy,
+    downloadLabel,
+    downloading,
+    onDownload,
+    accentClass,
+    logoUrl,
+    logoLabel,
+}: {
+    caption: string;
+    hint: string;
+    copyLabel: string;
+    onCopy: () => void;
+    downloadLabel: string | null;
+    downloading: boolean;
+    onDownload?: () => void;
+    accentClass?: string | null;
+    logoUrl?: string | null;
+    logoLabel?: string;
+}) {
+    const nl = caption.indexOf('\n');
+    const url = nl === -1 ? caption : caption.slice(0, nl);
+    const sentence = nl === -1 ? '' : caption.slice(nl + 1);
+    return (
+        <div role="status" className={`text-sm text-ink bg-brand/10 border-2 rounded-xl px-3 py-3 text-center ${accentClass || 'border-brand/25'}`}>
+            {logoUrl && (
+                <div
+                    role="img"
+                    aria-label={logoLabel || ''}
+                    className={`mx-auto mb-2 h-10 w-10 rounded-full border-2 bg-contain bg-center bg-no-repeat ${accentClass || 'border-ink/10'}`}
+                    style={{ backgroundImage: `url("${logoUrl.replace(/"/g, '')}")` }}
+                />
+            )}
+            <p>{hint}</p>
+            {sentence && (
+                <button
+                    type="button"
+                    onClick={onCopy}
+                    className="mt-2 w-full text-left text-sm leading-relaxed select-all rounded-lg px-1 py-1 hover:bg-brand/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
+                >
+                    {sentence}
+                </button>
+            )}
+            <button
+                type="button"
+                onClick={onCopy}
+                className="mt-1 w-full text-left text-xs leading-relaxed break-all select-all text-brand-deep rounded-lg px-1 py-1 hover:bg-brand/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
+            >
+                {url}
+            </button>
+            <div className="mt-3 flex flex-col gap-2">
+                <button
+                    type="button"
+                    onClick={onCopy}
+                    className="inline-flex w-full min-h-[44px] items-center justify-center rounded-xl border border-ink/15 bg-paper px-4 font-semibold text-ink"
+                >
+                    {copyLabel}
+                </button>
+                {downloadLabel && onDownload && (
+                    <button
+                        type="button"
+                        onClick={onDownload}
+                        disabled={downloading}
+                        className="inline-flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-ink px-4 font-semibold text-paper disabled:opacity-50"
+                    >
+                        {downloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                        {downloadLabel}
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+}

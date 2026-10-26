@@ -112,6 +112,7 @@ export type Messages = {
         shareAnother: string;
         moreWays: string;
         copyLink: string;
+        copyMessage: string;
         linkCopiedPaste: string;
         copyCaptionFailed: string;
         scanCampaign: string;
@@ -377,6 +378,25 @@ export type Messages = {
         create: string;
         browseUses: string;
         startOwn: string;
+    };
+    growth: {
+        title: string;
+        lede: string;
+        supporters: string;
+        shares: string;
+        taps: string;
+        whatsapp: string;
+        instagram: string;
+        facebook: string;
+        direct: string;
+        accent: string;
+        logo: string;
+        logoHint: string;
+        saveBrand: string;
+        saved: string;
+        export: string;
+        empty: string;
+        error: string;
     };
     meta: {
         manage: string;
@@ -657,13 +677,14 @@ const en: Messages = {
         shareAnother: 'Share another way',
         moreWays: 'More ways to share',
         copyLink: 'Copy link',
+        copyMessage: 'Copy message',
         linkCopiedPaste: 'Link copied. Paste it under the photo.',
         copyCaptionFailed: 'Could not copy the link. Select this and paste it with your photo:',
         scanCampaign: 'Scan to open this campaign',
         wantOwn: 'Like it? Make your own.',
         wantOwnBody: 'Create a frame for your cause in under a minute. Free.',
-        makeOwn: 'Create my frame',
-        makeOwnFooter: 'Create your own on Ollabs',
+        makeOwn: 'Make your own frame',
+        makeOwnFooter: 'Make your own with Ollabs',
         byName: 'By {name}',
         seeAllCampaigns: 'See all campaigns',
         backToHub: 'Back to hub',
@@ -935,6 +956,25 @@ const en: Messages = {
         browseUses: 'Browse use cases',
         startOwn: 'Start your own campaign',
     },
+    growth: {
+        title: 'Your campaigns',
+        lede: 'Every campaign you publish, with the counts. Free.',
+        supporters: 'Supporters',
+        shares: 'Shares',
+        taps: 'Make-your-own taps',
+        whatsapp: 'WhatsApp',
+        instagram: 'Instagram',
+        facebook: 'Facebook',
+        direct: 'Direct',
+        accent: 'Accent color',
+        logo: 'Logo',
+        logoHint: 'A small mark on the campaign page.',
+        saveBrand: 'Save brand',
+        saved: 'Saved',
+        export: 'Download CSV',
+        empty: 'Publish a campaign and it shows up here.',
+        error: 'Could not save that.',
+    },
     meta: {
         manage: 'Manage campaign',
         hub: 'Your hub',
@@ -1060,12 +1100,13 @@ const pt: Messages = {
         shareAnother: 'Compartilhar de outro jeito',
         moreWays: 'Outras formas de compartilhar',
         copyLink: 'Copiar link',
+        copyMessage: 'Copiar mensagem',
         linkCopiedPaste: 'Link copiado. Cole embaixo da foto.',
         copyCaptionFailed: 'Não deu para copiar o link. Selecione isto e cole junto com a sua foto:',
         scanCampaign: 'Escaneie para abrir esta campanha',
         wantOwn: 'Gostou? Crie a sua.',
         wantOwnBody: 'Crie uma moldura para sua causa em menos de um minuto. Grátis.',
-        makeOwn: 'Criar minha moldura',
+        makeOwn: 'Crie sua própria moldura',
         makeOwnFooter: 'Crie a sua no Ollabs',
         byName: 'Por {name}',
         seeAllCampaigns: 'ver todas as campanhas',
@@ -1339,6 +1380,25 @@ const pt: Messages = {
         browseUses: 'Ver para quem é',
         startOwn: 'Criar sua campanha',
     },
+    growth: {
+        title: 'Suas campanhas',
+        lede: 'Cada campanha que você publicou, com os números. Grátis.',
+        supporters: 'Apoiadores',
+        shares: 'Compartilhamentos',
+        taps: 'Toques em criar moldura',
+        whatsapp: 'WhatsApp',
+        instagram: 'Instagram',
+        facebook: 'Facebook',
+        direct: 'Direto',
+        accent: 'Cor de destaque',
+        logo: 'Logo',
+        logoHint: 'Uma marca pequena na página da campanha.',
+        saveBrand: 'Salvar marca',
+        saved: 'Salvo',
+        export: 'Baixar CSV',
+        empty: 'Publique uma campanha e ela aparece aqui.',
+        error: 'Não deu para salvar.',
+    },
     meta: {
         manage: 'Gerenciar campanha',
         hub: 'Seu hub',
@@ -1464,12 +1524,13 @@ const id: Messages = {
         shareAnother: 'Bagikan cara lain',
         moreWays: 'Cara lain untuk berbagi',
         copyLink: 'Salin link',
+        copyMessage: 'Salin pesan',
         linkCopiedPaste: 'Link disalin. Tempel di bawah fotonya.',
         copyCaptionFailed: 'Link tidak tersalin. Pilih teks ini dan tempel bersama fotomu:',
         scanCampaign: 'Pindai untuk buka kampanye ini',
         wantOwn: 'Suka? Buat punya kamu.',
         wantOwnBody: 'Buat bingkai untuk acaramu dalam kurang dari satu menit. Gratis.',
-        makeOwn: 'Buat bingkai saya',
+        makeOwn: 'Buat bingkai sendiri',
         makeOwnFooter: 'Buat sendiri di Ollabs',
         byName: 'Oleh {name}',
         seeAllCampaigns: 'lihat semua kampanye',
@@ -1742,6 +1803,25 @@ const id: Messages = {
         create: 'Buat kampanye',
         browseUses: 'Lihat contoh',
         startOwn: 'Buat kampanyemu',
+    },
+    growth: {
+        title: 'Kampanye kamu',
+        lede: 'Setiap kampanye yang kamu terbitkan, dengan angkanya. Gratis.',
+        supporters: 'Pendukung',
+        shares: 'Bagikan',
+        taps: 'Ketukan buat bingkai',
+        whatsapp: 'WhatsApp',
+        instagram: 'Instagram',
+        facebook: 'Facebook',
+        direct: 'Langsung',
+        accent: 'Warna aksen',
+        logo: 'Logo',
+        logoHint: 'Tanda kecil di halaman kampanye.',
+        saveBrand: 'Simpan merek',
+        saved: 'Tersimpan',
+        export: 'Unduh CSV',
+        empty: 'Terbitkan kampanye dan kampanye itu muncul di sini.',
+        error: 'Tidak bisa menyimpan.',
     },
     meta: {
         manage: 'Kelola kampanye',

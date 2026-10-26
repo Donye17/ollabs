@@ -2,6 +2,7 @@ import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
 import { CATEGORY_KEYS } from '@/lib/categories';
 import { hasVisibleFrame } from '@/lib/frameValidity';
+import { parseAccent, parseLogoUrl } from '@/lib/campaignBrand';
 import {
     createManageSession,
     findCampaignByManageSession,
@@ -176,6 +177,22 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             const cat = typeof body.category === 'string' && CATEGORY_KEYS.includes(body.category) ? body.category : null;
             sets.push(`category = $${i++}`);
             values.push(cat);
+        }
+        if ('accent' in body) {
+            const accent = parseAccent(body.accent);
+            if (body.accent != null && body.accent !== '' && !accent) {
+                return NextResponse.json({ error: 'Pick one of the accent colors.' }, { status: 400 });
+            }
+            sets.push(`accent_color = $${i++}`);
+            values.push(accent);
+        }
+        if ('logoUrl' in body) {
+            const logo = parseLogoUrl(body.logoUrl);
+            if (body.logoUrl != null && body.logoUrl !== '' && !logo) {
+                return NextResponse.json({ error: 'Logo must be an https link.' }, { status: 400 });
+            }
+            sets.push(`logo_url = $${i++}`);
+            values.push(logo);
         }
 
         // The frame itself is editable. Without this an owner who published a broken or

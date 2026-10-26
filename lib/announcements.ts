@@ -17,6 +17,33 @@ export type Announcement = {
 
 export const ANNOUNCEMENTS: Announcement[] = [
     {
+        id: '2026-10-25-save-paste',
+        date: '2026-10-25',
+        title: 'The campaign sentence stays next to the saved photo',
+        summary: 'After you save, the message and the link are on the page, with a Copy button.',
+        items: [
+            'On iPhone, if the share sheet does not open, Download and the message are both on the confirmation.',
+        ],
+    },
+    {
+        id: '2026-10-25-own-frame',
+        date: '2026-10-25',
+        title: 'Make your own frame, after you save',
+        summary: 'One button under the saved photo. It does not block download or share.',
+        items: [
+            'English: Make your own frame. Portuguese: Crie sua própria moldura.',
+        ],
+    },
+    {
+        id: '2026-10-25-free-hub',
+        date: '2026-10-25',
+        title: 'Your hub lists every campaign, free',
+        summary: 'Supporter counts, shares, taps, and where people arrived. A color and a logo, then a CSV.',
+        items: [
+            'Nothing on the hub is locked. There is no upgrade step.',
+        ],
+    },
+    {
         id: '2026-10-25-hub-flow',
         date: '2026-10-25',
         title: 'Campaign pages link back to the hub',
