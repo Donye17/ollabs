@@ -19,21 +19,35 @@ import { FrameType, type FrameConfig } from '@/lib/types';
  * through FrameRendererFactory with the same cutout the campaign page uses.
  */
 
-const CIRCLE = 112;
-const PAD = 12;
-const STEP = 64;
-const DROP = 26;
-const FAN_W = PAD + STEP * 2 + CIRCLE + PAD;
-const FAN_H = PAD + DROP + CIRCLE + PAD;
+/**
+ * Desktop circles match the old Top campaigns fan (208px center).
+ * Mobile stays at least that fan's phone size (156px) and fits a 390px screen.
+ */
+const DESKTOP_FAN = { circle: 208, step: 108, drop: 28, pad: 8 };
+const MOBILE_FAN = { circle: 156, step: 60, drop: 20, pad: 2 };
+type FanMetrics = typeof DESKTOP_FAN;
+
+function fanSize(m: FanMetrics) {
+    return {
+        w: m.pad + m.step * 2 + m.circle + m.pad,
+        h: m.pad + m.drop + m.circle + m.pad,
+    };
+}
+
+function placements(m: FanMetrics) {
+    return [
+        { x: m.pad, y: m.pad + m.drop, rotate: -16, z: 1 },
+        { x: m.pad + m.step, y: m.pad, rotate: 0, z: 3 },
+        { x: m.pad + m.step * 2, y: m.pad + m.drop, rotate: 16, z: 2 },
+    ] as const;
+}
+
+/** Campaign-art colors, so a late photo never flashes a blank paper circle. */
+const SLOT_TINT = ['var(--frame-green)', 'var(--frame-magenta)', 'var(--frame-purple)'] as const;
+
 const SWAP_MS = 3500;
 const FADE_MS = 250;
 const PHOTO_COUNT = 7;
-
-const PLACEMENTS = [
-    { x: PAD, y: PAD + DROP, rotate: -16, z: 1 },
-    { x: PAD + STEP, y: PAD, rotate: 0, z: 3 },
-    { x: PAD + STEP * 2, y: PAD + DROP, rotate: 16, z: 2 },
-] as const;
 
 /** Left Hugo, center Valkyries, right Pitágoras. Center sits in front. */
 const FAN_FRAMES: FrameConfig[] = [
@@ -70,16 +84,24 @@ function photoSrc(index: number): string {
     return `/hero/photo-${String(index + 1).padStart(2, '0')}.jpg`;
 }
 
-function paperColor(canvas: HTMLCanvasElement): string {
-    return getComputedStyle(canvas).color || 'rgb(247, 248, 246)';
+const TINT_VAR = ['--frame-green', '--frame-magenta', '--frame-purple'] as const;
+
+function tintColor(slot: number): string {
+    if (typeof document === 'undefined') return 'transparent';
+    const value = getComputedStyle(document.documentElement)
+        .getPropertyValue(TINT_VAR[slot] ?? TINT_VAR[0])
+        .trim();
+    return value || 'transparent';
 }
 
 /** Cover-crop into the circle, then stroke the real frame. Same pipeline as a campaign. */
+
 function drawFramed(
     canvas: HTMLCanvasElement,
     photo: HTMLImageElement | null,
     frame: FrameConfig,
     size: number,
+    slot: number,
     onImageLoad?: () => void,
 ) {
     const dpr = 2;
@@ -111,7 +133,7 @@ function drawFramed(
         ctx.closePath();
         ctx.fill();
     } else {
-        ctx.fillStyle = paperColor(canvas);
+        ctx.fillStyle = tintColor(slot);
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.closePath();
@@ -127,35 +149,41 @@ function FanSlot({
     photo,
     reduce,
     placement,
+    circle,
+    slot,
 }: {
     frame: FrameConfig;
     photo: HTMLImageElement | null;
     reduce: boolean;
-    placement: (typeof PLACEMENTS)[number];
+    placement: { x: number; y: number; rotate: number; z: number };
+    circle: number;
+    slot: number;
 }) {
     const aRef = useRef<HTMLCanvasElement>(null);
     const bRef = useRef<HTMLCanvasElement>(null);
     const layerRef = useRef<'a' | 'b'>('a');
     const painted = useRef<HTMLImageElement | null | undefined>(undefined);
+    const paintedSize = useRef<number | null>(null);
     const [layer, setLayer] = useState<'a' | 'b'>('a');
 
     useEffect(() => {
         const a = aRef.current;
         const b = bRef.current;
         if (!a || !b) return;
-        if (painted.current === photo) return;
+        if (painted.current === photo && paintedSize.current === circle) return;
 
         const paint = (canvas: HTMLCanvasElement, img: HTMLImageElement | null) => {
             const whenFrameLoads = () => {
                 const current = painted.current === undefined ? img : painted.current;
-                if (aRef.current) drawFramed(aRef.current, current, frame, CIRCLE);
-                if (bRef.current) drawFramed(bRef.current, current, frame, CIRCLE);
+                if (aRef.current) drawFramed(aRef.current, current, frame, circle, slot);
+                if (bRef.current) drawFramed(bRef.current, current, frame, circle, slot);
             };
-            drawFramed(canvas, img, frame, CIRCLE, whenFrameLoads);
+            drawFramed(canvas, img, frame, circle, slot, whenFrameLoads);
         };
 
         const first = painted.current === undefined;
         painted.current = photo;
+        paintedSize.current = circle;
 
         if (first) {
             paint(a, photo);
@@ -167,7 +195,7 @@ function FanSlot({
         paint(incoming === 'a' ? a : b, photo);
         layerRef.current = incoming;
         setLayer(incoming);
-    }, [photo, frame]);
+    }, [photo, frame, circle, slot]);
 
     const fade = reduce ? 'none' : `opacity ${FADE_MS}ms cubic-bezier(0.23, 1, 0.32, 1)`;
 
@@ -175,25 +203,26 @@ function FanSlot({
         <div
             className="absolute frame-fan-shadow rounded-full"
             style={{
-                width: CIRCLE,
-                height: CIRCLE,
+                width: circle,
+                height: circle,
                 left: placement.x,
                 top: placement.y,
                 zIndex: placement.z,
                 transform: `rotate(${placement.rotate}deg)`,
+                background: SLOT_TINT[slot],
             }}
         >
             <canvas
                 ref={aRef}
                 aria-hidden
                 className="hero-fan-layer absolute inset-0 text-paper rounded-full"
-                style={{ width: CIRCLE, height: CIRCLE, opacity: layer === 'a' ? 1 : 0, transition: fade }}
+                style={{ width: circle, height: circle, opacity: layer === 'a' ? 1 : 0, transition: fade }}
             />
             <canvas
                 ref={bRef}
                 aria-hidden
                 className="hero-fan-layer absolute inset-0 text-paper rounded-full"
-                style={{ width: CIRCLE, height: CIRCLE, opacity: layer === 'b' ? 1 : 0, transition: fade }}
+                style={{ width: circle, height: circle, opacity: layer === 'b' ? 1 : 0, transition: fade }}
             />
         </div>
     );
@@ -216,10 +245,19 @@ export function HeroFrameFan({ label, emptyLabel }: { label: string; emptyLabel:
     const [pool, setPool] = useState<HTMLImageElement[] | null>(null);
     const [shown, setShown] = useState<(number | null)[]>([null, null, null]);
     const [reduce, setReduce] = useState(false);
+    const [metrics, setMetrics] = useState<FanMetrics>(MOBILE_FAN);
     const pointer = useRef(0);
     const slotTurn = useRef(0);
     const poolRef = useRef<HTMLImageElement[]>([]);
     const shownRef = useRef<(number | null)[]>([null, null, null]);
+
+    useEffect(() => {
+        const wide = window.matchMedia('(min-width: 768px)');
+        const apply = () => setMetrics(wide.matches ? DESKTOP_FAN : MOBILE_FAN);
+        apply();
+        wide.addEventListener('change', apply);
+        return () => wide.removeEventListener('change', apply);
+    }, []);
 
     useEffect(() => {
         const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -251,6 +289,7 @@ export function HeroFrameFan({ label, emptyLabel }: { label: string; emptyLabel:
         for (let i = 0; i < PHOTO_COUNT; i++) {
             const img = new Image();
             img.decoding = 'async';
+            if (i < 3) img.fetchPriority = 'high';
             img.onload = () => {
                 const ready = () => {
                     slots[i] = img;
@@ -307,15 +346,17 @@ export function HeroFrameFan({ label, emptyLabel }: { label: string; emptyLabel:
 
     const hasPhoto = shown.some((index) => index !== null);
     const photos = pool ?? [];
+    const box = fanSize(metrics);
+    const slots = placements(metrics);
 
     return (
         <div
             role="img"
             aria-label={hasPhoto ? label : emptyLabel}
             className="relative mx-auto"
-            style={{ width: FAN_W, height: FAN_H }}
+            style={{ width: box.w, height: box.h }}
         >
-            {PLACEMENTS.map((placement, slot) => {
+            {slots.map((placement, slot) => {
                 const index = shown[slot];
                 const photo = index === null ? null : photos[index] ?? null;
                 return (
@@ -325,6 +366,8 @@ export function HeroFrameFan({ label, emptyLabel }: { label: string; emptyLabel:
                         photo={photo}
                         reduce={reduce}
                         placement={placement}
+                        circle={metrics.circle}
+                        slot={slot}
                     />
                 );
             })}

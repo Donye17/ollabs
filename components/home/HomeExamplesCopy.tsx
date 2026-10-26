@@ -9,12 +9,9 @@ export function HomeExamplesCopy() {
 
     return (
         <>
-            <h2 className="font-display text-center text-2xl sm:text-3xl font-bold tracking-tight mb-2 max-w-lg mx-auto px-5">
+            <h2 className="font-display text-center text-lg font-bold tracking-tight mb-4 max-w-lg mx-auto px-5">
                 {t.topCampaigns}
             </h2>
-            <p className="font-sans text-left text-[15px] text-ink/65 mb-8 max-w-lg mx-auto px-5 leading-relaxed">
-                {t.topCampaignsBody}
-            </p>
         </>
     );
 }
@@ -23,8 +20,8 @@ export function HomeCalendarLink() {
     const { messages } = useLocale();
 
     return (
-        <p className="mt-8 text-left max-w-lg mx-auto px-5 font-sans text-[15px] leading-relaxed">
-            <Link href="/day" className="font-semibold text-brand-deep hover:underline">
+        <p className="mt-4 text-center max-w-lg mx-auto px-5 font-sans text-sm leading-relaxed">
+            <Link href="/day" className="inline-flex min-h-11 items-center text-sm font-medium text-ink/80 hover:underline">
                 {messages.home.calendarLink}
             </Link>
         </p>

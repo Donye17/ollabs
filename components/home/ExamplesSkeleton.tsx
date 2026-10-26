@@ -1,17 +1,13 @@
-/** Placeholder shaped like the top campaigns fan while data loads. */
+/** Three small circles while the proof row loads. Not a second hero. */
 export function ExamplesSkeleton() {
     return (
-        <div className="campaign-fan-set" aria-hidden>
-            <div className="campaign-fan">
-                <div className="absolute left-0 top-[var(--fan-drop)] z-[1] h-[var(--fan-side)] w-[var(--fan-side)] -rotate-[14deg] rounded-avatar bg-frame-green/25 animate-pulse" />
-                <div className="absolute left-[calc(var(--fan-step)-(var(--fan-center)-var(--fan-side))/2)] top-0 z-[3] h-[var(--fan-center)] w-[var(--fan-center)] rounded-avatar bg-brand/20 animate-pulse" />
-                <div className="absolute left-[calc(var(--fan-step)*2)] top-[var(--fan-drop)] z-[2] h-[var(--fan-side)] w-[var(--fan-side)] rotate-[14deg] rounded-avatar bg-frame-purple/30 animate-pulse" />
-            </div>
-            <div className="campaign-fan-labels">
-                <div className="mx-auto h-3 w-16 rounded bg-ink/10 animate-pulse" />
-                <div className="mx-auto h-3 w-20 rounded bg-ink/10 animate-pulse" />
-                <div className="mx-auto h-3 w-16 rounded bg-ink/10 animate-pulse" />
-            </div>
+        <div className="mx-auto grid max-w-lg grid-cols-3 gap-3 px-5" aria-hidden>
+            {[0, 1, 2].map((i) => (
+                <div key={i} className="flex flex-col items-center gap-2">
+                    <div className="h-[72px] w-[72px] animate-pulse rounded-full bg-ink/10" />
+                    <div className="h-3 w-16 animate-pulse rounded bg-ink/10" />
+                </div>
+            ))}
         </div>
     );
 }

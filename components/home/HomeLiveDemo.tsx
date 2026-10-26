@@ -34,11 +34,11 @@ export function HomeLiveDemo() {
         <div className="w-full">
             <HeroFrameFan label={t.exampleAlt} emptyLabel={t.fanEmptyAlt} />
 
-            <p className="mt-3 text-center font-mono text-xs text-muted truncate">
+            <p className="mt-3 text-center font-mono text-xs text-ink/80 truncate">
                 ollabs.studio/c/<span className="text-ink font-semibold">{slug}</span>
             </p>
 
-            <label htmlFor="home-demo-name" className="block mt-4 font-sans text-xs font-semibold text-muted">
+            <label htmlFor="home-demo-name" className="block mt-4 font-sans text-xs font-semibold text-ink/80">
                 {t.nameLabel}
             </label>
             <input
@@ -57,7 +57,7 @@ export function HomeLiveDemo() {
             >
                 {t.create}
             </Link>
-            <p className="mt-2.5 text-center font-sans text-xs text-muted">{t.free}</p>
+            <p className="mt-2.5 text-center font-sans text-xs text-ink/80">{t.free}</p>
         </div>
     );
 }

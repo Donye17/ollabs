@@ -1,11 +1,13 @@
+import { cache } from 'react';
 import { pool } from '@/lib/neon';
 import { visibleFrameSql, HOME_TOP_CAMPAIGNS, HOME_PODIUM_SLOTS, MIN_SUPPORTERS_TO_DISPLAY } from '@/lib/frameValidity';
 import type { TopCampaign } from '@/components/home/TopCampaignsPodium';
 import { HomeTopCampaignsClient } from '@/components/home/HomeTopCampaignsClient';
 import { HomeCalendarLink, HomeExamplesCopy } from '@/components/home/HomeExamplesCopy';
+import { HomeHeroProofText } from '@/components/home/HomeHeroProof';
 import { parseFrameConfig } from '@/lib/parseFrameConfig';
 
-async function getTopCampaigns(): Promise<TopCampaign[]> {
+export const getTopCampaigns = cache(async (): Promise<TopCampaign[]> => {
     try {
         // Rank by real campaign_uses rows, not the denormalized counter. Seeded
         // demo frames used to inflate supporter_count without matching uses.
@@ -44,6 +46,14 @@ async function getTopCampaigns(): Promise<TopCampaign[]> {
         console.error('Failed to load top campaigns', e);
         return [];
     }
+});
+
+/** Leader count for the hero subhead. Shares the proof-row query. */
+export async function HomeHeroProof() {
+    const campaigns = await getTopCampaigns();
+    const count = campaigns[0]?.supporterCount ?? 0;
+    if (!count) return null;
+    return <HomeHeroProofText count={count} />;
 }
 
 export async function HomeExamplesSection() {
