@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { Users } from 'lucide-react';
 import { CampaignGridThumb } from '@/components/CampaignGridThumb';
 import type { SeoExampleCampaign } from '@/lib/seoExampleCampaign';
+import { formatCount, type Locale } from '@/lib/i18n/locale';
+import { getMessages } from '@/lib/i18n/messages';
 
 /** Single live campaign proof for SEO / home marketing surfaces. */
 export function SeoCampaignExample({
@@ -12,6 +14,7 @@ export function SeoCampaignExample({
     title,
     className = '',
     priority = false,
+    locale = 'en',
 }: {
     campaign: SeoExampleCampaign;
     size?: number;
@@ -20,6 +23,8 @@ export function SeoCampaignExample({
     className?: string;
     /** Mark as LCP candidate (home hero). */
     priority?: boolean;
+    /** Page language. Bare toLocaleString() follows the server, which prints 2,516 on a Portuguese page. */
+    locale?: Locale;
 }) {
     return (
         <div className={className}>
@@ -51,7 +56,7 @@ export function SeoCampaignExample({
                     </p>
                     <p className="text-xs text-muted flex items-center justify-center gap-1 mt-0.5">
                         <Users size={12} />
-                        {campaign.supporterCount.toLocaleString()} supporters
+                        {formatCount(campaign.supporterCount, locale)} {getMessages(locale).campaign.ofSupporters}
                     </p>
                 </div>
             </Link>

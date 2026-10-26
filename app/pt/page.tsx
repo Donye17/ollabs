@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { NavBar } from '@/components/NavBar';
+import { HomeExamplesSection } from '@/components/home/HomeExamplesSection';
 import { getMessages } from '@/lib/i18n/messages';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 
@@ -51,6 +52,8 @@ export default function PortugueseLandingPage() {
                     </div>
                 </div>
             </section>
+
+            <HomeExamplesSection />
 
             <section className="px-6 py-20">
                 <div className="max-w-5xl mx-auto">

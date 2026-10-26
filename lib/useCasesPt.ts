@@ -268,6 +268,180 @@ export const USE_CASES_PT: UseCase[] = [
         ],
         guide: { href: '/guides/start-a-campaign', label: 'Como começar uma campanha' },
     },
+    {
+        slug: 'arrecadacao',
+        audience: 'Arrecadação',
+        h1: 'Moldura de foto de perfil para arrecadação',
+        subtitle: 'Um link para a causa aparecer nos perfis antes do prazo.',
+        keyword: 'moldura foto perfil arrecadação',
+        intro: [
+            'Para uma arrecadação, faça uma moldura, mande um link e deixe as pessoas colocarem na foto. O Ollabs não recebe o dinheiro. Pix, boleto ou a página de doação continuam no texto que você já envia.',
+            'Grátis, sem cadastro e sem marca d\'água. A contagem é de quem salvou a foto, não de curtida.',
+        ],
+        scenarios: [
+            {
+                title: 'Doação dobrada com prazo na sexta',
+                paragraphs: [
+                    'Quando alguém dobra as doações até sexta à noite, o relógio é a campanha. Coloque o link da moldura no mesmo email do botão de doar. Muita gente não clica em doar na primeira leitura, mas troca a foto em dez segundos no celular. Os amigos veem o pedido no WhatsApp e no Instagram.',
+                    'No sábado, cole a contagem de apoiadores no recado que você manda para quem está dobrando. É gente que abriu o link e salvou a imagem. O Ollabs não processa pagamento. Deixe o Pix ou o formulário na legenda e no email, junto do link da moldura.',
+                ],
+            },
+            {
+                title: 'O grupo da comissão, não a newsletter',
+                paragraphs: [
+                    'Um PDF de mural de doadores fica no site. A moldura fica no grupo onde a comissão já discute as mesas. Leilão da escola, telhado da igreja ou rifa do bairro: peça para cada organizador colocar a moldura na noite do lançamento, e mande o mesmo link no WhatsApp de pais ou voluntários.',
+                    'Você não está coletando email e não está montando uma lista nova. Está deixando a arrecadação visível no fio onde o dinheiro já circula.',
+                ],
+            },
+            {
+                title: 'O que esta página não é',
+                paragraphs: [
+                    'Se a organização precisa de uma casa pública estável, com bio e um botão Entrar para a moldura da vez, isso é um hub. Se precisa de página de pagamento, isso é a ferramenta de doação que vocês já usam. Esta página é o empurrão curto: um link, uma contagem visível e uma foto que a pessoa coloca antes do prazo.',
+                ],
+            },
+        ],
+        benefits: [
+            { title: 'Um link só', body: 'O mesmo endereço no email, no texto e no grupo.' },
+            { title: 'A contagem é real', body: 'Mostra quem salvou a foto, e atualiza conforme as pessoas entram.' },
+            { title: 'A marca é a sua', body: 'Envie o logo ou escolha as cores da campanha.' },
+        ],
+        faqs: [
+            { q: 'É grátis para arrecadação e ONG?', a: 'Sim. Grátis, sem cadastro e sem marca d\'água, para quem organiza e para quem apoia.' },
+            { q: 'A pessoa pode postar a foto em qualquer lugar?', a: 'Sim. Ela baixa uma imagem normal e usa como foto de perfil ou em qualquer rede.' },
+            { q: 'O Ollabs recebe a doação?', a: 'Não. A campanha é uma ferramenta de imagem. Coloque o link de doação no texto de compartilhar e no email.' },
+        ],
+        guide: { href: '/guides/start-a-campaign', label: 'Como começar uma campanha' },
+    },
+    {
+        slug: 'aniversarios',
+        audience: 'Aniversários',
+        h1: 'Moldura de foto de perfil para aniversário',
+        subtitle: 'Todo mundo com a mesma moldura no dia da festa.',
+        keyword: 'moldura foto perfil aniversário',
+        intro: [
+            'Para um aniversário, crie a moldura, deixe a campanha fora da lista pública e mande o link só no grupo da surpresa. Cada pessoa coloca a foto de manhã, ou na véspera se o fuso atrapalha.',
+            'Grátis e sem cadastro. Até quem não instala aplicativo de festa consegue, porque é um link no navegador.',
+        ],
+        exampleNote:
+            'Os exemplos ao vivo vêm de campanhas de evento quando não há uma de aniversário na lista. A ferramenta é a mesma: um link no grupo da família.',
+        scenarios: [
+            {
+                title: 'A surpresa no grupo da família',
+                paragraphs: [
+                    'Moldura de aniversário é logística, não marketing. Crie em particular, marque como não listada e cole o link só no grupo que está na surpresa. Peça para trocar a foto na manhã do dia, ou na noite anterior. A pessoa homenageada não deve ver o link antes das fotos estarem no ar.',
+                    'Não é QR de local e não é lista de ingresso. Não há email de inscrição. A distribuição inteira é um fio de tios, primos e amigos que não vão baixar um aplicativo de festa para um sábado.',
+                ],
+            },
+            {
+                title: 'Segunda-feira a festa acabou',
+                paragraphs: [
+                    'Diferente de temporada de time ou de série da igreja, o aniversário acaba na segunda. Avise o grupo que pode voltar a foto antiga. Deixe a campanha no ar se quiser, mas pare de mandar o link. Moldura de aniversário em março parece spam, não carinho.',
+                    'Fixe o link no grupo na véspera, com o horário em que as fotos devem virar. Um lembrete. Uma sequência de “já fez?” é como a surpresa vaza.',
+                ],
+            },
+        ],
+        benefits: [
+            { title: 'A surpresa', body: 'Combine para todo mundo trocar a foto ao mesmo tempo.' },
+            { title: 'Com o nome da pessoa', body: 'Envie uma arte com o nome, ou escolha uma cor e mantenha simples.' },
+            { title: 'Qualquer um entra', body: 'Sem aplicativo e sem login. Abre o link e coloca a foto.' },
+        ],
+        faqs: [
+            { q: 'Dá para colocar o nome de quem faz aniversário?', a: 'Sim. Envie uma moldura com o nome, ou escolha uma cor e deixe simples.' },
+            { q: 'É grátis?', a: 'Sim, de graça, e sem marca d\'água na foto.' },
+            { q: 'Dá para esconder da página Explorar para a pessoa não ver antes?', a: 'Sim. Deixe a campanha não listada e compartilhe o link só no grupo da surpresa.' },
+        ],
+        guide: { href: '/guides/start-a-campaign', label: 'Como começar uma campanha' },
+    },
+    {
+        slug: 'empresas',
+        audience: 'Empresas',
+        h1: 'Moldura de foto de perfil para empresas',
+        subtitle: 'Um marco, um lançamento ou uma semana interna, com um link para o time.',
+        keyword: 'moldura foto perfil empresa',
+        intro: [
+            'Para um momento interno, dê ao time um link. Aniversário da empresa, rodada, lançamento ou semana de valores: cada pessoa coloca na própria foto, no LinkedIn ou onde já posta.',
+            'Sem cadastro e sem marca d\'água. Envie o logo ou as cores da marca. A foto sai como se tivesse vindo do time de design.',
+        ],
+        scenarios: [
+            {
+                title: 'LinkedIn na semana de lançamento',
+                paragraphs: [
+                    'Lançamento, anúncio de rodada e semana de aniversário aparecem no LinkedIn antes do Instagram. Quem já posta sobre o trabalho coloca a moldura se ela segue o guia da marca e não marca o rosto. Terceiros e agência usam o mesmo link. Você não está ligando login corporativo numa ferramenta de foto.',
+                    'Use o hex aprovado ou o PNG que a marca já liberou. Um anel “quase a cor” ao lado do logotipo parece que alguém pulou o jurídico. O modo não listado tira a campanha da página Explorar, para uma semana discreta ficar dentro da empresa.',
+                ],
+            },
+            {
+                title: 'Reunião geral, não um gesto público',
+                paragraphs: [
+                    'Semana de valores, campanha de segurança ou ensaio de marca nova pode ser só para funcionários. Não listada mais o link na intranet basta. Não há aplicativo para a TI revisar. A pessoa abre o navegador, coloca a foto e baixa. Se o celular da empresa bloqueia download, a folha de compartilhar ainda leva a imagem para Fotos ou Drive.',
+                    'Não publique uma moldura interna na Explorar “para visibilidade”. O time vai tratar como vazamento.',
+                ],
+            },
+            {
+                title: 'O que isto não substitui',
+                paragraphs: [
+                    'Não é chat interno, não é diretório e não é pasta de marca. Se você precisa de um endereço estável de carreiras que sempre abre a moldura atual, use um hub. Se precisa do logo em cinquenta tamanhos, continue na pasta da marca. A campanha é a semana em que a empresa inteira deveria parecer o mesmo feed.',
+                ],
+            },
+        ],
+        benefits: [
+            { title: 'As pessoas entram por escolha', body: 'Ninguém é obrigado a trocar a foto. O link está lá para quem quer.' },
+            { title: 'Sem marca d\'água', body: 'A imagem baixa limpa, sem logo do Ollabs por cima do rosto.' },
+            { title: 'Cores da marca', body: 'Hex exato ou PNG que o guia já aprovou.' },
+        ],
+        faqs: [
+            { q: 'A foto do funcionário sai com marca d\'água?', a: 'Não. A foto baixa limpa, sem marca e sem o nome do Ollabs. Ninguém precisa criar conta, e quem apoia não paga.' },
+            { q: 'Dá para fazer só para dentro da empresa?', a: 'Sim. Deixe a campanha não listada para ela não aparecer na Explorar, e compartilhe o link por dentro.' },
+        ],
+        guide: { href: '/guides/hub', label: 'O que é um hub de campanha' },
+    },
+    {
+        slug: 'universidades',
+        audience: 'Universidades',
+        h1: 'Moldura de foto de perfil para universidades',
+        subtitle: 'Volta às aulas, formatura, calouros e dia de doação, cada um com o próprio link.',
+        keyword: 'moldura foto perfil universidade',
+        intro: [
+            'Para um momento de campus, faça uma moldura e mande um link. Volta às aulas, formatura, dia dos aprovados e a campanha anual de doação funcionam do mesmo jeito. Quem já saiu do campus não cria conta.',
+            'Grátis para estudante, ex-aluno e equipe. Use as cores da escola. A contagem desta edição começa do zero se você publicar uma campanha nova.',
+        ],
+        exampleNote:
+            'Os exemplos ao vivo vêm de campanhas marcadas como escola. A moldura de universidade é o mesmo produto, para ex-alunos e grupos do campus, não para pais do ensino fundamental.',
+        scenarios: [
+            {
+                title: 'Ex-aluno que não vai criar conta',
+                paragraphs: [
+                    'Dia de doação e volta ao campus falham quando o pedido exige uma conta nova. Muita gente já ignora o site da campanha. Um link de moldura no grupo da turma ou no WhatsApp de ex-alunos termina no celular, no estacionamento. A pessoa baixa uma foto. Não cria login de portal.',
+                    'A reitoria ainda pode usar a marca oficial. Diretórios, atlética e departamentos fazem a própria campanha sem fila no site da universidade, porque criar não exige conta no CMS.',
+                ],
+            },
+            {
+                title: 'Formatura não é dia de doação',
+                paragraphs: [
+                    'Formatura e dia dos aprovados são orgulho. Dia de doação é um pedido. Use arte diferente e links diferentes. Família imprimindo foto de formatura não quer fita de doação na moldura. Quem doa não quer o chapéu de formatura em novembro.',
+                    'Reaproveite o desenho no ano que vem se quiser, mas publique uma campanha nova para a contagem começar em zero. O número do ano passado nesta página é como essas páginas passam a parecer porta de entrada velha.',
+                ],
+            },
+            {
+                title: 'Atlética e centros acadêmicos sem chamado central',
+                paragraphs: [
+                    'Um centro que quer moldura para a semana de recepção não precisa abrir chamado no marketing da universidade. Faz a campanha, manda um link no grupo e para depois. O hub só serve se o grupo quer um endereço estável de bio. Para três dias, o link da campanha basta.',
+                    'Não é semana cívica de escola de criança. O público é estudante, ex-aluno, professor e equipe. Mantenha o texto e a arte nesse registro.',
+                ],
+            },
+        ],
+        benefits: [
+            { title: 'Um momento, um link', body: 'Volta às aulas, formatura e doação ficam separados, cada um com a própria contagem.' },
+            { title: 'Ex-aluno sem conta', body: 'Quem menos cria cadastro é justamente quem você precisa. Não precisa.' },
+            { title: 'O grupo faz sozinho', body: 'Atlética, departamento e centro acadêmico não esperam a fila do marketing central.' },
+        ],
+        faqs: [
+            { q: 'Um centro ou departamento pode fazer a própria?', a: 'Sim. Criar é grátis e leva um minuto. Qualquer grupo do campus faz a sua sem passar por um time central.' },
+            { q: 'O estudante precisa instalar algo?', a: 'Não. Funciona no navegador do celular. Abre o link, coloca a foto e baixa.' },
+            { q: 'Dá para reusar a mesma arte no ano que vem?', a: 'Sim. Publique uma campanha nova com o mesmo desenho, para a contagem ser desta edição.' },
+        ],
+        guide: { href: '/guides/start-a-campaign', label: 'Como começar uma campanha' },
+    },
 ];
 
 export function getUseCasePt(slug: string): UseCase | undefined {

@@ -1,5 +1,7 @@
 /** Portuguese bodies for calendar days that have one. English stays on the day entry. */
 
+import { DAY_PT_MORE } from '@/lib/daysPtMore';
+
 export type DayPtCopy = {
     name: string;
     tagline: string;
@@ -148,6 +150,7 @@ const DAY_PT: Record<string, DayPtCopy> = {
             { q: 'As crianças podem ajudar a desenhar a moldura?', a: 'Sim, desde que um adulto cuide da proteção e da publicação. Escola ou projeto pode enviar o desenho pronto como PNG transparente.' },
         ],
     },
+    ...DAY_PT_MORE,
 };
 
 export function getDayPt(slug: string): DayPtCopy | undefined {

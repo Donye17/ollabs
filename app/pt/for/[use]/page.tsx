@@ -64,6 +64,7 @@ export default async function UseCasePtPage({ params }: { params: Promise<{ use:
             related={USE_CASES_PT.filter((u) => u.slug !== uc.slug)}
             relatedHref={(slug) => `/pt/for/${slug}`}
             example={example}
+            locale="pt"
         />
     );
 }

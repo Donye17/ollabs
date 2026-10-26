@@ -6,7 +6,7 @@ const URL = 'https://ollabs.studio/pt/for';
 
 export const metadata: Metadata = {
     title: 'Para quem é o Ollabs | Campanhas com moldura de perfil',
-    description: 'Molduras de foto de perfil para igrejas, escolas, times, ONGs, eventos e campanhas de conscientização.',
+    description: 'Molduras de foto de perfil para igrejas, escolas, times, ONGs, eventos, conscientização, arrecadação, aniversários, empresas e universidades.',
     alternates: {
         canonical: URL,
         languages: {

@@ -6,6 +6,7 @@ import { NavBar } from '@/components/NavBar';
 import { SiteFooter } from '@/components/SiteFooter';
 import { DayFrameTool } from '@/components/day/DayFrameTool';
 import { DAYS, getDay, nextOccurrence, formatOccurrence, countdownLabel, resolveFrame } from '@/lib/days';
+import { formatCount } from '@/lib/i18n/locale';
 import { getDayPt, type DayPtCopy } from '@/lib/daysPt';
 import { ptForPath } from '@/lib/useCaseHreflang';
 import { FrameType } from '@/lib/types';
@@ -390,6 +391,7 @@ export async function DayArticle({ slug, locale = 'en' }: { slug: string; locale
                                             }}
                                             size={200}
                                             title={ui.example}
+                                            locale={locale}
                                         />
                                     </div>
                                 );
@@ -405,7 +407,7 @@ export async function DayArticle({ slug, locale = 'en' }: { slug: string; locale
                                                 <p className="font-display font-bold truncate">{c.title}</p>
                                                 <p className="text-xs text-muted flex items-center gap-1.5 shrink-0">
                                                     <Users size={12} />
-                                                    {(c.supporter_count ?? 0).toLocaleString()}
+                                                    {formatCount(c.supporter_count ?? 0, locale)}
                                                 </p>
                                             </Link>
                                         </li>
