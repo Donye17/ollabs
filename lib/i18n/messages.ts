@@ -45,6 +45,7 @@ export type Messages = {
         slugFallback: string;
         topCampaigns: string;
         topCampaignsBody: string;
+        seeHub: string;
         framedTheirs: string;
         calendarLink: string;
         howTitle: string;
@@ -60,6 +61,19 @@ export type Messages = {
         freeBody: string;
         ctaTitle: string;
         ctaBody: string;
+    };
+    hub: {
+        featured: string;
+        joinHint: string;
+        shareHub: string;
+        linkCopied: string;
+        copyFailed: string;
+        moreCampaigns: string;
+        notReady: string;
+        seeExample: string;
+        publicUrl: string;
+        bioRequired: string;
+        bioFallback: string;
     };
     campaign: {
         eyebrow: string;
@@ -105,6 +119,9 @@ export type Messages = {
         wantOwnBody: string;
         makeOwn: string;
         makeOwnFooter: string;
+        byName: string;
+        seeAllCampaigns: string;
+        backToHub: string;
         setupHub: string;
         report: string;
         guides: string;
@@ -572,6 +589,7 @@ const en: Messages = {
         slugFallback: 'your-campaign',
         topCampaigns: 'Top campaigns',
         topCampaignsBody: 'Real frames people are using right now, ranked by supporters.',
+        seeHub: 'See a hub: Profª Ana Lúcia',
         framedTheirs: '{count} people already framed theirs',
         calendarLink: 'Calendar moments',
         howTitle: 'How it works',
@@ -588,6 +606,19 @@ const en: Messages = {
             'No signup, no watermark, no paywall. Upload your own frame art, share one link, and watch the counter climb.',
         ctaTitle: 'Make a frame',
         ctaBody: 'Takes under a minute. No account needed.',
+    },
+    hub: {
+        featured: 'Featured campaign',
+        joinHint: 'Tap Join to add this frame to your photo, free, no signup',
+        shareHub: 'Share this hub',
+        linkCopied: 'Link copied',
+        copyFailed: 'Could not copy the link. Select it and copy:',
+        moreCampaigns: 'More campaigns',
+        notReady: 'This hub is not ready yet.',
+        seeExample: 'See an example public hub',
+        publicUrl: 'Public hubs live at ollabs.studio/u/your-handle.',
+        bioRequired: 'Add a short bio before this page goes live. One sentence about who you are.',
+        bioFallback: 'Until you add a bio, visitors see your featured campaign description.',
     },
     campaign: {
         eyebrow: 'Ollabs campaign',
@@ -632,7 +663,10 @@ const en: Messages = {
         wantOwn: 'Like it? Make your own.',
         wantOwnBody: 'Create a frame for your cause in under a minute. Free.',
         makeOwn: 'Create my frame',
-        makeOwnFooter: 'Make your own with Ollabs',
+        makeOwnFooter: 'Create your own on Ollabs',
+        byName: 'By {name}',
+        seeAllCampaigns: 'See all campaigns',
+        backToHub: 'Back to hub',
         setupHub: 'Set up your campaign hub',
         report: 'Report this campaign',
         guides: 'Guides',
@@ -957,6 +991,7 @@ const pt: Messages = {
         slugFallback: 'sua-campanha',
         topCampaigns: 'Campanhas em alta',
         topCampaignsBody: 'Molduras que as pessoas estão usando agora, por número de apoiadores.',
+        seeHub: 'Ver um hub: Profª Ana Lúcia',
         framedTheirs: '{count} pessoas já usaram esta moldura',
         calendarLink: 'Datas para marcar',
         howTitle: 'Como funciona',
@@ -973,6 +1008,19 @@ const pt: Messages = {
             'Sem cadastro, sem marca d\'água, sem paywall. Envie a arte da moldura, compartilhe um link e veja o contador subir.',
         ctaTitle: 'Faça uma moldura',
         ctaBody: 'Leva menos de um minuto. Sem conta.',
+    },
+    hub: {
+        featured: 'Campanha em destaque',
+        joinHint: 'Toque em Participar para colocar esta moldura na sua foto, grátis, sem cadastro',
+        shareHub: 'Compartilhar este hub',
+        linkCopied: 'Link copiado',
+        copyFailed: 'Não deu para copiar. Selecione e copie:',
+        moreCampaigns: 'Mais campanhas',
+        notReady: 'Este hub ainda não está pronto.',
+        seeExample: 'Ver um hub público de exemplo',
+        publicUrl: 'Hubs públicos ficam em ollabs.studio/u/seu-nome.',
+        bioRequired: 'Escreva uma bio curta antes de publicar. Uma frase sobre quem você é.',
+        bioFallback: 'Sem uma bio, as pessoas veem a descrição da campanha em destaque.',
     },
     campaign: {
         eyebrow: 'Campanha Ollabs',
@@ -1019,6 +1067,9 @@ const pt: Messages = {
         wantOwnBody: 'Crie uma moldura para sua causa em menos de um minuto. Grátis.',
         makeOwn: 'Criar minha moldura',
         makeOwnFooter: 'Crie a sua no Ollabs',
+        byName: 'Por {name}',
+        seeAllCampaigns: 'ver todas as campanhas',
+        backToHub: 'Voltar ao hub',
         setupHub: 'Configure seu hub de campanhas',
         report: 'Denunciar esta campanha',
         guides: 'Guias',
@@ -1344,6 +1395,7 @@ const id: Messages = {
         slugFallback: 'your-campaign',
         topCampaigns: 'Top campaigns',
         topCampaignsBody: 'Real frames people are using right now, ranked by supporters.',
+        seeHub: 'Lihat hub: Profª Ana Lúcia',
         framedTheirs: '{count} orang sudah memakai bingkai ini',
         calendarLink: 'Calendar moments',
         howTitle: 'How it works',
@@ -1360,6 +1412,19 @@ const id: Messages = {
             'No signup, no watermark, no paywall. Upload your own frame art, share one link, and watch the counter climb.',
         ctaTitle: 'Make a frame',
         ctaBody: 'Takes under a minute. No account needed.',
+    },
+    hub: {
+        featured: 'Kampanye utama',
+        joinHint: 'Ketuk Gabung untuk pasang bingkai ini di fotomu, gratis, tanpa daftar',
+        shareHub: 'Bagikan hub ini',
+        linkCopied: 'Tautan disalin',
+        copyFailed: 'Tautan tidak tersalin. Pilih dan salin:',
+        moreCampaigns: 'Kampanye lain',
+        notReady: 'Hub ini belum siap.',
+        seeExample: 'Lihat contoh hub publik',
+        publicUrl: 'Hub publik ada di ollabs.studio/u/nama-anda.',
+        bioRequired: 'Tambahkan bio singkat sebelum halaman ini tayang. Satu kalimat tentang siapa Anda.',
+        bioFallback: 'Tanpa bio, pengunjung melihat deskripsi kampanye utama.',
     },
     campaign: {
         eyebrow: 'Kampanye Ollabs',
@@ -1406,6 +1471,9 @@ const id: Messages = {
         wantOwnBody: 'Buat bingkai untuk acaramu dalam kurang dari satu menit. Gratis.',
         makeOwn: 'Buat bingkai saya',
         makeOwnFooter: 'Buat sendiri di Ollabs',
+        byName: 'Oleh {name}',
+        seeAllCampaigns: 'lihat semua kampanye',
+        backToHub: 'Kembali ke hub',
         setupHub: 'Atur hub kampanyemu',
         report: 'Laporkan kampanye ini',
         guides: 'Panduan',

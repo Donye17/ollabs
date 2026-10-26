@@ -19,9 +19,14 @@ export const revalidate = 60;
 const getCampaign = cache(async (slug: string) => {
     try {
         const res = await pool.query(
-            `SELECT id, slug, title, description, share_caption, frame_config, creator_name, supporter_count, goal, preview_url, is_public, is_hidden,
-                    publisher_country, first_supporter_country
-             FROM campaigns WHERE slug = $1 LIMIT 1`,
+            `SELECT c.id, c.slug, c.title, c.description, c.share_caption, c.frame_config, c.creator_name,
+                    c.supporter_count, c.goal, c.preview_url, c.is_public, c.is_hidden,
+                    c.publisher_country, c.first_supporter_country,
+                    o.handle AS organizer_handle, o.display_name AS organizer_display_name
+             FROM campaigns c
+             LEFT JOIN organizers o ON o.id::text = c.creator_id
+             WHERE c.slug = $1
+             LIMIT 1`,
             [slug]
         );
         const c = res.rows[0];
@@ -56,6 +61,14 @@ const resolveRedirectSlug = cache(async (slug: string): Promise<string | null> =
 
 function campaignCountry(c: { publisher_country?: string | null; first_supporter_country?: string | null }): string | null {
     return c.publisher_country || c.first_supporter_country || null;
+}
+
+function organizerLabel(displayName: unknown, creatorName: unknown): string | null {
+    const display = typeof displayName === 'string' ? displayName.trim() : '';
+    const creator = typeof creatorName === 'string' ? creatorName.trim() : '';
+    const name = display || creator;
+    if (!name || /^anonymous$/i.test(name)) return null;
+    return name;
 }
 
 function fallbackDescription(title: string, locale: Locale): string {
@@ -121,6 +134,13 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
     if (!frame) notFound();
 
     const country = campaignCountry(campaign);
+    const organizerName = organizerLabel(
+        campaign.organizer_display_name,
+        campaign.creator_name,
+    );
+    const organizer = campaign.organizer_handle && organizerName
+        ? { handle: campaign.organizer_handle as string, name: organizerName }
+        : null;
     // ISR caches this HTML per slug. Reading Accept-Language here would make
     // every campaign page dynamic, which we cannot do before the October spike.
     // Untagged and Brazilian campaigns are Portuguese from resolveSupporterLocale.
@@ -132,6 +152,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
             description={campaign.description}
             organizerCaption={campaign.share_caption}
             creatorName={campaign.creator_name}
+            organizer={organizer}
             initialCount={campaign.supporter_count ?? 0}
             goal={campaign.goal ?? null}
             frame={frame}
