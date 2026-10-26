@@ -6,7 +6,7 @@ import type { PublicHub } from '@/lib/hub';
 import { HubMadeWithFooter } from '@/components/hub/HubMadeWithFooter';
 import { resolveHubTheme } from '@/lib/hubThemes';
 import { detectSocial } from '@/lib/hubSocial';
-import { supportVerb, supportersLabel } from '@/lib/hubSupportLabel';
+import { hubExplainer, hubNotReadyLabel, moreCampaignsLabel, supportVerb, supportersLabel } from '@/lib/hubSupportLabel';
 import {
     FacebookGlyph,
     InstagramGlyph,
@@ -98,10 +98,13 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                     </h1>
                     <p className="mt-0.5 text-sm" style={{ color: theme.muted }}>@{hub.handle}</p>
                     {hub.bio && (
-                        <p className="mt-2 text-sm leading-relaxed max-w-sm opacity-90 line-clamp-3">
+                        <p className="mt-2 max-w-sm whitespace-pre-line text-sm leading-relaxed opacity-90">
                             {hub.bio}
                         </p>
                     )}
+                    <p className="mt-2 max-w-sm text-sm leading-relaxed" style={{ color: theme.muted }}>
+                        {hubExplainer(localeHint)}
+                    </p>
                 </header>
 
                 <div className="space-y-3">
@@ -111,7 +114,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                     src={featured.preview_url}
-                                    alt=""
+                                    alt={featured.title}
                                     className="w-[min(72vw,16.5rem)] h-[min(72vw,16.5rem)] rounded-full object-cover frame-shadow"
                                 />
                             ) : (
@@ -127,15 +130,18 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                                 <p className="text-[15px] font-semibold mt-0.5 opacity-90 line-clamp-2">
                                     {featured.title}
                                 </p>
-                                {count > 0 && (
-                                    <p
-                                        className="text-sm flex items-center justify-center gap-1.5 mt-2"
-                                        style={{ color: theme.muted }}
-                                    >
-                                        <Users size={14} aria-hidden />
-                                        {supportersLabel(count, localeHint)}
+                                {featured.description?.trim() && featured.description.trim() !== featured.title.trim() && (
+                                    <p className="mt-2 max-w-sm whitespace-pre-line text-sm leading-relaxed" style={{ color: theme.muted }}>
+                                        {featured.description.trim()}
                                     </p>
                                 )}
+                                <p
+                                    className="text-sm flex items-center justify-center gap-1.5 mt-2"
+                                    style={{ color: theme.muted }}
+                                >
+                                    <Users size={14} aria-hidden />
+                                    {supportersLabel(count, localeHint)}
+                                </p>
                             </div>
 
                             <Link
@@ -182,7 +188,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                                 className="mb-3 text-sm font-semibold px-1"
                                 style={{ color: theme.muted }}
                             >
-                                More campaigns
+                                {moreCampaignsLabel(localeHint)}
                             </p>
                             <ul className="space-y-2">
                                 {hub.campaigns.map((c) => (
@@ -217,15 +223,13 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
                                                 <p className="font-display font-bold truncate text-[15px]">
                                                     {c.title}
                                                 </p>
-                                                {c.supporter_count != null && c.supporter_count > 0 && (
-                                                    <p
-                                                        className="text-xs flex items-center gap-1 mt-0.5"
-                                                        style={{ color: theme.muted }}
-                                                    >
-                                                        <Users size={11} />
-                                                        {supportersLabel(c.supporter_count, localeHint)}
-                                                    </p>
-                                                )}
+                                                <p
+                                                    className="text-xs flex items-center gap-1 mt-0.5"
+                                                    style={{ color: theme.muted }}
+                                                >
+                                                    <Users size={11} aria-hidden />
+                                                    {supportersLabel(c.supporter_count ?? 0, localeHint)}
+                                                </p>
                                             </div>
                                         </Link>
                                     </li>
@@ -236,7 +240,7 @@ export function HubPublicView({ hub }: { hub: PublicHub }) {
 
                     {!ctaHref && hub.links.length === 0 && hub.campaigns.length === 0 && (
                         <p className="text-center text-sm py-8" style={{ color: theme.muted }}>
-                            This hub is not ready yet.
+                            {hubNotReadyLabel(localeHint)}
                         </p>
                     )}
                 </div>

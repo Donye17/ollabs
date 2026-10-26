@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { pool } from '@/lib/neon';
-import { normalizeHandle, type PublicHub } from '@/lib/hub';
+import { HUB_INDEXABLE_BIO_MIN, normalizeHandle, type PublicHub } from '@/lib/hub';
 import { resolveHubTheme } from '@/lib/hubThemes';
 
 function parseHiddenIds(raw: unknown): string[] {
@@ -45,7 +45,7 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
                 [org.id]
             ),
             pool.query(
-                `SELECT id, slug, title, supporter_count, preview_url
+                `SELECT id, slug, title, description, supporter_count, preview_url
                  FROM campaigns
                  WHERE creator_id = $1
                    AND is_public = true
@@ -60,6 +60,7 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
             id: string;
             slug: string;
             title: string;
+            description: string | null;
             supporter_count: number | null;
             preview_url: string | null;
         };
@@ -91,6 +92,7 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
                 ? {
                       slug: featured.slug,
                       title: featured.title,
+                      description: featured.description,
                       supporter_count: featured.supporter_count,
                       preview_url: featured.preview_url,
                       id: featured.id,
@@ -102,6 +104,7 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
                 .map((c) => ({
                     slug: c.slug,
                     title: c.title,
+                    description: c.description,
                     supporter_count: c.supporter_count,
                     preview_url: c.preview_url,
                     id: c.id,
@@ -119,3 +122,23 @@ export const getPublicHub = cache(async (rawHandle: string): Promise<PublicHub |
         return null;
     }
 });
+
+/** Handles whose bio is long enough to be their own search result. */
+export async function listIndexableHubHandles(): Promise<string[]> {
+    try {
+        const res = await pool.query(
+            `SELECT handle
+             FROM organizers
+             WHERE handle IS NOT NULL
+               AND length(trim(coalesce(bio, ''))) >= $1
+             ORDER BY handle ASC`,
+            [HUB_INDEXABLE_BIO_MIN]
+        );
+        return res.rows
+            .map((row: { handle?: string }) => (typeof row.handle === 'string' ? row.handle : ''))
+            .filter((handle: string) => handle.length > 0);
+    } catch (e) {
+        console.error('Failed to list indexable hubs', e);
+        return [];
+    }
+}

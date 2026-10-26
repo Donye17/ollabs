@@ -8,11 +8,12 @@ import { ArrowRight, Check, X } from 'lucide-react';
 const URL = 'https://ollabs.studio/vs/twibbonize';
 
 export const metadata: Metadata = {
-    title: 'Ollabs vs Twibbonize',
+    title: 'Free Twibbonize alternative: no signup, one link',
     description:
-        'An honest comparison of Ollabs and Twibbonize for profile picture frame campaigns. The core difference: Twibbonize charges supporters to remove a watermark. Ollabs never charges supporters.',
+        'A free Twibbonize alternative. No signup and no watermark. One link, and supporters add your frame to their profile picture.',
     keywords: [
         'twibbonize alternative',
+        'twibbonize alternative free',
         'ollabs vs twibbonize',
         'twibbonize without watermark',
         'free twibbon alternative',
@@ -30,9 +31,9 @@ export const metadata: Metadata = {
         type: 'website',
         url: URL,
         siteName: 'Ollabs',
-        title: 'Ollabs vs Twibbonize',
+        title: 'Free Twibbonize alternative: no signup, one link',
         description:
-            'The core difference: Twibbonize charges supporters to remove a watermark. Ollabs never charges supporters.',
+            'A free Twibbonize alternative. No signup and no watermark. One link, and supporters add your frame to their profile picture.',
         images: ['/og.png'],
     },
     twitter: { card: 'summary_large_image', images: ['/og.png'] },
@@ -132,7 +133,7 @@ export default function VsTwibbonizePage() {
                         <span className="w-2.5 h-2.5 rounded-full bg-brand" /> Comparison
                     </span>
                     <h1 className="font-display text-4xl md:text-6xl font-extrabold leading-[1.03] mb-5">
-                        Ollabs vs Twibbonize
+                        A free Twibbonize alternative
                     </h1>
                     <p className="text-lg md:text-xl text-ink/70 mb-4 max-w-2xl">
                         Both let you run a profile picture frame campaign. The difference that actually matters is

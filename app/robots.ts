@@ -4,11 +4,10 @@ export default function robots(): MetadataRoute.Robots {
     return {
         rules: {
             userAgent: '*',
-            // Do not move /c or /u to disallow. Those pages carry
-            // robots: { index: false, follow: true } in their metadata, and a
-            // page blocked from crawling never has its noindex tag read, so the
-            // URLs would sit in the index indefinitely. Crawlable + noindex is
-            // deliberate. See docs/ADSENSE_REMEDIATION.md.
+            // Do not move /c or /u to disallow. Thin campaigns and hubs carry
+            // a noindex tag, and a page blocked from crawling never has that
+            // tag read, so the URLs would sit in the index indefinitely.
+            // Hubs with a real bio are indexable. They still have to be crawled.
             allow: [
                 '/',
                 '/ads.txt',

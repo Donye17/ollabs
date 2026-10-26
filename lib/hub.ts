@@ -50,6 +50,8 @@ export type HubCampaignSummary = {
     title: string;
     supporter_count: number | null;
     preview_url: string | null;
+    /** Featured campaign body. Optional on list cards and editor payloads. */
+    description?: string | null;
     /** Campaign id for editor hide toggles. Optional on public payloads. */
     id?: string;
 };
@@ -105,7 +107,6 @@ export function isSafeHttpUrl(raw: string): boolean {
     }
 }
 
-/** Whether crawlers should index this hub (has something useful to show). */
 /**
  * Best-effort handle from an organizer email local part.
  * Used after publish and on /hub so claiming /u/… is one tap, not a blank field.
@@ -127,18 +128,15 @@ export function suggestHandleFromEmail(email: string): string {
     return '';
 }
 
-// Currently unused. Public hubs are unconditionally noindex after the 2026-08-28
-// AdSense low-value-content review (inventory-value policy: almost no publisher
-// text). Kept so we can restore a threshold later without reinventing the rule.
-export function hubIsIndexable(hub: {
-    featured: unknown;
-    campaigns: unknown[];
-    links: unknown[];
-    bio: string | null;
-}): boolean {
-    if (hub.featured) return true;
-    if (hub.campaigns.length > 0) return true;
-    if (hub.links.length > 0) return true;
-    if (hub.bio && hub.bio.trim().length > 0) return true;
-    return false;
+/**
+ * A hub is worth indexing only when the organizer wrote a real bio.
+ * Forty characters is a short sentence. A handle, a slogan under that, or an
+ * empty bio is the same thin page repeated, which is what Search and AdSense
+ * already treated as low value. The shared "what a hub is" line does not count:
+ * it is identical on every hub.
+ */
+export const HUB_INDEXABLE_BIO_MIN = 40;
+
+export function hubIsIndexable(hub: { bio: string | null }): boolean {
+    return (hub.bio?.trim().length ?? 0) >= HUB_INDEXABLE_BIO_MIN;
 }

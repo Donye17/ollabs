@@ -8,6 +8,7 @@ import {
     caseLanguageAlternates,
 } from '@/lib/useCaseHreflang';
 import { DAYS } from '@/lib/days';
+import { listIndexableHubHandles } from '@/lib/getPublicHub';
 
 export const revalidate = 3600; // Revalidate every hour
 
@@ -125,6 +126,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                     'x-default': `${baseUrl}/guides/${g.slug}`,
                 },
             },
+        })),
+        ...(await listIndexableHubHandles()).map((handle) => ({
+            url: `${baseUrl}/u/${handle}`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly' as const,
+            priority: 0.55,
         })),
         { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
         { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
