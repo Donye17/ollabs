@@ -198,6 +198,7 @@ export const HubEditorClient: React.FC = () => {
         // First save is what makes /u/handle public. A bare handle is not a page.
         if (!publishedHandle && !bio.trim()) {
             setBioError(hubCopy.bioRequired);
+            saveTap.end();
             return { ok: false, handle: null };
         }
 
