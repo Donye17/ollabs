@@ -22,7 +22,7 @@ Thesis still holds: no social feed, no watermark, never charge supporters.
 | **True drag-reorder** for hub links | Up/down exists; real drag is table stakes. | Polish |
 | **QR for hub URL** on editor | Campaign manage already has QR. | Small |
 | **Hub Explore entry** | Soft link from public hub to Explore in same country. | After hubs have traffic |
-| **Paid upgrades (real)** | Custom domain, remove Made with, richer analytics. Interest waitlist already exists. | After demand is clear |
+| **Paid upgrades (real)** | Custom domain, remove Made with, richer analytics. Hub PATCH still accepts `upgradeInterest`; there is no waitlist UI. Growth counts are free. | After demand is clear |
 
 ## Organizer analytics & trust
 

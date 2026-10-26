@@ -12,7 +12,12 @@ description: >-
 
 - App Router metadata API + sitemap / robots conventions.
 - Campaign + day pages use ISR-style revalidate where freshness matters without hammering Neon.
-- Locales in play: PT, ID, TL, HI, ES landings and localized `/for` where they exist.
+- Product UI: `en` `pt` `id` dictionaries; `es` `tl` overlays. Marketing landings
+  for ES/ID/TL 301 to `/`. `/pt` is SEO, not the product UI. `/hi` is a noindex stub.
+- `/c` is crawlable + noindex. `/u` indexes when bio ≥ 40 chars (`hubIsIndexable`)
+  and those handles are in `app/sitemap.ts`. Do not `disallow` `/c` or `/u`.
+- Portuguese editorial: `/pt/guides`, `/pt/day`, `/pt/for`, `/pt/vs/twibbonize`.
+  Machine index: `public/llms.txt`.
 - No em dashes in user-facing hub/create/mine copy.
 
 ## When changing pages
@@ -21,7 +26,9 @@ description: >-
 2. Keep OG images accurate to the frame/campaign; use existing OG routes when present.
 3. Ensure new public routes appear in the sitemap when they should be indexed.
 4. For locale variants, keep hreflang / alternates consistent.
-5. `/c` and supporter flows stay lean; put denser SEO content on `/for`, `/day`, hubs — not on the save path.
+5. `/c` and supporter flows stay lean; put denser SEO content on `/for`, `/day`,
+   `/guides`. Indexable hubs need a real bio, not a handle alone. Ads still
+   never mount on `/c` or `/u`.
 
 ## Dig deeper
 

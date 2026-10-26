@@ -1,12 +1,15 @@
 # Path to 1M — agent handoff brief
 
 **Audience:** a coding agent picking this up cold.  
-**Date:** 2026-08-22  
+**Date:** 2026-08-22 (status checked 2026-10-26)  
 **Repo:** Ollabs (`c:\Users\josh\Desktop\Ollab`)  
 **Owner intent:** Execute the audit backlog. Ship P0 first, then hubs (Linktree wedge), then P1. Do not wander into P3 or rebuild the product.
 
+**Status 2026-10-26:** Phases A–E in this brief are shipped on `main` (`c9e9d9b`). Hub public CTA is **Join**, not Support. Ads stay off `/c` and `/u`. `/c` is crawlable + noindex. `/u` indexes when the bio is at least 40 characters. Homepage is one hero plus a proof podium. Oct 19–25 added hub growth (counts, brand, CSV), PNG provenance, post-save make-your-own, PT guides/days, and `llms.txt`. Remaining owner work is real-phone QA (`docs/REAL_PHONE_QA.md`) and AdSense review. How the code works now: `docs/ENGINEERING.md`. Do not re-implement the tables below as if they were still open. Unmerged bugfix PRs are present behavior, not shipped fixes.
+
 **Related artifacts (read these):**
 - `AGENTS.md` — hard mobile / ads / copy rules (do not regress)
+- `docs/ENGINEERING.md` — current auth, env, APIs, locale, share, indexing, migrations
 - Cursor canvas: `path-to-million.canvas.tsx` (full audit tables)
 - Skills under `.agents/skills/`: `platform-docs`, `mobile-share-download`, `adsense-quiet`, `seo-locales`, `drizzle-neon`, `campaign-canvas`, `organizer-email`, `ollab-analytics`
 - Docs mirrors: `docs/reference/` (optional deep API; prefer skills + code)
@@ -20,10 +23,10 @@ Ollabs is **two products fused into one**:
 | Lane | Competitor | Job |
 |------|------------|-----|
 | Campaigns `/c/[slug]` | Twibbonize | Ephemeral viral frame: publish → WhatsApp → supporters save photo |
-| Hubs `/u/[handle]` | Linktree | Permanent bio URL: Support featured campaign → `/c` |
+| Hubs `/u/[handle]` | Linktree | Permanent bio URL: Join featured campaign → `/c` |
 
 **Canonical funnel:**  
-Instagram/TikTok bio → `ollabs.studio/u/{handle}` → **Support** (featured frame) → `/c` save → WhatsApp share again.
+Instagram/TikTok bio → `ollabs.studio/u/{handle}` → **Join** (featured frame) → `/c` save → WhatsApp share again.
 
 - Campaigns = growth virus (first supporter median ~4.5 min; most success is in the first hour).
 - Hubs = identity / retention (what organizers paste in the bio).
@@ -42,10 +45,10 @@ From `AGENTS.md` and production reality:
 3. **Drag canvases:** `touchAction: 'none'` (or Tailwind `touch-none`) on the element that receives drag handlers — see `components/editor/CanvasArea.tsx`, `components/campaign/CampaignClient.tsx`.
 4. **Modals:** `dvh`, never `vh`. Body scroll lock + restore. Copy patterns from `components/PublishTemplateModal.tsx`.
 5. **No `alert()`.** Inline errors: `role="alert"` + `text-coral bg-coral/10 border-coral/25`.
-6. **Ads:** `components/AdSlot.tsx` only. Never on the photo. Never on `/create`. `/c` lean (1 before save, 2 after). Auto ads / anchors / vignettes stay OFF.
-7. **Copy:** no em dashes in hub / create / mine user-facing strings. Hub Support CTA is **two lines** (`Support` / campaign title), not `Support — title`.
+6. **Ads:** `components/AdSlot.tsx` only. Never on the photo. Never on `/create`. Never on `/c` or `/u`. Auto ads / anchors / vignettes stay OFF.
+7. **Copy:** no em dashes in hub / create / mine user-facing strings. Hub Join CTA is **two lines** (`Join` / campaign title), not `Join` + em dash + title.
 8. **Colors:** Tailwind theme tokens (`brand`, `ink`, `paper`, `cream`, `coral`, `muted`). Platform brand colors (WhatsApp green, Messenger blue) only in existing glyph helpers if needed.
-9. **Organizer mobile tab bar** (`Mine · Create · Hub`): show on organizer surfaces; **hide** on `/c` public, `/u` hubs, `/for`, `/day`, locale landings, `/vs` — see `lib/mobileNav.ts` (`shouldShowMobileOrganizerNav`).
+9. **Organizer mobile tab bar** (`Mine · Create · Hub`): show on organizer surfaces; **hide** on `/` (home is the tool), `/c` public, `/u` hubs, `/for`, `/day`, locale landings, `/vs` — see `lib/mobileNav.ts` (`shouldShowMobileOrganizerNav`).
 10. **Comments:** explain *why*; keep history. Commit messages: sentence case, plain English, no conventional-commit prefixes. Do not commit unless the user asks; do not push unless asked.
 
 ---
@@ -164,7 +167,7 @@ Parked next ideas (grid banners, supporter collage, etc.): `docs/FUTURE_IDEAS.md
 ### Phase E (thesis-safe only)
 - [x] Owner-token hash + 72h manage session cookie (dual-read plaintext; no social feed; no Stripe billing)  
 - [x] 9:16 story export on `/c` and `/day`  
-- [x] Paid upgrade **interest** waitlist on hub editor (no billing, no custom domain yet)  
+- [x] Paid upgrade **interest** waitlist on hub editor (no billing, no custom domain yet). UI removed 2026-10-25; PATCH `upgradeInterest` remains. Growth counts are free.  
 - [x] **Skipped by thesis:** social follow feed, full in-product frame designer, Stripe paid upgrades  
 
 ### Still human

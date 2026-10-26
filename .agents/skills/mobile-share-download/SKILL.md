@@ -12,7 +12,8 @@ Most Ollab traffic is phones; many arrive inside WhatsApp/Instagram WebViews whe
 
 ## Do this
 
-1. Prefer `saveFramedPhoto` from `lib/savePhoto.ts` for framed PNG save flows.
+1. Prefer `shareFramedPhoto` / `saveFramedPhoto` from `lib/savePhoto.ts` for
+   framed PNG save flows. Copy the paste caption in the same turn as `share()`.
 2. Gate file share with `canShareFiles` from `lib/share.ts`.
 3. Trigger blob downloads only via `downloadBlob` in `lib/download.ts` — never a hand-rolled detached anchor.
 4. On iPhone, lead with Share / Save Image; do not rely on Download as the primary path (`preferShareSheetForSave`).
@@ -22,7 +23,12 @@ Most Ollab traffic is phones; many arrive inside WhatsApp/Instagram WebViews whe
 ## Do not
 
 - Revoke an object URL immediately after `click()` — `downloadBlob` already delays revoke (~60s).
-- Call `navigator.share` with `text`/`url` alongside `files` on iOS in-app browsers (files-only payloads are safer — see `saveFramedPhoto`).
+- Call `navigator.share` with `text`/`url` alongside `files` on iOS in-app browsers
+  (files-only payloads are safer). Current `main` still sends `title` on the
+  iOS file payload; that can hide Save Image (unmerged PR #24).
+- Await clipboard before `share()` on iOS. That drops the user gesture.
+- Skip `useTapGuard` on Save/Share. `disabled` does not catch the second tap.
+- Assume story (9:16) PNGs carry the same tEXt as square PF saves. They do not.
 - Use `alert()` for save failures — inline `role="alert"` next to the control.
 
 ## Dig deeper

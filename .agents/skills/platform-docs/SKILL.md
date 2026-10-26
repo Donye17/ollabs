@@ -12,6 +12,7 @@ description: >-
 
 Before inventing APIs or SEO/ad behavior, read the local reference tree:
 
+- Product map: `docs/ENGINEERING.md` (auth, env, APIs, locale, share, hub, pitfalls)
 - Index: `docs/reference/INDEX.md`
 - Cursor `@Docs` URL list: `docs/reference/CURSOR_DOCS.md`
 

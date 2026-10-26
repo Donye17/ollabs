@@ -12,7 +12,8 @@ description: >-
 - Same quiet labelled units. No special rules by category, country, or politics.
 - Never on the photo / canvas.
 - Never on `/create`.
-- Never on `/c` or `/u` (user-generated pages with almost no publisher content).
+- Never on `/c` or `/u` (user-generated pages). Indexable hubs (bio ≥ 40) still
+  get no units.
 - SEO pages (`/for`, `/day`, locale landings, `/vs`, guides) may carry denser labelled inventory between content blocks.
 - Auto ads, anchors, and vignettes stay OFF in the AdSense dashboard.
 
@@ -20,8 +21,10 @@ description: >-
 
 - Use `components/AdSlot.tsx` only — do not invent a second ad loader.
 - Surfaces: `campaign` | `seo`.
-- Env: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN`, `NEXT_PUBLIC_ADSENSE_SLOT_SEO` (optional fallback `NEXT_PUBLIC_ADSENSE_SLOT_INLINE`).
-- Script loads on first `AdSlot` mount, not in the root layout (keeps `/create` clean).
+- Env: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_ADSENSE_SLOT_SEO` (optional fallback
+  `NEXT_PUBLIC_ADSENSE_SLOT_INLINE`). Campaign slot env is unused.
+- Script loads via `DeferredAdSense` in the root layout (interaction or ~5s), so
+  home LCP is not fighting unused ad JS. Units still only via `AdSlot`.
 - Unfilled units must collapse; filled units reserve height to avoid layout shift under thumb buttons.
 
 ## Dig deeper

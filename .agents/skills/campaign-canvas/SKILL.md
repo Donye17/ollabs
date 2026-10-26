@@ -11,7 +11,11 @@ description: >-
 ## Hard mobile rules
 
 1. Any element with drag/pinch handlers needs `touchAction: 'none'` on that element — React’s root `touchmove` is passive, so `preventDefault` alone will not stop page scroll (`components/editor/CanvasArea.tsx`).
-2. Keep the live preview visible while the organizer adjusts the photo window (custom frames are primary; premade rings are collapsed fallback).
+2. Keep the live preview visible while the organizer adjusts the photo window.
+   Premade colour rings open on the first visit (`simpleStylesOpen` defaults
+   true; collapse writes `ollabs_simple_styles_open`). The 500 ms share
+   snapshot in `Editor.tsx` does not list `textureVersion`, so custom-frame
+   publish can store a blank cream circle (`docs/ENGINEERING.md`).
 3. Cap canvas work — do not re-render at full export resolution on every pointer move.
 4. Export through `saveFramedPhoto` / shared blob helpers, not one-off canvas download code.
 5. Modals over the editor: `dvh` + scroll lock with restore (see existing publish modal pattern).
