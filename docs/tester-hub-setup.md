@@ -1,6 +1,6 @@
 # Ollab Studio hub — tester setup
 
-Organizer hubs are the Linktree-style page at **`/u/[handle]`**. The frame tool stays on **`/c/[slug]`**; the hub is the one bio link that lists campaigns and a Support button.
+Organizer hubs are the Linktree-style page at **`/u/[handle]`**. The frame tool stays on **`/c/[slug]`**; the hub is the one bio link that lists campaigns and a Join button.
 
 ## URLs
 
@@ -17,17 +17,28 @@ Organizer hubs are the Linktree-style page at **`/u/[handle]`**. The frame tool 
 3. Open **`/hub`** (also linked from `/mine` and the campaign manage dashboard).
 4. **Claim a handle** — e.g. `ollabstudio` → public URL `https://ollabs.studio/u/ollabstudio`.
 5. Set **display name**, **bio**, optional **avatar**.
-6. Pick a **featured campaign** (Support button goes to `/c/[slug]`).
+6. Pick a **featured campaign** (Join button goes to `/c/[slug]`).
 7. Add **extra links** (Instagram, donate page, etc.).
-8. **Save** → open the public hub in a private window and tap Support.
+8. **Save** → open the public hub in a private window and tap Join.
 
 ## What to verify
 
-- Support button opens the framed campaign on a phone.
-- More campaigns list below if you have several.
-- Hub with no content stays `noindex`; hub with bio + campaign indexes (sitemap).
-- Share the hub link in WhatsApp — page loads, no horizontal scroll, thumb-friendly taps.
+- Join opens the framed campaign on a phone and records a hub click.
+- More campaigns list below if you have several. Hide on the editor keeps old frames off the public list.
+- Featured and list cards use stored `preview_url`. A custom frame published without a pan after the PNG showed on the canvas can unfurl and render as an empty cream circle (`docs/ENGINEERING.md`, pitfall 25).
+- A hub indexes when its **own bio** is at least 40 characters (`hubIsIndexable`). Those handles appear in `sitemap.xml`. A handle with no sentence stays crawlable + noindex, same crawl pattern as `/c`. Ads never mount on `/u`.
+- First Save of a new handle requires a bio. On current `main`, that warning can stick the Save button until reload (`docs/ENGINEERING.md`, pitfall 29).
+- `/hub` lists supporter / share / CTA counts, accent, logo, and a CSV. Nothing there is a paywall. Link tap counts still reset on every Save (pitfall 22).
+- Share the hub link in WhatsApp. Page loads, no horizontal scroll, thumb-friendly taps.
+- Explore will not list a brand-new campaign until it has **five supporters**. Direct `/c` and hub Join still work at zero.
+- If you change the campaign custom URL, WhatsApp `/c/[old]` still opens. The manage link from the welcome email (`/c/[old]/manage?k=`) does not. Bookmark `/c/[live-slug]/manage` after a rename, or use Mine while signed in. A save from the original `/c/[old]` paste in the first minute after rename can 404 `/use` even though the photo downloads. Check the dashboard count, not only Photos.
+- Do not rename onto a slug that used to belong to someone else. On current `main`, that DELETE of their redirect sends their still-shared `/c/[old]` to your campaign (`docs/ENGINEERING.md`).
+- After you claim a custom handle, do not mash Publish on a slow network while signed in until the modal shows `/u/your-handle`. If hub GET has not returned, auto-claim can replace the handle with an email local-part. Prefer claiming and renaming on `/hub`.
 
 ## If handle is taken
 
 Handles are 3–30 chars, lowercase `a-z`, digits, hyphens. Reserved: `ollabs`, `create`, `hub`, etc. (see `lib/hub.ts`).
+
+## Email recovery
+
+`/recover` mails a 24h one-time link. On current `main` the first GET redeems it, including Outlook Safe Links and chat unfurls, and the page HTML includes every campaign's `manage?k=`. If "This link has expired" appears before you tapped it, that is this path, not a bad mailbox. Prefer Mine while still signed in, or a bookmarked manage URL. Details: `docs/ENGINEERING.md`.

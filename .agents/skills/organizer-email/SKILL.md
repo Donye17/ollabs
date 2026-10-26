@@ -17,6 +17,8 @@ description: >-
 ## Rules
 
 1. If `RESEND_API_KEY` is unset, no-op with a warning — do not throw and break create flows.
+   Lifecycle mail is `en` or `pt` via `campaignMailLang(publisher_country)`
+   (untagged defaults to Portuguese). Login codes follow the locale cookie.
 2. From / reply: `EMAIL_FROM` / `EMAIL_REPLY_TO` (see `AGENTS.md`); keep `ollabs.studio` verified in Resend.
 3. Tag sends for dashboard analytics (`campaign_live`, `first_supporter`, etc.).
 4. Webhook must verify the **raw** body; avoid retry storms on handler bugs after a valid signature.

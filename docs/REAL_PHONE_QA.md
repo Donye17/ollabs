@@ -11,6 +11,7 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 2. Confirm the circle fills most of the first viewport (roughly half the screen height).
 3. Confirm **Upload your photo** is the only primary CTA (no three step cards).
 4. Confirm **no** Mine · Create · Hub tab bar.
+5. Confirm first paint is Portuguese for Brazilian (or untagged) campaigns: buttons, counts as 1.926, not English leftover chrome.
 
 ### Adjust (after photo)
 1. Upload a photo.
@@ -18,7 +19,7 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 3. Confirm **Drag to move** + Size slider are visible under the circle.
 4. Finger-drag the photo. Confirm the **page does not scroll** under the drag.
 5. Confirm the fixed **Save or share photo** bar sits above the home indicator.
-6. Confirm ads sit under the fit controls, not on the photo, and are not covered by the bar.
+6. Confirm **no ads** on this page (inventory lives on SEO pages only). The bar must not cover fit controls.
 
 ### Save / share sheet
 1. Tap **Save or share photo**.
@@ -29,9 +30,23 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 ### Post-save (Lane A2)
 1. After a successful save, confirm the sticky save bar is **gone**.
 2. Confirm the framed result stays large on screen.
-3. Confirm **Share photo** (WhatsApp green) is the first / largest button.
-4. Confirm **Share as story** is the clear second action.
-5. Confirm supporter count and report sit below the share stack (not competing with WhatsApp).
+3. Confirm the campaign sentence and URL are on the page with a Copy button.
+4. Confirm **Share photo** leads when the sheet exists; otherwise WhatsApp. **Share as story** sits under that.
+5. If the iOS sheet never opens, confirm Download and the sentence are both on the confirmation (`iosSaveFallback`). Current `main` still sends `title` with the file (`docs/ENGINEERING.md`, pitfall 28).
+6. Confirm **Make your own with Ollabs** sits under the share actions (does not block save).
+7. Confirm supporter count and report sit below the share stack (not competing with WhatsApp).
+8. Confirm the paste text starts with the campaign URL, then one sentence that ends with (via Ollabs) unless Manage set a custom second line.
+9. Share to WhatsApp immediately, then check the organizer count. On current `main` the join waits on the Explore thumb upload, so leaving during that upload can leave the count at 0 (`docs/ENGINEERING.md`, pitfall 21).
+
+## Homepage tool (`/`)
+
+1. First viewport is headline, lede (with a live count if there is one), then the fan, live slug, one name field, **Create a campaign**. No colour rings. First HTML is English.
+2. Confirm the hero is a fan of three **campaign overlay** frames (`/hero/frames/hugo.png` and siblings), not premade colour rings and not a gray silhouette. One photo may crossfade; the other two stay put. Reduced motion holds the fan still. Top campaigns sit lower as a three-slot row.
+3. Switch to PT. Confirm the headline is Reúna sua galera. Confirm **EN | PT** in the nav. Portuguese stays on `/`. `/pt` is the SEO landing, not the product UI.
+4. Confirm **no** Mine · Create · Hub tab bar on `/`.
+5. Type a name. Confirm the `/c/` slug preview updates, then Create a campaign lands on `/create?name=...`.
+6. Open a Brazilian or untagged `/c` from WhatsApp. Confirm campaign chrome is Portuguese even if you just used English on `/`.
+7. On an **untagged** campaign (`publisher_country` null), save once from a non-BR network, then reopen `/c` from WhatsApp. On current `main` chrome can switch to English (`docs/ENGINEERING.md`, pitfall 24). Skip if the campaign already has `publisher_country = BR`.
 
 ## Hub public (`/u/[handle]`) — Lane A4
 
@@ -39,14 +54,18 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 2. On a phone viewport, confirm without scrolling you can see: avatar/name, **large frame preview**, supporter count (if any), and a full-width **Join** button.
 3. Tap Join. Confirm it lands on `/c/[slug]` and records a hub click.
 4. Confirm **no** organizer tab bar on `/u/...`.
+5. On `/hub`, note a link's tap count, change only the bio, Save. On current `main` the count returns to 0 (`docs/ENGINEERING.md`, pitfall 22).
+6. On a new handle, leave bio empty and tap Save. Confirm the bio warning. On current `main` a second Save may do nothing until reload (pitfall 29).
+7. Confirm a hub with a 40+ character bio is indexable. A handle-only hub stays noindex. No ads on either.
 
 ## Create drag (`/create`)
 
-1. Upload a custom frame PNG (or pick a colour ring).
-2. Optionally drop a preview photo on the circle.
-3. Finger-drag the photo to reposition.
-4. Confirm the **page does not scroll** under the drag (`touch-action: none` on the canvas).
-5. Confirm zoom/slider still works with a thumb.
+1. On a first visit (or after clearing `ollabs_simple_styles_open`), confirm the colour-ring accordion is **open**. Collapse it and reload: it should stay closed.
+2. Upload a custom frame PNG (or pick a colour ring).
+3. Optionally drop a preview photo on the circle.
+4. Finger-drag the photo to reposition.
+5. Confirm the **page does not scroll** under the drag (`touch-action: none` on the canvas).
+6. Confirm zoom/slider still works with a thumb.
 
 ## Custom frame live preview
 
@@ -54,18 +73,39 @@ Run these on a **physical phone**, ideally inside WhatsApp’s in-app browser on
 2. Adjust the photo window slider.
 3. Confirm the live preview above stays visible while adjusting (not buried under chrome).
 4. If the PNG has no transparency hole, confirm the inline transparency warning appears (does not hard-block publish).
+5. Wait until the circle shows the artwork, then publish or Save **without** panning the photo. Paste the `/c` link into WhatsApp. On current `main` the unfurl can still be the empty cream circle even though the live canvas was correct (`docs/ENGINEERING.md`, pitfall 25). Hub featured image uses the same `preview_url`. Explore thumbs do not.
 
 ## Organizer chrome
 
 1. On public `/c/...`, confirm **no** Mine · Create · Hub tab bar.
 2. On `/create`, `/mine`, `/hub`, confirm the tab bar is present.
-3. On `/u/[handle]`, confirm no organizer tab bar.
+3. On `/` and `/u/[handle]`, confirm no organizer tab bar.
 4. Confirm a language banner never covers the sticky save bar on `/c`.
+
+## Manage / Change the frame
+
+1. Open `/c/[slug]/manage?k=...` once, then bookmark the URL **after** `k=` disappears.
+2. From that bookmarked (cookie-only) page, tap **Change the frame**. Confirm Create loads the live frame, not a blank new campaign. If it publishes a second slug, that is the current cookie-only gap (`docs/ENGINEERING.md`).
+3. Change the custom link on manage. Confirm old WhatsApp `/c/[old]` still opens the campaign. Confirm the welcome-email `/manage?k=` URL: today it 404s after rename.
+4. Within a minute of that rename, open the **original** WhatsApp `/c/[old]` link, save a photo, and check the manage count. On current `main` the PNG still saves and `/use` can 404, so the count never moves (`docs/ENGINEERING.md`, Public writes). Wait a minute and retry from a fresh tab if you are isolating ISR from the `countedRef` latch.
+5. Do not take a custom URL that another campaign used to own (their redirect). On current `main` that hijacks their still-shared link. See `docs/ENGINEERING.md`.
+
+## Email recovery
+
+1. Request a recover link for an organizer mailbox that has campaigns.
+2. Open the mailed `/recover/[token]` URL once. Confirm it lists dashboards.
+3. Refresh. Confirm it shows expired (one-time). Note: a chat unfurl or Outlook Safe Links GET counts as that first open, so the organizer tap may already be expired. Current `main` also puts `manage?k=` in that first HTML.
+
+## Signed-in publish vs hub handle
+
+1. Claim a custom handle on `/hub` (not the email local-part).
+2. Open Create while signed in and publish as soon as the modal appears (slow network if you can).
+3. Confirm `/u/your-custom-handle` still resolves. If it became `/u/<email-local-part>`, that is the current publish overwrite (`docs/ENGINEERING.md`).
 
 ## Owner follow-ups (cannot be fully automated)
 
 - [ ] iPhone + WhatsApp: Save Image path verified on production or a preview URL.
-- [ ] iPhone + WhatsApp: post-save Share photo opens the sheet with the framed PNG.
+- [ ] iPhone + WhatsApp: post-save Share photo opens the sheet with the framed PNG. If it does not, confirm Download + sentence on the confirmation (current `main` still sends `title` with the file).
 - [ ] Hub Join CTA above the fold on a real handset (not only desktop DevTools).
-- [ ] AdSense: create Campaign + SEO display units; set `NEXT_PUBLIC_ADSENSE_SLOT_CAMPAIGN` and `NEXT_PUBLIC_ADSENSE_SLOT_SEO` on Vercel; keep Auto ads / anchors / vignettes OFF.
+- [ ] AdSense: SEO display unit env `NEXT_PUBLIC_ADSENSE_SLOT_SEO` on Vercel; keep Auto ads / anchors / vignettes OFF. Do not put units back on `/c` or `/u`.
 - [ ] Optional cron: set `CRON_SECRET` and confirm `/api/cron/zero-supporter` runs (see `vercel.json`).

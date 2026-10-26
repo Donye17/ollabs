@@ -4,6 +4,14 @@ Status as of Aug 28, 2026: ollabs.studio is **Needs attention / Low value conten
 Ads.txt is Authorized, so the seller file is not the problem. This is a
 human-ish content review of the site as a whole.
 
+**Current code (2026-10-26), do not relitigate from this file alone:** ads still
+never mount on `/c` or `/u` (including hubs that now index). `/c` stays
+crawlable + noindex. `/u` indexes when trimmed bio length ≥ 40
+(`hubIsIndexable`); those handles are in the sitemap. Units live on SEO
+pages via `AdSlot` (`surface="seo"`). `adsbygoogle.js` loads from
+`DeferredAdSense` in the root layout after interaction or ~5s. Keep Auto
+ads / anchors / vignettes off. Operational map: `docs/ENGINEERING.md`.
+
 ---
 
 ## What the reviewer is actually reacting to
