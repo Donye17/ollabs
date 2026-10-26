@@ -11,6 +11,7 @@ import { getFlag, resolveFlagFrame } from '@/lib/flags';
 import { AlertCircle, ArrowRight, ChevronDown, Loader2, Save } from 'lucide-react';
 import { PublishTemplateModal } from './PublishTemplateModal';
 import { useLocale } from '@/components/i18n/LocaleProvider';
+import { useTapGuard } from '@/lib/tapLock';
 import { ABOVE_MOBILE_NAV, ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
 import { track } from '@/lib/analytics';
 // Loaded on demand (see handleRemoveBackground). This library is ~5.5MB of WASM;
@@ -27,6 +28,7 @@ export interface EditTarget {
 export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
     const { messages } = useLocale();
     const t = messages.create;
+    const removeTap = useTapGuard();
     // First visit shows the colour rings. A later collapse sticks, so someone
     // who already has a PNG is not asked again on the next visit.
     const [simpleStylesOpen, setSimpleStylesOpen] = useState(true);
@@ -173,6 +175,7 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
 
     const handleRemoveBackground = async () => {
         if (!imageSrc) return;
+        if (!removeTap.start()) return;
         setIsRemovingBg(true);
         setNotice(null);
         try {
@@ -182,9 +185,10 @@ export const EditorPage: React.FC<{ remixId?: string }> = ({ remixId }) => {
             setImageSrc(url);
         } catch (error) {
             console.error("BG Removal failed", error);
-            setNotice("Could not remove the background. Your photo is unchanged. Try again, or use it as it is.");
+            setNotice(messages.create.removeBgFailed);
         } finally {
             setIsRemovingBg(false);
+            removeTap.end();
         }
     };
 

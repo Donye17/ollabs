@@ -13,6 +13,7 @@ import { organizerShareText, whatsappUrl, messengerShareUrl, prefersTagalog, hub
 import { normalizeHandle, suggestHandleFromEmail } from '@/lib/hub';
 import { useLocale } from '@/components/i18n/LocaleProvider';
 import { ORGANIZER_PRIMARY_BTN } from '@/lib/mobileNav';
+import { useTapGuard } from '@/lib/tapLock';
 
 interface EditTarget {
     slug: string;
@@ -38,8 +39,11 @@ type AccountStep = 'offer' | 'sending' | 'code' | 'verifying' | 'saved';
 export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOpen, onClose, config, previewDataUrl, editTarget }) => {
     const { messages, locale } = useLocale();
     const tp = messages.publish;
+    const frameTap = useTapGuard();
+    const createTap = useTapGuard();
     const router = useRouter();
     const dialogRef = useRef<HTMLDivElement>(null);
+    const hubLock = useRef(false);
     // Set when the builder was opened from a /day page, so the campaign can be
     // attributed to that day rather than guessed at by category.
     const [daySlug, setDaySlug] = useState<string | null>(null);
@@ -130,6 +134,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
     const saveFrame = async () => {
         if (!editTarget || savingFrame) return;
+        if (!frameTap.start()) return;
         setSavingFrame(true);
         setFrameError(null);
         try {
@@ -166,6 +171,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             setFrameError('Could not reach the server. Try again.');
         } finally {
             setSavingFrame(false);
+            frameTap.end();
         }
     };
 
@@ -293,7 +299,8 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             || (opts.emailForSuggest ? suggestHandleFromEmail(opts.emailForSuggest) : '');
         const normalized = normalizeHandle(handle);
         if (!normalized) return null;
-
+        if (hubLock.current) return null;
+        hubLock.current = true;
         setHubClaiming(true);
         setHubClaimError(null);
         try {
@@ -325,6 +332,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             return null;
         } finally {
             setHubClaiming(false);
+            hubLock.current = false;
         }
     }, []);
 
@@ -438,6 +446,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
 
     const handleCreate = async () => {
         if (!title) return;
+        if (!createTap.start()) return;
         setIsSubmitting(true);
         setCreateError(null);
 
@@ -517,6 +526,7 @@ export const PublishTemplateModal: React.FC<PublishTemplateModalProps> = ({ isOp
             setCreateError('Could not reach the server. Check your connection and try again.');
         } finally {
             setIsSubmitting(false);
+            createTap.end();
         }
     };
 

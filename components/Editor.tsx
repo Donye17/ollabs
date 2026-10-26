@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { FrameConfig } from '@/lib/types';
 import { saveFramedPhoto, preferShareSheetForSave } from '@/lib/savePhoto';
+import { useTapGuard } from '@/lib/tapLock';
 import { useEditorLogic } from './editor/useEditorLogic';
 import { CanvasArea } from './editor/CanvasArea';
 import { EditorToolbar } from './editor/EditorToolbar';
@@ -39,6 +40,7 @@ export const Editor: React.FC<EditorProps> = ({
 
   const [canSharePhoto, setCanSharePhoto] = useState(false);
   const [sharingPhoto, setSharingPhoto] = useState(false);
+  const shareTap = useTapGuard();
 
   useEffect(() => {
     setCanSharePhoto(preferShareSheetForSave());
@@ -77,17 +79,23 @@ export const Editor: React.FC<EditorProps> = ({
   };
 
   const handleDownload = async () => {
-    const blob = await renderedBlob();
-    if (!blob) return;
-    await saveFramedPhoto({
-      blob,
-      filename: `ollabs-frame-${Date.now()}.png`,
-      title: 'Ollabs frame',
-      forceDownload: true,
-    });
+    if (!shareTap.start()) return;
+    try {
+      const blob = await renderedBlob();
+      if (!blob) return;
+      await saveFramedPhoto({
+        blob,
+        filename: `ollabs-frame-${Date.now()}.png`,
+        title: 'Ollabs frame',
+        forceDownload: true,
+      });
+    } finally {
+      shareTap.end();
+    }
   };
 
   const handleSharePhoto = async () => {
+    if (!shareTap.start()) return;
     setSharingPhoto(true);
     try {
       const blob = await renderedBlob();
@@ -99,6 +107,7 @@ export const Editor: React.FC<EditorProps> = ({
       });
     } finally {
       setSharingPhoto(false);
+      shareTap.end();
     }
   };
 

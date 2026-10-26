@@ -8,6 +8,7 @@ import { MobileOrganizerNav } from '@/components/MobileOrganizerNav';
 import { MobileNavSpacer } from '@/components/MobileNavSpacer';
 import { DeferredAnalytics } from '@/components/DeferredAnalytics';
 import { DeferredAdSense } from '@/components/DeferredAdSense';
+import { RouteProgress } from '@/components/RouteProgress';
 import './globals.css';
 
 const inter = Inter({
@@ -172,6 +173,7 @@ export default function RootLayout({
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
                 />
                 <LocaleProvider>
+                    <RouteProgress />
                     {children}
                     {/* Spacer + nav share the same route gate so /c and SEO pages
                         do not reserve empty thumb space under the fold. */}

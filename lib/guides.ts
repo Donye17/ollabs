@@ -698,7 +698,7 @@ export const GUIDES: Guide[] = [
             {
                 title: 'You can publish with nothing but a frame',
                 paragraphs: [
-                    'Frame, Name, Send works without an account. That is why a captain can finish a PNG in a bus queue. Supporters never sign in either. The cost of that speed is that the site does not magically know you on the next device.',
+                    'Frame, Name, Send works without an account. That is why a captain can finish a PNG in a bus queue. Supporters never sign in either. The cost of that speed is that the site does not know you on the next device until you save an email or claim the campaign.',
                     'After publish you hold two different URLs. The public one is /c/your-slug. Anyone may open it, add a photo, and save. The private one is manage, with a key. Whoever has the key can change the title, the frame, and the slug. Treat the key like a spare key to a room, not like a poster.',
                     'Bookmark manage before you close the tab. Screenshot is a poor backup, because the page tries to drop k= from the address bar once the cookie is set, so a later screenshot may not include the key. The bookmark should be the original link from publish, or the copy in the welcome mail.',
                     'If you already sent WhatsApp, you are not blocked. The campaign is live. You are only blocked from editing it on a new phone. The group can still join. Fix access when you have a minute, not instead of the first send.',

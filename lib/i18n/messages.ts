@@ -170,6 +170,7 @@ export type Messages = {
         changePreviewPhoto: string;
         adjustPhoto: string;
         magicRemove: string;
+        removeBgFailed: string;
         zoomLevel: string;
         rotationAngle: string;
         fitToFrame: string;
@@ -700,7 +701,8 @@ const en: Messages = {
         tryPhotoOptional: 'Try with a photo (optional)',
         changePreviewPhoto: 'Change preview photo',
         adjustPhoto: 'Adjust photo',
-        magicRemove: 'Magic remove background',
+        magicRemove: 'Cut out the background',
+        removeBgFailed: 'Could not cut out the background. Your photo is unchanged. Try again, or use it as it is.',
         zoomLevel: 'Zoom level',
         rotationAngle: 'Rotation angle',
         fitToFrame: 'Fit to frame',
@@ -1085,7 +1087,8 @@ const pt: Messages = {
         tryPhotoOptional: 'Testar com uma foto (opcional)',
         changePreviewPhoto: 'Trocar foto de preview',
         adjustPhoto: 'Ajustar a foto',
-        magicRemove: 'Remover o fundo',
+        magicRemove: 'Tirar o fundo da foto',
+        removeBgFailed: 'Não deu para tirar o fundo. A foto continua igual. Tente de novo, ou use assim.',
         zoomLevel: 'Zoom',
         rotationAngle: 'Rotação',
         fitToFrame: 'Encaixar na moldura',
@@ -1471,7 +1474,8 @@ const id: Messages = {
         tryPhotoOptional: 'Coba dengan foto (opsional)',
         changePreviewPhoto: 'Ganti foto pratinjau',
         adjustPhoto: 'Sesuaikan foto',
-        magicRemove: 'Hapus latar',
+        magicRemove: 'Hapus latar foto',
+        removeBgFailed: 'Latar tidak terhapus. Foto tetap sama. Coba lagi, atau pakai apa adanya.',
         zoomLevel: 'Zoom',
         rotationAngle: 'Rotasi',
         fitToFrame: 'Sesuaikan ke bingkai',

@@ -102,7 +102,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                         <button
                             onClick={onRemoveBackground}
                             disabled={isRemovingBackground}
-                            className="w-full py-3 rounded-xl bg-brand/10 border border-brand/30 hover:bg-brand/20 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
+                            className="w-full min-h-11 py-3 rounded-xl bg-brand/10 border border-brand/30 hover:bg-brand/20 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                         >
                             {isRemovingBackground ? (
                                 <Loader2 size={16} className="animate-spin text-brand-deep" />

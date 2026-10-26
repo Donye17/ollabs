@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 import { ExamplesSkeleton } from "@/components/home/ExamplesSkeleton";
+import { FaqSkeleton } from "@/components/home/FaqSkeleton";
 import { HomeExamplesSection, HomeHeroProof } from "@/components/home/HomeExamplesSection";
 import { HomeHowItWorks } from "@/components/home/HomeHowItWorks";
 import { HomeHero } from "@/components/home/HomeHero";
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
 
 const FAQSection = dynamic(
     () => import("@/components/landing/FAQSection").then((m) => ({ default: m.FAQSection })),
-    { loading: () => <div className="h-80 bg-paper2/50" aria-hidden /> }
+    { loading: () => <FaqSkeleton /> }
 );
 
 const faqJsonLd = {
@@ -70,7 +71,12 @@ export default function Home() {
             <HomeHowItWorks />
 
             <section className="border-y border-ink/10 bg-paper2 py-8">
-                <Suspense fallback={<ExamplesSkeleton />}>
+                <Suspense fallback={
+                    <div className="relative z-10 mx-auto max-w-lg px-5" aria-busy="true" aria-live="polite">
+                        <span className="sr-only">Loading</span>
+                        <ExamplesSkeleton />
+                    </div>
+                }>
                     <HomeExamplesSection />
                 </Suspense>
             </section>
@@ -88,47 +94,47 @@ export default function Home() {
                         </p>
                     </div>
                     <div className="grid w-full grid-cols-2 gap-x-6 gap-y-6 lg:grid-cols-4 lg:gap-y-0">
-                            <div>
+                            <div className="min-w-0">
                                 <h5 className="font-display font-bold mb-2">Product</h5>
-                                <ul className="space-y-1 font-sans text-sm leading-relaxed text-ink/80">
-                                    <li><Link href="/create" className="hover:text-ink hover:underline">Create a campaign</Link></li>
-                                    <li><Link href="/explore" className="hover:text-ink hover:underline">Explore campaigns</Link></li>
-                                    <li><Link href="/mine" className="hover:text-ink hover:underline">My campaigns</Link></li>
-                                    <li><Link href="/hub" className="hover:text-ink hover:underline">Your hub</Link></li>
-                                    <li><Link href="/updates" className="hover:text-ink hover:underline">What&apos;s new</Link></li>
+                                <ul className="font-sans text-sm leading-relaxed text-ink/80">
+                                    <li><Link href="/create" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Create a campaign</Link></li>
+                                    <li><Link href="/explore" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Explore campaigns</Link></li>
+                                    <li><Link href="/mine" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">My campaigns</Link></li>
+                                    <li><Link href="/hub" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Your hub</Link></li>
+                                    <li><Link href="/updates" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">What&apos;s new</Link></li>
                                 </ul>
                             </div>
-                            <div>
+                            <div className="min-w-0">
                                 <h5 className="font-display font-bold mb-2">
-                                    <Link href="/guides" className="hover:text-ink hover:underline">Guides</Link>
+                                    <Link href="/guides" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Guides</Link>
                                 </h5>
-                                <ul className="space-y-1 font-sans text-sm leading-relaxed text-ink/80">
-                                    <li><Link href="/guides/add-a-frame-to-a-profile-picture" className="hover:text-ink hover:underline">Add a frame to a photo</Link></li>
-                                    <li><Link href="/guides/run-a-campaign-people-join" className="hover:text-ink hover:underline">Campaigns people join</Link></li>
-                                    <li><Link href="/guides/start-a-campaign" className="hover:text-ink hover:underline">Start a campaign</Link></li>
-                                    <li><Link href="/guides/hub" className="hover:text-ink hover:underline">What is a hub?</Link></li>
-                                    <li><Link href="/guides" className="hover:text-ink hover:underline">All guides</Link></li>
+                                <ul className="font-sans text-sm leading-relaxed text-ink/80">
+                                    <li><Link href="/guides/add-a-frame-to-a-profile-picture" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Add a frame to a photo</Link></li>
+                                    <li><Link href="/guides/run-a-campaign-people-join" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Campaigns people join</Link></li>
+                                    <li><Link href="/guides/start-a-campaign" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Start a campaign</Link></li>
+                                    <li><Link href="/guides/hub" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">What is a hub?</Link></li>
+                                    <li><Link href="/guides" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">All guides</Link></li>
                                 </ul>
                             </div>
-                            <div>
+                            <div className="min-w-0">
                                 <h5 className="font-display font-bold mb-2">Discover</h5>
-                                <ul className="space-y-1 font-sans text-sm leading-relaxed text-ink/80">
-                                    <li><Link href="/day" className="hover:text-ink hover:underline">Calendar moments</Link></li>
-                                    <li><Link href="/vs/twibbonize" className="hover:text-ink hover:underline">Twibbonize alternative</Link></li>
-                                    <li><Link href="/for" className="hover:text-ink hover:underline">Use cases</Link></li>
+                                <ul className="font-sans text-sm leading-relaxed text-ink/80">
+                                    <li><Link href="/day" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Calendar moments</Link></li>
+                                    <li><Link href="/vs/twibbonize" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Twibbonize alternative</Link></li>
+                                    <li><Link href="/for" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Use cases</Link></li>
                                     <li className="flex flex-wrap gap-x-2 gap-y-1">
-                                        <Link href="/pt" className="hover:text-ink hover:underline">Português</Link>
-                                        <Link href="/hi" className="hover:text-ink hover:underline">हिन्दी</Link>
+                                        <Link href="/pt" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Português</Link>
+                                        <Link href="/hi" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">हिन्दी</Link>
                                     </li>
                                 </ul>
                             </div>
-                            <div>
+                            <div className="min-w-0">
                                 <h5 className="font-display font-bold mb-2">Legal</h5>
-                                <ul className="space-y-1 font-sans text-sm leading-relaxed text-ink/80">
-                                    <li><Link href="/about" className="hover:text-ink hover:underline">About</Link></li>
-                                    <li><Link href="/contact" className="hover:text-ink hover:underline">Contact</Link></li>
-                                    <li><Link href="/privacy" className="hover:text-ink hover:underline">Privacy</Link></li>
-                                    <li><Link href="/terms" className="hover:text-ink hover:underline">Terms</Link></li>
+                                <ul className="font-sans text-sm leading-relaxed text-ink/80">
+                                    <li><Link href="/about" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">About</Link></li>
+                                    <li><Link href="/contact" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Contact</Link></li>
+                                    <li><Link href="/privacy" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Privacy</Link></li>
+                                    <li><Link href="/terms" className="inline-flex min-h-11 items-center hover:text-ink hover:underline">Terms</Link></li>
                                 </ul>
                             </div>
                     </div>

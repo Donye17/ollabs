@@ -54,7 +54,7 @@ export function HomeHowItWorks() {
                     {audiences.map((a, i) => (
                         <span key={a.href} className="inline-flex items-center gap-1.5">
                             {i > 0 && <span className="text-ink/40">·</span>}
-                            <Link href={a.href} className="text-ink/80 hover:underline">
+                            <Link href={a.href} className="inline-flex min-h-11 items-center text-ink/80 hover:underline">
                                 {locale === 'pt' ? audiencesPt[a.href] ?? a.label : a.label}
                             </Link>
                         </span>
