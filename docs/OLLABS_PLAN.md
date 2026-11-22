@@ -25,7 +25,7 @@ Move these into `docs/_archive/` so agents stop reading them as instructions:
 | `LAUNCH_PLAN.md` | An Aug 1 snapshot. Its QA checklist is superseded by and partly contradicts `REAL_PHONE_QA.md`. |
 | `PROJECT_REPORT.md` | Describes the pre-pivot product: stickers, GIF export, avatar builder, community gallery, three OAuth providers. None of it exists. |
 | `TECH_STACK.md` | Two of five sections document removed packages. |
-| `INTEGRATIONS.md` | **Extract the env var list first.** Section 4 publishes a live-looking admin secret in plain text: `secret=ollabs-2026-master-key`. Rotate it. |
+| `INTEGRATIONS.md` | **Extract the env var list first.** Section 4 publishes a live-looking admin secret in plain text: the old claim secret. Rotate it. |
 | `docs/PATH_TO_MILLION_HANDOFF.md` | Phases A through E are complete per its own checkboxes. Its ads line ("`/c` lean, 1 before save, 2 after") is stale and contradicts `AGENTS.md`. |
 
 Keep, unchanged: `OLLABS_CALENDAR_SPEC.md` (the only spec of record for day-page
@@ -225,7 +225,7 @@ between 1 and 4 October.
   since July.
 
 **Ops, this week.**
-- Rotate `ollabs-2026-master-key` and remove it from `INTEGRATIONS.md`.
+- Rotate the old claim secret and remove it from `INTEGRATIONS.md`.
 - Switch Vercel to Pro.
 - Decide on error monitoring. **Done 29 August 2026:** `@sentry/nextjs` is
   wired for server and edge only (`docs/SENTRY.md`). No browser SDK, so the
