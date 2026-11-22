@@ -13,6 +13,6 @@ export const pool = new Pool({
 // ("Error: Unhandled error. ()" in Vercel, 97 hits Aug to Nov). The pool
 // already drops the dead client and opens a new one on the next query, so
 // logging is all that is needed here.
-pool.on('error', (err) => {
+pool.on('error', (err: Error) => {
     console.warn('[neon] idle client error, client discarded:', err?.message ?? err);
 });
