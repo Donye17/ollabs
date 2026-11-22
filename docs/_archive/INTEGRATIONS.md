@@ -87,5 +87,5 @@ These are already integrated into the codebase, but ensure they are enabled in V
 
 ## 4. Admin Access
 Once deployed, claim your ownership:
-1. Visit: `https://ollabs.studio/api/admin/claim?secret=ollabs-2026-master-key`
+1. Visit: `https://ollabs.studio/api/admin/claim?secret=<removed: secret retired>`
 2. Click: "Populate Default Templates" in the Gallery.
