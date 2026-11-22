@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { QRCode } from '@/components/QRCode';
 import { CATEGORIES } from '@/lib/categories';
 import { organizerShareText, whatsappUrl } from '@/lib/share';
@@ -77,6 +78,7 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     const { locale, messages } = useLocale();
     const t = messages.manage;
     const saveTap = useTapGuard();
+    const router = useRouter();
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -95,6 +97,10 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
     const [saveErr, setSaveErr] = useState<string | null>(null);
 
     const [copied, setCopied] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [deletedDone, setDeletedDone] = useState(false);
+    const [deleteErr, setDeleteErr] = useState(false);
     const [showQR, setShowQR] = useState(false);
 
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://ollabs.studio';
@@ -475,6 +481,76 @@ export const ManageClient: React.FC<{ slug: string }> = ({ slug }) => {
                                     </span>
                                 )}
                             </div>
+                        </section>
+
+                        <section className="mt-10 pt-6 border-t border-ink/10 space-y-3" aria-labelledby="delete-heading">
+                            <h2 id="delete-heading" className="text-sm font-semibold text-muted">{t.deleteHeading}</h2>
+                            {deletedDone ? (
+                                <p role="status" className="text-sm font-semibold text-ink">{t.deleted}</p>
+                            ) : (
+                                <>
+                                    <p className="text-sm text-ink/70 leading-relaxed">{t.deleteBody}</p>
+                                    {!confirmDelete ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => { setConfirmDelete(true); setDeleteErr(false); }}
+                                            className="inline-flex min-h-11 items-center justify-center px-4 rounded-control border border-coral/40 text-coral font-semibold text-sm hover:bg-coral/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
+                                        >
+                                            {t.deleteButton}
+                                        </button>
+                                    ) : (
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            <button
+                                                type="button"
+                                                disabled={deleting}
+                                                onClick={async () => {
+                                                    setDeleting(true);
+                                                    setDeleteErr(false);
+                                                    try {
+                                                        const res = await fetch(`/api/campaigns/${currentSlug}/manage`, {
+                                                            method: 'DELETE',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify(token ? { token } : {}),
+                                                        });
+                                                        if (!res.ok) throw new Error('delete failed');
+                                                        track('campaign_deleted', { campaign: currentSlug });
+                                                        // My campaigns also lists what this browser remembers. Forget it
+                                                        // here, or the deleted campaign reappears under "this device".
+                                                        try {
+                                                            const key = 'ollabs_my_campaigns';
+                                                            const list = JSON.parse(localStorage.getItem(key) || '[]');
+                                                            if (Array.isArray(list)) {
+                                                                localStorage.setItem(key, JSON.stringify(
+                                                                    list.filter((c: { slug?: string }) => c?.slug !== currentSlug && c?.slug !== slug)
+                                                                ));
+                                                            }
+                                                        } catch { /* storage can be unavailable in in-app browsers */ }
+                                                        setDeletedDone(true);
+                                                        setTimeout(() => router.push('/mine'), 1200);
+                                                    } catch {
+                                                        setDeleteErr(true);
+                                                    } finally {
+                                                        setDeleting(false);
+                                                    }
+                                                }}
+                                                className="inline-flex min-h-11 items-center justify-center gap-2 px-4 rounded-control bg-coral text-white font-semibold text-sm hover:brightness-105 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
+                                            >
+                                                {deleting ? <Loader2 size={15} className="animate-spin" /> : t.deleteConfirm}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setConfirmDelete(false)}
+                                                className="inline-flex min-h-11 items-center justify-center px-3 text-sm font-semibold text-ink/70 hover:underline"
+                                            >
+                                                {t.deleteCancel}
+                                            </button>
+                                        </div>
+                                    )}
+                                    {deleteErr && (
+                                        <p role="alert" className="text-sm text-coral font-semibold">{t.deleteFailed}</p>
+                                    )}
+                                </>
+                            )}
                         </section>
 
                         <div className="mt-8 flex items-start gap-2 text-xs text-muted">

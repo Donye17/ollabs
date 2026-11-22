@@ -46,6 +46,8 @@ export const campaigns = pgTable("campaigns", {
 	firstSupporterCountry: text("first_supporter_country"),
 	firstSupporterEmailedAt: timestamp("first_supporter_emailed_at", { withTimezone: true, mode: 'string' }),
 	zeroSupporterEmailedAt: timestamp("zero_supporter_emailed_at", { withTimezone: true, mode: 'string' }),
+	/** Owner deleted the campaign. Also sets is_hidden; see drizzle/0024. */
+	deletedAt: timestamp("deleted_at", { withTimezone: true, mode: 'string' }),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
 	index("idx_campaigns_slug").using("btree", table.slug.asc().nullsLast()),

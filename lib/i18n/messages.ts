@@ -364,6 +364,13 @@ export type Messages = {
         frameInvisible: string;
         privateBefore: string;
         privateAfter: string;
+        deleteHeading: string;
+        deleteBody: string;
+        deleteButton: string;
+        deleteConfirm: string;
+        deleteCancel: string;
+        deleted: string;
+        deleteFailed: string;
     };
     explore: {
         title: string;
@@ -942,6 +949,13 @@ const en: Messages = {
         frameInvisible: "That frame would not show up on anyone's photo. Pick a border style or upload a frame image.",
         privateBefore: 'This dashboard is private to whoever has this link. Bookmark it, and do not share the part after',
         privateAfter: '.',
+        deleteHeading: 'Delete campaign',
+        deleteBody: 'The link stops working and the campaign leaves Explore, your hub and My campaigns. Photos people already saved stay theirs.',
+        deleteButton: 'Delete this campaign',
+        deleteConfirm: 'Yes, delete it',
+        deleteCancel: 'Keep it',
+        deleted: 'Campaign deleted.',
+        deleteFailed: 'Could not delete. Try again.',
     },
     explore: {
         title: 'Explore campaigns',
@@ -1367,6 +1381,13 @@ const pt: Messages = {
         frameInvisible: 'Essa moldura não aparece na foto de ninguém. Escolha uma borda ou envie uma imagem de moldura.',
         privateBefore: 'Este painel é privado para quem tem este link. Salve nos favoritos e não compartilhe a parte depois de',
         privateAfter: '.',
+        deleteHeading: 'Excluir campanha',
+        deleteBody: 'O link para de funcionar e a campanha sai do Explorar, do seu hub e de Minhas campanhas. As fotos que as pessoas já baixaram continuam com elas.',
+        deleteButton: 'Excluir esta campanha',
+        deleteConfirm: 'Sim, excluir',
+        deleteCancel: 'Manter',
+        deleted: 'Campanha excluída.',
+        deleteFailed: 'Não deu para excluir. Tente de novo.',
     },
     explore: {
         title: 'Explorar campanhas',
@@ -1792,6 +1813,13 @@ const id: Messages = {
         frameInvisible: 'Bingkai itu tidak akan terlihat di foto siapa pun. Pilih gaya tepi atau unggah gambar bingkai.',
         privateBefore: 'Dasbor ini privat bagi siapa pun yang punya link ini. Simpan bookmark, dan jangan bagikan bagian setelah',
         privateAfter: '.',
+        deleteHeading: 'Hapus kampanye',
+        deleteBody: 'Tautan berhenti berfungsi dan kampanye keluar dari Jelajahi, hub kamu dan Kampanye saya. Foto yang sudah disimpan orang tetap milik mereka.',
+        deleteButton: 'Hapus kampanye ini',
+        deleteConfirm: 'Ya, hapus',
+        deleteCancel: 'Simpan',
+        deleted: 'Kampanye dihapus.',
+        deleteFailed: 'Gagal menghapus. Coba lagi.',
     },
     explore: {
         title: 'Jelajahi kampanye',

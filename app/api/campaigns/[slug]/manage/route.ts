@@ -1,5 +1,6 @@
 import { pool } from '@/lib/neon';
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { CATEGORY_KEYS } from '@/lib/categories';
 import { hasVisibleFrame } from '@/lib/frameValidity';
 import { parseAccent, parseLogoUrl } from '@/lib/campaignBrand';
@@ -282,5 +283,44 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     } catch (error) {
         console.error('Failed to update campaign:', error);
         return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
+    }
+}
+
+// DELETE /api/campaigns/[slug]/manage  Body: { token? }
+// Owner deletes their own campaign. Soft delete: is_hidden removes it from the
+// campaign page, Explore, hubs, My campaigns and every count, and deleted_at
+// keeps it distinguishable from moderation. Until this existed, organizers had
+// no way to clear test campaigns and wrote to support asking for it.
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+    try {
+        const { slug } = await params;
+        const body = await request.json().catch(() => ({}));
+        const token = typeof body.token === 'string' ? body.token : '';
+
+        const resolved = await resolveOwned(request, slug, token);
+        if (!resolved) {
+            return NextResponse.json({ error: 'Not found or wrong key' }, { status: 404 });
+        }
+
+        await pool.query(
+            `UPDATE campaigns
+             SET is_hidden = true, is_public = false, deleted_at = COALESCE(deleted_at, NOW())
+             WHERE id = $1`,
+            [resolved.owned.id]
+        );
+        try {
+            await pool.query(
+                `UPDATE organizers SET featured_campaign_id = NULL WHERE featured_campaign_id = $1`,
+                [resolved.owned.id]
+            );
+        } catch (e) {
+            console.error('clear featured on delete failed', e);
+        }
+        revalidatePath(`/c/${resolved.owned.slug}`);
+
+        return NextResponse.json({ deleted: true });
+    } catch (error) {
+        console.error('Failed to delete campaign:', error);
+        return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
     }
 }
