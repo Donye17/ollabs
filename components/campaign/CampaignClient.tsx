@@ -858,8 +858,16 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                             </button>
                         )}
 
-                        <div className="w-full rounded-2xl border border-ink/10 bg-cream px-4 py-4 text-center">
-                            <p className="text-sm text-ink/75 leading-relaxed">{t.wantOwnBody}</p>
+                        {/* The only place a supporter becomes an organizer. It was a muted
+                            text link converting ~2% of savers (cta_taps / supporters, Nov
+                            2026). Proof from the campaign they just joined, plus a real
+                            button, is the test. Still visually below the share action. */}
+                        <div className="w-full rounded-2xl border border-ink/10 bg-cream px-4 py-4 text-center space-y-3">
+                            <p className="text-sm text-ink/80 leading-relaxed">
+                                {count >= 10
+                                    ? t.wantOwnProof.replace('{n}', formatCount(count, locale))
+                                    : t.wantOwnBody}
+                            </p>
                             <a
                                 href={withUtm(`/create?from=${encodeURIComponent(slug)}`, 'campaign_post_save')}
                                 onClick={() => {
@@ -867,9 +875,9 @@ export const CampaignClient: React.FC<CampaignClientProps> = ({
                                     track('create_from_campaign', { campaign: slug, from: 'post_save' });
                                     fetch(`/api/campaigns/${slug}/cta`, { method: 'POST', keepalive: true }).catch(() => {});
                                 }}
-                                className="inline-flex min-h-11 items-center justify-center px-2 text-sm font-semibold text-ink/80 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
+                                className="w-full min-h-[48px] py-3 rounded-control font-semibold text-[15px] flex items-center justify-center gap-2 border border-ink/20 bg-paper text-ink hover:bg-ink/5 active:bg-ink/10 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                             >
-                                {t.makeOwnFooter}
+                                {t.makeOwn}
                             </a>
                         </div>
 

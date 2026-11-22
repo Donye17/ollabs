@@ -118,6 +118,8 @@ export type Messages = {
         scanCampaign: string;
         wantOwn: string;
         wantOwnBody: string;
+        /** Post-save proof line. {n} is the formatted supporter count. */
+        wantOwnProof: string;
         makeOwn: string;
         makeOwnFooter: string;
         byName: string;
@@ -683,6 +685,7 @@ const en: Messages = {
         scanCampaign: 'Scan to open this campaign',
         wantOwn: 'Like it? Make your own.',
         wantOwnBody: 'Create a frame for your cause in under a minute. Free.',
+        wantOwnProof: '{n} people used this frame. Run a group, team or cause? Make one for it in a minute, free.',
         makeOwn: 'Make your own frame',
         makeOwnFooter: 'Make your own with Ollabs',
         byName: 'By {name}',
@@ -1106,6 +1109,7 @@ const pt: Messages = {
         scanCampaign: 'Escaneie para abrir esta campanha',
         wantOwn: 'Gostou? Crie a sua.',
         wantOwnBody: 'Crie uma moldura para sua causa em menos de um minuto. Grátis.',
+        wantOwnProof: '{n} pessoas usaram esta moldura. Tem um grupo, time, igreja ou causa? Crie uma para ele em 1 minuto, grátis.',
         makeOwn: 'Crie sua própria moldura',
         makeOwnFooter: 'Crie a sua no Ollabs',
         byName: 'Por {name}',
@@ -1530,6 +1534,7 @@ const id: Messages = {
         scanCampaign: 'Pindai untuk buka kampanye ini',
         wantOwn: 'Suka? Buat punya kamu.',
         wantOwnBody: 'Buat bingkai untuk acaramu dalam kurang dari satu menit. Gratis.',
+        wantOwnProof: '{n} orang memakai bingkai ini. Punya grup, tim atau komunitas? Buat bingkai untuknya dalam 1 menit, gratis.',
         makeOwn: 'Buat bingkai sendiri',
         makeOwnFooter: 'Buat sendiri di Ollabs',
         byName: 'Oleh {name}',
