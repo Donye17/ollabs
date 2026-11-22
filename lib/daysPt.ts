@@ -1,6 +1,7 @@
 /** Portuguese bodies for calendar days that have one. English stays on the day entry. */
 
 import { DAY_PT_MORE } from '@/lib/daysPtMore';
+import { DAY_PT_HOLIDAYS } from '@/lib/daysHolidaysPt';
 
 export type DayPtCopy = {
     name: string;
@@ -151,6 +152,7 @@ const DAY_PT: Record<string, DayPtCopy> = {
         ],
     },
     ...DAY_PT_MORE,
+    ...DAY_PT_HOLIDAYS,
 };
 
 export function getDayPt(slug: string): DayPtCopy | undefined {

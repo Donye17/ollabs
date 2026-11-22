@@ -10,6 +10,7 @@
 
 import { FrameConfig, FrameType } from '@/lib/types';
 import { SEPT_OCT_DAYS } from '@/lib/daysSeptOct';
+import { HOLIDAY_DAYS } from '@/lib/daysHolidays';
 
 export type DateRule =
     | { type: 'fixed'; month: number; day: number }
@@ -19,7 +20,10 @@ export type DateRule =
     // e.g. Unity Day is { month: 10, weekday: 3, n: 3 } -> Oct 21 in 2026.
     | { type: 'nth-weekday'; month: number; weekday: number; n: number }
     // Giving Tuesday is { offsetDays: 5 } -> Dec 1 in 2026.
-    | { type: 'after-thanksgiving'; offsetDays: number };
+    | { type: 'after-thanksgiving'; offsetDays: number }
+    // Days relative to Western Easter Sunday. Carnaval is { from: -50, to: -47 }:
+    // Saturday through Tuesday before Ash Wednesday (Feb 6 to 9 in 2027).
+    | { type: 'easter-offset'; from: number; to: number };
 
 export interface AwarenessDay {
     slug: string;
@@ -103,6 +107,25 @@ function nthWeekday(year: number, month: number, weekday: number, n: number): Da
     }
 }
 
+/** Western Easter Sunday (anonymous Gregorian algorithm), as a UTC date. */
+function easterSunday(year: number): Date {
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(Date.UTC(year, month - 1, day));
+}
+
 function thanksgiving(year: number): Date {
     return nthWeekday(year, 11, 4, 4); // 4th Thursday of November
 }
@@ -144,6 +167,14 @@ export function nextOccurrence(rule: DateRule, from: Date = new Date()): { start
                 const s = new Date(t);
                 s.setUTCDate(s.getUTCDate() + rule.offsetDays);
                 return { start: s, end: s };
+            }
+            case 'easter-offset': {
+                const easter = easterSunday(year);
+                const s = new Date(easter);
+                s.setUTCDate(s.getUTCDate() + rule.from);
+                const e = new Date(easter);
+                e.setUTCDate(e.getUTCDate() + rule.to);
+                return { start: s, end: e };
             }
         }
     };
@@ -748,6 +779,7 @@ export const DAYS: AwarenessDay[] = [
         relatedDays: ['national-dog-day', 'national-nonprofit-day'],
     },
     ...SEPT_OCT_DAYS,
+    ...HOLIDAY_DAYS,
 ];
 
 export function getDay(slug: string): AwarenessDay | undefined {
