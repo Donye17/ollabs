@@ -40,6 +40,7 @@ export type AvatarConfig = {
     hat: string;
     glasses: string;
     bg: string;
+    hatColor: string;
 };
 
 export const DEFAULT_AVATAR: AvatarConfig = {
@@ -56,6 +57,7 @@ export const DEFAULT_AVATAR: AvatarConfig = {
     hat: 'none',
     glasses: 'none',
     bg: 'paper',
+    hatColor: 'red',
 };
 
 /** Field order for the share link. Appending is safe; reordering breaks old links. */
@@ -73,6 +75,7 @@ const FIELDS: { key: keyof AvatarConfig; options: () => string[] }[] = [
     { key: 'hat', options: () => Object.keys(DUMMYS.parts.hat) },
     { key: 'glasses', options: () => Object.keys(DUMMYS.parts.glasses) },
     { key: 'bg', options: () => Object.keys(DUMMYS.backgrounds) },
+    { key: 'hatColor', options: () => Object.keys(DUMMYS.palettes.cloth) },
 ];
 
 export function optionsFor(key: keyof AvatarConfig): string[] {
@@ -118,6 +121,7 @@ export function randomAvatar(): AvatarConfig {
         hat: Math.random() < 0.25 ? pick(o('hat').filter((h) => h !== 'none')) : 'none',
         glasses: Math.random() < 0.25 ? pick(o('glasses').filter((g) => g !== 'none')) : 'none',
         bg: pick(o('bg').filter((b) => b !== 'none')),
+        hatColor: pick(o('hatColor')),
     };
 }
 
@@ -135,6 +139,7 @@ export function composeAvatar(c: AvatarConfig, opts: { crop?: Crop; transparent?
     const [hair, hairsh] = palettes.hair[c.hairColor] ?? palettes.hair.brown;
     const [c1, c1sh] = palettes.cloth[c.color1] ?? palettes.cloth.green;
     const [c2, c2sh] = palettes.cloth[c.color2] ?? palettes.cloth.brown;
+    const [c3, c3sh] = palettes.cloth[c.hatColor] ?? palettes.cloth.red;
     const hatOn = c.hat !== 'none';
     // Headwear like a hijab covers the hair entirely. Other hats sit where tall
     // hair would be, so tall styles fall back to a buzz cut underneath.
@@ -166,9 +171,9 @@ export function composeAvatar(c: AvatarConfig, opts: { crop?: Crop; transparent?
 
     const colors: Record<string, string> = {
         '{skin}': skin, '{skinsh}': skinsh, '{hair}': hair, '{hairsh}': hairsh,
-        '{c1}': c1, '{c1sh}': c1sh, '{c2}': c2, '{c2sh}': c2sh, '{ink}': DUMMYS.ink,
+        '{c1}': c1, '{c1sh}': c1sh, '{c2}': c2, '{c2sh}': c2sh, '{c3}': c3, '{c3sh}': c3sh, '{ink}': DUMMYS.ink,
     };
-    const filled = body.replace(/\{(skin|skinsh|hair|hairsh|c1|c1sh|c2|c2sh|ink)\}/g, (m) => colors[m]);
+    const filled = body.replace(/\{(skin|skinsh|hair|hairsh|c1|c1sh|c2|c2sh|c3|c3sh|ink)\}/g, (m) => colors[m]);
 
     return (
         `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${CROPS[opts.crop ?? 'full']}">` +

@@ -28,7 +28,7 @@ const COPY = {
     colorsHair: 'Hair color',
     colorsTop: 'Top color',
     colorsBottom: 'Bottom color',
-    headwearColor: 'Hijab and cap color',
+    headwearColor: 'Headwear color',
 };
 
 type Tab = { id: string; label: string; part?: keyof AvatarConfig; crop: Crop; colors?: { key: keyof AvatarConfig; label: string; palette: 'skin' | 'hair' | 'cloth' }[] };
@@ -44,7 +44,7 @@ const TABS: Tab[] = [
         { key: 'color1', label: COPY.colorsTop, palette: 'cloth' },
         { key: 'color2', label: COPY.colorsBottom, palette: 'cloth' },
     ] },
-    { id: 'hat', label: 'Headwear', part: 'hat', crop: 'head', colors: [{ key: 'color1', label: COPY.headwearColor, palette: 'cloth' }] },
+    { id: 'hat', label: 'Headwear', part: 'hat', crop: 'head', colors: [{ key: 'hatColor', label: COPY.headwearColor, palette: 'cloth' }] },
     { id: 'glasses', label: 'Glasses', part: 'glasses', crop: 'head' },
     { id: 'bg', label: 'Background', part: 'bg', crop: 'full' },
 ];
