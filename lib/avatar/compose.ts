@@ -121,8 +121,9 @@ export function randomAvatar(): AvatarConfig {
 
 /** Square crops of the 1500 canvas: the whole figure, or head and shoulders for a profile picture. */
 export const CROPS = {
-    full: '0 0 1500 1500',
-    head: '330 20 940 940',
+    // Square, with headroom above the canvas: buns, curls and hats reach past y=0.
+    full: '-40 -80 1580 1580',
+    head: '310 -60 980 980',
 } as const;
 export type Crop = keyof typeof CROPS;
 
@@ -140,7 +141,7 @@ export function composeAvatar(c: AvatarConfig, opts: { crop?: Crop; transparent?
     const clipId = opts.clipId ?? 'headclip';
 
     const body = [
-        bg ? `<rect width="1500" height="1500" fill="${bg}"/>` : '',
+        bg ? `<rect x="-200" y="-200" width="1900" height="1900" fill="${bg}"/>` : '',
         hairBack,
         DUMMYS.base.limbs,
         parts.outfit[c.outfit] ?? '',

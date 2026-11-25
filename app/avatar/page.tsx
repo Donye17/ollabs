@@ -4,7 +4,7 @@ import { SiteFooter } from '@/components/SiteFooter';
 import { AvatarBuilder } from '@/components/avatar/AvatarBuilder';
 import { PAGE_TOP_UNDER_NAV } from '@/lib/mobileNav';
 
-const TITLE = 'Free avatar maker: make your Dummy | Ollabs';
+const TITLE = 'Free avatar maker: make your Dummy';
 const DESCRIPTION = 'Make a free cartoon avatar in seconds. Pick skin tone, hair, face and outfit, then download a PNG for your profile picture. No account.';
 
 export const metadata: Metadata = {
