@@ -53,6 +53,8 @@ export function shouldShowMobileOrganizerNav(pathname: string): boolean {
     if (path === '/vs' || path.startsWith('/vs/')) return false;
     if (path === '/guides' || path.startsWith('/guides/')) return false;
     if (path === '/privacy' || path === '/terms') return false;
+    // Avatar maker is for anyone, not organizer chrome.
+    if (path === '/avatar' || path.startsWith('/avatar/')) return false;
     if (path === '/about' || path === '/contact' || path === '/updates' || path === '/explore') return false;
 
     const localeRoots = ['/pt', '/hi'] as const;

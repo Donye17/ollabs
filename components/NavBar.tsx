@@ -78,6 +78,12 @@ export const NavBar: React.FC<NavBarProps> = ({ isHome = false }) => {
                                 {messages.nav.explore}
                             </Link>
                             <Link
+                                href="/avatar"
+                                className="font-sans text-sm font-semibold text-muted hover:text-brand-deep min-h-11 hidden sm:inline-flex items-center"
+                            >
+                                Avatars
+                            </Link>
+                            <Link
                                 href="/guides"
                                 className="font-sans text-sm font-semibold text-muted hover:text-brand-deep min-h-11 hidden sm:inline-flex items-center"
                             >
@@ -96,6 +102,9 @@ export const NavBar: React.FC<NavBarProps> = ({ isHome = false }) => {
                             </Link>
                             <Link href="/explore" className="font-sans text-sm font-semibold text-muted hover:text-brand-deep hidden md:inline-flex min-h-11 items-center transition-colors">
                                 {messages.nav.explore}
+                            </Link>
+                            <Link href="/avatar" className="font-sans text-sm font-semibold text-muted hover:text-brand-deep hidden md:inline-flex min-h-11 items-center transition-colors">
+                                Avatars
                             </Link>
                             <Link href="/guides" className="font-sans text-sm font-semibold text-muted hover:text-brand-deep hidden md:inline-flex min-h-11 items-center transition-colors">
                                 {messages.nav.guides}
