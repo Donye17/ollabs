@@ -99,13 +99,19 @@ def trace(mask, eps=1.0, minarea=60, step=14):
         idx = np.linspace(0, len(pts), n, endpoint=False).astype(int)
         p = pts[idx]
         m = len(p)
-        seg = [f'M{p[0][0]:.1f},{p[0][1]:.1f}']
+        q = []  # absolute control points, rounded, so relative steps never drift
         for i in range(m):
             p0, p1, p2, p3 = p[(i - 1) % m], p[i], p[(i + 1) % m], p[(i + 2) % m]
-            c1 = p1 + (p2 - p0) / 6
-            c2 = p2 - (p3 - p1) / 6
-            seg.append(f'C{c1[0]:.1f},{c1[1]:.1f} {c2[0]:.1f},{c2[1]:.1f} {p2[0]:.1f},{p2[1]:.1f}')
-        d.append(' '.join(seg) + 'Z')
+            q.append((np.rint(p1 + (p2 - p0) / 6), np.rint(p2 - (p3 - p1) / 6), np.rint(p2)))
+        cur = np.rint(p[0])
+        seg = [f'M{cur[0]:.0f} {cur[1]:.0f}c']
+        parts = []
+        for c1, c2, e in q:
+            a, b, c = c1 - cur, c2 - cur, e - cur
+            parts.append(' '.join(f'{v:.0f}' for v in (a[0], a[1], b[0], b[1], c[0], c[1])))
+            cur = e
+        seg.append(' '.join(parts).replace(' -', '-'))
+        d.append(''.join(seg) + 'z')
     return ' '.join(d)
 
 
@@ -262,52 +268,231 @@ def plait(x, y0, y1, w):
     return out
 
 
+def build2():
+    """Second batch of styles, appended after the first eleven."""
+    F, Bk = {}, {}
+
+    # Ponytail: slicked back, tail hanging behind the head on the far side.
+    F['ponytail'] = (paint(short_cap(16))
+                     + '<path d="M600,250 Q720,200 860,214 M560,300 Q700,236 900,236" fill="none" stroke="{hairsh}" stroke-width="9" stroke-linecap="round" opacity="0.6"/>')
+    tail = smooth(poly(curve((470, 250), (330, 330), (360, 620)) + curve((360, 620), (380, 780), (470, 860))
+                       + curve((470, 860), (430, 700), (450, 560)) + curve((450, 560), (470, 400), (520, 330))), 10)
+    Bk['ponytail'] = (paint(tail) + '<rect x="440" y="258" width="78" height="44" rx="20" fill="{hairsh}" transform="rotate(-30 479 280)"/>')
+
+    # Locs: rope-like strands from the crown to the chest, ringed texture.
+    def loc(x0, y0, x1, y1, w):
+        out = (f'<path d="M{x0},{y0} Q{(x0 + x1) / 2 + (x1 - x0) * .2:.0f},{(y0 + y1) / 2:.0f} {x1},{y1}" fill="none" '
+               f'stroke="{{hair}}" stroke-width="{w}" stroke-linecap="round"/>')
+        for t in np.linspace(.12, .92, 7):
+            x = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * ((x0 + x1) / 2 + (x1 - x0) * .2) + t * t * x1
+            y = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * ((y0 + y1) / 2) + t * t * y1
+            out += f'<path d="M{x - w * .42:.0f},{y:.0f} Q{x:.0f},{y + 10:.0f} {x + w * .42:.0f},{y:.0f}" fill="none" stroke="{{hairsh}}" stroke-width="6" stroke-linecap="round"/>'
+        return out
+    Bk['locs'] = ''.join(loc(x, 320, x + dx, 900 + dy, 62) for x, dx, dy in
+                         [(424, -30, 10), (482, -14, 60), (1010, 16, 50), (1070, 30, 0)])
+    Bk['locs'] = flat(smooth(grow(HEAD, 34) & (Y < 430), 8)) + Bk['locs']
+    F['locs'] = (paint(smooth(grow(HEAD, 36) & above(LONG_LINE), 6))
+                 + loc(520, 330, 486, 880, 58) + loc(1040, 330, 1084, 860, 58)
+                 + '<path d="M806,206 L806,248" stroke="{hairsh}" stroke-width="10" stroke-linecap="round"/>')
+
+    # Twists: short two-strand twists packed over the crown, pointing up and out.
+    tw = ''
+    spots = []
+    for cy, rx, ry, n in [(380, 330, 250, 14), (360, 250, 210, 11), (350, 150, 190, 7), (340, 40, 175, 2)]:
+        for i in range(n):
+            t = math.pi * (0.03 + 0.94 * i / max(1, n - 1))
+            spots.append((748 - rx * math.cos(t), cy - ry * math.sin(t)))
+    spots = [(x, y) for x, y in spots if y < 250 or x < 500 or x > 1010]
+    spots.sort(key=lambda p: p[1])
+    for x, y in spots:
+        ang = 0.45 * (math.degrees(math.atan2(y - 560, x - 748)) + 90)
+        fill = '{hairsh}' if x < 540 else '{hair}'
+        tw += (f'<g transform="rotate({ang:.0f} {x:.0f} {y:.0f})"><rect x="{x - 26:.0f}" y="{y - 52:.0f}" width="52" height="104" rx="26" fill="{fill}"/>'
+               f'<path d="M{x - 18:.0f},{y - 28:.0f} L{x + 18:.0f},{y - 10:.0f} M{x - 18:.0f},{y + 6:.0f} L{x + 18:.0f},{y + 24:.0f}" stroke="{{hairsh}}" stroke-width="7" stroke-linecap="round"/></g>')
+    F['twists'] = paint(grow(HEAD, 16) & above(SHORT_LINE)) + tw
+
+    # Mohawk: a crest of spikes along the top, faded sides.
+    crest = smooth(grow(HEAD, 20) & (X > 650) & (X < 920) & (Y < 260), 6)
+    for x0, h in [(670, 120), (730, 170), (790, 190), (850, 160), (905, 110)]:
+        crest |= poly([(x0 - 44, 200), (x0 + 6, 160 - h), (x0 + 48, 200)])
+    F['mohawk'] = (f'<path d="{trace(smooth(short_cap(8), 3))}" fill="{{hair}}" opacity="0.35"/>'
+                   + paint(smooth(crest, 5)))
+
+    # Side part: neat top with a soft wave swept across the forehead.
+    wave = poly(curve((480, 330), (520, 180), (700, 160)) + curve((700, 160), (1000, 150), (1050, 300))
+                + curve((1050, 300), (900, 250), (760, 300)) + curve((760, 300), (640, 340), (560, 290)) + [(500, 340)])
+    F['sidepart'] = (paint((top_volume(34, 14) & above(SHORT_LINE)) | smooth(wave, 10))
+                     + '<path d="M600,170 Q620,220 640,250" fill="none" stroke="{hairsh}" stroke-width="12" stroke-linecap="round"/>')
+
+    # Pixie: close-cropped with a wispy fringe flicking to the side.
+    fringe = poly([(470, 300), (520, 210), (700, 180), (1000, 220), (1046, 300), (980, 300), (940, 350), (880, 300),
+                   (820, 380), (760, 310), (690, 390), (640, 300), (560, 330)])
+    F['pixie'] = paint((grow(HEAD, 18) & above(SHORT_LINE)) | smooth(fringe, 4))
+
+    # Mullet: short on top, long at the back.
+    F['mullet'] = paint(top_volume(30, 14) & above(SHORT_LINE))
+    Bk['mullet'] = flat(smooth(poly([(410, 360), (1086, 360), (1100, 760), (1060, 900), (440, 900), (400, 760)]), 30) & ~HEAD)
+
+    # Balding: hair only round the sides, shine on top.
+    F['balding'] = (paint(short_cap(14) & ((Y > 300) | (X < 500) | (X > 1020)))
+                    + '<path d="M650,190 Q760,150 860,170" fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round" opacity="0.25"/>')
+
+    # Coily: short, dense natural hair with a soft bumpy outline.
+    cm = grow(HEAD, 22) & above(SHORT_LINE)
+    for a in np.linspace(-math.pi - 0.25, 0.25, 30):
+        cm |= circle(748 + 330 * math.cos(a), 470 + 340 * math.sin(a), 22) & (Y < 440)
+    cm = smooth(cm & grow(HEAD, 40), 3)
+    spk = ''.join(f'<path d="M{x},{y} q12,-14 24,0" fill="none" stroke="{{hairsh}}" stroke-width="7" stroke-linecap="round" opacity="0.7"/>'
+                  for x, y in [(560, 230), (640, 180), (720, 160), (800, 165), (880, 185), (960, 230), (600, 290), (700, 230), (820, 220), (930, 280), (520, 300), (1000, 290)])
+    F['coily'] = paint(cm) + spk
+    return F, Bk
+
+
+ORDER2 = ['ponytail', 'locs', 'twists', 'mohawk', 'sidepart', 'pixie', 'mullet', 'balding', 'coily']
 ORDER = ['bald', 'buzz', 'swoop', 'curly', 'bun', 'long', 'crop', 'afro', 'puffs', 'bob', 'braids']
 
 
+CXH = 780  # hats centre slightly toward the face, which turns right
+
+
+def arc(yc, sag, hw=340):
+    """y of a band edge that wraps the head: lowest at the front centre."""
+    return yc - sag * ((X - CXH) / hw) ** 2
+
+
+# hats are rounder than hair: shade a crescent on the left, as if lit from the upper right
+HATSIDE = (((X - 860) / 400.0) ** 2 + ((Y - 520) / 640.0) ** 2) > 1
+HATSIDE &= X < 800
+
+
+def lit(mask, fill, shade, r=3):
+    return (f'<path d="{trace(mask)}" fill="{fill}"/>'
+            f'<path d="{trace(smooth(mask & HATSIDE, r))}" fill="{shade}"/>')
+
+
+def pompom(cx, cy, r, edge=None):
+    ring = f' stroke="{edge}" stroke-width="7"' if edge else ''
+    return (f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="#F2F4F3"{ring}/>'
+            f'<path d="M{cx - r * .55:.0f},{cy - r * .83:.0f} A{r},{r} 0 0 0 {cx - r * .55:.0f},{cy + r * .83:.0f} '
+            f'A{r * 1.1:.0f},{r * 1.1:.0f} 0 0 1 {cx - r * .55:.0f},{cy - r * .83:.0f}Z" fill="#D9DFDD"/>')
+
+
 def cap():
-    """Baseball cap grown from the head, so it covers any hair under it."""
-    capline = curve((300, 300), (800, 238), (1200, 262))
-    crown = smooth(grow(HEAD, 56) & above(capline), 4)
-    out = (f'<path d="{trace(crown)}" fill="{{c3}}"/>'
-           f'<path d="{trace(smooth(crown & SIDE, 3))}" fill="{{c3sh}}"/>')
-    # seams on the crown and a button on top
-    out += '<path d="M770,96 Q690,170 640,262 M770,96 Q860,170 900,250" fill="none" stroke="{c3sh}" stroke-width="9" stroke-linecap="round" opacity="0.7"/>'
-    out += '<circle cx="770" cy="100" r="20" fill="{c3sh}"/>'
-    # brim: a band across the forehead, longer on the lit side
-    out += '<path d="M500,276 Q800,218 1120,246 Q1158,266 1132,298 Q800,270 500,310 Q470,292 500,276Z" fill="{c3sh}"/>'
-    out += '<path d="M540,280 Q800,236 1100,258" fill="none" stroke="{c3}" stroke-width="10" stroke-linecap="round" opacity="0.6"/>'
+    """Baseball cap: six-panel crown grown from the head, brim projecting toward the face."""
+    crown = smooth(grow(HEAD, 40) & (Y < arc(292, 34)), 6)
+    out = lit(crown, '{c3}', '{c3sh}')
+    out += ('<path d="M790,86 Q700,150 650,276 M790,86 Q880,150 930,270" fill="none" stroke="{c3sh}" '
+            'stroke-width="9" stroke-linecap="round" opacity="0.6"/>')
+    out += '<circle cx="790" cy="90" r="22" fill="{c3sh}"/>'
+    # front panel highlight
+    out += '<path d="M720,150 Q790,120 860,150" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity="0.18"/>'
+    # brim: visible top surface, longer on the side the face turns to
+    brim = smooth(poly(curve((520, 262), (800, 312), (1150, 262))
+                       + curve((1150, 262), (1200, 300), (1130, 340))
+                       + curve((1130, 340), (820, 400), (530, 312))
+                       + [(505, 290)]), 6)
+    shadow = smooth(poly(curve((560, 300), (820, 390), (1080, 330)) + curve((1080, 330), (820, 430), (570, 330))), 6)
+    out += f'<path d="{trace(shadow)}" fill="#000000" opacity="0.14"/>'
+    out += f'<path d="{trace(brim)}" fill="{{c3sh}}"/>'
+    top = smooth(brim & (Y < arc(318, 40, 380)) , 4)
+    out += f'<path d="{trace(top)}" fill="{{c3}}"/>'
     return out
 
 
 def beanie():
-    """Knitted beanie grown from the head, with a folded cuff and a pompom."""
-    dome = smooth(grow(HEAD, 58) & (Y < 300), 6)
-    cuff = smooth(grow(HEAD, 66) & (Y >= 250) & (Y < 345), 8)
-    out = (f'<path d="{trace(dome)}" fill="{{c3}}"/>'
-           f'<path d="{trace(smooth(dome & SIDE, 3))}" fill="{{c3sh}}"/>')
-    # knit ribs on the dome
-    for x in range(540, 1060, 64):
-        out += f'<path d="M{x},{120 if 640 < x < 960 else 170} L{x + 6},262" stroke="{{c3sh}}" stroke-width="8" stroke-linecap="round" opacity="0.45"/>'
-    out += (f'<path d="{trace(cuff)}" fill="{{c3sh}}"/>'
-            '<circle cx="760" cy="64" r="58" fill="#F2F4F3"/>')
+    """Knitted beanie: dome plus a ribbed cuff that wraps the head, pompom on top."""
+    dome = smooth(grow(HEAD, 40) & (Y < arc(262, 40)), 6)
+    cuff = smooth(grow(HEAD, 48) & (Y >= arc(236, 40)) & (Y < arc(338, 46)), 8)
+    out = lit(dome, '{c3}', '{c3sh}')
+    for x in range(520, 1080, 56):
+        top = 150 if 620 < x < 980 else 196
+        out += (f'<path d="M{x},{top} Q{x + (x - CXH) * .06:.0f},{(top + 250) / 2:.0f} {x + (x - CXH) * .1:.0f},{arc(244, 40)[0, 0] * 0 + 240 - 40 * ((x - CXH) / 340) ** 2:.0f}" '
+                'fill="none" stroke="{c3sh}" stroke-width="8" stroke-linecap="round" opacity="0.35"/>')
+    out += lit(cuff, '{c3}', '{c3sh}')
+    # cuff ribs and the fold line
+    for x in range(482, 1100, 46):
+        t = 240 - 40 * ((x - CXH) / 340) ** 2
+        b = 334 - 46 * ((x - CXH) / 340) ** 2
+        out += f'<path d="M{x},{t + 14:.0f} L{x},{b - 10:.0f}" stroke="{{c3sh}}" stroke-width="8" stroke-linecap="round" opacity="0.3"/>'
+    out += f'<path d="{trace(smooth(cuff & ~(Y > arc(250, 40)), 2))}" fill="#000000" opacity="0.12"/>'
+    out += pompom(800, 92, 62, '{c3sh}')
     return out
 
 
 def santa():
-    """Santa hat: the cone flops to the right; the fur band covers any hairstyle."""
-    cone = smooth(poly(curve((380, 300), (470, 30), (820, 34)) + curve((820, 34), (1060, 40), (1180, 236)) + [(1120, 300)]), 8)
-    band = smooth(grow(HEAD, 64) & (Y >= 232) & (Y < 334), 10)
-    out = (f'<path d="{trace(cone)}" fill="#D63A2F"/>'
-           f'<path d="{trace(smooth(cone & SIDE, 3))}" fill="#A8281F"/>'
-           '<circle cx="1186" cy="250" r="56" fill="#F2F4F3"/>'
-           f'<path d="{trace(band)}" fill="#F2F4F3"/>'
-           f'<path d="{trace(smooth(band & SIDE, 3))}" fill="#DDE2E0"/>')
+    """Santa hat: the cone flops over to the right and hangs beside the head; fluffy fur band."""
+    cone = smooth(poly(curve((430, 290), (440, 20), (820, 22))
+                       + curve((820, 22), (1230, 14), (1222, 404))
+                       + [(1190, 436), (1100, 424)]
+                       + curve((1100, 424), (1060, 230), (930, 205))
+                       + [(1000, 260), (1040, 300)]), 8)
+    dome = smooth(grow(HEAD, 40) & (Y < 300), 6)
+    tail = smooth(cone & ~dome & (X > 1010) & (Y > 120), 4)
+    out = lit(cone, '#D63A2F', '#A8281F')
+    out += f'<path d="{trace(tail)}" fill="#B8302A"/>'
+    out += '<path d="M960,150 Q1130,160 1150,380" fill="none" stroke="#E5554A" stroke-width="12" stroke-linecap="round" opacity="0.6"/>'
+    out += pompom(1162, 448, 64)
+    band = grow(HEAD, 44) & (Y >= arc(232, 40)) & (Y < arc(318, 44))
+    for x in range(450, 1100, 40):  # fluffy edges
+        yb = 318 - 44 * ((x - CXH) / 340) ** 2
+        yt = 232 - 40 * ((x - CXH) / 340) ** 2
+        band |= circle(x, yb, 24) | circle(x + 20, yt, 20)
+    band = smooth(band & grow(HEAD, 62), 4)
+    out += f'<path d="{trace(band)}" fill="#F2F4F3"/>'
+    out += f'<path d="{trace(smooth(band & (Y > arc(292, 44)), 3))}" fill="#E2E7E5"/>'
+    return out
+
+
+def tiara():
+    """Tiara: a gold band that follows the curve of the head with five peaks; sits on the hair."""
+    c, hw = CXH + 10, 280
+    yb = lambda x: 262 - 44 * ((x - c) / hw) ** 2
+    peaks = [(-1.0, 50), (-.62, 96), (-.28, 134), (0, 196), (.28, 134), (.62, 96), (1.0, 50)]
+    pts = []
+    for i, (t, h) in enumerate(peaks):
+        x = c + t * hw
+        if i:
+            xm = (pts[-1][0] + x) / 2
+            pts.append((xm, yb(xm) - 22))
+        pts.append((x, yb(x) - h))
+    crown = smooth(poly(pts + [(c + hw + 8, yb(c + hw) + 30)] + [(x, yb(x) + 42) for x in np.linspace(c + hw, c - hw, 20)] + [(c - hw - 8, yb(c - hw) + 30)]), 3)
+    band = smooth(poly([(x, yb(x) - 8) for x in np.linspace(c - hw - 6, c + hw + 6, 24)]
+                       + [(x, yb(x) + 42) for x in np.linspace(c + hw + 6, c - hw - 6, 24)]), 3)
+    out = lit(crown, '#F5C518', '#C99D0C')
+    out += f'<path d="{trace(band)}" fill="#E0AE10"/>'
+    out += f'<path d="{trace(smooth(band & HATSIDE, 2))}" fill="#B88A08"/>'
+    for t, h in peaks:  # gems at the tips
+        x = c + t * hw
+        r = 32 if t == 0 else 21 if abs(t) < .5 else 15
+        col = '#D00060' if t == 0 else '#01BEF6' if abs(t) < .5 else '#7E22CE'
+        out += f'<circle cx="{x:.0f}" cy="{yb(x) - h + r + 18:.0f}" r="{r}" fill="{col}"/>'
+        out += f'<circle cx="{x - r * .35:.0f}" cy="{yb(x) - h + r * .65 + 18:.0f}" r="{max(3, r * .3):.0f}" fill="#FFFFFF" opacity="0.7"/>'
+    for x in np.linspace(c - hw + 18, c + hw - 18, 13):
+        out += f'<circle cx="{x:.0f}" cy="{yb(x) + 17:.0f}" r="11" fill="#FFF3E6"/>'
+    return out
+
+
+def hijab():
+    """Hijab: wraps the head and drapes over the shoulders, open around the face."""
+    drape = poly(curve((430, 520), (380, 760), (450, 920)) + curve((450, 920), (775, 1010), (1100, 920)) + curve((1100, 920), (1150, 760), (1080, 520)))
+    outer = smooth(grow(HEAD, 54) | drape, 12)
+    opening = smooth(poly(curve((552, 306), (800, 196), (1046, 306)) + [(1050, 600)]
+                          + curve((1050, 600), (1000, 796), (800, 804))
+                          + curve((800, 804), (600, 796), (548, 600))), 6)
+    scarf = outer & ~opening
+    out = lit(scarf, '{c3}', '{c3sh}', 4)
+    # under-scarf edge around the face, a chin wrap and a fold on the shaded side
+    out += ('<path d="M549,440 L552,306 Q800,196 1046,306 L1049,440" fill="none" stroke="{c3sh}" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>'
+            '<path d="M560,760 Q800,900 1080,690" fill="none" stroke="{c3sh}" stroke-width="12" stroke-linecap="round" opacity="0.55"/>'
+            '<path d="M470,560 Q470,760 560,930" fill="none" stroke="{c3sh}" stroke-width="12" stroke-linecap="round" opacity="0.45"/>'
+            '<path d="M760,90 Q960,110 1040,240" fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" opacity="0.14"/>')
     return out
 
 
 if __name__ == '__main__':
     F, Bk = build()
-    F = {k: F[k] for k in ORDER}  # fixed order keeps share codes stable
-    json.dump({'front': F, 'back': Bk, 'tall': ['swoop', 'curly', 'bun', 'afro', 'puffs', 'crop'], 'cap': cap(), 'beanie': beanie(), 'santa': santa()}, open('hair3.json', 'w'))
+    F2, Bk2 = build2()
+    F.update(F2); Bk.update(Bk2)
+    F = {k: F[k] for k in ORDER + ORDER2}  # fixed order keeps share codes stable
+    json.dump({'front': F, 'back': Bk, 'tall': ['swoop', 'curly', 'bun', 'afro', 'puffs', 'crop', 'mohawk', 'twists', 'sidepart'], 'cap': cap(), 'beanie': beanie(), 'santa': santa(), 'tiara': tiara(), 'hijab': hijab()}, open('hair3.json', 'w'))
     print({k: len(v) for k, v in F.items()})

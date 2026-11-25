@@ -37,11 +37,16 @@ HAIR = {
     'ginger': ('#C2622D', '#9E4B1F'),
     'grey': ('#B9BCBD', '#959899'),
     'cyan': ('#01BEF6', '#0098C7'),
+    'platinum': ('#ECE3CC', '#CBBE9E'),
+    'pink': ('#F27BB0', '#D2558F'),
+    'purple': ('#8B5CF6', '#6A3FD1'),
+    'blue': ('#2F6FE0', '#1F52AE'),
+    'auburn': ('#8C2F1E', '#6E2214'),
 }
 CLOTH = {
     'green': ('#0A9875', '#057058'),
-    'sky': ('#54C0FF', '#163C52'),
-    'brown': ('#573F33', '#48352C'),
+    'sky': ('#54C0FF', '#2E8FCB'),
+    'brown': ('#573F33', '#3B2A21'),
     'denim': ('#3C6FA6', '#2A527D'),
     'red': ('#D63A2F', '#A8281F'),
     'yellow': ('#F5C518', '#C99D0C'),
@@ -145,7 +150,8 @@ FACIAL = {
 _H = json.load(open('hair3.json'))
 HAIR_FRONT, HAIR_BACK, TALL = _H['front'], _H['back'], _H['tall']
 CAP_V3 = _H['cap']
-BEANIE_V3, SANTA_V3 = _H['beanie'], _H['santa']
+BEANIE_V3, SANTA_V3, TIARA_V3 = _H['beanie'], _H['santa'], _H['tiara']
+HIJAB_V3 = _H['hijab']
 
 # ---------------------------------------------------------------- headwear
 HATS = {
@@ -205,6 +211,8 @@ def frames(kind):
 HATS['cap'] = CAP_V3
 HATS['beanie'] = BEANIE_V3
 HATS['santa'] = SANTA_V3
+HATS['tiara'] = TIARA_V3
+HATS['hijab'] = HIJAB_V3
 
 GLASSES = {k: frames(k) for k in ('none', 'round', 'square', 'shades', 'masquerade')}
 
