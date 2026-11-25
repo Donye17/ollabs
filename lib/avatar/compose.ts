@@ -12,11 +12,13 @@ type Collection = {
     name: string;
     size: number;
     headClip: string;
+    sideClip: string;
     base: { limbs: string; head: string };
     palettes: { skin: Record<string, Pair>; hair: Record<string, Pair>; cloth: Record<string, Pair> };
     backgrounds: Record<string, string | null>;
     parts: Record<PartKey, Record<string, string>>;
     tallHair: string[];
+    coversHair?: string[];
     ink: string;
 };
 
@@ -134,9 +136,12 @@ export function composeAvatar(c: AvatarConfig, opts: { crop?: Crop; transparent?
     const [c1, c1sh] = palettes.cloth[c.color1] ?? palettes.cloth.green;
     const [c2, c2sh] = palettes.cloth[c.color2] ?? palettes.cloth.brown;
     const hatOn = c.hat !== 'none';
-    // A hat sits where tall hair would be: fall back to a buzz cut underneath.
-    const hairFront = hatOn && DUMMYS.tallHair.includes(c.hair) ? 'buzz' : c.hair;
-    const hairBack = hatOn && c.hair === 'curly' ? '' : parts.hairBack[c.hair] ?? '';
+    // Headwear like a hijab covers the hair entirely. Other hats sit where tall
+    // hair would be, so tall styles fall back to a buzz cut underneath.
+    const covers = (DUMMYS.coversHair ?? []).includes(c.hat);
+    const tall = hatOn && DUMMYS.tallHair.includes(c.hair);
+    const hairFront = covers ? '' : tall ? 'buzz' : c.hair;
+    const hairBack = covers || tall ? '' : parts.hairBack[c.hair] ?? '';
     const bg = opts.transparent ? null : backgrounds[c.bg];
     const clipId = opts.clipId ?? 'headclip';
 
@@ -155,7 +160,9 @@ export function composeAvatar(c: AvatarConfig, opts: { crop?: Crop; transparent?
         (parts.glasses[c.glasses] ?? '').replace('{eyes_again}', parts.eyes[c.eyes] ?? ''),
     ]
         .join('')
-        .replace(/url\(#headclip\)/g, `url(#${clipId})`);
+        .replace(/url\(#headclip\)/g, `url(#${clipId})`)
+        .replace(/url\(#sideclip\)/g, `url(#${clipId}-s)`)
+        .replace(/url\(#leftclip\)/g, `url(#${clipId}-l)`);
 
     const colors: Record<string, string> = {
         '{skin}': skin, '{skinsh}': skinsh, '{hair}': hair, '{hairsh}': hairsh,
@@ -165,7 +172,9 @@ export function composeAvatar(c: AvatarConfig, opts: { crop?: Crop; transparent?
 
     return (
         `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${CROPS[opts.crop ?? 'full']}">` +
-        `<defs><clipPath id="${clipId}"><path d="${DUMMYS.headClip}"/></clipPath></defs>${filled}</svg>`
+        `<defs><clipPath id="${clipId}"><path d="${DUMMYS.headClip}"/></clipPath>` +
+        `<clipPath id="${clipId}-s"><path d="${DUMMYS.sideClip}"/></clipPath>` +
+        `<clipPath id="${clipId}-l"><rect x="-200" y="-200" width="705" height="1900"/></clipPath></defs>${filled}</svg>`
     );
 }
 

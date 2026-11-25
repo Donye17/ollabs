@@ -28,6 +28,7 @@ const COPY = {
     colorsHair: 'Hair color',
     colorsTop: 'Top color',
     colorsBottom: 'Bottom color',
+    headwearColor: 'Hijab and cap color',
 };
 
 type Tab = { id: string; label: string; part?: keyof AvatarConfig; crop: Crop; colors?: { key: keyof AvatarConfig; label: string; palette: 'skin' | 'hair' | 'cloth' }[] };
@@ -43,7 +44,7 @@ const TABS: Tab[] = [
         { key: 'color1', label: COPY.colorsTop, palette: 'cloth' },
         { key: 'color2', label: COPY.colorsBottom, palette: 'cloth' },
     ] },
-    { id: 'hat', label: 'Hat', part: 'hat', crop: 'head' },
+    { id: 'hat', label: 'Headwear', part: 'hat', crop: 'head', colors: [{ key: 'color1', label: COPY.headwearColor, palette: 'cloth' }] },
     { id: 'glasses', label: 'Glasses', part: 'glasses', crop: 'head' },
     { id: 'bg', label: 'Background', part: 'bg', crop: 'full' },
 ];
@@ -56,6 +57,7 @@ const LABELS: Record<string, string> = {
     grin: 'Grin', flat: 'Flat', oh: 'Oh', smirk: 'Smirk', cap: 'Cap', beanie: 'Beanie', santa: 'Santa', tiara: 'Carnival tiara',
     round: 'Round', square: 'Square', shades: 'Shades', masquerade: 'Carnival mask',
     paper: 'Paper', cyan: 'Cyan', sage: 'Sage', sun: 'Sun', blush: 'Blush',
+    crop: 'Crop', afro: 'Afro', puffs: 'Puffs', bob: 'Bob', braids: 'Braids', hijab: 'Hijab', dress: 'Dress',
 };
 const label = (k: string) => LABELS[k] ?? k.charAt(0).toUpperCase() + k.slice(1);
 

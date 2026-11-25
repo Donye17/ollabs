@@ -65,6 +65,9 @@ OUTFITS = {
                   + P(D['leg_skin'], '{skin}') + P(D['leg_skin_dark'], '{skinsh}')
                   + P(D['shorts'], '{c2}') + P(D['shorts_dark'], '{c2sh}') + P(D['shoes'], '{ink}')
                   + P(D['tee'], '{c1}') + P(D['tee_dark'], '{c1sh}'),
+    'dress': P(D['arm_skin'], '{skin}') + P(D['arm_skin_dark'], '{skinsh}')
+             + P(D['dress_legs'], '{skin}') + P(D['dress_legs_dark'], '{skinsh}') + P(D['shoes'], '{ink}')
+             + P(D['dress'], '{c1}') + P(D['dress_dark'], '{c1sh}') + P(D['dress_belt'], '{c2}'),
     'jersey': P(D['arm_skin'], '{skin}') + P(D['arm_skin_dark'], '{skinsh}')
               + P(D['leg_skin'], '{skin}') + P(D['leg_skin_dark'], '{skinsh}')
               + P(D['shorts'], '{ink}') + P(D['shoes'], '{ink}')
@@ -138,44 +141,18 @@ FACIAL = {
     'goatee': f'<path d="M{CX - 60},{MY + 50} Q{CX},{MY + 36} {CX + 60},{MY + 50} Q{CX + 50},{MY + 140} {CX},{MY + 146} Q{CX - 50},{MY + 140} {CX - 60},{MY + 50}Z" fill="{{hair}}"/>',
 }
 
-# ---------------------------------------------------------------- hair
-def curls_front():
-    import math
-    s = ''
-    for i in range(13):
-        t = math.pi * (0.04 + 0.92 * i / 12)
-        x = CX - 10 - 360 * math.cos(t)
-        y = 300 - 230 * math.sin(t)
-        s += f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{88 if 2 < i < 10 else 72}" fill="{{hair}}"/>'
-    return s
-
-HAIR_BACK = {
-    'curly': f'<ellipse cx="{CX - 10}" cy="330" rx="430" ry="300" fill="{{hairsh}}"/>',
-    'long': f'<path d="M380,260 Q380,120 {CX},90 Q1110,110 1110,280 L1120,980 Q900,1010 {CX},1000 Q660,1010 470,980Z" fill="{{hairsh}}"/>',
-}
-HAIR_FRONT = {
-    'bald': '',
-    'buzz': (f'<g clip-path="url(#headclip)"><path d="M380,90 L1120,90 L1120,250 Q{CX},190 380,300Z" fill="{{hair}}"/>'
-             '<path d="M380,90 L505,90 L505,270 L380,300Z" fill="{{hairsh}}"/></g>'),
-    'swoop': (f'<g clip-path="url(#headclip)"><path d="M380,90 L1120,90 L1120,250 Q{CX},200 380,320Z" fill="{{hairsh}}"/></g>'
-              f'<path d="M560,250 Q560,110 760,70 Q900,40 1010,110 Q1060,150 1040,240 Q960,170 860,190 Q720,215 560,250Z" fill="{{hair}}"/>'
-              f'<path d="M700,120 Q820,80 960,120 M690,170 Q820,130 1000,170" fill="none" stroke="{{hairsh}}" stroke-width="14" stroke-linecap="round"/>'),
-    'curly': curls_front(),
-    'bun': (f'<circle cx="{CX - 10}" cy="70" r="92" fill="{{hair}}"/>'
-            f'<g clip-path="url(#headclip)"><path d="M380,90 L1120,90 L1120,265 Q{CX},215 380,320Z" fill="{{hair}}"/>'
-            '<path d="M380,90 L505,90 L505,290 L380,320Z" fill="{{hairsh}}"/></g>'),
-    'long': (f'<g clip-path="url(#headclip)"><path d="M380,90 L1120,90 L1120,330 Q1000,200 {CX},180 Q610,200 505,360 L380,420Z" fill="{{hair}}"/>'
-             '<path d="M380,90 L505,90 L505,360 L380,420Z" fill="{{hairsh}}"/></g>'
-             f'<path d="M{CX},120 L{CX - 4},200" stroke="{{hairsh}}" stroke-width="12" stroke-linecap="round"/>'),
-}
+# ---------------------------------------------------------------- hair (second pass)
+from hair2 import HAIR_BACK, HAIR_FRONT, TALL
 
 # ---------------------------------------------------------------- headwear
 HATS = {
     'none': '',
-    'cap': (f'<g clip-path="url(#headclip)"><path d="M380,60 L1120,60 L1120,268 Q{CX},235 380,300Z" fill="{{c1}}"/>'
-            '<path d="M380,60 L505,60 L505,285 L380,300Z" fill="{{c1sh}}"/></g>'
-            f'<path d="M560,265 Q{CX},228 1100,262 Q1130,300 1080,312 Q{CX},286 560,300Z" fill="{{c1sh}}"/>'
-            f'<circle cx="{CX}" cy="128" r="16" fill="{{c1sh}}"/>'),
+    'cap': (f'<g clip-path="url(#headclip)"><path d="M380,40 L1120,40 L1120,262 Q{CX},228 380,292Z" fill="{{c1}}"/></g>'
+            '<g clip-path="url(#sideclip)"><path d="M380,40 L1120,40 L1120,262 Q804,228 380,292Z" fill="{c1sh}"/></g>'
+            f'<path d="M460,280 Q420,100 760,66 Q1090,80 1075,262 Q{CX},226 460,280Z" fill="{{c1}}" opacity="0"/>'
+            '<path d="M520,262 Q800,214 1112,248 Q1140,268 1118,292 Q800,262 520,300 Q500,282 520,262Z" fill="{c1sh}"/>'
+            '<path d="M560,264 Q800,226 1090,254" fill="none" stroke="{c1}" stroke-width="10" stroke-linecap="round"/>'
+            f'<circle cx="770" cy="150" r="18" fill="{{c1sh}}"/>'),
     'beanie': (f'<path d="M420,300 Q410,110 {CX},90 Q1090,105 1080,290Z" fill="{{c1}}"/>'
                f'<path d="M420,300 Q410,110 {CX - 140},100 Q520,170 505,300Z" fill="{{c1sh}}"/>'
                f'<rect x="405" y="250" width="690" height="92" rx="40" fill="{{c1sh}}"/>'
@@ -184,6 +161,11 @@ HATS = {
               f'<path d="M430,270 Q520,60 {CX - 60},48 Q560,140 520,280Z" fill="#A8281F"/>'
               f'<circle cx="1160" cy="250" r="58" fill="#F2F4F3"/>'
               f'<rect x="400" y="235" width="700" height="96" rx="46" fill="#F2F4F3"/>'),
+    'hijab': ('<path fill-rule="evenodd" fill="{c1}" d="M418,340 Q400,80 750,58 Q1100,78 1084,340 L1098,700 Q1120,880 985,940 L515,940 Q390,880 408,700Z '
+              'M552,306 Q800,196 1046,306 L1050,610 Q996,790 800,800 Q600,790 548,610Z"/>'
+              '<g clip-path="url(#leftclip)"><path fill-rule="evenodd" fill="{c1sh}" d="M418,340 Q400,80 750,58 Q1100,78 1084,340 L1098,700 Q1120,880 985,940 L515,940 Q390,880 408,700Z '
+              'M552,306 Q800,196 1046,306 L1050,610 Q996,790 800,800 Q600,790 548,610Z"/></g>'
+              '<path d="M552,306 Q800,196 1046,306" fill="none" stroke="{c1sh}" stroke-width="14" stroke-linecap="round"/>'),
     'tiara': (
         '<path d="M470,300 L520,170 L600,250 L680,120 L760,240 L804,60 L848,240 L928,120 L1008,250 L1088,170 L1138,300Z" fill="#F5C518"/>'
         '<path d="M470,300 L520,170 L600,250 L620,300Z" fill="#C99D0C"/>'
