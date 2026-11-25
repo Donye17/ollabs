@@ -142,30 +142,33 @@ FACIAL = {
 }
 
 # ---------------------------------------------------------------- hair (second pass)
-from hair2 import HAIR_BACK, HAIR_FRONT, TALL
+_H = json.load(open('hair3.json'))
+HAIR_FRONT, HAIR_BACK, TALL = _H['front'], _H['back'], _H['tall']
+CAP_V3 = _H['cap']
+BEANIE_V3, SANTA_V3 = _H['beanie'], _H['santa']
 
 # ---------------------------------------------------------------- headwear
 HATS = {
     'none': '',
-    'cap': (f'<g clip-path="url(#headclip)"><path d="M380,40 L1120,40 L1120,262 Q{CX},228 380,292Z" fill="{{c1}}"/></g>'
-            '<g clip-path="url(#sideclip)"><path d="M380,40 L1120,40 L1120,262 Q804,228 380,292Z" fill="{c1sh}"/></g>'
-            f'<path d="M460,280 Q420,100 760,66 Q1090,80 1075,262 Q{CX},226 460,280Z" fill="{{c1}}" opacity="0"/>'
-            '<path d="M520,262 Q800,214 1112,248 Q1140,268 1118,292 Q800,262 520,300 Q500,282 520,262Z" fill="{c1sh}"/>'
-            '<path d="M560,264 Q800,226 1090,254" fill="none" stroke="{c1}" stroke-width="10" stroke-linecap="round"/>'
-            f'<circle cx="770" cy="150" r="18" fill="{{c1sh}}"/>'),
-    'beanie': (f'<path d="M420,300 Q410,110 {CX},90 Q1090,105 1080,290Z" fill="{{c1}}"/>'
-               f'<path d="M420,300 Q410,110 {CX - 140},100 Q520,170 505,300Z" fill="{{c1sh}}"/>'
-               f'<rect x="405" y="250" width="690" height="92" rx="40" fill="{{c1sh}}"/>'
+    'cap': (f'<g clip-path="url(#headclip)"><path d="M380,40 L1120,40 L1120,262 Q{CX},228 380,292Z" fill="{{c3}}"/></g>'
+            '<g clip-path="url(#sideclip)"><path d="M380,40 L1120,40 L1120,262 Q804,228 380,292Z" fill="{c3sh}"/></g>'
+            f'<path d="M460,280 Q420,100 760,66 Q1090,80 1075,262 Q{CX},226 460,280Z" fill="{{c3}}" opacity="0"/>'
+            '<path d="M520,262 Q800,214 1112,248 Q1140,268 1118,292 Q800,262 520,300 Q500,282 520,262Z" fill="{c3sh}"/>'
+            '<path d="M560,264 Q800,226 1090,254" fill="none" stroke="{c3}" stroke-width="10" stroke-linecap="round"/>'
+            f'<circle cx="770" cy="150" r="18" fill="{{c3sh}}"/>'),
+    'beanie': (f'<path d="M420,300 Q410,110 {CX},90 Q1090,105 1080,290Z" fill="{{c3}}"/>'
+               f'<path d="M420,300 Q410,110 {CX - 140},100 Q520,170 505,300Z" fill="{{c3sh}}"/>'
+               f'<rect x="405" y="250" width="690" height="92" rx="40" fill="{{c3sh}}"/>'
                f'<circle cx="{CX}" cy="70" r="58" fill="#F2F4F3"/>'),
     'santa': (f'<path d="M430,270 Q520,60 {CX + 60},40 Q1000,50 1150,230 L1060,280Z" fill="#D63A2F"/>'
               f'<path d="M430,270 Q520,60 {CX - 60},48 Q560,140 520,280Z" fill="#A8281F"/>'
               f'<circle cx="1160" cy="250" r="58" fill="#F2F4F3"/>'
               f'<rect x="400" y="235" width="700" height="96" rx="46" fill="#F2F4F3"/>'),
-    'hijab': ('<path fill-rule="evenodd" fill="{c1}" d="M418,340 Q400,80 750,58 Q1100,78 1084,340 L1098,700 Q1120,880 985,940 L515,940 Q390,880 408,700Z '
+    'hijab': ('<path fill-rule="evenodd" fill="{c3}" d="M418,340 Q400,80 750,58 Q1100,78 1084,340 L1098,700 Q1120,880 985,940 L515,940 Q390,880 408,700Z '
               'M552,306 Q800,196 1046,306 L1050,610 Q996,790 800,800 Q600,790 548,610Z"/>'
-              '<g clip-path="url(#leftclip)"><path fill-rule="evenodd" fill="{c1sh}" d="M418,340 Q400,80 750,58 Q1100,78 1084,340 L1098,700 Q1120,880 985,940 L515,940 Q390,880 408,700Z '
+              '<g clip-path="url(#leftclip)"><path fill-rule="evenodd" fill="{c3sh}" d="M418,340 Q400,80 750,58 Q1100,78 1084,340 L1098,700 Q1120,880 985,940 L515,940 Q390,880 408,700Z '
               'M552,306 Q800,196 1046,306 L1050,610 Q996,790 800,800 Q600,790 548,610Z"/></g>'
-              '<path d="M552,306 Q800,196 1046,306" fill="none" stroke="{c1sh}" stroke-width="14" stroke-linecap="round"/>'),
+              '<path d="M552,306 Q800,196 1046,306" fill="none" stroke="{c3sh}" stroke-width="14" stroke-linecap="round"/>'),
     'tiara': (
         '<path d="M470,300 L520,170 L600,250 L680,120 L760,240 L804,60 L848,240 L928,120 L1008,250 L1088,170 L1138,300Z" fill="#F5C518"/>'
         '<path d="M470,300 L520,170 L600,250 L620,300Z" fill="#C99D0C"/>'
@@ -198,6 +201,10 @@ def frames(kind):
                     f'<path d="M{x - 70},{EYE_Y - 34} L{x - 30},{EYE_Y - 34}" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="12" stroke-linecap="round"/>' for x in (EYE_L, EYE_R))
     bridge = f'<path d="M{EYE_L + 86},{EYE_Y - 10} Q{CX},{EYE_Y - 40} {EYE_R - 86},{EYE_Y - 10}" fill="none" stroke="{{ink}}" stroke-width="14"/>'
     return g + bridge
+
+HATS['cap'] = CAP_V3
+HATS['beanie'] = BEANIE_V3
+HATS['santa'] = SANTA_V3
 
 GLASSES = {k: frames(k) for k in ('none', 'round', 'square', 'shades', 'masquerade')}
 
