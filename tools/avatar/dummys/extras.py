@@ -5,24 +5,26 @@ the first is drawn behind the head (necklaces), the second on top (earrings, hea
 """
 import math
 import numpy as np
-from hair3 import (HEAD, X, Y, grow, smooth, poly, curve, circle, trace, arc, lit, pompom, CXH)
+from hair3 import (HEAD, X, Y, grow, smooth, poly, curve, circle, trace, arc, lit, pompom, CXH, HATSIDE)
+HATSIDE_P = X < 700 - (Y - 20) * 0.1
 
 L = '<!--L-->'
 GOLD, GOLDSH = '#F5C518', '#C99D0C'
 
 # ------------------------------------------------------------------ accessories
-EAR_L, EAR_R, EAR_Y = 446, 1060, 600
+EAR_L, EAR_R, EAR_Y = 462, 1036, 600  # just inside the jawline
 
 
 def hoop(x, y, r):
-    return f'<circle cx="{x}" cy="{y + r}" r="{r}" fill="none" stroke="{GOLD}" stroke-width="10"/>'
+    return (f'<circle cx="{x}" cy="{y}" r="9" fill="{GOLD}"/>'
+            f'<circle cx="{x}" cy="{y + r}" r="{r}" fill="none" stroke="{GOLD}" stroke-width="10"/>')
 
 
 chain_pts = ' '.join(f'{640 + 240 * t:.0f},{812 + 70 * math.sin(math.pi * t):.0f}' for t in np.linspace(0, 1, 13))
 ACCESSORIES = {
     'none': '',
-    'studs': L + f'<circle cx="{EAR_L}" cy="{EAR_Y}" r="15" fill="{GOLD}"/><circle cx="{EAR_R}" cy="{EAR_Y}" r="15" fill="{GOLD}"/>',
-    'hoops': L + hoop(EAR_L, EAR_Y - 6, 34) + hoop(EAR_R, EAR_Y - 6, 34),
+    'studs': L + L + f'<circle cx="{EAR_L}" cy="{EAR_Y}" r="15" fill="{GOLD}"/><circle cx="{EAR_R}" cy="{EAR_Y}" r="15" fill="{GOLD}"/>',
+    'hoops': L + L + hoop(EAR_L, EAR_Y - 6, 34) + hoop(EAR_R, EAR_Y - 6, 34),
     'necklace': (f'<polyline points="{chain_pts}" fill="none" stroke="{GOLD}" stroke-width="7"/>'
                  f'<path d="M760,878 L782,906 L760,934 L738,906Z" fill="{{c3}}" stroke="{GOLDSH}" stroke-width="5"/>'),
     'chain': ''.join(f'<ellipse cx="{640 + 240 * t:.0f}" cy="{816 + 78 * math.sin(math.pi * t):.0f}" rx="16" ry="11" fill="none" stroke="{GOLD}" stroke-width="8" '
@@ -31,8 +33,8 @@ ACCESSORIES = {
         f'<path d="M424,470 Q400,20 760,10 Q1110,20 1092,470" fill="none" stroke="{{ink}}" stroke-width="34" stroke-linecap="round"/>'
         f'<rect x="372" y="400" width="96" height="180" rx="42" fill="{{c3}}"/><rect x="372" y="400" width="40" height="180" rx="20" fill="{{c3sh}}"/>'
         f'<rect x="1046" y="400" width="96" height="180" rx="42" fill="{{c3}}"/><rect x="1046" y="400" width="40" height="180" rx="20" fill="{{c3sh}}"/>'),
-    'hearing_aid': L + (f'<path d="M1062,470 Q1104,470 1100,540 Q1096,600 1066,606" fill="none" stroke="{{c3}}" stroke-width="30" stroke-linecap="round"/>'
-                        f'<circle cx="1060" cy="606" r="14" fill="{{c3sh}}"/>'),
+    'hearing_aid': L + L + (f'<path d="M1044,470 Q1094,470 1090,540 Q1086,600 1040,606" fill="none" stroke="{{c3}}" stroke-width="30" stroke-linecap="round"/>'
+                        f'<circle cx="1040" cy="606" r="14" fill="{{c3sh}}"/>'),
     'bandana': smooth(poly([(600, 800), (920, 800), (870, 860), (760, 930), (650, 860)]), 8),
 }
 ACCESSORIES['bandana'] = (f'<path d="{trace(ACCESSORIES["bandana"])}" fill="{{c3}}"/>'
@@ -53,10 +55,11 @@ PROPS = {
                f'<path d="M{HX - 40},{HY - 70} L{HX + 40},{HY - 70} L{HX + 36},{HY - 24} L{HX - 36},{HY - 24}Z" fill="{{c3}}"/>'
                f'<rect x="{HX - 52}" y="{HY - 130}" width="104" height="26" rx="10" fill="#7A5236"/>'
                f'<path d="M{HX - 14},{HY - 150} q-16,-30 0,-60 M{HX + 18},{HY - 150} q-16,-30 0,-60" fill="none" stroke="#C9CFCC" stroke-width="10" stroke-linecap="round"/>'),
-    'ball': ('<circle cx="1210" cy="1318" r="74" fill="#F2F4F3"/>'
-             '<path d="M1210,1288 L1238,1308 L1228,1342 L1192,1342 L1182,1308Z" fill="#22313B"/>'
-             '<path d="M1210,1288 L1210,1250 M1238,1308 L1272,1294 M1228,1342 L1250,1374 M1192,1342 L1170,1374 M1182,1308 L1148,1294" stroke="#22313B" stroke-width="8"/>'
-             '<path d="M1150,1268 Q1210,1238 1268,1268" fill="none" stroke="#C9CFCC" stroke-width="6" opacity="0.6"/>'),
+    'ball': ('<ellipse cx="1160" cy="1392" rx="96" ry="18" fill="#000000" opacity="0.15"/>'
+             '<circle cx="1160" cy="1300" r="90" fill="#F2F4F3" stroke="#22313B" stroke-width="8"/>'
+             '<path d="M1160,1262 L1196,1288 L1182,1330 L1138,1330 L1124,1288Z" fill="#22313B"/>'
+             '<path d="M1160,1262 L1160,1212 M1196,1288 L1244,1272 M1182,1330 L1212,1372 M1138,1330 L1108,1372 M1124,1288 L1076,1272" stroke="#22313B" stroke-width="8"/>'
+             '<path d="M1102,1240 Q1140,1220 1180,1222" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity="0.8"/>'),
     'flag': (f'<path d="M{HX},{HY + 40} L{HX + 20},560" stroke="#7A5236" stroke-width="16" stroke-linecap="round"/>'
              f'<path d="M{HX + 20},570 Q{HX + 140},530 {HX + 260},580 Q{HX + 330},610 {HX + 380},580 L{HX + 380},790 Q{HX + 300},830 {HX + 240},790 Q{HX + 140},750 {HX + 20},790Z" fill="{{c3}}"/>'
              f'<path d="M{HX + 20},650 Q{HX + 140},610 {HX + 260},660 Q{HX + 330},690 {HX + 380},660 L{HX + 380},710 Q{HX + 300},750 {HX + 240},710 Q{HX + 140},670 {HX + 20},710Z" fill="#F2F4F3"/>'),
@@ -76,7 +79,6 @@ PROPS = {
 }
 
 PROPS = {k: _scale(v, HX, HY, 1.0 if k in ('flag', 'sign', 'balloon', 'guitar', 'ball') else 1.5) for k, v in PROPS.items()}
-PROPS['ball'] = _scale(PROPS['ball'], 1210, 1392, 1.3)
 
 # ------------------------------------------------------------------ pets (sit at the left of the figure)
 DOG_C, DOG_SH = '#C89948', '#A87B32'
@@ -106,7 +108,7 @@ PETS = {
         '<path d="M260,1236 Q320,1258 380,1236" fill="none" stroke="{c3}" stroke-width="14" stroke-linecap="round"/>'),
 }
 
-PETS = {k: (L + _scale(v.replace(L, ''), 300, 1400, 1.8)) if v else '' for k, v in PETS.items()}
+PETS = {k: (L + f'<g transform="translate(-55 0)">{_scale(v.replace(L, ""), 300, 1400, 1.8)}</g>') if v else '' for k, v in PETS.items()}
 
 # ------------------------------------------------------------------ headwear, second batch
 
@@ -116,13 +118,12 @@ def band(top, bot, g, sag_t=40, sag_b=44):
 
 
 def bucket():
-    crown = smooth(grow(HEAD, 30) & (Y < arc(260, 34)) & (Y > 60), 10) | smooth(grow(HEAD, 30) & (Y < arc(260, 34)) & (Y >= 60), 4)
-    crown = smooth(crown & (Y > 70), 8)
-    brim = smooth(poly(curve((330, 330), (380, 230), (500, 236)) + curve((500, 236), (780, 290), (1080, 236))
-                       + curve((1080, 236), (1200, 230), (1240, 330)) + curve((1240, 330), (780, 420), (330, 330))), 8)
-    return (lit(brim, '{c3}', '{c3sh}') + lit(crown, '{c3}', '{c3sh}')
-            + f'<path d="M490,236 Q780,300 1090,236" fill="none" stroke="{{c3sh}}" stroke-width="12" stroke-linecap="round"/>'
-            + f'<path d="M420,320 Q780,400 1150,320" fill="none" stroke="{{c3sh}}" stroke-width="7" stroke-dasharray="4 18" stroke-linecap="round"/>')
+    crown = smooth(grow(HEAD, 40) & (Y < arc(280, 34)) & (Y > 96), 22)
+    brim = smooth(poly(curve((350, 300), (420, 228), (520, 236)) + curve((520, 236), (780, 286), (1060, 236))
+                       + curve((1060, 236), (1170, 228), (1230, 300)) + curve((1230, 300), (780, 410), (350, 300))), 8)
+    return (lit(crown, '{c3}', '{c3sh}') + lit(brim, '{c3}', '{c3sh}')
+            + '<path d="M512,250 Q780,302 1066,250" fill="none" stroke="{c3sh}" stroke-width="14" stroke-linecap="round"/>'
+            + '<path d="M420,318 Q780,396 1160,318" fill="none" stroke="{c3sh}" stroke-width="7" stroke-dasharray="4 18" stroke-linecap="round"/>')
 
 
 def beret():
@@ -140,24 +141,26 @@ def headband():
 
 
 def straw():
-    brim = smooth(poly([(780 + 560 * math.cos(a), 270 + 120 * math.sin(a)) for a in np.linspace(0, 2 * math.pi, 70)]), 4)
-    crown = smooth(grow(HEAD, 24) & (Y < 270) & (Y > 70), 10)
-    s = lit(brim, '#E3B64B', '#C4952F') + lit(crown, '#E3B64B', '#C4952F')
-    s += ''.join(f'<path d="M{780 + 520 * math.cos(a):.0f},{270 + 104 * math.sin(a):.0f} L{780 + 300 * math.cos(a):.0f},{270 + 60 * math.sin(a):.0f}" stroke="#C4952F" stroke-width="6" opacity="0.6"/>'
-                 for a in np.linspace(0, 2 * math.pi, 28, endpoint=False) if math.sin(a) > -0.2)
-    s += f'<path d="{trace(smooth(band(222, 266, 26, 30, 30) & (Y < 270), 3))}" fill="#D63A2F"/>'
-    s += '<path d="M560,120 L600,150 M960,130 L920,160" stroke="#C4952F" stroke-width="8" stroke-linecap="round"/>'
+    brim = smooth(poly([(780 + 470 * math.cos(a), 262 + 92 * math.sin(a)) for a in np.linspace(0, 2 * math.pi, 70)]), 4)
+    crown = smooth(grow(HEAD, 26) & (Y < 262) & (Y > 40), 18)
+    s = lit(brim, '#E3B64B', '#C4952F')
+    s += ''.join(f'<path d="M{780 + 466 * math.cos(a):.0f},{262 + 90 * math.sin(a):.0f} L{780 + 500 * math.cos(a):.0f},{262 + 100 * math.sin(a):.0f}" stroke="#C4952F" stroke-width="7" stroke-linecap="round"/>'
+                 for a in np.linspace(0, 2 * math.pi, 40, endpoint=False) if math.sin(a) > -0.3)
+    s += lit(crown, '#EBC35E', '#C4952F')
+    s += f'<path d="{trace(smooth(crown & (Y > 196), 3))}" fill="#D63A2F"/>'
+    s += '<rect x="880" y="120" width="70" height="58" rx="6" fill="#4C7FC0" transform="rotate(12 915 149)"/>'
+    s += '<path d="M884,126 L944,172 M944,126 L884,172" stroke="#E3B64B" stroke-width="5" transform="rotate(12 915 149)"/>'
     return s
 
 
 def party():
-    cone = poly([(530, 250), (790, -10), (1050, 236)])
-    out = f'<path d="{trace(smooth(cone, 3))}" fill="{{c3}}"/>'
-    for y in (80, 170):
-        w = (y + 10) / 260 * 260 - 18
-        out += f'<path d="M{790 - w:.0f},{y + 24:.0f} L{790 + w:.0f},{y - 12:.0f} L{790 + w + 10:.0f},{y + 24:.0f} L{790 - w + 8:.0f},{y + 60:.0f}Z" fill="#F2F4F3" opacity="0.85"/>'
-    out += f'<path d="M530,250 Q790,280 1050,236" fill="none" stroke="{{c3sh}}" stroke-width="14" stroke-linecap="round"/>'
-    out += pompom(790, -12, 38)
+    cone = smooth(poly([(540, 252), (790, 20), (1040, 238)]), 3)
+    out = f'<path d="{trace(cone)}" fill="{{c3}}"/>'
+    for y0 in (78, 168):  # stripes cut from the cone so they follow its edges
+        out += f'<path d="{trace(cone & (Y > y0) & (Y < y0 + 40) & ~poly([(400, y0 + 60), (1200, y0 - 10), (1200, -100), (400, -100)]) | (cone & (Y >= y0 + 40) & (Y < y0 + 46)) & False)}" fill="#F2F4F3" opacity="0.9"/>'
+    out += f'<path d="{trace(smooth(cone & HATSIDE_P, 2))}" fill="{{c3sh}}" opacity="0.8"/>'
+    out += '<path d="M540,252 Q790,282 1040,238" fill="none" stroke="{c3sh}" stroke-width="14" stroke-linecap="round"/>'
+    out += pompom(790, 22, 34)
     return out
 
 
@@ -175,11 +178,14 @@ def flowers():
 
 
 def headwrap():
-    body = smooth(grow(HEAD, 54) & (Y < arc(320, 50)), 10)
-    knot = smooth(circle(820, 60, 110) | circle(700, 90, 90), 6)
-    return (lit(body | knot, '{c3}', '{c3sh}')
-            + '<path d="M460,300 Q620,160 900,120 M520,330 Q700,230 1060,250 M600,180 Q760,90 980,170" fill="none" stroke="{c3sh}" stroke-width="12" stroke-linecap="round" opacity="0.7"/>'
-            + '<path d="M760,40 Q820,10 880,60" fill="none" stroke="#FFFFFF" stroke-width="10" opacity="0.25" stroke-linecap="round"/>')
+    """Wrapped head scarf: a full dome with a twist crossing at the front and a soft knot on top."""
+    body = smooth((grow(HEAD, 50) | circle(790, 232, 200)) & (Y < arc(318, 48)), 14)
+    out = lit(body, '{c3}', '{c3sh}')
+    # the two ends of the wrap crossing over the forehead
+    out += f'<path d="{trace(smooth(poly(curve((520, 300), (650, 150), (880, 70)) + [(930, 110)] + curve((930, 110), (700, 200), (600, 320))) & body, 4))}" fill="{{c3sh}}" opacity="0.55"/>'
+    out += f'<path d="{trace(smooth(poly(curve((1050, 300), (930, 160), (700, 80)) + [(660, 120)] + curve((660, 120), (880, 200), (980, 320))) & body, 4))}" fill="#FFFFFF" opacity="0.14"/>'
+    out += '<path d="M520,300 Q650,150 880,70 M1050,300 Q930,160 700,80" fill="none" stroke="{c3sh}" stroke-width="10" stroke-linecap="round"/>'
+    return out
 
 
 def durag():

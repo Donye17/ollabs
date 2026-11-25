@@ -31,6 +31,10 @@ def compose(M, c, crop='head', transparent=False, cid='hc'):
             out.append('' if (covers or tall) else p['hairBack'].get(c['hair'], ''))
         elif tok == 'hair':
             out.append(p['hair'].get(front, ''))
+        elif crop == 'head' and tok.split('@')[0] in ('prop', 'pet'):
+            out.append('')  # held items and pets only show in the full-body crop
+        elif tok == 'accessory@2' and covers:
+            out.append('')  # earrings sit under covering headwear
         elif tok == 'pattern':
             pat = p['pattern'].get(g('pattern', 'none'), '')
             top = M['tops'].get(outfit)

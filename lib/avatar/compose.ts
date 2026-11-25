@@ -225,6 +225,9 @@ export function composeAvatar(c: AvatarConfig, opts: { crop?: Crop; transparent?
         if (tok.startsWith('base.')) return DUMMYS.base[tok.slice(5)] ?? '';
         if (tok === 'hairBack') return covers || tall ? '' : parts.hairBack[c.hair] ?? '';
         if (tok === 'hair') return parts.hair[hairFront] ?? '';
+        // Held items and pets only show in the full-body crop; in a profile picture they'd be cut in half.
+        if ((opts.crop ?? 'full') === 'head' && /^(prop|pet)(@|$)/.test(tok)) return '';
+        if (tok === 'accessory@2' && covers) return ''; // earrings sit under covering headwear
         if (tok === 'pattern') {
             const pat = parts.pattern[c.pattern] ?? '';
             const top = DUMMYS.tops[c.outfit];

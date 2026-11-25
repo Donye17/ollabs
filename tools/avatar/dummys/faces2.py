@@ -87,8 +87,8 @@ CHEEK_L, CHEEK_R, CHEEK_Y = 590, 1010, 600
 
 def freckles():
     pts = [(-40, -10), (-10, 8), (20, -14), (44, 12), (-24, 30), (10, 34)]
-    return ''.join(f'<circle cx="{cx + dx}" cy="{CHEEK_Y + dy}" r="12" fill="{{skinsh}}"/>'
-                   for cx in (CHEEK_L, CHEEK_R) for dx, dy in pts)
+    return ''.join(f'<circle cx="{cx + dx * sgn}" cy="{CHEEK_Y + dy}" r="12" fill="#3B1F10" opacity="0.3"/>'
+                   for cx, sgn in ((CHEEK_L, 1), (CHEEK_R - 16, -1)) for dx, dy in pts)
 
 
 DETAILS = {

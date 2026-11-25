@@ -37,7 +37,7 @@ P2['details']=faces2.DETAILS
 add(P2['outfit'],outfits2.OUT,outfits2.ORDER)
 P2['outfit']['jersey']=P2['outfit']['jersey'].replace('>10</text>','>{num}</text>')
 P2['pattern']=outfits2.PATTERNS
-M['tops']=outfits2.top_paths()
+M['tops']={k:v for k,v in outfits2.top_paths().items() if k not in ('jersey','flannel','suit','chef')}  # these have their own design
 try:
     import extras
     P2['accessory']=extras.ACCESSORIES; P2['prop']=extras.PROPS; P2['pet']=extras.PETS
@@ -46,7 +46,9 @@ try:
     M['hatKeepsHair']=extras.KEEPS_HAIR; M['coversHair']=M['coversHair']+extras.COVERS
 except ImportError:
     P2['accessory']={'none':''}; P2['prop']={'none':''}; P2['pet']={'none':''}
-M['layers']=['bg','pet@0','hairBack','base.limbs','outfit','pattern','accessory@0','base.head','details','brows','eyes','mouth','facial','hair','hat','glasses','accessory@1','prop','pet@1']
+# beards sit under the mouth; mustaches over the upper lip
+for k in ('walrus','pencil'): P2['facial'][k]='<!--L-->'+P2['facial'][k]
+M['layers']=['bg','pet@0','hairBack','base.limbs','outfit','pattern','accessory@0','base.head','details','brows','eyes','facial@0','mouth','facial@1','hair','accessory@2','hat','glasses','accessory@1','prop','pet@1']
 M=fix(M)
 s=json.dumps(M,separators=(',',':'))
 open('../../../lib/avatar/dummys.json','w').write(s)

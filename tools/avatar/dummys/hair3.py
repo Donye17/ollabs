@@ -275,9 +275,10 @@ def build2():
     # Ponytail: slicked back, tail hanging behind the head on the far side.
     F['ponytail'] = (paint(short_cap(16))
                      + '<path d="M600,250 Q720,200 860,214 M560,300 Q700,236 900,236" fill="none" stroke="{hairsh}" stroke-width="9" stroke-linecap="round" opacity="0.6"/>')
-    tail = smooth(poly(curve((470, 250), (330, 330), (360, 620)) + curve((360, 620), (380, 780), (470, 860))
-                       + curve((470, 860), (430, 700), (450, 560)) + curve((450, 560), (470, 400), (520, 330))), 10)
-    Bk['ponytail'] = (paint(tail) + '<rect x="440" y="258" width="78" height="44" rx="20" fill="{hairsh}" transform="rotate(-30 479 280)"/>')
+    tail = smooth(poly(curve((520, 170), (330, 200), (330, 470)) + curve((330, 470), (320, 700), (430, 860))
+                       + curve((430, 860), (470, 700), (470, 520)) + curve((470, 520), (480, 340), (560, 230))), 12)
+    Bk['ponytail'] = paint(tail)
+    F['ponytail'] += '<rect x="440" y="176" width="92" height="50" rx="22" fill="{c3}" transform="rotate(-40 486 201)"/>'
 
     # Locs: rope-like strands from the crown to the chest, ringed texture.
     def loc(x0, y0, x1, y1, w):
@@ -312,9 +313,9 @@ def build2():
     F['twists'] = paint(grow(HEAD, 16) & above(SHORT_LINE)) + tw
 
     # Mohawk: a crest of spikes along the top, faded sides.
-    crest = smooth(grow(HEAD, 20) & (X > 650) & (X < 920) & (Y < 260), 6)
-    for x0, h in [(670, 120), (730, 170), (790, 190), (850, 160), (905, 110)]:
-        crest |= poly([(x0 - 44, 200), (x0 + 6, 160 - h), (x0 + 48, 200)])
+    crest = smooth(short_cap(26) & (((X - 785) / 130.0) ** 2 + ((Y - 140) / 190.0) ** 2 < 1), 12)
+    for x0, h in [(680, 110), (734, 160), (790, 180), (846, 150), (898, 100)]:
+        crest |= poly([(x0 - 40, 150), (x0 + 6, 120 - h), (x0 + 44, 150)])
     F['mohawk'] = (f'<path d="{trace(smooth(short_cap(8), 3))}" fill="{{hair}}" opacity="0.35"/>'
                    + paint(smooth(crest, 5)))
 
@@ -331,7 +332,7 @@ def build2():
 
     # Mullet: short on top, long at the back.
     F['mullet'] = paint(top_volume(30, 14) & above(SHORT_LINE))
-    Bk['mullet'] = flat(smooth(poly([(410, 360), (1086, 360), (1100, 760), (1060, 900), (440, 900), (400, 760)]), 30) & ~HEAD)
+    Bk['mullet'] = flat(smooth(poly([(440, 560), (1060, 560), (1080, 760), (1040, 900), (980, 880), (900, 920), (620, 920), (540, 880), (470, 900), (430, 760)]), 24) & ~HEAD)
 
     # Balding: hair only round the sides, shine on top.
     F['balding'] = (paint(short_cap(14) & ((Y > 300) | (X < 500) | (X > 1020)))
@@ -342,8 +343,8 @@ def build2():
     for a in np.linspace(-math.pi - 0.25, 0.25, 30):
         cm |= circle(748 + 330 * math.cos(a), 470 + 340 * math.sin(a), 22) & (Y < 440)
     cm = smooth(cm & grow(HEAD, 40), 3)
-    spk = ''.join(f'<path d="M{x},{y} q12,-14 24,0" fill="none" stroke="{{hairsh}}" stroke-width="7" stroke-linecap="round" opacity="0.7"/>'
-                  for x, y in [(560, 230), (640, 180), (720, 160), (800, 165), (880, 185), (960, 230), (600, 290), (700, 230), (820, 220), (930, 280), (520, 300), (1000, 290)])
+    spk = ''.join(f'<path d="M{x + 10},{y - 6} a10,10 0 1 0 4,12" fill="none" stroke="{{hairsh}}" stroke-width="6" stroke-linecap="round" opacity="0.75"/>'
+                  for x, y in [(560, 220), (640, 175), (720, 150), (800, 155), (880, 175), (960, 215), (690, 215), (820, 205), (500, 270), (1010, 260)])
     F['coily'] = paint(cm) + spk
     return F, Bk
 

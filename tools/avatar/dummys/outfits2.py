@@ -47,7 +47,7 @@ collar_pts_l = poly([(NECK_X - 96, 808), (NECK_X - 6, 846), (NECK_X - 64, 880)])
 collar_pts_r = poly([(NECK_X + 96, 808), (NECK_X + 6, 846), (NECK_X + 64, 880)])
 
 # tank: tee body without the sleeves; upper arms show as skin
-tank_body = TEE & poly([(600, 790), (640, 790), (700, 880), (820, 880), (880, 790), (920, 790), (900, 960), (930, 1100), (590, 1100), (620, 960)])
+tank_body = smooth(TEE & poly([(606, 812), (646, 806), (700, 880), (820, 880), (874, 806), (914, 812), (900, 960), (930, 1100), (590, 1100), (620, 960)]), 8) & TEE
 upper_arms = TEE & ~tank_body & ~poly([(600, 760), (920, 760), (920, 840), (600, 840)])
 
 OUT = {}
@@ -96,7 +96,10 @@ lapel_l = poly([(NECK_X - 70, 790), (NECK_X - 110, 800), (NECK_X - 70, 900), (NE
 lapel_r = poly([(NECK_X + 70, 790), (NECK_X + 110, 800), (NECK_X + 70, 900), (NECK_X, 980)])
 OUT['suit'] = (P(SRC['pants'], '{c1}') + P(SRC['pants_dark'], '{c1sh}') + SHOES + garment(SW & ~shirt_v, SW_D)
                + M(lapel_l | lapel_r, '{c1sh}', r=1) + M(shirt_v, '#F2F4F3') + M(tie, '{c2}', r=1) + M(knot, '{c2sh}', r=1)
-               + buttons(NECK_X, [1010, 1060], '{c1sh}', 11))
+               + buttons(NECK_X, [1010, 1060], '{c1sh}', 11)
+               + f'<path d="M{NECK_X - 118},812 L{NECK_X - 74},900 L{NECK_X - 4},982 M{NECK_X + 118},812 L{NECK_X + 74},900 L{NECK_X + 4},982" '
+               'fill="none" stroke="{c1sh}" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/>'
+               + '<path d="M846,900 L900,896" stroke="#F2F4F3" stroke-width="10" stroke-linecap="round"/>')
 TOPS['suit'] = SW & ~shirt_v
 
 # Beach: open-collar short-sleeve shirt with flower print, board shorts
